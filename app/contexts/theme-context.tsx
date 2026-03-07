@@ -38,7 +38,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("app-theme", newMode);
   };
 
-  if (!mounted) return <>{children}</>;
+  // ✨ [Provide context value - always available even during SSR]
+  const value: ThemeContextType = { mode, toggleTheme };
 
   // ✨ [Ant Design Theme Configuration - Beautiful Dark Mode Support]
   const themeConfig: ThemeConfig = {
@@ -183,7 +184,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       <ConfigProvider theme={themeConfig}>{children}</ConfigProvider>
     </ThemeContext.Provider>
   );

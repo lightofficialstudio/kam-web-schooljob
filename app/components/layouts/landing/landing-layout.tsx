@@ -1,12 +1,13 @@
 "use client";
 
+import { ThemeProvider, useTheme } from "@/app/contexts/theme-context";
 import type { ThemeConfig } from "antd";
 import { App, ConfigProvider, Layout, theme } from "antd";
 import thTH from "antd/locale/th_TH";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import Footer from "./footer";
 import Navbar from "./navbar";
 
@@ -48,29 +49,6 @@ const SYSTEM_PALETTE = {
     border: "#1E293B",
     borderSecondary: "#1E293B",
   },
-};
-
-const useThemeDetector = (): boolean => {
-  const [isDark, setIsDark] = useState<boolean>(false);
-
-  useEffect(() => {
-    const checkDark = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    };
-    checkDark();
-
-    const observer = new MutationObserver(checkDark);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  return isDark;
 };
 
 const getModernTheme = (isDark: boolean): ThemeConfig => {
@@ -133,24 +111,15 @@ const getModernTheme = (isDark: boolean): ThemeConfig => {
   };
 };
 
-export default function LandingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const isDark = useThemeDetector();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+/**
+ * Inner component that uses theme context
+ * Must be wrapped within ThemeProvider
+ */
+function LandingLayoutInner({ children }: { children: React.ReactNode }) {
+  const { mode } = useTheme();
+  const isDark = mode === "dark";
   const themeConfig = useMemo(() => getModernTheme(isDark), [isDark]);
   const palette = isDark ? SYSTEM_PALETTE.dark : SYSTEM_PALETTE.light;
-
-  if (!isMounted) {
-    return <div style={{ visibility: "hidden" }}>{children}</div>;
-  }
 
   return (
     <ConfigProvider
@@ -222,7 +191,7 @@ export default function LandingLayout({
               flexDirection: "column",
             }}
           >
-            <Navbar />
+            <Navbar isDark={isDark} />
             <Layout.Content
               style={{
                 flex: "1 0 auto",
@@ -238,5 +207,17 @@ export default function LandingLayout({
         </div>
       </App>
     </ConfigProvider>
+  );
+}
+
+export default function LandingLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ThemeProvider>
+      <LandingLayoutInner>{children}</LandingLayoutInner>
+    </ThemeProvider>
   );
 }

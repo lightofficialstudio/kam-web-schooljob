@@ -1,20 +1,28 @@
 "use client";
 
+import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   LogoutOutlined,
+  MoonOutlined,
   SolutionOutlined,
+  SunOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Space, Typography } from "antd";
+import { Button, Dropdown, Space, Tooltip, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const { Text } = Typography;
 
-export default function Navbar() {
+interface NavbarProps {
+  isDark: boolean;
+}
+
+export default function Navbar({ isDark }: NavbarProps) {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { toggleTheme } = useTheme();
 
   const userMenuItems = [
     {
@@ -42,13 +50,16 @@ export default function Navbar() {
         top: 0,
         width: "100%",
         zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.85)",
+        background: isDark
+          ? "rgba(15, 23, 42, 0.85)"
+          : "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #F1F5F9",
+        borderBottom: isDark ? "1px solid #1E293B" : "1px solid #F1F5F9",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "12px 60px",
+        color: isDark ? "#F8FAFC" : "#1E293B",
       }}
     >
       <Link
@@ -87,7 +98,7 @@ export default function Navbar() {
           style={{
             fontSize: "18px",
             letterSpacing: "-0.5px",
-            color: "#1E293B",
+            color: isDark ? "#F8FAFC" : "#1E293B",
           }}
         >
           KAM <span style={{ color: "#0066FF" }}>SCHOOLJOB</span>
@@ -97,22 +108,46 @@ export default function Navbar() {
       <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
         <Space size={32}>
           <Link href="/jobs" style={{ textDecoration: "none" }}>
-            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            <Text
+              strong
+              style={{
+                cursor: "pointer",
+                color: isDark ? "#CBD5E1" : "#475569",
+              }}
+            >
               ค้นหางาน
             </Text>
           </Link>
           <Link href="/resume" style={{ textDecoration: "none" }}>
-            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            <Text
+              strong
+              style={{
+                cursor: "pointer",
+                color: isDark ? "#CBD5E1" : "#475569",
+              }}
+            >
               ฝากประวัติ
             </Text>
           </Link>
           <Link href="/employer" style={{ textDecoration: "none" }}>
-            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            <Text
+              strong
+              style={{
+                cursor: "pointer",
+                color: isDark ? "#CBD5E1" : "#475569",
+              }}
+            >
               สำหรับสถานศึกษา
             </Text>
           </Link>
           <Link href="/blog" style={{ textDecoration: "none" }}>
-            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            <Text
+              strong
+              style={{
+                cursor: "pointer",
+                color: isDark ? "#CBD5E1" : "#475569",
+              }}
+            >
               บทความ
             </Text>
           </Link>
@@ -120,6 +155,21 @@ export default function Navbar() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        {/* ✨ [Dark Mode Toggle] */}
+        <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
+          <Button
+            type="text"
+            shape="circle"
+            icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+            onClick={toggleTheme}
+            style={{
+              fontWeight: 600,
+              fontSize: "16px",
+              color: isDark ? "#FDB022" : "#64748B",
+            }}
+          />
+        </Tooltip>
+
         {user ? (
           <>
             {/* ✨ [แสดง user info เมื่อ login แล้ว] */}
