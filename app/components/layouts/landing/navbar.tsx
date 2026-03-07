@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Typography } from "antd";
+import { SolutionOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Space, Typography } from "antd";
 
 const { Text } = Typography;
 
@@ -12,22 +13,22 @@ export default function Navbar() {
         top: 0,
         width: "100%",
         zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.8)",
-        backdropFilter: "blur(10px)",
+        background: "rgba(255, 255, 255, 0.85)",
+        backdropFilter: "blur(12px)",
         borderBottom: "1px solid #F1F5F9",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "16px 40px",
+        padding: "12px 60px",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <div
           style={{
             background: "#0066FF",
-            width: "40px",
-            height: "40px",
-            borderRadius: "12px",
+            width: "36px",
+            height: "36px",
+            borderRadius: "10px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -37,34 +38,58 @@ export default function Navbar() {
             style={{
               color: "white",
               fontWeight: "bold",
-              fontSize: "20px",
+              fontSize: "18px",
               lineHeight: 1,
             }}
           >
             K
           </span>
         </div>
-        <Text strong style={{ fontSize: "20px", letterSpacing: "-0.5px" }}>
-          KAM SCHOOLJOB
+        <Text
+          strong
+          style={{
+            fontSize: "18px",
+            letterSpacing: "-0.5px",
+            color: "#1E293B",
+          }}
+        >
+          KAM <span style={{ color: "#0066FF" }}>SCHOOLJOB</span>
         </Text>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-        <Text strong style={{ cursor: "pointer" }}>
-          คอร์สทั้งหมด
-        </Text>
-        <Text strong style={{ cursor: "pointer" }}>
-          ติวเตอร์
-        </Text>
-        <Text strong style={{ cursor: "pointer" }}>
-          โปรโมชัน
-        </Text>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
+        <Space size={32}>
+          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            ค้นหางาน
+          </Text>
+          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            ฝากประวัติ
+          </Text>
+          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            สำหรับสถานศึกษา
+          </Text>
+          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+            บทความ
+          </Text>
+        </Space>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <Button type="text" icon={<UserOutlined />} style={{ fontWeight: 600 }}>
+          เข้าสู่ระบบ
+        </Button>
         <Button
           type="primary"
           shape="round"
-          size="large"
-          style={{ height: "44px", padding: "0 24px" }}
+          icon={<SolutionOutlined />}
+          style={{
+            height: "40px",
+            padding: "0 20px",
+            fontWeight: 600,
+            boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
+          }}
         >
-          เข้าสู่ระบบ
+          สมัครงานครู
         </Button>
       </div>
     </div>
