@@ -1,6 +1,6 @@
+import { authService } from "@/app/api/v1/authenticate/service/authenticate-service";
+import { signupSchema } from "@/app/api/v1/authenticate/validation/authenticate-schema";
 import { NextRequest, NextResponse } from "next/server";
-import { authService } from "../../service/authenticate-service";
-import { signupSchema } from "../../validation/authenticate-schema";
 
 // ✨ [API สำหรับการสมัครสมาชิก (Signup)]
 export async function POST(req: NextRequest) {
@@ -28,13 +28,16 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     // ✨ [จัดการกรณี validation error หรือ supabase error]
+    const errorMessage =
+      err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการสมัครสมาชิก";
+
     return NextResponse.json(
       {
         status_code: 400,
-        message_th: err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก",
-        message_en: err.message || "An error occurred during registration",
+        message_th: errorMessage,
+        message_en: errorMessage,
         data: null,
       },
       { status: 400 },

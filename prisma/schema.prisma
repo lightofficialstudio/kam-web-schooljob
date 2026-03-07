@@ -31,20 +31,6 @@ model Profile {
   email     String   @unique
   fullName  String?  @map("full_name")
   role      UserRole @default(TEACHER)
-  avatarUrl String?  @map("avatar_url")
-
-  // Teacher specific
-  headline   String?
-  bio        String?
-  experience Int? // Years of experience
-  skills     String[] // AntD Select tags
-
-  // School specific
-  schoolName String? @map("school_name")
-  location   String?
-  website    String?
-
-  jobs      Job[]    @relation("PostedBy")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -52,32 +38,27 @@ model Profile {
 }
 
 model Job {
-  id          String    @id @default(uuid())
+  id          String        @id @default(uuid())
+  schoolId    String        @map("school_id")
   title       String
   description String
   location    String
-  salary      String?
-  type        String // e.g., Full-time, Part-time
-  subjects    String[] // Relevant subjects
-  status      JobStatus @default(OPEN)
-
-  authorId String  @map("author_id")
-  author   Profile @relation("PostedBy", fields: [authorId], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  salaryRange String?       @map("salary_range")
+  status      JobStatus     @default(OPEN)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  Application Application[]
 
   @@map("jobs")
 }
 
 model Application {
-  id          String @id @default(uuid())
-  jobId       String @map("job_id")
-  applicantId String @map("applicant_id")
-  status      String @default("PENDING") // PENDING, REVIEWS, REJECTED, ACCEPTED
-
+  id        String   @id @default(uuid())
+  jobId     String   @map("job_id")
+  teacherId String   @map("teacher_id")
+  status    String   @default("PENDING")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  job       Job      @relation(fields: [jobId], references: [id])
 
   @@map("applications")
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { supabase } from "@/app/lib/supabase";
 import {
   BankOutlined,
   CheckCircleFilled,
@@ -40,24 +39,27 @@ export default function SignupForm() {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      const { email, password, role } = values;
+      const payload = {
+        email: values.email,
+        password: values.password,
+        full_name: values.fullName || "",
+        role: values.role.toUpperCase(),
+      };
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: role,
-            full_name: values.fullName || "",
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const response = await fetch("/api/v1/authenticate/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      message.success("สมัครสมาชิกสำเร็จ! กรุณาเช็คอีเมลเพื่อยืนยันตัวตน");
-      router.push("/");
+      if (!response.ok) {
+        throw new Error(result.message_th || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      }
+
+      message.success(result.message_th);
+      router.push("/signin");
     } catch (err: any) {
       message.error(err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
     } finally {
@@ -185,7 +187,7 @@ export default function SignupForm() {
               <Text type="secondary" style={{ fontSize: 16 }}>
                 มีบัญชีอยู่แล้ว?{" "}
                 <Link
-                  href="/login"
+                  href="/pages/signin"
                   style={{ color: token.colorPrimary, fontWeight: 600 }}
                 >
                   เข้าสู่ระบบ
@@ -201,9 +203,26 @@ export default function SignupForm() {
               size="large"
             >
               <Form.Item
+                name="fullName"
+                label={<Text strong>ชื่อ-นามสกุล</Text>}
+                rules={[{ required: true, message: "กรุณาระบุชื่อ-นามสกุล" }]}
+              >
+                <Input
+                  prefix={
+                    <UserOutlined
+                      style={{ color: token.colorTextDescription }}
+                    />
+                  }
+                  placeholder="ชื่อ-นามสกุล"
+                  variant="filled"
+                />
+              </Form.Item>
+
+              <Form.Item
                 name="role"
+                label={<Text strong>บทบาทผู้ใช้งาน</Text>}
                 initialValue="teacher"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}
               >
                 <Radio.Group style={{ width: "100%" }}>
                   <Row gutter={16}>

@@ -54,7 +54,19 @@ export class AuthenticateService {
 
     if (error) throw error;
 
-    return data;
+    // ✨ [ดึงข้อมูลโปรไฟล์จาก Prisma เพื่อให้ได้ข้อมูลที่สมบูรณ์]
+    let profile = null;
+    if (data.user) {
+      profile = await prisma.profile.findUnique({
+        where: { userId: data.user.id },
+      });
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+      profile: profile,
+    };
   }
 }
 

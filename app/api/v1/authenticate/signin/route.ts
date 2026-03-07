@@ -1,6 +1,6 @@
+import { authService } from "@/app/api/v1/authenticate/service/authenticate-service";
+import { signinSchema } from "@/app/api/v1/authenticate/validation/authenticate-schema";
 import { NextRequest, NextResponse } from "next/server";
-import { authService } from "../../service/authenticate-service";
-import { signinSchema } from "../../validation/authenticate-schema";
 
 // ✨ [API สำหรับการเข้าสู่ระบบ (Signin)]
 export async function POST(req: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const validatedData = signinSchema.parse(body);
 
     // 2. ✨ [เรียกใช้ Service เพื่อเข้าสู่ระบบ]
-    const data = await authService.signin(validatedData);
+    const result = await authService.signin(validatedData);
 
     return NextResponse.json(
       {
@@ -19,20 +19,22 @@ export async function POST(req: NextRequest) {
         message_th: "เข้าสู่ระบบสำเร็จ",
         message_en: "Login successful",
         data: {
-          user_id: data.user?.id,
-          email: data.user?.email,
-          role: data.user?.user_metadata?.role,
-          full_name: data.user?.user_metadata?.full_name,
+          user_id: result.user?.id,
+          email: result.user?.email,
+          role: result.profile?.role || "TEACHER",
+          full_name: result.profile?.fullName || "",
         },
       },
       { status: 200 },
     );
   } catch (err: any) {
     // ✨ [จัดการกรณี validation error หรือ supabase auth error]
+    const message = err.message || "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+
     return NextResponse.json(
       {
         status_code: 401,
-        message_th: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+        message_th: message,
         message_en: "Invalid email or password",
         data: null,
       },
