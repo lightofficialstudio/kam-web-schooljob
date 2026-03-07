@@ -541,7 +541,8 @@ export default function UserManagementPage() {
                 {users.length > 0 && (
                   <>
                     <Text>
-                      ผู้ใช้ล่าสุด: {formatDateThai(users[users.length - 1].createdAt)}
+                      ผู้ใช้ล่าสุด:{" "}
+                      {formatDateThai(users[users.length - 1].createdAt)}
                     </Text>
                     <Text>อีเมล: {users[users.length - 1].email}</Text>
                   </>
@@ -570,8 +571,7 @@ export default function UserManagementPage() {
                   ได้ชื่อเต็ม: {users.filter((u) => u.fullName).length}
                 </Text>
                 <Text>
-                  ยังไม่มีชื่อเต็ม:{" "}
-                  {users.filter((u) => !u.fullName).length}
+                  ยังไม่มีชื่อเต็ม: {users.filter((u) => !u.fullName).length}
                 </Text>
               </Space>
             </Col>
