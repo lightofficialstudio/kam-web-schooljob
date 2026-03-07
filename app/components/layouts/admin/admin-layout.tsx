@@ -30,7 +30,21 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         <Layout>
           <AdminSidebar collapsed={false} onCollapse={() => {}} />
           <Layout>
-            <AdminNavbar onMenuClick={() => {}} title={title} />
+            <Layout.Header
+              style={{
+                background:
+                  mode === "dark"
+                    ? "linear-gradient(90deg, #001529 0%, #003d82 100%)"
+                    : "linear-gradient(90deg, #fafafa 0%, #f0f0f0 100%)",
+                boxShadow:
+                  mode === "dark"
+                    ? "0 2px 8px rgba(0, 0, 0, 0.15)"
+                    : "0 2px 8px rgba(0, 0, 0, 0.08)",
+                padding: 0,
+              }}
+            >
+              <AdminNavbar onMenuClick={() => {}} title={title} mode={mode} />
+            </Layout.Header>
             <Layout.Content style={{ padding: "24px", overflow: "auto" }}>
               <AdminBreadcrumb />
               {children}
@@ -59,11 +73,26 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
         {/* ✨ [Main Content Area] */}
         <Layout>
-          {/* ✨ [Navbar] */}
-          <AdminNavbar
-            onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            title={title}
-          />
+          {/* ✨ [Navbar with Theme Styling] */}
+          <Layout.Header
+            style={{
+              background:
+                mode === "dark"
+                  ? "linear-gradient(90deg, #001529 0%, #003d82 100%)"
+                  : "linear-gradient(90deg, #fafafa 0%, #f0f0f0 100%)",
+              boxShadow:
+                mode === "dark"
+                  ? "0 2px 8px rgba(0, 0, 0, 0.15)"
+                  : "0 2px 8px rgba(0, 0, 0, 0.08)",
+              padding: 0,
+            }}
+          >
+            <AdminNavbar
+              onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={title}
+              mode={mode}
+            />
+          </Layout.Header>
 
           {/* ✨ [Content] */}
           <Layout.Content
