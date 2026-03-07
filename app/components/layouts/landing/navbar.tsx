@@ -2,6 +2,7 @@
 
 import { SolutionOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Space, Typography } from "antd";
+import Link from "next/link";
 
 const { Text } = Typography;
 
@@ -22,7 +23,15 @@ export default function Navbar() {
         padding: "12px 60px",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <Link
+        href="/"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          textDecoration: "none",
+        }}
+      >
         <div
           style={{
             background: "#0066FF",
@@ -55,42 +64,58 @@ export default function Navbar() {
         >
           KAM <span style={{ color: "#0066FF" }}>SCHOOLJOB</span>
         </Text>
-      </div>
+      </Link>
 
       <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
         <Space size={32}>
-          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
-            ค้นหางาน
-          </Text>
-          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
-            ฝากประวัติ
-          </Text>
-          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
-            สำหรับสถานศึกษา
-          </Text>
-          <Text strong style={{ cursor: "pointer", color: "#475569" }}>
-            บทความ
-          </Text>
+          <Link href="/jobs" style={{ textDecoration: "none" }}>
+            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+              ค้นหางาน
+            </Text>
+          </Link>
+          <Link href="/resume" style={{ textDecoration: "none" }}>
+            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+              ฝากประวัติ
+            </Text>
+          </Link>
+          <Link href="/employer" style={{ textDecoration: "none" }}>
+            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+              สำหรับสถานศึกษา
+            </Text>
+          </Link>
+          <Link href="/blog" style={{ textDecoration: "none" }}>
+            <Text strong style={{ cursor: "pointer", color: "#475569" }}>
+              บทความ
+            </Text>
+          </Link>
         </Space>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Button type="text" icon={<UserOutlined />} style={{ fontWeight: 600 }}>
-          เข้าสู่ระบบ
-        </Button>
-        <Button
-          type="primary"
-          shape="round"
-          icon={<SolutionOutlined />}
-          style={{
-            height: "40px",
-            padding: "0 20px",
-            fontWeight: 600,
-            boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
-          }}
-        >
-          สมัครงานครู
-        </Button>
+        <Link href="/login">
+          <Button
+            type="text"
+            icon={<UserOutlined />}
+            style={{ fontWeight: 600 }}
+          >
+            เข้าสู่ระบบ
+          </Button>
+        </Link>
+        <Link href="/signup">
+          <Button
+            type="primary"
+            shape="round"
+            icon={<SolutionOutlined />}
+            style={{
+              height: "40px",
+              padding: "0 20px",
+              fontWeight: 600,
+              boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
+            }}
+          >
+            สมัครงานครู
+          </Button>
+        </Link>
       </div>
     </div>
   );
