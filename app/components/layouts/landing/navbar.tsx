@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   Dropdown,
+  Row,
   Space,
   Tooltip,
   Typography,
@@ -23,14 +24,10 @@ import { useRouter } from "next/navigation";
 
 const { Text } = Typography;
 
-interface NavbarProps {
-  isDark?: boolean;
-}
-
-export default function Navbar({ isDark: _ }: NavbarProps = {}) {
+export default function Navbar() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { toggleTheme, isDark } = useTheme();
+  const { toggleTheme, mode } = useTheme();
 
   const userMenuItems = [
     {
@@ -52,17 +49,15 @@ export default function Navbar({ isDark: _ }: NavbarProps = {}) {
     },
   ];
   return (
-    <div
+    <Row
+      justify="space-between"
+      align="middle"
       style={{
         position: "fixed",
         top: 0,
         width: "100%",
         zIndex: 1000,
         backdropFilter: "blur(12px)",
-        borderBottom: isDark ? "1px solid #404854" : "1px solid #F1F5F9",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
         padding: "12px 60px",
       }}
     >
@@ -127,11 +122,11 @@ export default function Navbar({ isDark: _ }: NavbarProps = {}) {
 
       <Space size={12}>
         {/* ✨ [Dark Mode Toggle] */}
-        <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
+        <Tooltip title={mode === "dark" ? "Light Mode" : "Dark Mode"}>
           <Button
             type="text"
             shape="circle"
-            icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+            icon={mode === "dark" ? <SunOutlined /> : <MoonOutlined />}
             onClick={toggleTheme}
             style={{
               fontWeight: 600,
@@ -194,6 +189,6 @@ export default function Navbar({ isDark: _ }: NavbarProps = {}) {
           </>
         )}
       </Space>
-    </div>
+    </Row>
   );
 }
