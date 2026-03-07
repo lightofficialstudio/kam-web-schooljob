@@ -9,20 +9,28 @@ import {
   SunOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Space, Tooltip, Typography } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Dropdown,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const { Text } = Typography;
 
 interface NavbarProps {
-  isDark: boolean;
+  isDark?: boolean;
 }
 
-export default function Navbar({ isDark }: NavbarProps) {
+export default function Navbar({ isDark: _ }: NavbarProps = {}) {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { toggleTheme } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   const userMenuItems = [
     {
@@ -50,111 +58,74 @@ export default function Navbar({ isDark }: NavbarProps) {
         top: 0,
         width: "100%",
         zIndex: 1000,
-        background: isDark
-          ? "rgba(26, 32, 44, 0.9)"
-          : "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(12px)",
         borderBottom: isDark ? "1px solid #404854" : "1px solid #F1F5F9",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "12px 60px",
-        color: isDark ? "#E2E8F0" : "#1E293B",
       }}
     >
       <Link
         href="/"
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
           textDecoration: "none",
         }}
       >
-        <div
-          style={{
-            background: "#0066FF",
-            width: "36px",
-            height: "36px",
-            borderRadius: "10px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span
+        <Space size="small">
+          <Card
+            size="small"
+            variant="borderless"
             style={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "18px",
-              lineHeight: 1,
+              width: "36px",
+              height: "36px",
+              padding: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "10px",
             }}
           >
-            K
-          </span>
-        </div>
-        <Text
-          strong
-          style={{
-            fontSize: "18px",
-            letterSpacing: "-0.5px",
-            color: isDark ? "#E2E8F0" : "#1E293B",
-          }}
-        >
-          KAM <span style={{ color: "#0066FF" }}>SCHOOLJOB</span>
-        </Text>
+            <Text strong style={{ fontSize: "18px", lineHeight: 1 }}>
+              K
+            </Text>
+          </Card>
+          <Text
+            strong
+            style={{
+              fontSize: "18px",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            KAM <span>SCHOOLJOB</span>
+          </Text>
+        </Space>
       </Link>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "40px" }}>
-        <Space size={32}>
-          <Link href="/jobs" style={{ textDecoration: "none" }}>
-            <Text
-              strong
-              style={{
-                cursor: "pointer",
-                color: isDark ? "#A0AEC0" : "#475569",
-              }}
-            >
-              ค้นหางาน
-            </Text>
-          </Link>
-          <Link href="/resume" style={{ textDecoration: "none" }}>
-            <Text
-              strong
-              style={{
-                cursor: "pointer",
-                color: isDark ? "#A0AEC0" : "#475569",
-              }}
-            >
-              ฝากประวัติ
-            </Text>
-          </Link>
-          <Link href="/employer" style={{ textDecoration: "none" }}>
-            <Text
-              strong
-              style={{
-                cursor: "pointer",
-                color: isDark ? "#A0AEC0" : "#475569",
-              }}
-            >
-              สำหรับสถานศึกษา
-            </Text>
-          </Link>
-          <Link href="/blog" style={{ textDecoration: "none" }}>
-            <Text
-              strong
-              style={{
-                cursor: "pointer",
-                color: isDark ? "#A0AEC0" : "#475569",
-              }}
-            >
-              บทความ
-            </Text>
-          </Link>
-        </Space>
-      </div>
+      <Space size={32}>
+        <Link href="/jobs" style={{ textDecoration: "none" }}>
+          <Text strong style={{ cursor: "pointer" }}>
+            ค้นหางาน
+          </Text>
+        </Link>
+        <Link href="/resume" style={{ textDecoration: "none" }}>
+          <Text strong style={{ cursor: "pointer" }}>
+            ฝากประวัติ
+          </Text>
+        </Link>
+        <Link href="/employer" style={{ textDecoration: "none" }}>
+          <Text strong style={{ cursor: "pointer" }}>
+            สำหรับสถานศึกษา
+          </Text>
+        </Link>
+        <Link href="/blog" style={{ textDecoration: "none" }}>
+          <Text strong style={{ cursor: "pointer" }}>
+            บทความ
+          </Text>
+        </Link>
+      </Space>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <Space size={12}>
         {/* ✨ [Dark Mode Toggle] */}
         <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
           <Button
@@ -165,7 +136,6 @@ export default function Navbar({ isDark }: NavbarProps) {
             style={{
               fontWeight: 600,
               fontSize: "16px",
-              color: isDark ? "#FDB022" : "#64748B",
             }}
           />
         </Tooltip>
@@ -173,38 +143,17 @@ export default function Navbar({ isDark }: NavbarProps) {
         {user ? (
           <>
             {/* ✨ [แสดง user info เมื่อ login แล้ว] */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                paddingRight: "16px",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  background: "#0066FF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              >
-                {user.full_name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <Text strong style={{ display: "block", fontSize: "14px" }}>
+            <Space size={12} style={{ paddingRight: "16px" }}>
+              <Avatar>{user.full_name.charAt(0).toUpperCase()}</Avatar>
+              <Space direction="vertical" size={0}>
+                <Text strong style={{ fontSize: "14px" }}>
                   {user.full_name}
                 </Text>
                 <Text type="secondary" style={{ fontSize: "12px" }}>
                   {user.role === "TEACHER" ? "ครูผู้สอน" : "สถานศึกษา"}
                 </Text>
-              </div>
-            </div>
+              </Space>
+            </Space>
 
             {/* ✨ [Dropdown menu สำหรับ logout] */}
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
@@ -237,7 +186,6 @@ export default function Navbar({ isDark }: NavbarProps) {
                   height: "40px",
                   padding: "0 20px",
                   fontWeight: 600,
-                  boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
                 }}
               >
                 สมัครงานครู
@@ -245,7 +193,7 @@ export default function Navbar({ isDark }: NavbarProps) {
             </Link>
           </>
         )}
-      </div>
+      </Space>
     </div>
   );
 }
