@@ -26,8 +26,7 @@ export function LayoutSelector({ children }: LayoutSelectorProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   // ✨ [ตรวจสอบ URL path - ถ้าเป็น admin route ให้ใช้ AdminLayout]
-  const isAdminRoute =
-    pathname.startsWith("/admin") || pathname.startsWith("/pages/admin");
+  const isAdminRoute = pathname.startsWith("/pages/admin");
 
   console.log("🏗️  [LAYOUT SELECTOR]", {
     userRole: user?.role || "not-logged-in",
@@ -50,10 +49,7 @@ export function LayoutSelector({ children }: LayoutSelectorProps) {
       console.log(
         "🔐 [LAYOUT SELECTOR] Not logged in, redirecting to signin...",
       );
-      const returnUrl = pathname.startsWith("/pages")
-        ? pathname.replace("/pages", "")
-        : pathname;
-      router.push(`/pages/signin?redirect=${encodeURIComponent(returnUrl)}`);
+      router.push(`/pages/signin?redirect=${encodeURIComponent(pathname)}`);
     }
   }, [isMounted, isAdminRoute, user, pathname, router]);
 

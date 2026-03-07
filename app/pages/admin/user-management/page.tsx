@@ -1,7 +1,7 @@
 "use client";
 
-import { AdminGuard } from "@/app/components/layouts/admin/admin-guard";
 import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
+import { AdminGuard } from "@/app/components/layouts/admin/admin-guard";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -136,22 +136,11 @@ export default function UserManagementPage() {
       },
     },
     {
-      title: "Joined",
+      title: "Created",
       dataIndex: "createdAt",
       key: "createdAt",
       width: 150,
-      render: (date: string) => (
-        <span className="text-slate-600">
-          {new Date(date).toLocaleDateString("th-TH", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
-      ),
-      sorter: (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      defaultSortOrder: "descend",
+      render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
       title: "Actions",
@@ -161,11 +150,12 @@ export default function UserManagementPage() {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Edit">
-            <Link href={`/admin/users/${record.id}/edit`}>
+            <Link href={`/pages/admin/users/${record.id}/edit`}>
               <Button
                 type="text"
                 icon={<EditOutlined />}
-                className="text-blue-600 hover:text-blue-700"
+                size="small"
+                className="text-blue-600"
               />
             </Link>
           </Tooltip>
@@ -173,7 +163,8 @@ export default function UserManagementPage() {
             <Button
               type="text"
               icon={<DeleteOutlined />}
-              className="text-red-600 hover:text-red-700"
+              size="small"
+              danger
               onClick={() => handleDelete(record.id, record.email)}
             />
           </Tooltip>
@@ -182,7 +173,6 @@ export default function UserManagementPage() {
     },
   ];
 
-  // ✨ [Render]
   return (
     <AdminGuard>
       <AdminLayout title="User Management">
@@ -220,7 +210,7 @@ export default function UserManagementPage() {
               >
                 Refresh
               </Button>
-              <Link href="/admin/users/new">
+              <Link href="/pages/admin/users/new">
                 <Button type="primary">Add New User</Button>
               </Link>
             </Space>
@@ -245,9 +235,7 @@ export default function UserManagementPage() {
               </div>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
-              <div className="text-slate-600 text-sm font-semibold">
-                Schools
-              </div>
+              <div className="text-slate-600 text-sm font-semibold">Schools</div>
               <div className="text-3xl font-bold text-blue-600 mt-2">
                 {users.filter((u) => u.role === "SCHOOL").length}
               </div>

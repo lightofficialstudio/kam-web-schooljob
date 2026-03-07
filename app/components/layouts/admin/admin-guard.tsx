@@ -4,7 +4,7 @@ import { useAuthStore } from "@/app/stores/auth-store";
 import { AlertOutlined } from "@ant-design/icons";
 import { Alert, Button, Space } from "antd";
 import { useRouter } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 interface AdminGuardProps {
   children: ReactNode;
@@ -17,6 +17,21 @@ interface AdminGuardProps {
 export function AdminGuard({ children }: AdminGuardProps) {
   const { user } = useAuthStore();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // ✨ [รอให้ store hydrate จาก localStorage เสร็จ - ใช้ useEffect โดยไม่ suppress warning]
+  useEffect(() => {
+    // ✨ debounce mount check เพื่อให้ store hydrate ก่อน
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // ✨ [ถ้ากำลังรอ hydrate ให้ render children ปกติ]
+  if (!isMounted) {
+    return <>{children}</>;
+  }
 
   // ✨ [ถ้า user ไม่ใช่ admin ให้แสดง warning]
   if (!user || user.role !== "ADMIN") {
