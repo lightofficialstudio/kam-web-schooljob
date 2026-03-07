@@ -32,14 +32,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           <Layout>
             <Layout.Header
               style={{
-                background:
-                  mode === "dark"
-                    ? "linear-gradient(90deg, #001529 0%, #003d82 100%)"
-                    : "linear-gradient(90deg, #fafafa 0%, #f0f0f0 100%)",
-                boxShadow:
-                  mode === "dark"
-                    ? "0 2px 8px rgba(0, 0, 0, 0.15)"
-                    : "0 2px 8px rgba(0, 0, 0, 0.08)",
                 padding: 0,
               }}
             >
@@ -61,7 +53,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         minHeight: "100vh",
         fontFamily:
           "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        background: mode === "dark" ? "#141414" : "#f5f5f5",
       }}
     >
       <Layout>
@@ -76,10 +67,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           {/* ✨ [Navbar with Theme Styling] */}
           <Layout.Header
             style={{
-              background:
-                mode === "dark"
-                  ? "linear-gradient(90deg, #001529 0%, #003d82 100%)"
-                  : "linear-gradient(90deg, #fafafa 0%, #f0f0f0 100%)",
               boxShadow:
                 mode === "dark"
                   ? "0 2px 8px rgba(0, 0, 0, 0.15)"
@@ -99,7 +86,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
             style={{
               padding: "24px",
               overflow: "auto",
-              background: mode === "dark" ? "#141414" : "#f5f5f5",
             }}
           >
             {/* ✨ [Breadcrumb Navigation] */}

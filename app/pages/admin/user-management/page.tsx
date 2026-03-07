@@ -247,7 +247,6 @@ export default function UserManagementPage() {
                 style={{
                   fontSize: "28px",
                   fontWeight: 700,
-                  color: "#001529",
                 }}
               >
                 {users.length}
