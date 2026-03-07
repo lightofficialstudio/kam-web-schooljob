@@ -1,6 +1,5 @@
 "use client";
 
-import LandingLayout from "@/app/components/layouts/landing/landing-layout";
 import {
   AppstoreOutlined,
   BankOutlined,
@@ -10,6 +9,7 @@ import {
   MessageOutlined,
   RocketOutlined,
   SearchOutlined,
+
   SolutionOutlined,
   TrophyOutlined,
   UsergroupAddOutlined,
@@ -32,7 +32,7 @@ const { Option } = Select;
 
 export default function LandingPage() {
   return (
-    <LandingLayout>
+    <>
       {/* 🚀 Hero Section - The "One-Stop" Job Portal for Education */}
       <div
         style={{
@@ -458,6 +458,6 @@ export default function LandingPage() {
           />
         </Badge>
       </div>
-    </LandingLayout>
+    </>
   );
 }
