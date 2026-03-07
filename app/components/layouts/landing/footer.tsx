@@ -74,7 +74,7 @@ export default function Footer() {
             <Title level={5} style={{ marginBottom: "24px" }}>
               สำหรับคนหางาน
             </Title>
-            <Space direction="vertical" size={12}>
+            <Space orientation="vertical" size={12}>
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 ค้นหาตำแหน่งงาน
               </Text>
@@ -94,7 +94,7 @@ export default function Footer() {
             <Title level={5} style={{ marginBottom: "24px" }}>
               สำหรับสถานศึกษา
             </Title>
-            <Space direction="vertical" size={12}>
+            <Space orientation="vertical" size={12}>
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 ประกาศรับสมัครงาน
               </Text>
@@ -114,7 +114,7 @@ export default function Footer() {
             <Title level={5} style={{ marginBottom: "24px" }}>
               ติดต่อเรา
             </Title>
-            <Space direction="vertical" size={16}>
+            <Space orientation="vertical" size={16}>
               <Space>
                 <PhoneOutlined style={{ color: "#0066FF" }} />
                 <Text type="secondary">02-XXX-XXXX (ฝ่ายบริการลูกค้า)</Text>

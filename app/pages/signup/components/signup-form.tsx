@@ -57,7 +57,7 @@ export default function SignupForm() {
       if (error) throw error;
 
       message.success("สมัครสมาชิกสำเร็จ! กรุณาเช็คอีเมลเพื่อยืนยันตัวตน");
-      router.push("/signup/success");
+      router.push("/");
     } catch (err: any) {
       message.error(err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
     } finally {
@@ -97,7 +97,7 @@ export default function SignupForm() {
             style={{ background: token.colorPrimary, padding: 60 }}
           >
             <Space
-              direction="vertical"
+              orientation="vertical"
               size={48}
               style={{ height: "100%", justifyContent: "center" }}
             >
@@ -144,7 +144,7 @@ export default function SignupForm() {
                 </Paragraph>
               </div>
 
-              <Space direction="vertical" size={24}>
+              <Space orientation="vertical" size={24}>
                 {[
                   {
                     icon: <CheckCircleFilled />,
@@ -224,7 +224,7 @@ export default function SignupForm() {
                           lineHeight: 1.5,
                         }}
                       >
-                        <Space direction="vertical" size={4}>
+                        <Space orientation="vertical" size={4}>
                           <UserOutlined style={{ fontSize: 24 }} />
                           <div style={{ fontWeight: 600 }}>ครูผู้สอน</div>
                         </Space>
@@ -247,7 +247,7 @@ export default function SignupForm() {
                           lineHeight: 1.5,
                         }}
                       >
-                        <Space direction="vertical" size={4}>
+                        <Space orientation="vertical" size={4}>
                           <BankOutlined style={{ fontSize: 24 }} />
                           <div style={{ fontWeight: 600 }}>สถานศึกษา</div>
                         </Space>
