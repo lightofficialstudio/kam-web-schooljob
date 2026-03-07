@@ -1,14 +1,14 @@
 "use client";
 
-import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
 import { AdminGuard } from "@/app/components/layouts/admin/admin-guard";
-import { Card, Col, Row, Statistic } from "antd";
+import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
 import {
-  UserOutlined,
-  TeamOutlined,
   AppstoreOutlined,
   DatabaseOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Card, Col, Row, Statistic } from "antd";
 
 /**
  * 📊 Admin Dashboard Page
@@ -102,9 +102,7 @@ export default function AdminPage() {
               <Card title="Quick Actions">
                 <div className="space-y-3">
                   <div className="p-3 bg-blue-50 rounded cursor-pointer hover:bg-blue-100 transition">
-                    <p className="font-medium text-blue-900">
-                      👥 Manage Users
-                    </p>
+                    <p className="font-medium text-blue-900">👥 Manage Users</p>
                     <p className="text-xs text-blue-700">
                       View and manage all users
                     </p>
