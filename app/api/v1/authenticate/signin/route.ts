@@ -28,8 +28,17 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (err: any) {
+    // ✨ [DEBUG: Log all error details]
+    console.error("❌ Signin Error:", {
+      message: err.message,
+      code: err.code,
+      status: err.status,
+      statusCode: err.statusCode,
+      fullError: err,
+    });
+
     // ✨ [จัดการกรณี validation error หรือ supabase auth error]
-    const message = err.message || "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    const message = err.message || "Invalid login credentials";
 
     return NextResponse.json(
       {

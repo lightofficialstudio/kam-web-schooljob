@@ -1,12 +1,40 @@
 "use client";
 
-import { SolutionOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Space, Typography } from "antd";
+import { useAuthStore } from "@/app/stores/auth-store";
+import {
+  LogoutOutlined,
+  SolutionOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Button, Dropdown, Space, Typography } from "antd";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const { Text } = Typography;
 
 export default function Navbar() {
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
+
+  const userMenuItems = [
+    {
+      key: "profile",
+      label: "โปรไฟล์ของฉัน",
+      icon: <UserOutlined />,
+      onClick: () => router.push("/profile"),
+    },
+    {
+      key: "logout",
+      label: "ออกจากระบบ",
+      icon: <LogoutOutlined />,
+      onClick: () => {
+        logout();
+        router.push("/");
+        router.refresh();
+      },
+      danger: true,
+    },
+  ];
   return (
     <div
       style={{
@@ -92,30 +120,81 @@ export default function Navbar() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Link href="/pages/signin">
-          <Button
-            type="text"
-            icon={<UserOutlined />}
-            style={{ fontWeight: 600 }}
-          >
-            เข้าสู่ระบบ
-          </Button>
-        </Link>
-        <Link href="/pages/signup">
-          <Button
-            type="primary"
-            shape="round"
-            icon={<SolutionOutlined />}
-            style={{
-              height: "40px",
-              padding: "0 20px",
-              fontWeight: 600,
-              boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
-            }}
-          >
-            สมัครงานครู
-          </Button>
-        </Link>
+        {user ? (
+          <>
+            {/* ✨ [แสดง user info เมื่อ login แล้ว] */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                paddingRight: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  background: "#0066FF",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                {user.full_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <Text strong style={{ display: "block", fontSize: "14px" }}>
+                  {user.full_name}
+                </Text>
+                <Text type="secondary" style={{ fontSize: "12px" }}>
+                  {user.role === "TEACHER" ? "ครูผู้สอน" : "สถานศึกษา"}
+                </Text>
+              </div>
+            </div>
+
+            {/* ✨ [Dropdown menu สำหรับ logout] */}
+            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <Button
+                type="text"
+                shape="circle"
+                icon={<UserOutlined />}
+                style={{ fontWeight: 600, marginLeft: "8px" }}
+              />
+            </Dropdown>
+          </>
+        ) : (
+          <>
+            {/* ✨ [แสดง signin/signup buttons เมื่อยังไม่ login] */}
+            <Link href="/pages/signin">
+              <Button
+                type="text"
+                icon={<UserOutlined />}
+                style={{ fontWeight: 600 }}
+              >
+                เข้าสู่ระบบ
+              </Button>
+            </Link>
+            <Link href="/pages/signup">
+              <Button
+                type="primary"
+                shape="round"
+                icon={<SolutionOutlined />}
+                style={{
+                  height: "40px",
+                  padding: "0 20px",
+                  fontWeight: 600,
+                  boxShadow: "0 4px 10px rgba(0, 102, 255, 0.2)",
+                }}
+              >
+                สมัครงานครู
+              </Button>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

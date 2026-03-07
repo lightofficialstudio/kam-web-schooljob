@@ -1,5 +1,6 @@
 "use client";
 
+import ResultModal from "@/app/components/layouts/modal/result-modal";
 import {
   BankOutlined,
   CheckCircleFilled,
@@ -8,7 +9,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import {
-  App,
   Button,
   Card,
   Checkbox,
@@ -29,12 +29,38 @@ import { useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
 
+interface ModalState {
+  open: boolean;
+  type: "success" | "error" | "warning" | "info";
+  mainTitle: string;
+  description: string;
+}
+
 export default function SignupForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState<ModalState>({
+    open: false,
+    type: "info",
+    mainTitle: "",
+    description: "",
+  });
   const router = useRouter();
-  const { message } = App.useApp();
   const { token } = antTheme.useToken();
+
+  const showModal = (
+    type: "success" | "error" | "warning" | "info",
+    mainTitle: string,
+    description: string,
+  ) => {
+    setModal({ open: true, type, mainTitle, description });
+  };
+
+  const handleModalConfirm = () => {
+    if (modal.type === "success") {
+      router.push("/signin");
+    }
+  };
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -58,10 +84,17 @@ export default function SignupForm() {
         throw new Error(result.message_th || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
       }
 
-      message.success(result.message_th);
-      router.push("/signin");
+      showModal(
+        "success",
+        "สมัครสมาชิกสำเร็จ",
+        result.message_th || "บัญชีของคุณได้สร้างเรียบร้อย",
+      );
     } catch (err: any) {
-      message.error(err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      showModal(
+        "error",
+        "เกิดข้อผิดพลาด",
+        err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก",
+      );
     } finally {
       setLoading(false);
     }
@@ -79,6 +112,17 @@ export default function SignupForm() {
         },
       }}
     >
+      <ResultModal
+        open={modal.open}
+        type={modal.type}
+        mainTitle={modal.mainTitle}
+        description={modal.description}
+        onConfirm={handleModalConfirm}
+        onCancel={() => setModal({ ...modal, open: false })}
+        confirmText="ตกลง"
+        centered
+        width={420}
+      />
       <Card
         variant="borderless"
         style={{

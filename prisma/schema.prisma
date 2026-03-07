@@ -29,6 +29,7 @@ model Profile {
   id        String   @id @default(uuid())
   userId    String   @unique @map("user_id") // Link to Supabase Auth ID
   email     String   @unique
+  password  String? // Hash only - bcrypt (nullable for existing records)
   fullName  String?  @map("full_name")
   role      UserRole @default(TEACHER)
   createdAt DateTime @default(now()) @map("created_at")

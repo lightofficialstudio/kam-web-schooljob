@@ -6,6 +6,11 @@ import { PrismaClient } from "@prisma/client";
  */
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
+console.log("🔧 Initializing Prisma with connection:", {
+  url: process.env.DATABASE_MAIN_URL?.substring(0, 50) + "...",
+  directUrl: process.env.DIRECT_URL?.substring(0, 50) + "...",
+});
+
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
@@ -16,3 +21,5 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+console.log("✅ Prisma client initialized successfully");

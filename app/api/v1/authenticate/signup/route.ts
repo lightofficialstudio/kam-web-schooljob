@@ -6,12 +6,15 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log("📝 Signup request body:", body);
 
     // 1. ✨ [ตรวจสอบข้อมูลตาม Schema]
     const validatedData = signupSchema.parse(body);
+    console.log("✅ Validation passed:", validatedData);
 
     // 2. ✨ [เรียกใช้ Service เพื่อสมัครสมาชิก]
     const user = await authService.signup(validatedData);
+    console.log("🎉 User created:", user?.id, user?.email);
 
     return NextResponse.json(
       {
@@ -32,6 +35,11 @@ export async function POST(req: NextRequest) {
     // ✨ [จัดการกรณี validation error หรือ supabase error]
     const errorMessage =
       err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการสมัครสมาชิก";
+
+    console.error("❌ Signup error:", {
+      message: errorMessage,
+      fullError: err,
+    });
 
     return NextResponse.json(
       {
