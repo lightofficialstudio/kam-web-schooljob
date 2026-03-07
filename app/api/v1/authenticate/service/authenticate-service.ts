@@ -1,94 +1,181 @@
+import { supabase } from "@/app/lib/supabase";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
-import bcryptjs from "bcryptjs";
-import { randomUUID } from "crypto";
 import { SigninInput, SignupInput } from "../validation/authenticate-schema";
 
 export class AuthenticateService {
-  // ✨ [ฟังก์ชันสำหรับการสมัครสมาชิกและสร้างโปรไฟล์ในฐานข้อมูล]
+  // ✨ [สมัครสมาชิกด้วย Supabase Auth SDK]
   async signup(input: SignupInput) {
     const { email, password, full_name, role } = input;
 
-    // 0. ✨ [ตรวจสอบว่าอีเมลถูกใช้งานแล้วหรือไม่]
-    const existingProfile = await prisma.profile.findUnique({
-      where: { email },
-    });
+    console.log("📝 [SIGNUP] Starting signup process...");
+    console.log(`   📧 Email: ${email}`);
+    console.log(`   👤 Full name: ${full_name}`);
+    console.log(`   🎯 Role: ${role}`);
 
-    if (existingProfile) {
-      throw new Error("อีเมลนี้ถูกใช้งานแล้ว");
-    }
-
-    // 1. ✨ [Hash password ด้วย bcryptjs]
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    console.log("🔐 Password hashed successfully");
-
-    // 2. ✨ [สร้างโปรไฟล์ในฐานข้อมูลท้องถิ่น (ไม่ใช้ Supabase)]
-    const userId = randomUUID();
     try {
-      const createdProfile = await prisma.profile.create({
-        data: {
-          userId: userId,
-          email: email,
-          password: hashedPassword,
-          fullName: full_name,
-          role: role as UserRole,
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name,
+            role,
+          },
         },
       });
-      console.log("✅ Profile created successfully:", createdProfile.id);
+
+      if (authError) {
+        console.error(`❌ [SIGNUP] Supabase auth error:`, {
+          message: authError.message,
+          code: authError.code,
+          status: authError.status,
+        });
+
+        // 🔍 [แปล Supabase error messages เป็นภาษาไทย]
+        if (authError.message.includes("already registered")) {
+          throw new Error("อีเมลนี้ถูกลงทะเบียนแล้ว");
+        }
+        if (authError.message.includes("Password should be at least")) {
+          throw new Error("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร");
+        }
+        if (authError.message.includes("invalid email")) {
+          throw new Error("อีเมลไม่ถูกต้อง");
+        }
+
+        throw new Error(
+          authError.message || "ไม่สามารถสมัครสมาชิกได้ กรุณาลองใหม่",
+        );
+      }
+
+      console.log(`✅ [SIGNUP] User created in Supabase: ${authData.user?.id}`);
+
+      // 2. ✨ [บันทึกข้อมูล extra ใน Prisma (optional)]
+      if (authData.user) {
+        try {
+          await prisma.profile.upsert({
+            where: { userId: authData.user.id },
+            update: {
+              email,
+              fullName: full_name,
+              role: role as UserRole,
+            },
+            create: {
+              userId: authData.user.id,
+              email,
+              fullName: full_name,
+              role: role as UserRole,
+              password: "", // ❌ ไม่เก็บ password - Supabase จัดการแล้ว
+            },
+          });
+          console.log(
+            `✅ [SIGNUP] Profile synced to Prisma: ${authData.user.id}`,
+          );
+        } catch (prismaError) {
+          console.warn(
+            `⚠️ [SIGNUP] Prisma sync failed (non-critical):`,
+            prismaError,
+          );
+          // ไม่ throw - ให้ signup สำเร็จแม้ Prisma fail
+        }
+      }
 
       return {
-        id: createdProfile.userId,
-        email: createdProfile.email,
+        id: authData.user?.id,
+        email: authData.user?.email,
       };
-    } catch (error: any) {
-      if (error.code === "P2002") {
-        throw new Error("อีเมลนี้ถูกใช้งานแล้ว");
-      }
+    } catch (error) {
+      console.error("❌ [SIGNUP] Signup failed:", error);
       throw error;
     }
   }
 
-  // ✨ [ฟังก์ชันสำหรับการเข้าสู่ระบบจากฐานข้อมูลท้องถิ่น]
+  // ✨ [เข้าสู่ระบบด้วย Supabase Auth SDK]
   async signin(input: SigninInput) {
     const { email, password } = input;
 
-    console.log("🔐 Attempting signin with email:", email);
+    console.log("🔐 [SIGNIN] Starting signin process...");
+    console.log(`   📧 Email: ${email}`);
 
-    // 1. ✨ [ค้นหา profile จากฐานข้อมูล]
-    const profile = await prisma.profile.findUnique({
-      where: { email },
-    });
+    try {
+      // 1. ✨ [เข้าสู่ระบบกับ Supabase Auth]
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (!profile) {
-      console.error("❌ Profile not found for email:", email);
-      throw new Error("Invalid login credentials");
+      if (error) {
+        console.error(`❌ [SIGNIN] Auth failed:`, {
+          message: error.message,
+          code: error.code,
+          status: error.status,
+        });
+
+        // 🔍 [แปล Supabase error messages เป็นภาษาไทย]
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+        }
+        if (error.message.includes("Email not confirmed")) {
+          throw new Error("โปรดยืนยันอีเมลของคุณก่อน");
+        }
+
+        throw new Error(error.message || "ไม่สามารถเข้าสู่ระบบได้");
+      }
+
+      console.log(`✅ [SIGNIN] Auth successful: ${data.user?.id}`);
+      console.log(`   📧 User email: ${data.user?.email}`);
+      console.log(`   💾 User metadata:`, data.user?.user_metadata);
+
+      // 2. ✨ [ดึงข้อมูล extra จาก Prisma (optional)]
+      let profile = null;
+      if (data.user) {
+        try {
+          profile = await prisma.profile.findUnique({
+            where: { userId: data.user.id },
+          });
+          console.log(`✅ [SIGNIN] Profile fetched from Prisma:`, profile?.id);
+        } catch (prismaError) {
+          console.warn(
+            `⚠️ [SIGNIN] Prisma fetch failed (non-critical):`,
+            prismaError,
+          );
+          // ไม่ throw - ให้ signin สำเร็จแม้ Prisma fail
+        }
+      }
+
+      // 3. ✨ [รวมข้อมูล Supabase + Prisma]
+      const fullName =
+        data.user?.user_metadata?.full_name || profile?.fullName || "";
+      const role = data.user?.user_metadata?.role || profile?.role || "TEACHER";
+
+      console.log(`✅ [SIGNIN] Ready to return user data:`, {
+        user_id: data.user?.id,
+        email: data.user?.email,
+        full_name: fullName,
+        role: role,
+      });
+
+      return {
+        user: {
+          id: data.user?.id,
+          email: data.user?.email,
+        },
+        session: data.session,
+        profile: {
+          userId: data.user?.id || "",
+          email: data.user?.email || "",
+          fullName: fullName,
+          role: role as UserRole,
+          password: "", // ❌ ไม่คืน password
+          id: profile?.id || "",
+          createdAt: profile?.createdAt || new Date(),
+          updatedAt: profile?.updatedAt || new Date(),
+        },
+      };
+    } catch (error) {
+      console.error("❌ [SIGNIN] Signin failed:", error);
+      throw error;
     }
-
-    if (!profile.password) {
-      console.error("❌ No password set for profile:", email);
-      throw new Error("Invalid login credentials");
-    }
-
-    console.log("✅ Profile found for email:", email);
-
-    // 2. ✨ [เปรียบเทียบ password ที่ส่งมากับ password hash ที่เก็บ]
-    const isPasswordValid = await bcryptjs.compare(password, profile.password);
-
-    if (!isPasswordValid) {
-      console.error("❌ Password mismatch for email:", email);
-      throw new Error("Invalid login credentials");
-    }
-
-    console.log("✅ Password verified successfully");
-
-    return {
-      user: {
-        id: profile.userId,
-        email: profile.email,
-      },
-      session: null,
-      profile: profile,
-    };
   }
 }
 
