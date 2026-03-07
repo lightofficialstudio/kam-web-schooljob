@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { Layout } from "antd";
+import { ReactNode, useEffect, useState } from "react";
 import { AdminNavbar } from "./navbar";
 import { AdminSidebar } from "./sidebar";
 
@@ -11,26 +12,69 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [mode, setMode] = useState<"light" | "dark">("dark");
+
+  // ✨ [Initialize theme from localStorage]
+  useEffect(() => {
+    const savedTheme =
+      (localStorage.getItem("app-theme") as "light" | "dark") || "dark";
+    setMode(savedTheme);
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Layout style={{ minHeight: "100vh" }}>
+        <Layout>
+          <AdminSidebar collapsed={false} onCollapse={() => {}} />
+          <Layout>
+            <AdminNavbar onMenuClick={() => {}} title={title} />
+            <Layout.Content style={{ padding: "24px", overflow: "auto" }}>
+              {children}
+            </Layout.Content>
+          </Layout>
+        </Layout>
+      </Layout>
+    );
+  }
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      {/* ✨ [Sidebar] */}
-      <AdminSidebar
-        collapsed={sidebarCollapsed}
-        onCollapse={setSidebarCollapsed}
-      />
-
-      {/* ✨ [Main Content Area] */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* ✨ [Navbar] */}
-        <AdminNavbar
-          onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          title={title}
+    <Layout
+      style={{
+        minHeight: "100vh",
+        fontFamily:
+          "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        background: mode === "dark" ? "#141414" : "#f5f5f5",
+      }}
+    >
+      <Layout>
+        {/* ✨ [Sidebar] */}
+        <AdminSidebar
+          collapsed={sidebarCollapsed}
+          onCollapse={setSidebarCollapsed}
         />
 
-        {/* ✨ [Content] */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </div>
+        {/* ✨ [Main Content Area] */}
+        <Layout>
+          {/* ✨ [Navbar] */}
+          <AdminNavbar
+            onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            title={title}
+          />
+
+          {/* ✨ [Content] */}
+          <Layout.Content
+            style={{
+              padding: "24px",
+              overflow: "auto",
+              background: mode === "dark" ? "#141414" : "#f5f5f5",
+            }}
+          >
+            {children}
+          </Layout.Content>
+        </Layout>
+      </Layout>
+    </Layout>
   );
 }

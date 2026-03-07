@@ -3,14 +3,18 @@
 import {
   DeleteOutlined,
   EditOutlined,
+  PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Button,
+  Card,
+  Col,
   Input,
-  message,
   Modal,
+  Row,
   Space,
   Spin,
   Table,
@@ -34,6 +38,7 @@ interface UserRecord {
 
 // ✨ [Component]
 export default function UserManagementPage() {
+  const { message } = App.useApp();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -53,13 +58,13 @@ export default function UserManagementPage() {
         console.log(`✅ [USER MANAGEMENT] Found ${data.data.total} users`);
         setUsers(data.data.users);
         setFilteredUsers(data.data.users);
-        message.success(`Loaded ${data.data.total} users`);
+        message.success(`โหลดผู้ใช้ ${data.data.total} คน เสร็จสิ้น`);
       } else {
-        message.error(data.message_th || "Failed to load users");
+        message.error(data.message_th || "ล้มเหลวในการโหลดผู้ใช้");
       }
     } catch (error: unknown) {
       console.error("❌ [USER MANAGEMENT] Error:", error);
-      message.error("Failed to fetch users");
+      message.error("ล้มเหลวในการดึงข้อมูลผู้ใช้");
     } finally {
       setLoading(false);
     }
@@ -84,14 +89,14 @@ export default function UserManagementPage() {
   // ✨ [Delete user]
   const handleDelete = (userId: string, email: string) => {
     Modal.confirm({
-      title: "Delete User",
-      content: `Are you sure you want to delete ${email}?`,
-      okText: "Delete",
+      title: "ลบผู้ใช้",
+      content: `คุณแน่ใจหรือว่าต้องการลบ ${email}?`,
+      okText: "ลบ",
       okType: "danger",
-      cancelText: "Cancel",
+      cancelText: "ยกเลิก",
       onOk: async () => {
         // TODO: Implement delete API
-        message.info("Delete API not yet implemented");
+        message.info("API ลบผู้ใช้ยังไม่ได้เตรียม");
         console.log("Delete user:", userId);
       },
     });
@@ -100,64 +105,70 @@ export default function UserManagementPage() {
   // ✨ [Column Definitions]
   const columns: ColumnsType<UserRecord> = [
     {
-      title: "Email",
+      title: "อีเมล",
       dataIndex: "email",
       key: "email",
       width: 200,
       render: (email: string) => (
         <Tooltip title={email}>
-          <span className="font-medium text-slate-800">{email}</span>
+          <span style={{ fontWeight: 500 }}>{email}</span>
         </Tooltip>
       ),
     },
     {
-      title: "Full Name",
+      title: "ชื่อเต็ม",
       dataIndex: "fullName",
       key: "fullName",
       width: 180,
-      render: (fullName: string | null) => (
-        <span className="text-slate-700">{fullName || "-"}</span>
-      ),
+      render: (fullName: string | null) => <span>{fullName || "-"}</span>,
     },
     {
-      title: "Role",
+      title: "บทบาท",
       dataIndex: "role",
       key: "role",
       width: 120,
       render: (role: string) => {
         let color = "default";
-        if (role === "ADMIN") color = "red";
-        else if (role === "SCHOOL") color = "blue";
-        else if (role === "TEACHER") color = "green";
+        let label = role;
+        if (role === "ADMIN") {
+          color = "red";
+          label = "ผู้ดูแล";
+        } else if (role === "SCHOOL") {
+          color = "blue";
+          label = "โรงเรียน";
+        } else if (role === "TEACHER") {
+          color = "green";
+          label = "ครู";
+        }
 
-        return <Tag color={color}>{role}</Tag>;
+        return <Tag color={color}>{label}</Tag>;
       },
     },
     {
-      title: "Created",
+      title: "สร้างเมื่อ",
       dataIndex: "createdAt",
       key: "createdAt",
       width: 150,
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      render: (date: string) => new Date(date).toLocaleDateString("th-TH"),
     },
     {
-      title: "Actions",
+      title: "การกระทำ",
       key: "actions",
       width: 120,
       fixed: "right",
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Edit">
+          <Tooltip title="แก้ไข">
             <Link href={`/pages/admin/users/${record.id}/edit`}>
               <Button
                 type="text"
                 icon={<EditOutlined />}
                 size="small"
-                className="text-blue-600"
+                style={{ color: "#1890ff" }}
               />
             </Link>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title="ลบ">
             <Button
               type="text"
               icon={<DeleteOutlined />}
@@ -172,112 +183,232 @@ export default function UserManagementPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <Row gutter={[16, 16]}>
       {/* ✨ [Header Section] */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">User Management</h2>
-          <p className="text-sm text-slate-600 mt-1">
-            Manage all registered users in the system
-          </p>
-        </div>
-      </div>
-
-      {/* ✨ [Toolbar] */}
-      <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between gap-4">
-        {/* ✨ [Search Box] */}
-        <Input
-          placeholder="Search by email, name, or role..."
-          prefix={<SearchOutlined />}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          allowClear
-          className="flex-1 max-w-xs"
-        />
-
-        {/* ✨ [Action Buttons] */}
-        <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={fetchUsers}
-            loading={loading}
+      <Col xs={24}>
+        <Card
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            border: "none",
+            color: "white",
+          }}
+        >
+          <h2
+            style={{
+              color: "white",
+              marginBottom: "8px",
+              fontSize: "24px",
+            }}
           >
-            Refresh
-          </Button>
-          <Link href="/pages/admin/users/new">
-            <Button type="primary">Add New User</Button>
-          </Link>
-        </Space>
-      </div>
+            จัดการผู้ใช้
+          </h2>
+          <p style={{ color: "rgba(255, 255, 255, 0.8)", marginBottom: 0 }}>
+            ดูและจัดการผู้ใช้ที่ลงทะเบียนทั้งหมดในระบบ
+          </p>
+        </Card>
+      </Col>
 
       {/* ✨ [Stats Section] */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-slate-600 text-sm font-semibold">
-            Total Users
-          </div>
-          <div className="text-3xl font-bold text-slate-900 mt-2">
-            {users.length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-slate-600 text-sm font-semibold">Teachers</div>
-          <div className="text-3xl font-bold text-green-600 mt-2">
-            {users.filter((u) => u.role === "TEACHER").length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-slate-600 text-sm font-semibold">Schools</div>
-          <div className="text-3xl font-bold text-blue-600 mt-2">
-            {users.filter((u) => u.role === "SCHOOL").length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-slate-600 text-sm font-semibold">Admins</div>
-          <div className="text-3xl font-bold text-red-600 mt-2">
-            {users.filter((u) => u.role === "ADMIN").length}
-          </div>
-        </div>
-      </div>
+      <Col xs={24}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card
+              style={{
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                borderRadius: "8px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(0,0,0,0.65)",
+                  marginBottom: "8px",
+                }}
+              >
+                จำนวนผู้ใช้ทั้งหมด
+              </div>
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "#001529",
+                }}
+              >
+                {users.length}
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card
+              style={{
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                borderRadius: "8px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(0,0,0,0.65)",
+                  marginBottom: "8px",
+                }}
+              >
+                ครู
+              </div>
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "#52C41A",
+                }}
+              >
+                {users.filter((u) => u.role === "TEACHER").length}
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card
+              style={{
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                borderRadius: "8px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(0,0,0,0.65)",
+                  marginBottom: "8px",
+                }}
+              >
+                โรงเรียน
+              </div>
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "#1890ff",
+                }}
+              >
+                {users.filter((u) => u.role === "SCHOOL").length}
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card
+              style={{
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                borderRadius: "8px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(0,0,0,0.65)",
+                  marginBottom: "8px",
+                }}
+              >
+                ผู้ดูแล
+              </div>
+              <div
+                style={{
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "#f5222d",
+                }}
+              >
+                {users.filter((u) => u.role === "ADMIN").length}
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </Col>
+
+      {/* ✨ [Toolbar] */}
+      <Col xs={24}>
+        <Card style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}>
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} sm={12}>
+              <Input
+                placeholder="ค้นหาจากอีเมล ชื่อ หรือบทบาท..."
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+              />
+            </Col>
+            <Col xs={24} sm={12}>
+              <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={fetchUsers}
+                  loading={loading}
+                >
+                  รีเฟรช
+                </Button>
+                <Link href="/pages/admin/users/new">
+                  <Button type="primary" icon={<PlusOutlined />}>
+                    เพิ่มผู้ใช้ใหม่
+                  </Button>
+                </Link>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
 
       {/* ✨ [Data Table] */}
-      <div className="bg-white rounded-lg shadow">
-        <Spin spinning={loading} tip="Loading users...">
-          <Table<UserRecord>
-            columns={columns}
-            dataSource={filteredUsers}
-            rowKey="id"
-            pagination={{
-              pageSize: 10,
-              total: filteredUsers.length,
-              showTotal: (total) => `Total ${total} users`,
-              showSizeChanger: true,
-              showQuickJumper: true,
-            }}
-            scroll={{ x: true }}
-            locale={{
-              emptyText: "No users found",
-            }}
-            rowSelection={{
-              selectedRowKeys,
-              onChange: (keys) => setSelectedRowKeys(keys),
-            }}
-          />
-        </Spin>
-      </div>
+      <Col xs={24}>
+        <Card style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}>
+          <Spin spinning={loading} description="กำลังโหลดผู้ใช้...">
+            <Table<UserRecord>
+              columns={columns}
+              dataSource={filteredUsers}
+              rowKey="id"
+              pagination={{
+                pageSize: 10,
+                total: filteredUsers.length,
+                showTotal: (total) => `รวม ${total} ผู้ใช้`,
+                showSizeChanger: true,
+                showQuickJumper: true,
+              }}
+              scroll={{ x: true }}
+              locale={{
+                emptyText: "ไม่พบผู้ใช้",
+              }}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: (keys) => setSelectedRowKeys(keys),
+              }}
+            />
+          </Spin>
+        </Card>
+      </Col>
 
       {/* ✨ [Bulk Actions] */}
       {selectedRowKeys.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-          <div className="text-slate-700">
-            <strong>{selectedRowKeys.length}</strong> user(s) selected
-          </div>
-          <Space>
-            <Button danger>Delete Selected</Button>
-            <Button>Export CSV</Button>
-          </Space>
-        </div>
+        <Col xs={24}>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)",
+              border: "1px solid #91d5ff",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            }}
+          >
+            <Row justify="space-between" align="middle">
+              <Col>
+                <span style={{ color: "rgba(0,0,0,0.65)" }}>
+                  เลือก <strong>{selectedRowKeys.length}</strong> ผู้ใช้
+                </span>
+              </Col>
+              <Col>
+                <Space>
+                  <Button danger>ลบที่เลือก</Button>
+                  <Button>ส่งออก CSV</Button>
+                </Space>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
       )}
-    </div>
+    </Row>
   );
 }

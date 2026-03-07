@@ -1,4 +1,5 @@
 import { LayoutSelector } from "@/app/components/layouts/layout-selector";
+import { ThemeProvider } from "@/app/contexts/theme-context";
 import "@/app/styles/globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
@@ -24,8 +25,10 @@ export default function RootLayout({
     <html lang="th">
       <body className={`${kanit.variable} antialiased font-kanit`}>
         <AntdRegistry>
-          {/* ✨ [LayoutSelector - เลือก Layout ตามสถานะ User] */}
-          <LayoutSelector>{children}</LayoutSelector>
+          <ThemeProvider>
+            {/* ✨ [LayoutSelector - เลือก Layout ตามสถานะ User] */}
+            <LayoutSelector>{children}</LayoutSelector>
+          </ThemeProvider>
         </AntdRegistry>
       </body>
     </html>

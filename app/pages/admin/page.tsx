@@ -1,7 +1,5 @@
 "use client";
 
-import { AdminGuard } from "@/app/components/layouts/admin/admin-guard";
-import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
 import {
   AppstoreOutlined,
   DatabaseOutlined,
@@ -15,112 +13,208 @@ import { Card, Col, Row, Statistic } from "antd";
  */
 export default function AdminPage() {
   return (
-    <AdminGuard>
-      <AdminLayout title="Dashboard">
-        <div className="space-y-6">
-          {/* ✨ [Header] */}
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              Admin Dashboard
-            </h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Welcome to the admin control panel
-            </p>
-          </div>
+    <Row gutter={[16, 16]}>
+      {/* ✨ [Header] */}
+      <Col xs={24}>
+        <Card
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            border: "none",
+            color: "white",
+          }}
+        >
+          <h2 style={{ color: "white", marginBottom: "8px", fontSize: "24px" }}>
+            ยินดีต้อนรับเข้าแดชบอร์ดแอดมิน
+          </h2>
+          <p style={{ color: "rgba(255, 255, 255, 0.8)", marginBottom: 0 }}>
+            จำหน่าย KAM - ระบบจัดการงานสำหรับโรงเรียน
+          </p>
+        </Card>
+      </Col>
 
-          {/* ✨ [Statistics Cards] */}
-          <Row gutter={16}>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title="Total Users"
-                  value={2}
-                  prefix={<UserOutlined />}
-                  valueStyle={{ color: "#0066FF" }}
-                />
+      {/* ✨ [Statistics Cards] */}
+      <Col xs={24} sm={12} lg={6}>
+        <Card
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            borderRadius: "8px",
+          }}
+        >
+          <Statistic
+            title="จำนวนผู้ใช้ทั้งหมด"
+            value={2}
+            prefix={<UserOutlined />}
+            valueStyle={{ color: "#0066FF", fontSize: "28px" }}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <Card
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            borderRadius: "8px",
+          }}
+        >
+          <Statistic
+            title="ผู้ดูแลระบบ"
+            value={1}
+            prefix={<TeamOutlined />}
+            valueStyle={{ color: "#FF4D4F", fontSize: "28px" }}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <Card
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            borderRadius: "8px",
+          }}
+        >
+          <Statistic
+            title="เซสชั่นใช้งาน"
+            value={1}
+            prefix={<AppstoreOutlined />}
+            valueStyle={{ color: "#52C41A", fontSize: "28px" }}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <Card
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            borderRadius: "8px",
+          }}
+        >
+          <Statistic
+            title="เรคคอร์ดฐานข้อมูล"
+            value={2}
+            prefix={<DatabaseOutlined />}
+            valueStyle={{ color: "#722ED1", fontSize: "28px" }}
+          />
+        </Card>
+      </Col>
+
+      {/* ✨ [System Status Card] */}
+      <Col xs={24} lg={12}>
+        <Card
+          title="สถานะระบบ"
+          style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24}>
+              <Row
+                justify="space-between"
+                style={{
+                  paddingBottom: "12px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <Col>
+                  <span style={{ color: "rgba(0,0,0,0.65)" }}>ฐานข้อมูล</span>
+                </Col>
+                <Col>
+                  <span style={{ color: "#52C41A", fontWeight: 600 }}>
+                    ✓ เชื่อมต่อ
+                  </span>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={24}>
+              <Row
+                justify="space-between"
+                style={{
+                  paddingBottom: "12px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <Col>
+                  <span style={{ color: "rgba(0,0,0,0.65)" }}>
+                    เซิร์ฟเวอร์ API
+                  </span>
+                </Col>
+                <Col>
+                  <span style={{ color: "#52C41A", fontWeight: 600 }}>
+                    ✓ ทำงาน
+                  </span>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={24}>
+              <Row justify="space-between">
+                <Col>
+                  <span style={{ color: "rgba(0,0,0,0.65)" }}>
+                    การยืนยันตัวตน
+                  </span>
+                </Col>
+                <Col>
+                  <span style={{ color: "#52C41A", fontWeight: 600 }}>
+                    ✓ ใช้งานอยู่
+                  </span>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+
+      {/* ✨ [Quick Actions Card] */}
+      <Col xs={24} lg={12}>
+        <Card
+          title="การจัดการด่วน"
+          style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24}>
+              <Card
+                hoverable
+                style={{
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  border: "none",
+                  color: "white",
+                }}
+              >
+                <div style={{ fontSize: "18px", marginBottom: "8px" }}>
+                  👥 จัดการผู้ใช้
+                </div>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "rgba(255, 255, 255, 0.8)",
+                    margin: 0,
+                  }}
+                >
+                  ดูและจัดการผู้ใช้ทั้งหมด
+                </p>
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title="Total Admins"
-                  value={1}
-                  prefix={<TeamOutlined />}
-                  valueStyle={{ color: "#FF4D4F" }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title="Active Sessions"
-                  value={1}
-                  prefix={<AppstoreOutlined />}
-                  valueStyle={{ color: "#52C41A" }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Card>
-                <Statistic
-                  title="Database Records"
-                  value={2}
-                  prefix={<DatabaseOutlined />}
-                  valueStyle={{ color: "#722ED1" }}
-                />
+            <Col xs={24}>
+              <Card
+                hoverable
+                style={{
+                  background:
+                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                  border: "none",
+                  color: "white",
+                }}
+              >
+                <div style={{ fontSize: "18px", marginBottom: "8px" }}>
+                  📊 ดูรายงาน
+                </div>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "rgba(255, 255, 255, 0.8)",
+                    margin: 0,
+                  }}
+                >
+                  การวิเคราะห์และรายงานระบบ
+                </p>
               </Card>
             </Col>
           </Row>
-
-          {/* ✨ [Info Cards] */}
-          <Row gutter={16}>
-            <Col xs={24} lg={12}>
-              <Card title="System Status" className="bg-green-50">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-700">Database</span>
-                    <span className="text-green-600 font-semibold">
-                      ✓ Connected
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-700">API Server</span>
-                    <span className="text-green-600 font-semibold">
-                      ✓ Running
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-700">Authentication</span>
-                    <span className="text-green-600 font-semibold">
-                      ✓ Active
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} lg={12}>
-              <Card title="Quick Actions">
-                <div className="space-y-3">
-                  <div className="p-3 bg-blue-50 rounded cursor-pointer hover:bg-blue-100 transition">
-                    <p className="font-medium text-blue-900">👥 Manage Users</p>
-                    <p className="text-xs text-blue-700">
-                      View and manage all users
-                    </p>
-                  </div>
-                  <div className="p-3 bg-purple-50 rounded cursor-pointer hover:bg-purple-100 transition">
-                    <p className="font-medium text-purple-900">
-                      📊 View Reports
-                    </p>
-                    <p className="text-xs text-purple-700">
-                      System analytics and reports
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          </Row>
-        </div>
-      </AdminLayout>
-    </AdminGuard>
+        </Card>
+      </Col>
+    </Row>
   );
 }

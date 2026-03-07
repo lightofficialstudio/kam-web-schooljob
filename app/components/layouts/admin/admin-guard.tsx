@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/app/stores/auth-store";
 import { AlertOutlined } from "@ant-design/icons";
-import { Alert, Button, Space } from "antd";
+import { Alert, Button, Col, Row, Space } from "antd";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
@@ -36,33 +36,42 @@ export function AdminGuard({ children }: AdminGuardProps) {
   // ✨ [ถ้า user ไม่ใช่ admin ให้แสดง warning]
   if (!user || user.role !== "ADMIN") {
     return (
-      <div className="space-y-4">
-        <Alert
-          message="⚠️ Access Restricted"
-          description={`You need to be an ADMIN to access this page. Current role: ${
-            user?.role || "Not logged in"
-          }`}
-          type="warning"
-          icon={<AlertOutlined />}
-          showIcon
-          closable
-        />
-
-        <div className="space-y-2">
-          <p className="text-slate-700">
-            Please login with an admin account to continue.
-          </p>
-          <Space>
-            <Button type="primary" onClick={() => router.push("/pages/signin")}>
-              Sign In as Admin
-            </Button>
-            <Button onClick={() => router.push("/")}>Back to Home</Button>
+      <Row gutter={[16, 16]} style={{ padding: "24px" }}>
+        <Col xs={24}>
+          <Alert
+            message="⚠️ ห้ามเข้า"
+            description={
+              <>
+                จำเป็นต้องเป็นผู้ดูแลระบบ (ADMIN) เพื่อเข้าถึงหน้านี้
+                <br />
+                บทบาทของคุณ: {user?.role || "ยังไม่ได้เข้าสู่ระบบ"}
+              </>
+            }
+            type="warning"
+            icon={<AlertOutlined />}
+            showIcon
+          />
+        </Col>
+        <Col xs={24}>
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <p style={{ margin: 0, color: "rgba(0,0,0,0.65)" }}>
+              กรุณาเข้าสู่ระบบด้วยบัญชีผู้ดูแลระบบเพื่อดำเนินการต่อ
+            </p>
+            <Space wrap>
+              <Button
+                type="primary"
+                onClick={() => router.push("/pages/signin")}
+              >
+                เข้าสู่ระบบเป็นผู้ดูแล
+              </Button>
+              <Button onClick={() => router.push("/")}>กลับหน้าหลัก</Button>
+            </Space>
           </Space>
-        </div>
-
-        {/* ✨ [ยัง render children เพื่อให้เห็น page structure] */}
-        <div className="opacity-50 pointer-events-none">{children}</div>
-      </div>
+        </Col>
+        <Col xs={24} style={{ opacity: 0.5, pointerEvents: "none" }}>
+          {children}
+        </Col>
+      </Row>
     );
   }
 
