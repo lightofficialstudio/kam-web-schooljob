@@ -12,6 +12,7 @@ import BaseModal, { BaseModalProps } from "./base-modal";
 export interface ResultModalProps extends BaseModalProps {
   type: "success" | "error" | "warning" | "info";
   onConfirm?: () => void;
+  onCancel?: () => void;
   confirmText?: string;
 }
 

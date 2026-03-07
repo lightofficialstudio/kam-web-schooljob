@@ -1,4 +1,4 @@
-import LandingLayout from "@/app/components/layouts/landing/landing-layout";
+import { LayoutSelector } from "@/app/components/layouts/layout-selector";
 import "@/app/styles/globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
@@ -24,7 +24,8 @@ export default function RootLayout({
     <html lang="th">
       <body className={`${kanit.variable} antialiased font-kanit`}>
         <AntdRegistry>
-          <LandingLayout>{children}</LandingLayout>
+          {/* ✨ [LayoutSelector - เลือก Layout ตามสถานะ User] */}
+          <LayoutSelector>{children}</LayoutSelector>
         </AntdRegistry>
       </body>
     </html>
