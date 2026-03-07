@@ -3,7 +3,15 @@
 import ResultModal from "@/app/components/layouts/modal/result-modal";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Card, ConfigProvider, Form, Input, Typography } from "antd";
+import {
+  Button,
+  Card,
+  ConfigProvider,
+  Form,
+  Input,
+  Space,
+  Typography,
+} from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -137,32 +145,34 @@ function SigninFormContent() {
           }}
           styles={{ body: { padding: 40 } }}
         >
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <div
+          <Space
+            direction="vertical"
+            align="center"
+            style={{ width: "100%", marginBottom: 32 }}
+            size={16}
+          >
+            <Card
+              size="small"
+              variant="borderless"
               style={{
-                background: "#0066FF",
                 width: 48,
                 height: 48,
-                borderRadius: 12,
-                display: "inline-flex",
+                padding: "0",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: 16,
+                borderRadius: 12,
               }}
             >
-              <span
-                style={{ color: "white", fontWeight: "bold", fontSize: 24 }}
-              >
-                K
-              </span>
-            </div>
+              <span style={{ fontWeight: "bold", fontSize: 24 }}>K</span>
+            </Card>
             <Title level={2} style={{ margin: 0, fontWeight: 700 }}>
               เข้าสู่ระบบ
             </Title>
             <Text type="secondary">
               ยินดีต้อนรับกลับมา! กรุณาลงชื่อเข้าใช้งาน
             </Text>
-          </div>
+          </Space>
 
           <Form layout="vertical" onFinish={onFinish} size="large">
             <Form.Item
@@ -175,17 +185,14 @@ function SigninFormContent() {
                 },
               ]}
             >
-              <Input
-                prefix={<MailOutlined style={{ color: "#94A3B8" }} />}
-                placeholder="อีเมล"
-              />
+              <Input prefix={<MailOutlined />} placeholder="อีเมล" />
             </Form.Item>
             <Form.Item
               name="password"
               rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}
             >
               <Input.Password
-                prefix={<LockOutlined style={{ color: "#94A3B8" }} />}
+                prefix={<LockOutlined />}
                 placeholder="รหัสผ่าน"
               />
             </Form.Item>
@@ -203,15 +210,12 @@ function SigninFormContent() {
             </Form.Item>
           </Form>
 
-          <div style={{ textAlign: "center", marginTop: 16 }}>
-            <Text type="secondary">ยังไม่มีบัญชี? </Text>
-            <Link
-              href="/pages/signup"
-              style={{ color: "#0066FF", fontWeight: 600 }}
-            >
+          <Space wrap justify="center" style={{ width: "100%", marginTop: 16 }}>
+            <Text type="secondary">ยังไม่มีบัญชี?</Text>
+            <Link href="/pages/signup" style={{ fontWeight: 600 }}>
               สมัครสมาชิก
             </Link>
-          </div>
+          </Space>
         </Card>
       </div>
     </ConfigProvider>
