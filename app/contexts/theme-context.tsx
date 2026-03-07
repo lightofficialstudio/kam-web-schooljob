@@ -63,8 +63,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Layout Colors]
       Layout: {
         headerBg: mode === "dark" ? "#1A202C" : "#fafafa",
-        headerColor:
-          mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
+        headerColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
         headerHeight: 64,
         siderBg: mode === "dark" ? "#1A202C" : "#ffffff",
         lightSiderBg: "#ffffff",
@@ -84,8 +83,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         itemSelectedColor: mode === "dark" ? "#52B8FF" : "#1890ff",
         itemHoverBg:
           mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.04)",
-        itemHoverColor:
-          mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
+        itemHoverColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
       },
 
       // ✨ [Card Styling]
@@ -177,8 +175,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       // ✨ [Breadcrumb Styling]
       Breadcrumb: {
-        colorText:
-          mode === "dark" ? "#A0AEC0" : "rgba(0, 0, 0, 0.45)",
+        colorText: mode === "dark" ? "#A0AEC0" : "rgba(0, 0, 0, 0.45)",
       },
     },
   };

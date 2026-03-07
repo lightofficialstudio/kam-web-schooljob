@@ -9,7 +9,6 @@ import {
   MessageOutlined,
   RocketOutlined,
   SearchOutlined,
-
   SolutionOutlined,
   TrophyOutlined,
   UsergroupAddOutlined,
@@ -270,11 +269,7 @@ export default function LandingPage() {
             <Col xs={24} md={12}>
               <Badge
                 status="processing"
-                text={
-                  <Text strong>
-                    สำหรับสถานศึกษา
-                  </Text>
-                }
+                text={<Text strong>สำหรับสถานศึกษา</Text>}
               />
               <Title style={{ fontSize: "40px", marginTop: "16px" }}>
                 พบกับบุคลากรที่ตรงใจ <br />
