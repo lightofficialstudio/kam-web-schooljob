@@ -2,6 +2,7 @@
 
 import { Layout } from "antd";
 import { ReactNode, useEffect, useState } from "react";
+import { AdminBreadcrumb } from "./breadcrumb";
 import { AdminNavbar } from "./navbar";
 import { AdminSidebar } from "./sidebar";
 
@@ -31,6 +32,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           <Layout>
             <AdminNavbar onMenuClick={() => {}} title={title} />
             <Layout.Content style={{ padding: "24px", overflow: "auto" }}>
+              <AdminBreadcrumb />
               {children}
             </Layout.Content>
           </Layout>
@@ -71,6 +73,10 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
               background: mode === "dark" ? "#141414" : "#f5f5f5",
             }}
           >
+            {/* ✨ [Breadcrumb Navigation] */}
+            <AdminBreadcrumb />
+
+            {/* ✨ [Page Content] */}
             {children}
           </Layout.Content>
         </Layout>

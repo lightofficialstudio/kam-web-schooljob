@@ -1,4 +1,5 @@
 import { LayoutSelector } from "@/app/components/layouts/layout-selector";
+import { NotificationModalProvider } from "@/app/components/layouts/modal/notification-modal-provider";
 import { ThemeProvider } from "@/app/contexts/theme-context";
 import "@/app/styles/globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -26,6 +27,9 @@ export default function RootLayout({
       <body className={`${kanit.variable} antialiased font-kanit`}>
         <AntdRegistry>
           <ThemeProvider>
+            {/* ✨ [Notification Modal Provider] */}
+            <NotificationModalProvider />
+
             {/* ✨ [LayoutSelector - เลือก Layout ตามสถานะ User] */}
             <LayoutSelector>{children}</LayoutSelector>
           </ThemeProvider>

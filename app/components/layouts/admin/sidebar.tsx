@@ -75,11 +75,18 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
     },
   ];
 
-  // ✨ [หาถ้า current pathname match]
+  // ✨ [หา current pathname match - match longest (most specific) path first]
+  const validMenuItems = menuItems.filter(
+    (item): item is NonNullable<typeof item> => !!item && "key" in item,
+  );
   const selectedKey =
-    menuItems.find(
-      (item) => item && "key" in item && pathname.includes(item.key as string),
-    )?.key || "/pages/admin";
+    validMenuItems
+      .sort(
+        (a, b) =>
+          ((b.key as string).length || 0) - ((a.key as string).length || 0),
+      )
+      .find((item) => pathname.startsWith(item.key as string))?.key ||
+    "/pages/admin";
 
   if (!mounted) return null;
 

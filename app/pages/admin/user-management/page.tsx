@@ -1,5 +1,6 @@
 "use client";
 
+import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -8,7 +9,6 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import {
-  App,
   Button,
   Card,
   Col,
@@ -38,7 +38,7 @@ interface UserRecord {
 
 // ✨ [Component]
 export default function UserManagementPage() {
-  const { message } = App.useApp();
+  const { openNotification } = useNotificationModalStore();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
@@ -58,13 +58,25 @@ export default function UserManagementPage() {
         console.log(`✅ [USER MANAGEMENT] Found ${data.data.total} users`);
         setUsers(data.data.users);
         setFilteredUsers(data.data.users);
-        message.success(`โหลดผู้ใช้ ${data.data.total} คน เสร็จสิ้น`);
+        openNotification({
+          type: "success",
+          mainTitle: "โหลดข้อมูลสำเร็จ",
+          subTitle: `โหลดผู้ใช้ ${data.data.total} คน เสร็จสิ้น`,
+        });
       } else {
-        message.error(data.message_th || "ล้มเหลวในการโหลดผู้ใช้");
+        openNotification({
+          type: "error",
+          mainTitle: "ล้มเหลวในการโหลด",
+          subTitle: data.message_th || "ล้มเหลวในการโหลดผู้ใช้",
+        });
       }
     } catch (error: unknown) {
       console.error("❌ [USER MANAGEMENT] Error:", error);
-      message.error("ล้มเหลวในการดึงข้อมูลผู้ใช้");
+      openNotification({
+        type: "error",
+        mainTitle: "เกิดข้อผิดพลาด",
+        subTitle: "ล้มเหลวในการดึงข้อมูลผู้ใช้",
+      });
     } finally {
       setLoading(false);
     }
@@ -96,7 +108,11 @@ export default function UserManagementPage() {
       cancelText: "ยกเลิก",
       onOk: async () => {
         // TODO: Implement delete API
-        message.info("API ลบผู้ใช้ยังไม่ได้เตรียม");
+        openNotification({
+          type: "info",
+          mainTitle: "แจ้งเตือน",
+          subTitle: "API ลบผู้ใช้ยังไม่ได้เตรียม",
+        });
         console.log("Delete user:", userId);
       },
     });
