@@ -1,19 +1,7 @@
 "use client";
 
-import {
-  LockOutlined,
-  MailOutlined,
-} from "@ant-design/icons";
-import {
-  App,
-  Button,
-  Card,
-  ConfigProvider,
-  Form,
-  Input,
-  Typography,
-  theme as antTheme,
-} from "antd";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { App, Button, Card, ConfigProvider, Form, Input, Typography } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -41,91 +29,60 @@ export default function SigninForm() {
 
       if (response.ok) {
         message.success(result.message_th);
-        router.p"use client";
+        router.push("/");
+        setTimeout(() => {
+          router.refresh();
+        }, 500);
+      } else {
+        throw new Error(result.message_th);
+      }
+    } catch (err: any) {
+      message.error(err.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-import {
-  LockOutlined,
-  
-import {
-  ref  LockO
-   MailOutlined;
-} from "@ant-d
- import {
-  App,
-  Button,
-ul  App,
-ge  But
-   Card,
-    Confch  Form,
-  Input,    Inpuag  Typog(e  theme as a| } from "antd";
-impo?mport Link f?mport { useRouter } from "n?mport { useState } from "react";
-
-const { {
-
-const { Title, Text } = Typogra };
-export default function SigninFor     const [loading, setLoading] = useStar  const router = useRouter();
-  const { messagene  const { message } = App.uson
-  const onFinish = async (values:},
-    setLoaInput: { controlHeightLG: 54 },
-      try {
-      cons        co<d        method: "POST",
-        headers: { "Content-Type": "applicr"        headers: { "Coter", padding: "40px 20px" }}>
+  return (
+    <ConfigProvider
+      theme={{
+        token: { colorPrimary: "#0066FF", borderRadius: 12 },
+        components: {
+          Button: { controlHeightLG: 54, fontWeight: 600 },
+          Input: { controlHeightLG: 54 },
+        },
+      }}
+    >
+      <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" }}>
         <Card
-          styl          email: values.email00          password: values.paow        }),
-      });
+          style={{ maxWidth: 450, width: "100%", borderRadius: 24, boxShadow: "0 20px 40px rgba(0,0,0,0.05)" }}
+          styles={{ body: { padding: 40 } }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div style={{ background: "#0066FF", width: 48, height: 48, borderRadius: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+              <span style={{ color: "white", fontWeight: "bold", fontSize: 24 }}>K</span>
+            </div>
+            <Title level={2} style={{ margin: 0, fontWeight: 700 }}>เข้าสู่ระบบ</Title>
+            <Text type="secondary">ยินดีต้อนรับกลับมา! กรุณาลงชื่อเข้าใช้งาน</Text>
+          </div>
 
-      const 
-       });
-ty
-      cody
-      if (response.ok) {
-        message.div        message.successen        router.p"use client";
+          <Form layout="vertical" onFinish={onFinish} size="large">
+            <Form.Item name="email" rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}>
+              <Input prefix={<MailOutlined style={{ color: "#94A3B8" }} />} placeholder="อีเมล" />
+            </Form.Item>
+            <Form.Item name="password" rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}>
+              <Input.Password prefix={<LockOutlined style={{ color: "#94A3B8" }} />} placeholder="รหัสผ่าน" />
+            </Form.Item>
 
-import  <div 
-import {
-  LockOutlined,
-  F",  LockO 4  
-import {
-   bird  ref  s:   MailOutly:} from "@ant-d
- a import {
-  Aen  App,
- st  Butntul  App,ntge  Butrg   Catom    Con>
-  Input,    Inpupaimpo?mport Link f?mpo, fontWeight: "bold", fontSize:
-const { {
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading} block style={{ marginTop: 8 }}>เข้าสู่ระบบ</Button>
+            </Form.Item>
+          </Form>
 
-const { Title, Text } = Typogra };
-export default function SigninFor    fo
-const {: 7export default function SigninFor? const { messagene  const { message } = App.uson
-  const onFinish = async (values:},
-    setLoaInput:  ? const onFinish = async (values:},
-    setLoaIn??    setLoaInput: { controlHeightLGv>      try {
-      cons        co<d      ni      conssh        headers: { "Content-Type": "applicr""e        <Card
-          styl          email: values.email00          password: values.paow     ??         st??      });
-
-      const 
-       });
-ty
-      cody
-      if (response.ok) {
-        mess94A3B8" }} />       });
-erty
-      ?? ??      if           message.div      
-import  <div 
-import {
-  LockOutlined,
-  F",  LockO 4  true, message: "กimport {
-  L? LockO? F",  LockO 4??import {
-   bir
-    bird   a import {
-  Aen  App,
- st  Butntul  App,st  Aen  Appor st  Butnt"   Input,    Inpupaimpo?mport Link f?mpo," const { {
-
-const { Title, Text } = Typogra };
-export default function Sign 
-const {imaexport default function SigninForadconst {: 7export default function Sign?? const onFinish = async (values:},
-    setLoaInput:  ? const onFinish = async (values:},
-  <d    setLoaInput:  ? const onFinisar    setLoaIn??    setLoaInput: { controlHeightLGv> ???     cons        co<d      ni      conssh        headers: {k           styl          email: values.email00          password: values.paow     ??         st??   </
-      con      </div>
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Text type="secondary">ยังไม่มีบัญชี? </Text>
+            <Link href="/pages/signup" style={{ color: "#0066FF", fontWeight: 600 }}>สมัครสมาชิก</Link>
+          </div>
         </Card>
       </div>
     </ConfigProvider>

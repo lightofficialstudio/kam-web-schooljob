@@ -215,9 +215,24 @@ export default function LandingLayout({
               border-radius: 10px;
             }
           `}</style>
-          <Layout style={{ minHeight: "100vh" }}>
+          <Layout
+            style={{
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Navbar />
-            <Layout.Content>{children}</Layout.Content>
+            <Layout.Content
+              style={{
+                flex: "1 0 auto",
+                width: "100%",
+                maxWidth: "100vw",
+                overflowX: "hidden",
+              }}
+            >
+              <div style={{ width: "100%", height: "100%" }}>{children}</div>
+            </Layout.Content>
             <Footer />
           </Layout>
         </div>

@@ -92,7 +92,7 @@ export default function Navbar() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Link href="/login">
+        <Link href="/pages/signin">
           <Button
             type="text"
             icon={<UserOutlined />}
@@ -101,7 +101,7 @@ export default function Navbar() {
             เข้าสู่ระบบ
           </Button>
         </Link>
-        <Link href="/signup">
+        <Link href="/pages/signup">
           <Button
             type="primary"
             shape="round"
