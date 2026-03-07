@@ -1,7 +1,7 @@
 "use client";
 
-import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
 import { AdminGuard } from "@/app/components/layouts/admin/admin-guard";
+import { AdminLayout } from "@/app/components/layouts/admin/admin-layout";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -187,115 +187,119 @@ export default function UserManagementPage() {
     <AdminGuard>
       <AdminLayout title="User Management">
         <div className="space-y-6">
-        {/* ✨ [Header Section] */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              User Management
-            </h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Manage all registered users in the system
-            </p>
+          {/* ✨ [Header Section] */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">
+                User Management
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Manage all registered users in the system
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* ✨ [Toolbar] */}
-        <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between gap-4">
-          {/* ✨ [Search Box] */}
-          <Input
-            placeholder="Search by email, name, or role..."
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-            className="flex-1 max-w-xs"
-          />
-
-          {/* ✨ [Action Buttons] */}
-          <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={fetchUsers}
-              loading={loading}
-            >
-              Refresh
-            </Button>
-            <Link href="/admin/users/new">
-              <Button type="primary">Add New User</Button>
-            </Link>
-          </Space>
-        </div>
-
-        {/* ✨ [Stats Section] */}
-        <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-slate-600 text-sm font-semibold">
-              Total Users
-            </div>
-            <div className="text-3xl font-bold text-slate-900 mt-2">
-              {users.length}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-slate-600 text-sm font-semibold">Teachers</div>
-            <div className="text-3xl font-bold text-green-600 mt-2">
-              {users.filter((u) => u.role === "TEACHER").length}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-slate-600 text-sm font-semibold">Schools</div>
-            <div className="text-3xl font-bold text-blue-600 mt-2">
-              {users.filter((u) => u.role === "SCHOOL").length}
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-slate-600 text-sm font-semibold">Admins</div>
-            <div className="text-3xl font-bold text-red-600 mt-2">
-              {users.filter((u) => u.role === "ADMIN").length}
-            </div>
-          </div>
-        </div>
-
-        {/* ✨ [Data Table] */}
-        <div className="bg-white rounded-lg shadow">
-          <Spin spinning={loading} tip="Loading users...">
-            <Table<UserRecord>
-              columns={columns}
-              dataSource={filteredUsers}
-              rowKey="id"
-              pagination={{
-                pageSize: 10,
-                total: filteredUsers.length,
-                showTotal: (total) => `Total ${total} users`,
-                showSizeChanger: true,
-                showQuickJumper: true,
-              }}
-              scroll={{ x: true }}
-              locale={{
-                emptyText: "No users found",
-              }}
-              rowSelection={{
-                selectedRowKeys,
-                onChange: (keys) => setSelectedRowKeys(keys),
-              }}
+          {/* ✨ [Toolbar] */}
+          <div className="bg-white rounded-lg shadow p-4 flex items-center justify-between gap-4">
+            {/* ✨ [Search Box] */}
+            <Input
+              placeholder="Search by email, name, or role..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+              className="flex-1 max-w-xs"
             />
-          </Spin>
-        </div>
 
-        {/* ✨ [Bulk Actions] */}
-        {selectedRowKeys.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-            <div className="text-slate-700">
-              <strong>{selectedRowKeys.length}</strong> user(s) selected
-            </div>
+            {/* ✨ [Action Buttons] */}
             <Space>
-              <Button danger>Delete Selected</Button>
-              <Button>Export CSV</Button>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={fetchUsers}
+                loading={loading}
+              >
+                Refresh
+              </Button>
+              <Link href="/admin/users/new">
+                <Button type="primary">Add New User</Button>
+              </Link>
             </Space>
           </div>
-        )}
-      </div>
-    </AdminLayout>
+
+          {/* ✨ [Stats Section] */}
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg shadow p-4">
+              <div className="text-slate-600 text-sm font-semibold">
+                Total Users
+              </div>
+              <div className="text-3xl font-bold text-slate-900 mt-2">
+                {users.length}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <div className="text-slate-600 text-sm font-semibold">
+                Teachers
+              </div>
+              <div className="text-3xl font-bold text-green-600 mt-2">
+                {users.filter((u) => u.role === "TEACHER").length}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <div className="text-slate-600 text-sm font-semibold">
+                Schools
+              </div>
+              <div className="text-3xl font-bold text-blue-600 mt-2">
+                {users.filter((u) => u.role === "SCHOOL").length}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4">
+              <div className="text-slate-600 text-sm font-semibold">Admins</div>
+              <div className="text-3xl font-bold text-red-600 mt-2">
+                {users.filter((u) => u.role === "ADMIN").length}
+              </div>
+            </div>
+          </div>
+
+          {/* ✨ [Data Table] */}
+          <div className="bg-white rounded-lg shadow">
+            <Spin spinning={loading} tip="Loading users...">
+              <Table<UserRecord>
+                columns={columns}
+                dataSource={filteredUsers}
+                rowKey="id"
+                pagination={{
+                  pageSize: 10,
+                  total: filteredUsers.length,
+                  showTotal: (total) => `Total ${total} users`,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                }}
+                scroll={{ x: true }}
+                locale={{
+                  emptyText: "No users found",
+                }}
+                rowSelection={{
+                  selectedRowKeys,
+                  onChange: (keys) => setSelectedRowKeys(keys),
+                }}
+              />
+            </Spin>
+          </div>
+
+          {/* ✨ [Bulk Actions] */}
+          {selectedRowKeys.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="text-slate-700">
+                <strong>{selectedRowKeys.length}</strong> user(s) selected
+              </div>
+              <Space>
+                <Button danger>Delete Selected</Button>
+                <Button>Export CSV</Button>
+              </Space>
+            </div>
+          )}
+        </div>
+      </AdminLayout>
     </AdminGuard>
   );
 }

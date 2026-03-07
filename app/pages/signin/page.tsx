@@ -5,8 +5,8 @@ import { useAuthStore } from "@/app/stores/auth-store";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Card, ConfigProvider, Form, Input, Typography } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 const { Title, Text } = Typography;
 
@@ -17,7 +17,8 @@ interface ModalState {
   description: string;
 }
 
-export default function SigninForm() {
+// 🏗️ [Sign in form component - wrapped in Suspense to handle useSearchParams]
+function SigninFormContent() {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState<ModalState>({
     open: false,
@@ -26,6 +27,8 @@ export default function SigninForm() {
     description: "",
   });
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
   const { setUser } = useAuthStore();
 
   const showModal = (
@@ -38,7 +41,14 @@ export default function SigninForm() {
 
   const handleModalConfirm = () => {
     if (modal.type === "success") {
-      router.push("/");
+      // ✨ [ถ้ามี redirect URL จากการพยายามเข้า admin route ให้ return ไปหน้านั้น]
+      const destinationUrl = redirectUrl
+        ? decodeURIComponent(redirectUrl)
+        : "/";
+      console.log(
+        `🔐 [SIGNIN] Redirecting to: ${destinationUrl || "home page"}`,
+      );
+      router.push(destinationUrl);
       setTimeout(() => {
         router.refresh();
       }, 500);
@@ -205,5 +215,14 @@ export default function SigninForm() {
         </Card>
       </div>
     </ConfigProvider>
+  );
+}
+
+// 🔐 [Default page export with Suspense boundary for useSearchParams]
+export default function SigninPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SigninFormContent />
+    </Suspense>
   );
 }

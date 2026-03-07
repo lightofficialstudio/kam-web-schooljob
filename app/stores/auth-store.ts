@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface User {
   user_id: string;
@@ -16,20 +17,33 @@ interface AuthStore {
 
 /**
  * 🔐 Auth Store - จัดการ state ของ user authentication
+ * ✨ ใช้ localStorage persistence เพื่อให้ user state ยัง maintain หลัง refresh/navigate
  */
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  isAuthenticated: false,
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      isAuthenticated: false,
 
-  // ✨ [กำหนด user เมื่อ login สำเร็จ]
-  setUser: (user: User) => {
-    set({ user, isAuthenticated: true });
-    console.log("✅ User set in auth store:", user.email);
-  },
+      // ✨ [กำหนด user เมื่อ login สำเร็จ]
+      setUser: (user: User) => {
+        set({ user, isAuthenticated: true });
+        console.log(
+          "✅ User set in auth store:",
+          user.email,
+          "role:",
+          user.role,
+        );
+      },
 
-  // ✨ [เคลียร์ user info เมื่อ logout]
-  logout: () => {
-    set({ user: null, isAuthenticated: false });
-    console.log("🚪 User logged out from auth store");
-  },
-}));
+      // ✨ [เคลียร์ user info เมื่อ logout]
+      logout: () => {
+        set({ user: null, isAuthenticated: false });
+        console.log("🚪 User logged out from auth store");
+      },
+    }),
+    {
+      name: "auth-store", // key ใน localStorage
+    },
+  ),
+);
