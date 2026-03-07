@@ -41,13 +41,13 @@ const SYSTEM_PALETTE = {
     borderSecondary: "#F8FAFC",
   },
   dark: {
-    bgLayout: "#020617",
-    bgContainer: "#0F172A",
-    bgElevated: "#1E293B",
-    textMain: "#F8FAFC",
-    textSub: "#94A3B8",
-    border: "#1E293B",
-    borderSecondary: "#1E293B",
+    bgLayout: "#0D1117",
+    bgContainer: "#1A202C",
+    bgElevated: "#2D3748",
+    textMain: "#E2E8F0",
+    textSub: "#A0AEC0",
+    border: "#404854",
+    borderSecondary: "#2D3748",
   },
 };
 
@@ -138,17 +138,17 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
               "--border": palette.border,
               "--text-main": palette.textMain,
               "--glass-bg": isDark
-                ? "rgba(15, 23, 42, 0.7)"
+                ? "rgba(26, 32, 44, 0.75)"
                 : "rgba(255, 255, 255, 0.7)",
               "--card-glass-bg": isDark
-                ? "rgba(15, 23, 42, 0.65)"
+                ? "rgba(45, 55, 72, 0.7)"
                 : "rgba(255, 255, 255, 0.65)",
               "--modal-mask-bg": isDark
-                ? "rgba(0, 0, 0, 0.6)"
+                ? "rgba(0, 0, 0, 0.5)"
                 : "rgba(0, 0, 0, 0.45)",
-              "--scroll-thumb": isDark ? "#1E293B" : "#CBD5E1",
-              "--scroll-thumb-hover": isDark ? "#334155" : "#94A3B8",
-              "--modal-bg": isDark ? "#1E293B" : "#FFFFFF",
+              "--scroll-thumb": isDark ? "#4A5568" : "#CBD5E1",
+              "--scroll-thumb-hover": isDark ? "#718096" : "#94A3B8",
+              "--modal-bg": isDark ? "#2D3748" : "#FFFFFF",
             } as React.CSSProperties
           }
         >

@@ -50,28 +50,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       colorPrimary: mode === "dark" ? "#1890ff" : "#1890ff",
       borderRadius: 8,
       // ✨ [Enhanced color tokens for dark mode]
-      colorBgBase: mode === "dark" ? "#141414" : "#ffffff",
-      colorTextBase: mode === "dark" ? "#e6e6e6" : "#000000",
-      colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
-      colorBgElevated: mode === "dark" ? "#262626" : "#fafafa",
-      colorBgContainer: mode === "dark" ? "#1f1f1f" : "#f6f6f6",
-      colorBgLayout: mode === "dark" ? "#000000" : "#f5f5f5",
+      colorBgBase: mode === "dark" ? "#1A202C" : "#ffffff",
+      colorTextBase: mode === "dark" ? "#E2E8F0" : "#000000",
+      colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
+      colorBgElevated: mode === "dark" ? "#2D3748" : "#fafafa",
+      colorBgContainer: mode === "dark" ? "#2D3748" : "#f6f6f6",
+      colorBgLayout: mode === "dark" ? "#0D1117" : "#f5f5f5",
     },
     algorithm:
       mode === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
     components: {
       // ✨ [Layout Colors]
       Layout: {
-        headerBg: mode === "dark" ? "#001529" : "#fafafa",
+        headerBg: mode === "dark" ? "#1A202C" : "#fafafa",
         headerColor:
-          mode === "dark" ? "rgba(255, 255, 255, 0.88)" : "rgba(0, 0, 0, 0.88)",
+          mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
         headerHeight: 64,
-        siderBg: mode === "dark" ? "#001529" : "#ffffff",
+        siderBg: mode === "dark" ? "#1A202C" : "#ffffff",
         lightSiderBg: "#ffffff",
-        bodyBg: mode === "dark" ? "#141414" : "#f5f5f5",
+        bodyBg: mode === "dark" ? "#0D1117" : "#f5f5f5",
         triggerHeight: 64,
-        triggerBg: mode === "dark" ? "#002766" : "#fafafa",
-        triggerColor: mode === "dark" ? "#ffffff" : "rgba(0, 0, 0, 0.88)",
+        triggerBg: mode === "dark" ? "#2D3748" : "#fafafa",
+        triggerColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
       },
 
       // ✨ [Menu Styling]
@@ -79,22 +79,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         itemBg: mode === "dark" ? "transparent" : "transparent",
         itemSelectedBg:
           mode === "dark"
-            ? "rgba(24, 144, 255, 0.15)"
+            ? "rgba(24, 144, 255, 0.2)"
             : "rgba(24, 144, 255, 0.1)",
-        itemSelectedColor: mode === "dark" ? "#177ddc" : "#1890ff",
+        itemSelectedColor: mode === "dark" ? "#52B8FF" : "#1890ff",
         itemHoverBg:
-          mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.04)",
+          mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.04)",
         itemHoverColor:
-          mode === "dark" ? "rgba(255, 255, 255, 0.88)" : "rgba(0, 0, 0, 0.88)",
+          mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
       },
 
       // ✨ [Card Styling]
       Card: {
-        colorBgContainer: mode === "dark" ? "#262626" : "#ffffff",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
         boxShadow:
           mode === "dark"
-            ? "0 2px 8px rgba(0, 0, 0, 0.25)"
+            ? "0 2px 8px rgba(0, 0, 0, 0.3)"
             : "0 2px 8px rgba(0, 0, 0, 0.08)",
         borderRadiusLG: 8,
         paddingLG: 24,
@@ -102,19 +102,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       // ✨ [Button Styling]
       Button: {
-        colorBgContainer: mode === "dark" ? "#1f1f1f" : "#ffffff",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
         controlHeight: 40,
         borderRadius: 8,
       },
 
       // ✨ [Input Styling]
       Input: {
-        colorBgContainer: mode === "dark" ? "#1f1f1f" : "#ffffff",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
         colorTextPlaceholder:
-          mode === "dark" ? "rgba(255, 255, 255, 0.45)" : "rgba(0, 0, 0, 0.45)",
-        colorBgElevated: mode === "dark" ? "#262626" : "#f5f5f5",
+          mode === "dark" ? "#718096" : "rgba(0, 0, 0, 0.45)",
+        colorBgElevated: mode === "dark" ? "#374151" : "#f5f5f5",
         borderRadius: 8,
         controlHeight: 40,
       },
@@ -127,20 +127,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       // ✨ [Select Styling]
       Select: {
-        colorBgContainer: mode === "dark" ? "#1f1f1f" : "#ffffff",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
         controlHeight: 40,
         borderRadius: 8,
       },
 
       // ✨ [Table Styling]
       Table: {
-        colorBgContainer: mode === "dark" ? "#1f1f1f" : "#ffffff",
-        colorBgElevated: mode === "dark" ? "#262626" : "#fafafa",
-        colorBorder: mode === "dark" ? "#434343" : "#f0f0f0",
+        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBgElevated: mode === "dark" ? "#1A202C" : "#fafafa",
+        colorBorder: mode === "dark" ? "#404854" : "#f0f0f0",
         rowHoverBg:
           mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.02)",
-        headerBg: mode === "dark" ? "#262626" : "#fafafa",
+        headerBg: mode === "dark" ? "#1A202C" : "#fafafa",
       },
 
       // ✨ [Statistic Styling]
@@ -150,35 +150,35 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       // ✨ [Tag Styling]
       Tag: {
-        colorBgContainer: mode === "dark" ? "#262626" : "#fafafa",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#374151" : "#fafafa",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
       },
 
       // ✨ [Modal Styling]
       Modal: {
-        colorBgElevated: mode === "dark" ? "#262626" : "#ffffff",
+        colorBgElevated: mode === "dark" ? "#2D3748" : "#ffffff",
       },
 
       // ✨ [Dropdown Styling]
       Dropdown: {
-        colorBgElevated: mode === "dark" ? "#262626" : "#ffffff",
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBgElevated: mode === "dark" ? "#2D3748" : "#ffffff",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
       },
 
       // ✨ [Tooltip Styling]
       Tooltip: {
-        colorBgBase: mode === "dark" ? "#595959" : "#000000",
+        colorBgBase: mode === "dark" ? "#4A5568" : "#000000",
       },
 
       // ✨ [Divider Styling]
       Divider: {
-        colorBorder: mode === "dark" ? "#434343" : "#d9d9d9",
+        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
       },
 
       // ✨ [Breadcrumb Styling]
       Breadcrumb: {
         colorText:
-          mode === "dark" ? "rgba(255, 255, 255, 0.65)" : "rgba(0, 0, 0, 0.45)",
+          mode === "dark" ? "#A0AEC0" : "rgba(0, 0, 0, 0.45)",
       },
     },
   };

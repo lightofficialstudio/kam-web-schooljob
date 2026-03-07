@@ -42,7 +42,6 @@ export default function LandingPage() {
           alignItems: "center",
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
         }}
       >
         {/* Decorative elements */}
@@ -53,7 +52,6 @@ export default function LandingPage() {
             right: "-5%",
             width: "500px",
             height: "500px",
-            background: "rgba(0, 102, 255, 0.05)",
             borderRadius: "50%",
             filter: "blur(100px)",
           }}
@@ -71,15 +69,12 @@ export default function LandingPage() {
           <Badge
             count="สมัครฟรีสำหรับคนหางาน"
             style={{
-              backgroundColor: "#E6F0FF",
-              color: "#0066FF",
               fontWeight: 600,
               padding: "0 12px",
               height: "32px",
               lineHeight: "32px",
               borderRadius: "100px",
               marginBottom: "24px",
-              border: "1px solid #B3D1FF",
             }}
           />
 
@@ -88,18 +83,16 @@ export default function LandingPage() {
               fontSize: "56px",
               fontWeight: 800,
               marginBottom: "16px",
-              color: "#1E293B",
               lineHeight: 1.2,
             }}
           >
             ศูนย์รวมงานสายการศึกษา <br />
-            <span style={{ color: "#0066FF" }}>อันดับ 1 ในประเทศไทย</span>
+            <span>อันดับ 1 ในประเทศไทย</span>
           </Title>
 
           <Paragraph
             style={{
               fontSize: "18px",
-              color: "#64748B",
               maxWidth: "800px",
               margin: "0 auto 40px auto",
             }}
@@ -115,14 +108,13 @@ export default function LandingPage() {
               margin: "0 auto",
               boxShadow: "0 20px 40px rgba(0, 0, 0, 0.06)",
               borderRadius: "24px",
-              border: "1px solid #F1F5F9",
               padding: "12px",
             }}
           >
             <Row gutter={[16, 16]} align="middle">
               <Col xs={24} lg={9}>
                 <Input
-                  prefix={<SearchOutlined style={{ color: "#94A3B8" }} />}
+                  prefix={<SearchOutlined />}
                   placeholder="ชื่อตำแหน่งงาน, วิชาเอก หรือชื่อโรงเรียน"
                   variant="borderless"
                   style={{ fontSize: "16px", padding: "8px 12px" }}
@@ -133,7 +125,6 @@ export default function LandingPage() {
                   style={{
                     width: "1px",
                     height: "30px",
-                    background: "#E2E8F0",
                     margin: "0 auto",
                   }}
                 />
@@ -143,7 +134,7 @@ export default function LandingPage() {
                   placeholder="ตำแหน่งที่สนใจ"
                   variant="borderless"
                   style={{ width: "100%", textAlign: "left" }}
-                  suffixIcon={<SolutionOutlined style={{ color: "#0066FF" }} />}
+                  suffixIcon={<SolutionOutlined />}
                 >
                   <Option value="teacher">ครูผู้สอน / อาจารย์</Option>
                   <Option value="tutor">ติวเตอร์ / ครูอัตราจ้าง</Option>
@@ -156,7 +147,6 @@ export default function LandingPage() {
                   style={{
                     width: "1px",
                     height: "30px",
-                    background: "#E2E8F0",
                     margin: "0 auto",
                   }}
                 />
@@ -166,7 +156,7 @@ export default function LandingPage() {
                   placeholder="ทุกจังหวัด"
                   variant="borderless"
                   style={{ width: "100%", textAlign: "left" }}
-                  suffixIcon={<GlobalOutlined style={{ color: "#0066FF" }} />}
+                  suffixIcon={<GlobalOutlined />}
                 >
                   <Option value="bkk">กรุงเทพมหานคร</Option>
                   <Option value="center">ภาคกลาง</Option>
@@ -218,7 +208,7 @@ export default function LandingPage() {
       </div>
 
       {/* 📊 Statistics Section */}
-      <div style={{ padding: "40px 24px", background: "#F8FAFC" }}>
+      <div style={{ padding: "40px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <Row gutter={[32, 32]}>
             {[
@@ -255,13 +245,12 @@ export default function LandingPage() {
                   <div
                     style={{
                       fontSize: "24px",
-                      color: stat.color,
                       marginBottom: "8px",
                     }}
                   >
                     {stat.icon}
                   </div>
-                  <Title level={2} style={{ margin: 0, color: "#1E293B" }}>
+                  <Title level={2} style={{ margin: 0 }}>
                     {stat.value}
                   </Title>
                   <Text type="secondary" strong>
@@ -275,26 +264,25 @@ export default function LandingPage() {
       </div>
 
       {/* 🏢 Employer Solutions Section */}
-      <div style={{ padding: "100px 24px", background: "white" }}>
+      <div style={{ padding: "100px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <Row gutter={[64, 48]} align="middle">
             <Col xs={24} md={12}>
               <Badge
                 status="processing"
                 text={
-                  <Text strong style={{ color: "#0066FF" }}>
+                  <Text strong>
                     สำหรับสถานศึกษา
                   </Text>
                 }
               />
               <Title style={{ fontSize: "40px", marginTop: "16px" }}>
                 พบกับบุคลากรที่ตรงใจ <br />
-                <span style={{ color: "#0066FF" }}>ได้เร็วกว่าที่เคย</span>
+                <span>ได้เร็วกว่าที่เคย</span>
               </Title>
               <Paragraph
                 style={{
                   fontSize: "16px",
-                  color: "#64748B",
                   marginBottom: "32px",
                 }}
               >
@@ -316,7 +304,7 @@ export default function LandingPage() {
                   "ส่งแจ้งเตือนผ่าน Line OA ถึงกลุ่มเป้าหมาย",
                 ].map((feature, i) => (
                   <Space key={i}>
-                    <RocketOutlined style={{ color: "#0066FF" }} />
+                    <RocketOutlined />
                     <Text strong>{feature}</Text>
                   </Space>
                 ))}
@@ -339,7 +327,6 @@ export default function LandingPage() {
                   <div
                     style={{
                       height: "350px",
-                      background: "#E6F0FF",
                       borderRadius: "24px",
                       display: "flex",
                       alignItems: "center",
@@ -349,7 +336,6 @@ export default function LandingPage() {
                     <SolutionOutlined
                       style={{
                         fontSize: "120px",
-                        color: "#0066FF",
                         opacity: 0.3,
                       }}
                     />
@@ -364,7 +350,7 @@ export default function LandingPage() {
       </div>
 
       {/* 🎓 Job Seeker Features */}
-      <div style={{ padding: "80px 24px", background: "#F8FAFC" }}>
+      <div style={{ padding: "80px 24px" }}>
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center" }}
         >
@@ -408,8 +394,6 @@ export default function LandingPage() {
                     style={{
                       width: "60px",
                       height: "60px",
-                      background: "#E6F0FF",
-                      color: "#0066FF",
                       borderRadius: "12px",
                       display: "flex",
                       alignItems: "center",

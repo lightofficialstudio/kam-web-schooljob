@@ -51,15 +51,15 @@ export default function Navbar({ isDark }: NavbarProps) {
         width: "100%",
         zIndex: 1000,
         background: isDark
-          ? "rgba(15, 23, 42, 0.85)"
+          ? "rgba(26, 32, 44, 0.9)"
           : "rgba(255, 255, 255, 0.85)",
         backdropFilter: "blur(12px)",
-        borderBottom: isDark ? "1px solid #1E293B" : "1px solid #F1F5F9",
+        borderBottom: isDark ? "1px solid #404854" : "1px solid #F1F5F9",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "12px 60px",
-        color: isDark ? "#F8FAFC" : "#1E293B",
+        color: isDark ? "#E2E8F0" : "#1E293B",
       }}
     >
       <Link
@@ -98,7 +98,7 @@ export default function Navbar({ isDark }: NavbarProps) {
           style={{
             fontSize: "18px",
             letterSpacing: "-0.5px",
-            color: isDark ? "#F8FAFC" : "#1E293B",
+            color: isDark ? "#E2E8F0" : "#1E293B",
           }}
         >
           KAM <span style={{ color: "#0066FF" }}>SCHOOLJOB</span>
@@ -112,7 +112,7 @@ export default function Navbar({ isDark }: NavbarProps) {
               strong
               style={{
                 cursor: "pointer",
-                color: isDark ? "#CBD5E1" : "#475569",
+                color: isDark ? "#A0AEC0" : "#475569",
               }}
             >
               ค้นหางาน
@@ -123,7 +123,7 @@ export default function Navbar({ isDark }: NavbarProps) {
               strong
               style={{
                 cursor: "pointer",
-                color: isDark ? "#CBD5E1" : "#475569",
+                color: isDark ? "#A0AEC0" : "#475569",
               }}
             >
               ฝากประวัติ
@@ -134,7 +134,7 @@ export default function Navbar({ isDark }: NavbarProps) {
               strong
               style={{
                 cursor: "pointer",
-                color: isDark ? "#CBD5E1" : "#475569",
+                color: isDark ? "#A0AEC0" : "#475569",
               }}
             >
               สำหรับสถานศึกษา
@@ -145,7 +145,7 @@ export default function Navbar({ isDark }: NavbarProps) {
               strong
               style={{
                 cursor: "pointer",
-                color: isDark ? "#CBD5E1" : "#475569",
+                color: isDark ? "#A0AEC0" : "#475569",
               }}
             >
               บทความ
