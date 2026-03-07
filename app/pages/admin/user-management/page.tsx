@@ -29,6 +29,18 @@ import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 
+// ✨ [Date Format Utility - Thai Style dd/mm/yyyy hh:mm]
+const formatDateThai = (dateString: string): string => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const thaiYear = date.getFullYear() + 543; // Convert to Thai year
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${day}/${month}/${thaiYear} ${hours}:${minutes}`;
+};
+
 // ✨ [Type Definition สำหรับ User]
 interface UserRecord {
   id: string;
@@ -125,6 +137,17 @@ export default function UserManagementPage() {
   // ✨ [Column Definitions]
   const columns: ColumnsType<UserRecord> = [
     {
+      title: "User ID",
+      dataIndex: "userId",
+      key: "userId",
+      width: 140,
+      render: (userId: string) => (
+        <Tooltip title="User ID ของระบบ">
+          <Text code>{userId.substring(0, 12)}...</Text>
+        </Tooltip>
+      ),
+    },
+    {
       title: "อีเมล",
       dataIndex: "email",
       key: "email",
@@ -139,14 +162,16 @@ export default function UserManagementPage() {
       title: "ชื่อเต็ม",
       dataIndex: "fullName",
       key: "fullName",
-      width: 180,
-      render: (fullName: string | null) => <Text>{fullName || "-"}</Text>,
+      width: 160,
+      render: (fullName: string | null) => (
+        <Text>{fullName || <Text type="secondary">-</Text>}</Text>
+      ),
     },
     {
       title: "บทบาท",
       dataIndex: "role",
       key: "role",
-      width: 120,
+      width: 110,
       render: (role: string) => {
         let color = "default";
         let label = role;
@@ -168,18 +193,44 @@ export default function UserManagementPage() {
       title: "สร้างเมื่อ",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: 150,
-      render: (date: string) => new Date(date).toLocaleDateString("th-TH"),
+      width: 160,
+      render: (date: string) => (
+        <Tooltip title="วันที่สร้างบัญชี">
+          <Text type="secondary">{formatDateThai(date)}</Text>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "อัปเดตล่าสุด",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      width: 160,
+      render: (date: string) => (
+        <Tooltip title="วันที่แก้ไขล่าสุด">
+          <Text type="secondary">{formatDateThai(date)}</Text>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "ID ระเบียน",
+      dataIndex: "id",
+      key: "id",
+      width: 140,
+      render: (id: string) => (
+        <Tooltip title="ID ของระเบียนในฐานข้อมูล">
+          <Text code>{id.substring(0, 12)}...</Text>
+        </Tooltip>
+      ),
     },
     {
       title: "การกระทำ",
       key: "actions",
-      width: 120,
+      width: 100,
       fixed: "right",
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="แก้ไข">
-            <Link href={`/pages/admin/users/${record.id}/edit`}>
+          <Tooltip title="ดูรายละเอียด">
+            <Link href={`/pages/admin/users/${record.id}`}>
               <Button type="text" icon={<EditOutlined />} size="small" />
             </Link>
           </Tooltip>
@@ -316,17 +367,96 @@ export default function UserManagementPage() {
               pagination={{
                 pageSize: 10,
                 total: filteredUsers.length,
-                showTotal: (total) => `รวม ${total} ผู้ใช้`,
+                showTotal: (total, range) =>
+                  `แสดง ${range[0]} ถึง ${range[1]} จากทั้งหมด ${total} ผู้ใช้`,
                 showSizeChanger: true,
                 showQuickJumper: true,
               }}
-              scroll={{ x: true }}
+              scroll={{ x: 1200 }}
               locale={{
                 emptyText: "ไม่พบผู้ใช้",
               }}
               rowSelection={{
                 selectedRowKeys,
                 onChange: (keys) => setSelectedRowKeys(keys),
+              }}
+              expandable={{
+                expandedRowRender: (record) => (
+                  <Row gutter={[24, 16]}>
+                    <Col xs={24} sm={12} md={8}>
+                      <Space direction="vertical" style={{ width: "100%" }}>
+                        <div>
+                          <Text type="secondary" strong>
+                            User ID:
+                          </Text>
+                          <br />
+                          <Text code>{record.userId}</Text>
+                        </div>
+                        <div>
+                          <Text type="secondary" strong>
+                            ID ระเบียน:
+                          </Text>
+                          <br />
+                          <Text code>{record.id}</Text>
+                        </div>
+                      </Space>
+                    </Col>
+                    <Col xs={24} sm={12} md={8}>
+                      <Space direction="vertical" style={{ width: "100%" }}>
+                        <div>
+                          <Text type="secondary" strong>
+                            สร้างเมื่อ:
+                          </Text>
+                          <br />
+                          <Text>{formatDateThai(record.createdAt)}</Text>
+                        </div>
+                        <div>
+                          <Text type="secondary" strong>
+                            แก้ไขล่าสุด:
+                          </Text>
+                          <br />
+                          <Text>{formatDateThai(record.updatedAt)}</Text>
+                        </div>
+                      </Space>
+                    </Col>
+                    <Col xs={24} sm={12} md={8}>
+                      <Space direction="vertical" style={{ width: "100%" }}>
+                        <div>
+                          <Text type="secondary" strong>
+                            ชื่อเต็ม:
+                          </Text>
+                          <br />
+                          <Text>
+                            {record.fullName || (
+                              <Text type="secondary">ยังไม่ได้ตั้ง</Text>
+                            )}
+                          </Text>
+                        </div>
+                        <div>
+                          <Text type="secondary" strong>
+                            บทบาท:
+                          </Text>
+                          <br />
+                          {(() => {
+                            let color = "default";
+                            let label: string = record.role;
+                            if (record.role === "ADMIN") {
+                              color = "red";
+                              label = "ผู้ดูแล";
+                            } else if (record.role === "SCHOOL") {
+                              color = "blue";
+                              label = "โรงเรียน";
+                            } else if (record.role === "TEACHER") {
+                              color = "green";
+                              label = "ครู";
+                            }
+                            return <Tag color={color}>{label}</Tag>;
+                          })()}
+                        </div>
+                      </Space>
+                    </Col>
+                  </Row>
+                ),
               }}
             />
           </Spin>
@@ -343,22 +473,136 @@ export default function UserManagementPage() {
               borderRadius: "8px",
             }}
           >
-            <Row justify="space-between" align="middle">
-              <Col>
-                <Text>
-                  เลือก <Text strong>{selectedRowKeys.length}</Text> ผู้ใช้
+            <Space direction="vertical" style={{ width: "100%" }} size="middle">
+              <Row justify="space-between" align="middle">
+                <Col>
+                  <Text>
+                    เลือก <Text strong>{selectedRowKeys.length}</Text> ผู้ใช้
+                  </Text>
+                </Col>
+                <Col>
+                  <Space>
+                    <Button danger>ลบที่เลือก</Button>
+                    <Button>ส่งออก CSV (ทั้งหมด)</Button>
+                    <Button>ส่งออก CSV (ที่เลือก)</Button>
+                  </Space>
+                </Col>
+              </Row>
+
+              <div>
+                <Text type="secondary" strong>
+                  รายละเอียดที่เลือก:
                 </Text>
-              </Col>
-              <Col>
-                <Space>
-                  <Button danger>ลบที่เลือก</Button>
-                  <Button>ส่งออก CSV</Button>
-                </Space>
-              </Col>
-            </Row>
+                <Row gutter={[8, 8]} style={{ marginTop: "8px" }}>
+                  {(() => {
+                    const selectedUsers = users.filter((u) =>
+                      selectedRowKeys.includes(u.id),
+                    );
+                    const adminCount = selectedUsers.filter(
+                      (u) => u.role === "ADMIN",
+                    ).length;
+                    const schoolCount = selectedUsers.filter(
+                      (u) => u.role === "SCHOOL",
+                    ).length;
+                    const teacherCount = selectedUsers.filter(
+                      (u) => u.role === "TEACHER",
+                    ).length;
+
+                    return (
+                      <>
+                        <Col xs={12} sm={6}>
+                          <Text>ผู้ดูแล: {adminCount}</Text>
+                        </Col>
+                        <Col xs={12} sm={6}>
+                          <Text>โรงเรียน: {schoolCount}</Text>
+                        </Col>
+                        <Col xs={12} sm={6}>
+                          <Text>ครู: {teacherCount}</Text>
+                        </Col>
+                      </>
+                    );
+                  })()}
+                </Row>
+              </div>
+            </Space>
           </Card>
         </Col>
       )}
+
+      {/* ✨ [Summary Section] */}
+      <Col xs={24}>
+        <Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical">
+                <Text type="secondary" strong>
+                  ข้อมูลล่าสุด
+                </Text>
+                {users.length > 0 && (
+                  <>
+                    <Text>
+                      ผู้ใช้ล่าสุด: {formatDateThai(users[users.length - 1].createdAt)}
+                    </Text>
+                    <Text>อีเมล: {users[users.length - 1].email}</Text>
+                  </>
+                )}
+              </Space>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical">
+                <Text type="secondary" strong>
+                  สถิติบทบาท
+                </Text>
+                <Text>
+                  ผู้ดูแล: {users.filter((u) => u.role === "ADMIN").length}
+                </Text>
+                <Text>
+                  โรงเรียน: {users.filter((u) => u.role === "SCHOOL").length}
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical">
+                <Text type="secondary" strong>
+                  สถิติข้อมูล
+                </Text>
+                <Text>
+                  ได้ชื่อเต็ม: {users.filter((u) => u.fullName).length}
+                </Text>
+                <Text>
+                  ยังไม่มีชื่อเต็ม:{" "}
+                  {users.filter((u) => !u.fullName).length}
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical">
+                <Text type="secondary" strong>
+                  การจัดการ
+                </Text>
+                <Text>
+                  <Button
+                    type="text"
+                    size="small"
+                    onClick={() => {
+                      console.log(
+                        "Export data:",
+                        users.map((u) => ({
+                          ...u,
+                          createdAt: formatDateThai(u.createdAt),
+                          updatedAt: formatDateThai(u.updatedAt),
+                        })),
+                      );
+                    }}
+                  >
+                    ดาวน์โหลด (JSON)
+                  </Button>
+                </Text>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
     </Row>
   );
 }
