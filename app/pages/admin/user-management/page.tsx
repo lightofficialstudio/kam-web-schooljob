@@ -17,13 +17,17 @@ import {
   Row,
   Space,
   Spin,
+  Statistic,
   Table,
   Tag,
   Tooltip,
+  Typography,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+const { Title, Text } = Typography;
 
 // ✨ [Type Definition สำหรับ User]
 interface UserRecord {
@@ -127,7 +131,7 @@ export default function UserManagementPage() {
       width: 200,
       render: (email: string) => (
         <Tooltip title={email}>
-          <span style={{ fontWeight: 500 }}>{email}</span>
+          <Text strong>{email}</Text>
         </Tooltip>
       ),
     },
@@ -136,7 +140,7 @@ export default function UserManagementPage() {
       dataIndex: "fullName",
       key: "fullName",
       width: 180,
-      render: (fullName: string | null) => <span>{fullName || "-"}</span>,
+      render: (fullName: string | null) => <Text>{fullName || "-"}</Text>,
     },
     {
       title: "บทบาท",
@@ -176,12 +180,7 @@ export default function UserManagementPage() {
         <Space size="small">
           <Tooltip title="แก้ไข">
             <Link href={`/pages/admin/users/${record.id}/edit`}>
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                size="small"
-                style={{ color: "#1890ff" }}
-              />
+              <Button type="text" icon={<EditOutlined />} size="small" />
             </Link>
           </Tooltip>
           <Tooltip title="ลบ">
@@ -205,22 +204,15 @@ export default function UserManagementPage() {
         <Card
           style={{
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            border: "none",
-            color: "white",
+            borderRadius: "8px",
           }}
         >
-          <h2
-            style={{
-              color: "white",
-              marginBottom: "8px",
-              fontSize: "24px",
-            }}
-          >
+          <Title level={2} style={{ color: "white", margin: 0 }}>
             จัดการผู้ใช้
-          </h2>
-          <p style={{ color: "rgba(255, 255, 255, 0.8)", marginBottom: 0 }}>
+          </Title>
+          <Text style={{ color: "rgba(255, 255, 255, 0.8)" }}>
             ดูและจัดการผู้ใช้ที่ลงทะเบียนทั้งหมดในระบบ
-          </p>
+          </Text>
         </Card>
       </Col>
 
@@ -228,110 +220,51 @@ export default function UserManagementPage() {
       <Col xs={24}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(0,0,0,0.65)",
-                  marginBottom: "8px",
-                }}
-              >
-                จำนวนผู้ใช้ทั้งหมด
-              </div>
-              <div
-                style={{
-                  fontSize: "28px",
-                  fontWeight: 700,
-                }}
-              >
-                {users.length}
-              </div>
+            <Card>
+              <Statistic
+                title="จำนวนผู้ใช้ทั้งหมด"
+                value={users.length}
+                valueStyle={{ fontSize: "28px", fontWeight: 700 }}
+              />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(0,0,0,0.65)",
-                  marginBottom: "8px",
-                }}
-              >
-                ครู
-              </div>
-              <div
-                style={{
+            <Card>
+              <Statistic
+                title="ครู"
+                value={users.filter((u) => u.role === "TEACHER").length}
+                valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
                   color: "#52C41A",
                 }}
-              >
-                {users.filter((u) => u.role === "TEACHER").length}
-              </div>
+              />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(0,0,0,0.65)",
-                  marginBottom: "8px",
-                }}
-              >
-                โรงเรียน
-              </div>
-              <div
-                style={{
+            <Card>
+              <Statistic
+                title="โรงเรียน"
+                value={users.filter((u) => u.role === "SCHOOL").length}
+                valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
                   color: "#1890ff",
                 }}
-              >
-                {users.filter((u) => u.role === "SCHOOL").length}
-              </div>
+              />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(0,0,0,0.65)",
-                  marginBottom: "8px",
-                }}
-              >
-                ผู้ดูแล
-              </div>
-              <div
-                style={{
+            <Card>
+              <Statistic
+                title="ผู้ดูแล"
+                value={users.filter((u) => u.role === "ADMIN").length}
+                valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
                   color: "#f5222d",
                 }}
-              >
-                {users.filter((u) => u.role === "ADMIN").length}
-              </div>
+              />
             </Card>
           </Col>
         </Row>
@@ -339,7 +272,7 @@ export default function UserManagementPage() {
 
       {/* ✨ [Toolbar] */}
       <Col xs={24}>
-        <Card style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}>
+        <Card>
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} sm={12}>
               <Input
@@ -351,20 +284,22 @@ export default function UserManagementPage() {
               />
             </Col>
             <Col xs={24} sm={12}>
-              <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={fetchUsers}
-                  loading={loading}
-                >
-                  รีเฟรช
-                </Button>
-                <Link href="/pages/admin/users/new">
-                  <Button type="primary" icon={<PlusOutlined />}>
-                    เพิ่มผู้ใช้ใหม่
+              <Row justify="end">
+                <Space>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    onClick={fetchUsers}
+                    loading={loading}
+                  >
+                    รีเฟรช
                   </Button>
-                </Link>
-              </Space>
+                  <Link href="/pages/admin/users/new">
+                    <Button type="primary" icon={<PlusOutlined />}>
+                      เพิ่มผู้ใช้ใหม่
+                    </Button>
+                  </Link>
+                </Space>
+              </Row>
             </Col>
           </Row>
         </Card>
@@ -372,7 +307,7 @@ export default function UserManagementPage() {
 
       {/* ✨ [Data Table] */}
       <Col xs={24}>
-        <Card style={{ boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)" }}>
+        <Card>
           <Spin spinning={loading} description="กำลังโหลดผู้ใช้...">
             <Table<UserRecord>
               columns={columns}
@@ -405,14 +340,14 @@ export default function UserManagementPage() {
             style={{
               background: "linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)",
               border: "1px solid #91d5ff",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+              borderRadius: "8px",
             }}
           >
             <Row justify="space-between" align="middle">
               <Col>
-                <span style={{ color: "rgba(0,0,0,0.65)" }}>
-                  เลือก <strong>{selectedRowKeys.length}</strong> ผู้ใช้
-                </span>
+                <Text>
+                  เลือก <Text strong>{selectedRowKeys.length}</Text> ผู้ใช้
+                </Text>
               </Col>
               <Col>
                 <Space>
