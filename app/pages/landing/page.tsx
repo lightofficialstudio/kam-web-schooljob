@@ -35,10 +35,8 @@ export default function LandingPage() {
       {/* 🚀 Hero Section - The "One-Stop" Job Portal for Education */}
       <div
         style={{
-          padding: "160px 0 80px 0",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          padding: "160px 24px 80px 24px",
+          textAlign: "center",
           position: "relative",
           overflow: "hidden",
         }}
@@ -58,11 +56,9 @@ export default function LandingPage() {
 
         <div
           style={{
-            textAlign: "center",
             zIndex: 1,
             maxWidth: "1200px",
-            width: "100%",
-            padding: "0 24px",
+            margin: "0 auto",
           }}
         >
           <Badge
@@ -181,9 +177,9 @@ export default function LandingPage() {
             </Row>
           </Card>
 
-          <div style={{ marginTop: "24px" }}>
+          <Space direction="vertical" size={8} style={{ marginTop: "24px" }}>
             <Text type="secondary">อาชีพยอดนิยม: </Text>
-            <Space size={[8, 8]} wrap style={{ marginLeft: "8px" }}>
+            <Space size={[8, 8]} wrap>
               {[
                 "ครูภาษาอังกฤษ",
                 "ครูคณิตศาสตร์",
@@ -202,7 +198,7 @@ export default function LandingPage() {
                 </Tag>
               ))}
             </Space>
-          </div>
+          </Space>
         </div>
       </div>
 
@@ -215,25 +211,21 @@ export default function LandingPage() {
                 label: "ตำแหน่งงานเปิดรับ",
                 value: "2,500+",
                 icon: <FileSearchOutlined />,
-                color: "#0066FF",
               },
               {
                 label: "สถาบันการศึกษา",
                 value: "1,200+",
                 icon: <BankOutlined />,
-                color: "#10B981",
               },
               {
                 label: "ผู้สมัครโปรไฟล์คุณภาพ",
                 value: "45,000+",
                 icon: <UsergroupAddOutlined />,
-                color: "#F59E0B",
               },
               {
                 label: "นัดสัมภาษณ์งาน/เดือน",
                 value: "850+",
                 icon: <CalendarOutlined />,
-                color: "#8B5CF6",
               },
             ].map((stat, idx) => (
               <Col xs={12} md={6} key={idx}>
@@ -284,13 +276,10 @@ export default function LandingPage() {
                 เราช่วยแก้ปัญหา "หาครูยาก" ด้วยระบบจัดการประกาศงานที่ทันสมัย
                 คัดกรองบุคลากรตามวิชาเอกที่ต้องการ และระบบนัดสัมภาษณ์อัตโนมัติ
               </Paragraph>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  marginBottom: "40px",
-                }}
+              <Space
+                direction="vertical"
+                size={16}
+                style={{ marginBottom: "40px" }}
               >
                 {[
                   "ประกาศงานไม่จำกัดตำแหน่ง",
@@ -303,7 +292,7 @@ export default function LandingPage() {
                     <Text strong>{feature}</Text>
                   </Space>
                 ))}
-              </div>
+              </Space>
               <Button
                 type="primary"
                 size="large"
@@ -336,7 +325,7 @@ export default function LandingPage() {
                     />
                   </div>
                 }
-                style={{ borderRadius: "24px", border: "8px solid #F1F5F9" }}
+                style={{ borderRadius: "24px" }}
                 variant="borderless"
               />
             </Col>
@@ -385,22 +374,37 @@ export default function LandingPage() {
                     border: "none",
                   }}
                 >
-                  <div
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      borderRadius: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "28px",
-                      margin: "0 auto 24px auto",
-                    }}
+                  <Space
+                    direction="vertical"
+                    align="center"
+                    style={{ width: "100%" }}
+                    size={24}
                   >
-                    {item.icon}
-                  </div>
-                  <Title level={4}>{item.title}</Title>
-                  <Text type="secondary">{item.desc}</Text>
+                    <div
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "28px",
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+                    <Space
+                      direction="vertical"
+                      align="center"
+                      style={{ width: "100%" }}
+                      size={8}
+                    >
+                      <Title level={4} style={{ margin: 0 }}>
+                        {item.title}
+                      </Title>
+                      <Text type="secondary">{item.desc}</Text>
+                    </Space>
+                  </Space>
                 </Card>
               </Col>
             ))}
@@ -432,7 +436,6 @@ export default function LandingPage() {
             style={{
               width: "64px",
               height: "64px",
-              boxShadow: "0 20px 25px -5px rgba(0, 102, 255, 0.4)",
             }}
           />
         </Badge>
