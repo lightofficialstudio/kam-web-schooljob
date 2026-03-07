@@ -1,3 +1,4 @@
+import LandingLayout from "@/app/components/layouts/landing/landing-layout";
 import "@/app/styles/globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body className={`${kanit.variable} antialiased font-kanit`}>
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          <LandingLayout>{children}</LandingLayout>
+        </AntdRegistry>
       </body>
     </html>
   );

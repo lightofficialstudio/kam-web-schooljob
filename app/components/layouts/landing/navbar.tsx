@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Button, Typography } from "antd";
+import { Button, Typography } from "antd";
 
 const { Text } = Typography;
 
