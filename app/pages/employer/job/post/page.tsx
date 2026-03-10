@@ -535,14 +535,13 @@ export default function PostJobPage() {
                     จะช่วยให้คุณพบครูที่ตรงใจได้เร็วขึ้นถึง 2 เท่า
                   </Paragraph>
                   <img
-                    src="https://illustrations.popsy.co/amber/meditating.svg"
+                    src="https://illustrations.popsy.co/amber/launching-soon.svg"
                     alt="Success Illustration"
                     style={{
                       width: "100%",
                       height: "auto",
                       marginTop: "20px",
                       display: "block",
-                      filter: "brightness(1.1)",
                     }}
                   />
                 </div>

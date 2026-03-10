@@ -50,9 +50,14 @@ function SigninFormContent() {
   const handleModalConfirm = () => {
     if (modal.type === "success") {
       // ✨ [ถ้ามี redirect URL จากการพยายามเข้า admin route ให้ return ไปหน้านั้น]
-      const destinationUrl = redirectUrl
-        ? decodeURIComponent(redirectUrl)
-        : "/";
+      const { user } = useAuthStore.getState();
+      let destinationUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/";
+
+      // 🏢 [ถ้า role เป็น SCHOOL ให้ไปที่หน้าจัดการงาน]
+      if (!redirectUrl && user && user.role === "SCHOOL") {
+        destinationUrl = "/pages/employer/job/read";
+      }
+
       console.log(
         `🔐 [SIGNIN] Redirecting to: ${destinationUrl || "home page"}`,
       );
