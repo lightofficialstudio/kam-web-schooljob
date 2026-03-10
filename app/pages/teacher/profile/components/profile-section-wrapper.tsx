@@ -22,11 +22,24 @@ export const ProfileSectionWrapper: React.FC<ProfileSectionWrapperProps> = ({
   return (
     <Card
       id={id}
-      bordered={false}
+      bordered={true}
+      style={{
+        borderRadius: "12px",
+        boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
+        border: "1px solid #f0f0f0",
+      }}
       className="mb-8"
-      styles={{ body: { padding: "0 0 24px 0" } }}
+      styles={{
+        header: {
+          borderBottom: "1px solid #f5f5f5",
+          padding: "16px 24px",
+        },
+        body: {
+          padding: "24px",
+        },
+      }}
       title={
-        <span className="text-2xl font-bold text-gray-800 tracking-tight">
+        <span className="text-xl font-bold text-gray-800 tracking-tight">
           {title}
         </span>
       }
@@ -46,8 +59,7 @@ export const ProfileSectionWrapper: React.FC<ProfileSectionWrapperProps> = ({
         </div>
       }
     >
-      <div className="py-2 px-1">{children}</div>
-      <div className="border-b border-gray-100 mt-4 mx-1" />
+      <div className="py-2">{children}</div>
     </Card>
   );
 };

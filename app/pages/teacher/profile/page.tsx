@@ -1,15 +1,28 @@
 "use client";
 
+import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 import {
+  CheckCircleFilled,
+  CloseCircleFilled,
   EditOutlined,
   EnvironmentOutlined,
   LinkOutlined,
   MailOutlined,
   UserOutlined,
-  CheckCircleFilled,
-  CloseCircleFilled,
 } from "@ant-design/icons";
-import { Avatar, Button, Form, Progress, Space, Tag, Row, Col, Typography, Card, Divider } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Form,
+  Progress,
+  Row,
+  Space,
+  Tag,
+  Typography,
+} from "antd";
 import { useState } from "react";
 import {
   BasicInfoSection,
@@ -22,7 +35,6 @@ import {
   WorkExperienceSection,
 } from "./components";
 import { useProfileStore } from "./stores/profile-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 
 const { Title, Text, Link } = Typography;
 
@@ -103,9 +115,9 @@ export default function TeacherProfilePage() {
         type: "success",
         mainTitle: "บันทึกข้อมูลสำเร็จ",
         description: "ข้อมูลโปรไฟล์ของคุณถูกอัปเดตเรียบร้อยแล้ว",
-        icon: <CheckCircleFilled style={{ color: "#52c41a" }} />
+        icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
       });
-      
+
       setIsDrawerOpen(false);
       setEditSection(null);
     } catch (err) {
@@ -114,30 +126,52 @@ export default function TeacherProfilePage() {
         type: "error",
         mainTitle: "เกิดข้อผิดพลาด",
         description: "กรุณาตรวจสอบข้อมูลในฟอร์มให้ถูกต้องอีกครั้ง",
-        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />
+        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />,
       });
     }
   };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#fff", paddingBottom: "80px" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#fff",
+        paddingBottom: "80px",
+      }}
+    >
       {/* 1. Header Banner Area */}
-      <div style={{ 
-        backgroundColor: "#001529", 
-        height: "224px", 
-        position: "relative", 
-        overflow: "hidden" 
-      }}>
-        <div style={{ 
-          position: "absolute", top: "-80px", right: "-80px", 
-          width: "256px", height: "256px", 
-          backgroundColor: "#ff006e", borderRadius: "50%", opacity: 0.8 
-        }} />
-        <div style={{ 
-          position: "absolute", bottom: "40px", right: "25%", 
-          width: "128px", height: "128px", 
-          backgroundColor: "#3a0ca3", borderRadius: "50%", opacity: 0.6 
-        }} />
+      <div
+        style={{
+          backgroundColor: "#001529",
+          height: "224px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "-80px",
+            right: "-80px",
+            width: "256px",
+            height: "256px",
+            backgroundColor: "#ff006e",
+            borderRadius: "50%",
+            opacity: 0.8,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "40px",
+            right: "25%",
+            width: "128px",
+            height: "128px",
+            backgroundColor: "#3a0ca3",
+            borderRadius: "50%",
+            opacity: 0.6,
+          }}
+        />
       </div>
 
       <Row justify="center">
@@ -146,9 +180,14 @@ export default function TeacherProfilePage() {
             {/* LEFT COLUMN: Main Profile Content */}
             <Col span={16} style={{ marginTop: "-64px", zIndex: 10 }}>
               {/* Header Identity Card */}
-              <Card 
-                bordered={false} 
-                style={{ borderRadius: "12px", marginBottom: "32px", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)" }}
+              <Card
+                bordered={true}
+                style={{
+                  borderRadius: "12px",
+                  marginBottom: "32px",
+                  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
+                  border: "1px solid #f0f0f0",
+                }}
                 styles={{ body: { padding: "32px" } }}
               >
                 <Row justify="space-between" align="top">
@@ -159,36 +198,49 @@ export default function TeacherProfilePage() {
                           size={140}
                           icon={<UserOutlined />}
                           src={profile.profileImageUrl}
-                          style={{ 
-                            border: "4px solid #fff", 
+                          style={{
+                            border: "4px solid #fff",
                             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                             backgroundColor: "#f3f4f6",
-                            borderRadius: "16px"
+                            borderRadius: "16px",
                           }}
                         />
-                        <Button 
+                        <Button
                           shape="circle"
                           icon={<EditOutlined style={{ color: "#6b7280" }} />}
-                          style={{ 
-                            position: "absolute", bottom: "8px", right: "8px",
+                          style={{
+                            position: "absolute",
+                            bottom: "8px",
+                            right: "8px",
                             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                            border: "1px solid #e5e7eb"
+                            border: "1px solid #e5e7eb",
                           }}
                         />
                       </div>
                       <div style={{ paddingTop: "8px" }}>
-                        <Title 
-                          level={1} 
-                          style={{ margin: 0, textTransform: "uppercase", fontSize: "36px", fontWeight: 700, letterSpacing: "-0.025em" }}
+                        <Title
+                          level={1}
+                          style={{
+                            margin: 0,
+                            textTransform: "uppercase",
+                            fontSize: "36px",
+                            fontWeight: 700,
+                            letterSpacing: "-0.025em",
+                          }}
                         >
                           {profile.firstName || "THANAT"}{" "}
                           {profile.lastName || "PROMPIRIYA"}
                         </Title>
-                        <Space direction="vertical" size={8} style={{ marginTop: "16px" }}>
+                        <Space
+                          direction="vertical"
+                          size={8}
+                          style={{ marginTop: "16px" }}
+                        >
                           <Space size={12}>
                             <EnvironmentOutlined style={{ color: "#9ca3af" }} />
                             <Text type="secondary">
-                              {profile.preferredProvinces?.[0] || "Bang Sue, Bangkok"}
+                              {profile.preferredProvinces?.[0] ||
+                                "Bang Sue, Bangkok"}
                             </Text>
                           </Space>
                           <Space size={12}>
@@ -200,7 +252,8 @@ export default function TeacherProfilePage() {
                           <Space size={12}>
                             <LinkOutlined style={{ color: "#9ca3af" }} />
                             <Link href="#" style={{ color: "#3b82f6" }}>
-                              th.schooljob.com/profiles/{(profile.firstName || "").toLowerCase()}
+                              th.schooljob.com/profiles/
+                              {(profile.firstName || "").toLowerCase()}
                             </Link>
                           </Space>
                         </Space>
@@ -220,79 +273,121 @@ export default function TeacherProfilePage() {
               <Space direction="vertical" size={32} style={{ width: "100%" }}>
                 {/* Personal Summary Section */}
                 <ProfileSectionWrapper
-                  title="Personal summary"
+                  title="สรุปข้อมูลส่วนตัว"
                   onEdit={() => handleOpenEdit("skills")}
                   id="personal-summary"
                 >
-                  <Text style={{ fontSize: "15px", color: "#4b5563", lineHeight: 1.6 }}>
+                  <Text
+                    style={{
+                      fontSize: "15px",
+                      color: "#4b5563",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {profile.specialActivities ||
                       "ยังไม่มีข้อมูลสรุปเบื้องต้น แนะนำประสบการณ์การสอนของคุณเพื่อให้ทางโรงเรียนรู้จักคุณมากขึ้น..."}
                   </Text>
                 </ProfileSectionWrapper>
 
                 {/* 3. ประสบการณ์การทำงาน */}
-                <div id="work-experience">
-                  <Row justify="space-between" align="middle" style={{ marginBottom: "16px" }}>
-                    <Title level={2} style={{ margin: 0, fontSize: "24px", fontWeight: 700 }}>Career history</Title>
-                  </Row>
+                <ProfileSectionWrapper
+                  id="work-experience"
+                  title="ประวัติการทำงาน"
+                  onEdit={() => handleOpenEdit("work-experience")}
+                >
                   <WorkExperienceSection />
-                </div>
+                </ProfileSectionWrapper>
 
                 {/* 4. ประวัติการศึกษา */}
-                <div id="education">
-                  <Row justify="space-between" align="middle" style={{ marginBottom: "16px", marginTop: "24px" }}>
-                    <Title level={2} style={{ margin: 0, fontSize: "24px", fontWeight: 700 }}>Education</Title>
-                  </Row>
+                <ProfileSectionWrapper
+                  id="education"
+                  title="ประวัติการศึกษา"
+                  onEdit={() => handleOpenEdit("education")}
+                >
                   <EducationHistorySection />
-                </div>
+                </ProfileSectionWrapper>
 
                 {/* 5. ข้อมูลการสอน & Skills */}
                 <ProfileSectionWrapper
-                  title="Teaching Expertise & Skills"
+                  title="ความเชี่ยวชาญการสอนและทักษะ"
                   onEdit={() => handleOpenEdit("teaching")}
                 >
-                  <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={24}
+                    style={{ width: "100%" }}
+                  >
                     <div>
-                      <Text strong style={{ display: "block", marginBottom: "12px" }}>วิชาที่เชี่ยวชาญ</Text>
+                      <Text
+                        strong
+                        style={{ display: "block", marginBottom: "12px" }}
+                      >
+                        วิชาที่เชี่ยวชาญ
+                      </Text>
                       <Space size={[8, 8]} wrap>
                         {profile.specialization?.length ? (
                           profile.specialization.map((s) => (
                             <Tag
                               key={s}
                               color="blue"
-                              style={{ padding: "4px 12px", borderRadius: "999px", border: "1px solid #bfdbfe" }}
+                              style={{
+                                padding: "4px 12px",
+                                borderRadius: "999px",
+                                border: "1px solid #bfdbfe",
+                              }}
                             >
                               {s}
                             </Tag>
                           ))
                         ) : (
-                          <Text type="secondary" italic>ไม่ได้ระบุ</Text>
+                          <Text type="secondary" italic>
+                            ยังไม่ได้ระบุ
+                          </Text>
                         )}
                       </Space>
                     </div>
                     <div>
-                      <Text strong style={{ display: "block", marginBottom: "12px" }}>ทักษะด้านภาษาและไอที</Text>
+                      <Text
+                        strong
+                        style={{ display: "block", marginBottom: "12px" }}
+                      >
+                        ทักษะด้านภาษาและไอที
+                      </Text>
                       <Space size={[8, 8]} wrap>
-                        {profile.languagesSpoken?.length &&
-                          profile.languagesSpoken.map((l) => (
-                            <Tag
-                              key={l}
-                              icon={<EnvironmentOutlined />}
-                              style={{ padding: "4px 12px", borderRadius: "999px" }}
-                            >
-                              {l}
-                            </Tag>
-                          ))}
-                        {profile.itSkills?.length &&
-                          profile.itSkills.map((i) => (
-                            <Tag
-                              key={i}
-                              color="orange"
-                              style={{ padding: "4px 12px", borderRadius: "999px" }}
-                            >
-                              {i}
-                            </Tag>
-                          ))}
+                        {profile.languagesSpoken?.length
+                          ? profile.languagesSpoken.map((l) => (
+                              <Tag
+                                key={l}
+                                icon={<EnvironmentOutlined />}
+                                style={{
+                                  padding: "4px 12px",
+                                  borderRadius: "999px",
+                                }}
+                              >
+                                {l}
+                              </Tag>
+                            ))
+                          : null}
+                        {profile.itSkills?.length
+                          ? profile.itSkills.map((i) => (
+                              <Tag
+                                key={i}
+                                color="orange"
+                                style={{
+                                  padding: "4px 12px",
+                                  borderRadius: "999px",
+                                }}
+                              >
+                                {i}
+                              </Tag>
+                            ))
+                          : null}
+                        {!profile.languagesSpoken?.length &&
+                          !profile.itSkills?.length && (
+                            <Text type="secondary" italic>
+                              ยังไม่ได้ระบุ
+                            </Text>
+                          )}
                       </Space>
                     </div>
                   </Space>
@@ -302,21 +397,37 @@ export default function TeacherProfilePage() {
 
             {/* RIGHT COLUMN: Sidebar Stats & Tools */}
             <Col span={8} style={{ paddingTop: "40px" }}>
-              <Space direction="vertical" size={32} style={{ width: "100%", position: "sticky", top: "24px" }}>
+              <Space
+                direction="vertical"
+                size={32}
+                style={{ width: "100%", position: "sticky", top: "24px" }}
+              >
                 {/* 1. Profile Visibility */}
                 <div style={{ cursor: "pointer" }}>
-                  <Row justify="space-between" align="middle" style={{ marginBottom: "8px" }}>
-                    <Text strong style={{ fontSize: "16px" }}>Profile visibility</Text>
+                  <Row
+                    justify="space-between"
+                    align="middle"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    <Text strong style={{ fontSize: "16px" }}>
+                      การมองเห็นโปรไฟล์
+                    </Text>
                     <LinkOutlined style={{ color: "#9ca3af" }} />
                   </Row>
-                  <Text type="secondary">Standard</Text>
+                  <Text type="secondary">ระดับเริ่มต้น</Text>
                   <Divider style={{ margin: "24px 0 0 0" }} />
                 </div>
 
                 {/* 2. Profile Activity */}
                 <div style={{ cursor: "pointer" }}>
-                  <Row justify="space-between" align="middle" style={{ marginBottom: "8px" }}>
-                    <Text strong style={{ fontSize: "16px" }}>Profile activity</Text>
+                  <Row
+                    justify="space-between"
+                    align="middle"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    <Text strong style={{ fontSize: "16px" }}>
+                      ความเคลื่อนไหวโปรไฟล์
+                    </Text>
                     <LinkOutlined style={{ color: "#9ca3af" }} />
                   </Row>
                   <Text type="secondary">
@@ -327,57 +438,107 @@ export default function TeacherProfilePage() {
 
                 {/* 3. Verifications */}
                 <div style={{ cursor: "pointer" }}>
-                  <Row justify="space-between" align="middle" style={{ marginBottom: "8px" }}>
-                    <Text strong style={{ fontSize: "16px" }}>Verifications</Text>
+                  <Row
+                    justify="space-between"
+                    align="middle"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    <Text strong style={{ fontSize: "16px" }}>
+                      การยืนยันตัวตน
+                    </Text>
                     <LinkOutlined style={{ color: "#9ca3af" }} />
                   </Row>
-                  <Text type="secondary" style={{ fontSize: "14px", display: "block", marginBottom: "16px" }}>
+                  <Text
+                    type="secondary"
+                    style={{
+                      fontSize: "14px",
+                      display: "block",
+                      marginBottom: "16px",
+                    }}
+                  >
                     โปรไฟล์ที่มีการยืนยันตัวตน มีโอกาสถูกเลือกโดยโรงเรียนมากกว่า
                   </Text>
                   <Button
                     block
-                    style={{ height: "40px", borderColor: "#001529", color: "#001529", fontWeight: 600 }}
+                    style={{
+                      height: "40px",
+                      borderColor: "#001529",
+                      color: "#001529",
+                      fontWeight: 600,
+                    }}
                   >
-                    Get verified
+                    ยืนยันตัวตนเลย
                   </Button>
                   <Divider style={{ margin: "24px 0 0 0" }} />
                 </div>
 
                 {/* 4. Profile Strength */}
                 <Card bordered={false} styles={{ body: { padding: "8px 0" } }}>
-                  <Title level={4} style={{ margin: "0 0 16px 0", fontSize: "16px" }}>Profile strength</Title>
+                  <Title
+                    level={4}
+                    style={{ margin: "0 0 16px 0", fontSize: "16px" }}
+                  >
+                    ความสมบูรณ์ของโปรไฟล์
+                  </Title>
                   <Progress
                     percent={strengthScore}
                     strokeColor="#10b981"
                     showInfo={false}
                     style={{ marginBottom: "16px" }}
                   />
-                  <Text type="secondary" style={{ fontSize: "14px", display: "block", marginBottom: "24px" }}>
-                    แสดงผลงานและประวัติของคุณให้โรงเรียนเห็นเพื่อโอกาสในการรับงานที่ตรงใจ
+                  <Text
+                    type="secondary"
+                    style={{
+                      fontSize: "14px",
+                      display: "block",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    เพิ่มข้อมูลใบอนุญาตประกอบวิชาชีพเพื่อให้โรงเรียนมั่นใจมากขึ้น
                   </Text>
                   <Button
                     block
-                    style={{ height: "40px", borderColor: "#001529", color: "#001529", fontWeight: 600 }}
+                    style={{
+                      height: "40px",
+                      borderColor: "#001529",
+                      color: "#001529",
+                      fontWeight: 600,
+                    }}
                   >
-                    Add license
+                    เพิ่มใบประกอบวิชาชีพ
                   </Button>
                 </Card>
 
                 {/* Search promotion card */}
-                <Card 
-                  bordered={false} 
-                  style={{ backgroundColor: "#f9fafb", borderRadius: "12px", border: "1px solid #f3f4f6" }}
+                <Card
+                  bordered={false}
+                  style={{
+                    backgroundColor: "#f9fafb",
+                    borderRadius: "12px",
+                    border: "1px solid #f3f4f6",
+                  }}
                   styles={{ body: { padding: "24px", textAlign: "center" } }}
                 >
                   <Space direction="vertical" size={16} align="center">
                     <Avatar.Group>
-                      <Avatar style={{ backgroundColor: "#f472b6" }} icon={<UserOutlined />} />
-                      <Avatar style={{ backgroundColor: "#60a5fa" }} icon={<UserOutlined />} />
-                      <Avatar style={{ backgroundColor: "#a78bfa" }} icon={<UserOutlined />} />
+                      <Avatar
+                        style={{ backgroundColor: "#f472b6" }}
+                        icon={<UserOutlined />}
+                      />
+                      <Avatar
+                        style={{ backgroundColor: "#60a5fa" }}
+                        icon={<UserOutlined />}
+                      />
+                      <Avatar
+                        style={{ backgroundColor: "#a78bfa" }}
+                        icon={<UserOutlined />}
+                      />
                     </Avatar.Group>
-                    <Text strong style={{ fontSize: "16px" }}>Search for people</Text>
+                    <Text strong style={{ fontSize: "16px" }}>
+                      ค้นหาคุณครูท่านอื่น
+                    </Text>
                     <Text type="secondary" style={{ fontSize: "13px" }}>
-                      Find people who have made their profile public.
+                      ค้นหาคุณครูที่เปิดโปรไฟล์เป็นสาธารณะเพื่อแลกเปลี่ยนเทคนิค
                     </Text>
                   </Space>
                 </Card>

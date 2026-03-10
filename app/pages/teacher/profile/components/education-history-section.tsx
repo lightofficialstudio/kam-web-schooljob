@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -11,10 +11,10 @@ import {
   Modal,
   Select,
   Space,
-  message,
 } from "antd";
 import React, { useState } from "react";
 import { EducationEntry, useProfileStore } from "../stores/profile-store";
+import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 
 const EDUCATION_LEVELS = [
   { value: "ประถมศึกษา", label: "ประถมศึกษา" },
@@ -32,6 +32,7 @@ export const EducationHistorySection: React.FC = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const { profile, addEducation, updateEducation, removeEducation } =
     useProfileStore();
+  const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
 
@@ -65,18 +66,32 @@ export const EducationHistorySection: React.FC = () => {
       };
 
       if (editingIndex !== null) {
-        updateEducation(editingIndex, entry);
-        message.success("อัปเดตข้อมูลสำเร็จ");
+        openNotification({
+          type: "success",
+          mainTitle: "อัปเดตข้อมูลสำเร็จ",
+          description: "ข้อมูลการศึกษาของคุณถูกบันทึกเรียบร้อยแล้ว",
+          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+        });
       } else {
         addEducation(entry);
-        message.success("เพิ่มข้อมูลสำเร็จ");
+        openNotification({
+          type: "success",
+          mainTitle: "เพิ่มข้อมูลสำเร็จ",
+          description: "ข้อมูลการศึกษาใหม่ถูกเพิ่มเรียบร้อยแล้ว",
+          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+        });
       }
 
       form.resetFields();
       setIsAddingNew(false);
       setEditingIndex(null);
     } catch (error) {
-      message.error("กรุณาตรวจสอบข้อมูลให้ถูกต้อง");
+      openNotification({
+        type: "error",
+        mainTitle: "เกิดข้อผิดพลาด",
+        description: "กรุณาตรวจสอบข้อมูลให้ถูกต้อง",
+        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />,
+      });
     }
   };
 
@@ -95,6 +110,12 @@ export const EducationHistorySection: React.FC = () => {
       okButtonProps: { danger: true },
       onOk() {
         removeEducation(index);
+        openNotification({
+          type: "success",
+          mainTitle: "ลบข้อมูลสำเร็จ",
+          description: "ข้อมูลการศึกษาถูกลบเรียบร้อยแล้ว",
+          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+        }
         message.success("ลบข้อมูลสำเร็จ");
       },
     });
