@@ -98,26 +98,54 @@ export default function Navbar() {
       </Link>
 
       <Space size={32}>
-        <Link href="/pages/job" style={{ textDecoration: "none" }}>
-          <Text strong style={{ cursor: "pointer" }}>
-            ค้นหางาน
-          </Text>
-        </Link>
-        <Link href="/pages/teacher/profile" style={{ textDecoration: "none" }}>
-          <Text strong style={{ cursor: "pointer" }}>
-            ฝากประวัติ
-          </Text>
-        </Link>
-        <Link href="/employer" style={{ textDecoration: "none" }}>
-          <Text strong style={{ cursor: "pointer" }}>
-            สำหรับสถานศึกษา
-          </Text>
-        </Link>
-        <Link href="/pages/blog" style={{ textDecoration: "none" }}>
-          <Text strong style={{ cursor: "pointer" }}>
-            บทความ
-          </Text>
-        </Link>
+        {(!user || user.role === "TEACHER") && (
+          <>
+            <Link href="/pages/job" style={{ textDecoration: "none" }}>
+              <Text strong style={{ cursor: "pointer" }}>
+                ค้นหางาน
+              </Text>
+            </Link>
+            <Link
+              href="/pages/teacher/profile"
+              style={{ textDecoration: "none" }}
+            >
+              <Text strong style={{ cursor: "pointer" }}>
+                ฝากประวัติ
+              </Text>
+            </Link>
+            <Link href="/pages/blog" style={{ textDecoration: "none" }}>
+              <Text strong style={{ cursor: "pointer" }}>
+                บทความ
+              </Text>
+            </Link>
+          </>
+        )}
+
+        {user && user.role === "SCHOOL" && (
+          <>
+            <Link
+              href="/pages/employer/job/read"
+              style={{ textDecoration: "none" }}
+            >
+              <Text strong style={{ cursor: "pointer" }}>
+                งานของฉัน
+              </Text>
+            </Link>
+            <Link
+              href="/pages/employer/job/post"
+              style={{ textDecoration: "none" }}
+            >
+              <Text strong style={{ cursor: "pointer" }}>
+                ประกาศงาน
+              </Text>
+            </Link>
+            <Link href="/pages/blog" style={{ textDecoration: "none" }}>
+              <Text strong style={{ cursor: "pointer" }}>
+                บทความ
+              </Text>
+            </Link>
+          </>
+        )}
       </Space>
 
       <Space size={12}>
