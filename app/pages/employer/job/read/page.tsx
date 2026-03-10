@@ -102,7 +102,7 @@ export default function MyJobsPage() {
               </Tag>
             ))}
           </Space>
-          <Text type="secondary" size="small">
+          <Text type="secondary" style={{ fontSize: "12px" }}>
             ระดับชั้น: {record.grades.join(", ")}
           </Text>
         </Space>
@@ -173,7 +173,7 @@ export default function MyJobsPage() {
       width: 150,
       render: (date: string) => (
         <Space direction="vertical" size={0}>
-          <Text size="small">{date}</Text>
+          <Text style={{ fontSize: "14px" }}>{date}</Text>
           <Text type="secondary" style={{ fontSize: "12px" }}>
             หมดอายุ: {MOCK_JOBS.find((j) => j.publishedAt === date)?.expiresAt}
           </Text>

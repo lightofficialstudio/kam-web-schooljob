@@ -502,10 +502,10 @@ export default function UserManagementPage() {
                       (u) => u.role === "ADMIN",
                     ).length;
                     const schoolCount = selectedUsers.filter(
-                      (u) => u.role === "SCHOOL",
+                      (u) => u.role === "EMPLOYER",
                     ).length;
                     const teacherCount = selectedUsers.filter(
-                      (u) => u.role === "TEACHER",
+                      (u) => u.role === "EMPLOYEE",
                     ).length;
 
                     return (
@@ -558,7 +558,10 @@ export default function UserManagementPage() {
                   ผู้ดูแล: {users.filter((u) => u.role === "ADMIN").length}
                 </Text>
                 <Text>
-                  โรงเรียน: {users.filter((u) => u.role === "SCHOOL").length}
+                  โรงเรียน: {users.filter((u) => u.role === "EMPLOYER").length}
+                </Text>
+                <Text>
+                  ครู: {users.filter((u) => u.role === "EMPLOYEE").length}
                 </Text>
               </Space>
             </Col>

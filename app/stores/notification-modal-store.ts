@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { create } from "zustand";
 
 export type NotificationType = "success" | "error" | "warning" | "info";
@@ -7,6 +8,7 @@ interface NotificationContent {
   mainTitle: string;
   subTitle?: string;
   description?: string;
+  icon?: ReactNode;
   open: boolean;
 }
 

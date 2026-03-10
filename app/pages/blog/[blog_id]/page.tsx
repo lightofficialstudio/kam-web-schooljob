@@ -264,8 +264,7 @@ export default function BlogDetailPage() {
                     <Link href={`/pages/blog/${item.id}`}>
                       <Tag
                         color="blue"
-                        size="small"
-                        style={{ marginBottom: "8px" }}
+                        style={{ marginBottom: "8px", fontSize: "11px" }}
                       >
                         {item.category}
                       </Tag>

@@ -18,6 +18,8 @@ export function NotificationModalProvider() {
 
   // 🎨 [Get icon based on notification type]
   const getIcon = () => {
+    if (notification.icon) return notification.icon;
+
     switch (notification.type) {
       case "success":
         return (
