@@ -184,10 +184,12 @@ export default function MyJobsPage() {
       title: "จัดการ",
       key: "action",
       width: 180,
-      render: () => (
+      render: (_: any, record: any) => (
         <Space size="middle">
           <Tooltip title="แก้ไขประกาศ">
-            <Button icon={<EditOutlined />} />
+            <Link href={`/pages/employer/job/post/${record.key}`}>
+              <Button icon={<EditOutlined />} />
+            </Link>
           </Tooltip>
           <Tooltip title="ดูสถิติเชิงลึก">
             <Button icon={<BarChartOutlined />} />
@@ -241,7 +243,7 @@ export default function MyJobsPage() {
               </Text>
             </Col>
             <Col>
-              <Link href="/pages/employer/job/create">
+              <Link href="/pages/employer/job/post">
                 <Button
                   type="primary"
                   size="large"
