@@ -48,7 +48,7 @@ const MOCK_JOB_DATA = {
     qualifications: "มีอัธยาศัยดี สอนสนุก รักเด็ก",
     duration: 30,
     status: true,
-  }
+  },
 };
 
 export default function PostJobPage() {
