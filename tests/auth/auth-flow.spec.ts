@@ -46,16 +46,23 @@ test.describe("Authentication Automated Testing", () => {
     await expect(successHeader).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "ตกลง" }).click();
 
-    // 6. Redirect to Signin or Manual Go
+    // 6. Login
     await page.goto("/pages/signin");
+    await page.getByPlaceholder("อีเมล").fill(email);
+    await page.getByPlaceholder("รหัสผ่าน").fill(password);
+    await page
+      .getByRole("button", { name: "เข้าสู่ระบบ", exact: true })
+      .click();
 
-    // 7. Login with new credentials
-    await page.getByPlaceholder("อีเมลสมัครใช้งาน").fill(email);
-    await page.getByPlaceholder("••••••••").fill(password);
-    await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+    // 7. Handle Login Redirect/Modal
+    await expect(page.getByText("เข้าสู่ระบบสำเร็จ")).toBeVisible({
+      timeout: 10000,
+    });
+    await page.getByRole("button", { name: "ตกลง" }).click();
 
     // 8. Verify Dashboard / Navbar shows name
-    await expect(page.getByText(fullName)).toBeVisible();
+    // Search in the whole page as the user might be in different places
+    await expect(page.getByText(fullName)).toBeVisible({ timeout: 15000 });
     await expect(page.getByText("ครูผู้สอน")).toBeVisible();
   });
 
@@ -107,13 +114,21 @@ test.describe("Authentication Automated Testing", () => {
 
     // 6. Login
     await page.goto("/pages/signin");
-    await page.getByPlaceholder("อีเมลสมัครใช้งาน").fill(email);
-    await page.getByPlaceholder("••••••••").fill(password);
-    await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+    await page.getByPlaceholder("อีเมล").fill(email);
+    await page.getByPlaceholder("รหัสผ่าน").fill(password);
+    await page
+      .getByRole("button", { name: "เข้าสู่ระบบ", exact: true })
+      .click();
 
-    // 7. Verify Employer Dashboard Redirect
-    await expect(page).toHaveURL(/.*\/employer\/job\/read/);
-    await expect(page.getByText(fullName)).toBeVisible();
+    // 7. Handle Login Redirect/Modal
+    await expect(page.getByText("เข้าสู่ระบบสำเร็จ")).toBeVisible({
+      timeout: 10000,
+    });
+    await page.getByRole("button", { name: "ตกลง" }).click();
+
+    // 8. Verify Employer Dashboard Redirect
+    await expect(page).toHaveURL(/.*\/employer\/job\/read/, { timeout: 15000 });
+    await expect(page.getByText(fullName)).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("สถานศึกษา")).toBeVisible();
   });
 });

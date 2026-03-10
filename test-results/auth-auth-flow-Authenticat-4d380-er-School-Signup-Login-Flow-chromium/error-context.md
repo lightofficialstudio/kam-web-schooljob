@@ -1,7 +1,7 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
+- generic [ref=e1]:
   - generic [ref=e4]:
     - generic [ref=e5]:
       - link "K KAM SCHOOLJOB" [ref=e6] [cursor=pointer]:
@@ -10,12 +10,12 @@
           - strong [ref=e12]: K
           - strong [ref=e15]: KAM SCHOOLJOB
       - generic [ref=e16]:
-        - link "ค้นหางาน" [ref=e18] [cursor=pointer]:
-          - /url: /pages/job
-          - strong [ref=e20]: ค้นหางาน
-        - link "ฝากประวัติ" [ref=e22] [cursor=pointer]:
-          - /url: /pages/teacher/profile
-          - strong [ref=e24]: ฝากประวัติ
+        - link "งานของฉัน" [ref=e18] [cursor=pointer]:
+          - /url: /pages/employer/job/read
+          - strong [ref=e20]: งานของฉัน
+        - link "ประกาศงาน" [ref=e22] [cursor=pointer]:
+          - /url: /pages/employer/job/post
+          - strong [ref=e24]: ประกาศงาน
         - link "บทความ" [ref=e26] [cursor=pointer]:
           - /url: /pages/blog
           - strong [ref=e28]: บทความ
@@ -23,101 +23,113 @@
         - button "sun" [ref=e31] [cursor=pointer]:
           - img "sun" [ref=e33]:
             - img [ref=e34]
-        - link "user เข้าสู่ระบบ" [ref=e37] [cursor=pointer]:
-          - /url: /pages/signin
-          - button "user เข้าสู่ระบบ" [ref=e38]:
-            - img "user" [ref=e40]:
-              - img [ref=e41]
-            - generic [ref=e43]: เข้าสู่ระบบ
-        - link "solution สมัครงานครู" [ref=e45] [cursor=pointer]:
-          - /url: /pages/signup
-          - button "solution สมัครงานครู" [ref=e46]:
-            - img "solution" [ref=e48]:
-              - img [ref=e49]
-            - generic [ref=e51]: สมัครงานครู
-    - main [ref=e52]:
-      - generic [ref=e56]:
-        - generic [ref=e57]:
-          - generic [ref=e60]: K
-          - heading "เข้าสู่ระบบ" [level=2] [ref=e62]
-          - generic [ref=e63]: ยินดีต้อนรับกลับมา! กรุณาลงชื่อเข้าใช้งาน
-        - generic [ref=e64]:
-          - generic [ref=e70]:
-            - img "mail" [ref=e72]:
-              - img [ref=e73]
-            - textbox "อีเมล" [ref=e75]
-          - generic [ref=e81]:
-            - img "lock" [ref=e83]:
-              - img [ref=e84]
-            - textbox "รหัสผ่าน" [ref=e86]
-            - img "eye-invisible" [ref=e88] [cursor=pointer]:
-              - img [ref=e89]
-          - button "เข้าสู่ระบบ" [ref=e97] [cursor=pointer]:
-            - generic [ref=e98]: เข้าสู่ระบบ
-        - generic [ref=e100]:
-          - generic [ref=e101]: ยังไม่มีบัญชี?
-          - link "สมัครสมาชิก" [ref=e103] [cursor=pointer]:
+        - generic [ref=e37]:
+          - generic [ref=e40]: T
+          - generic [ref=e42]:
+            - strong [ref=e45]: Test School Employer
+            - generic [ref=e46]: สถานศึกษา
+        - button "user" [ref=e48] [cursor=pointer]:
+          - img "user" [ref=e50]:
+            - img [ref=e51]
+    - main [ref=e53]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e61]: K
+          - heading "เข้าสู่ระบบ" [level=2] [ref=e63]
+          - generic [ref=e64]: ยินดีต้อนรับกลับมา! กรุณาลงชื่อเข้าใช้งาน
+        - generic [ref=e65]:
+          - generic [ref=e71]:
+            - img "mail" [ref=e73]:
+              - img [ref=e74]
+            - textbox "อีเมล" [ref=e76]: test-61474@example.com
+          - generic [ref=e82]:
+            - img "lock" [ref=e84]:
+              - img [ref=e85]
+            - textbox "รหัสผ่าน" [ref=e87]: Password123!
+            - img "eye-invisible" [ref=e89] [cursor=pointer]:
+              - img [ref=e90]
+          - button "loading เข้าสู่ระบบ" [ref=e98] [cursor=pointer]:
+            - generic:
+              - img "loading"
+            - generic [ref=e99]: เข้าสู่ระบบ
+        - generic [ref=e101]:
+          - generic [ref=e102]: ยังไม่มีบัญชี?
+          - link "สมัครสมาชิก" [ref=e104] [cursor=pointer]:
             - /url: /pages/signup
-    - contentinfo [ref=e104]:
-      - generic [ref=e105]:
-        - generic [ref=e107]:
-          - generic [ref=e109]:
-            - strong [ref=e114]: K
-            - strong [ref=e117]: KAM SCHOOLJOB
-          - generic [ref=e119]: แพลตฟอร์มหางานสายการศึกษาอันดับ 1 ของไทย ครบทุกตำแหน่งงานครู ติวเตอร์ ธุรการ และบุคลากรทางการศึกษา เชื่อมโยงสถานศึกษาและผู้หางานด้วยเทคโนโลยีที่ทันสมัย
-          - generic [ref=e121]:
-            - img "facebook" [ref=e123]:
-              - img [ref=e124]
-            - img "youtube" [ref=e127]:
-              - img [ref=e128]
-            - img "line" [ref=e131]:
-              - img [ref=e132]
-        - generic [ref=e135]:
-          - heading "สำหรับคนหางาน" [level=5] [ref=e137]
-          - generic [ref=e139]:
-            - generic [ref=e140]: ค้นหาตำแหน่งงาน
-            - generic [ref=e141]: ฝากประวัติ (Resume)
-            - generic [ref=e142]: งานครูตามวิชาเอก
-            - generic [ref=e143]: บทความเตรียมสอบ
-        - generic [ref=e145]:
-          - heading "สำหรับสถานศึกษา" [level=5] [ref=e147]
-          - generic [ref=e149]:
-            - generic [ref=e150]: ประกาศรับสมัครงาน
-            - generic [ref=e151]: ค้นหาประวัติครู
-            - generic [ref=e152]: แพ็กเกจสมาชิก
-            - generic [ref=e153]: คู่มือการใช้งาน
-        - generic [ref=e155]:
-          - heading "ติดต่อเรา" [level=5] [ref=e157]
-          - generic [ref=e159]:
-            - generic [ref=e161]:
-              - img "phone" [ref=e163]:
-                - img [ref=e164]
-              - generic [ref=e166]: 02-XXX-XXXX (ฝ่ายบริการลูกค้า)
-            - generic [ref=e168]:
-              - img "mail" [ref=e170]:
-                - img [ref=e171]
-              - generic [ref=e173]: support@kamschooljob.com
-            - generic [ref=e177]:
-              - strong [ref=e180]: เวลาทำการ
-              - generic [ref=e181]: "จันทร์ - ศุกร์ : 09:00 - 18:00 น."
-      - separator [ref=e182]
-      - generic [ref=e183]:
-        - generic [ref=e184]: © 2026 KAM SCHOOLJOB. All rights reserved.
-        - generic [ref=e186]:
-          - generic [ref=e187]: นโยบายความเป็นส่วนตัว
-          - generic [ref=e188]: ข้อตกลงการใช้งาน
-  - generic [ref=e193] [cursor=pointer]:
-    - button "Open Next.js Dev Tools" [ref=e194]:
-      - img [ref=e195]
-    - generic [ref=e198]:
-      - button "Open issues overlay" [ref=e199]:
-        - generic [ref=e200]:
-          - generic [ref=e201]: "1"
+    - contentinfo [ref=e105]:
+      - generic [ref=e106]:
+        - generic [ref=e108]:
+          - generic [ref=e110]:
+            - strong [ref=e115]: K
+            - strong [ref=e118]: KAM SCHOOLJOB
+          - generic [ref=e120]: แพลตฟอร์มหางานสายการศึกษาอันดับ 1 ของไทย ครบทุกตำแหน่งงานครู ติวเตอร์ ธุรการ และบุคลากรทางการศึกษา เชื่อมโยงสถานศึกษาและผู้หางานด้วยเทคโนโลยีที่ทันสมัย
+          - generic [ref=e122]:
+            - img "facebook" [ref=e124]:
+              - img [ref=e125]
+            - img "youtube" [ref=e128]:
+              - img [ref=e129]
+            - img "line" [ref=e132]:
+              - img [ref=e133]
+        - generic [ref=e136]:
+          - heading "สำหรับคนหางาน" [level=5] [ref=e138]
+          - generic [ref=e140]:
+            - generic [ref=e141]: ค้นหาตำแหน่งงาน
+            - generic [ref=e142]: ฝากประวัติ (Resume)
+            - generic [ref=e143]: งานครูตามวิชาเอก
+            - generic [ref=e144]: บทความเตรียมสอบ
+        - generic [ref=e146]:
+          - heading "สำหรับสถานศึกษา" [level=5] [ref=e148]
+          - generic [ref=e150]:
+            - generic [ref=e151]: ประกาศรับสมัครงาน
+            - generic [ref=e152]: ค้นหาประวัติครู
+            - generic [ref=e153]: แพ็กเกจสมาชิก
+            - generic [ref=e154]: คู่มือการใช้งาน
+        - generic [ref=e156]:
+          - heading "ติดต่อเรา" [level=5] [ref=e158]
+          - generic [ref=e160]:
+            - generic [ref=e162]:
+              - img "phone" [ref=e164]:
+                - img [ref=e165]
+              - generic [ref=e167]: 02-XXX-XXXX (ฝ่ายบริการลูกค้า)
+            - generic [ref=e169]:
+              - img "mail" [ref=e171]:
+                - img [ref=e172]
+              - generic [ref=e174]: support@kamschooljob.com
+            - generic [ref=e178]:
+              - strong [ref=e181]: เวลาทำการ
+              - generic [ref=e182]: "จันทร์ - ศุกร์ : 09:00 - 18:00 น."
+      - separator [ref=e183]
+      - generic [ref=e184]:
+        - generic [ref=e185]: © 2026 KAM SCHOOLJOB. All rights reserved.
+        - generic [ref=e187]:
+          - generic [ref=e188]: นโยบายความเป็นส่วนตัว
+          - generic [ref=e189]: ข้อตกลงการใช้งาน
+  - generic [ref=e194] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e195]:
+      - img [ref=e196]
+    - generic [ref=e199]:
+      - button "Open issues overlay" [ref=e200]:
+        - generic [ref=e201]:
           - generic [ref=e202]: "2"
-        - generic [ref=e203]:
+          - generic [ref=e203]: "3"
+        - generic [ref=e204]:
           - text: Issue
-          - generic [ref=e204]: s
-      - button "Collapse issues badge" [ref=e205]:
-        - img [ref=e206]
-  - alert [ref=e208]
+          - generic [ref=e205]: s
+      - button "Collapse issues badge" [ref=e206]:
+        - img [ref=e207]
+  - alert [ref=e209]
+  - generic [ref=e210]:
+    - dialog:
+      - generic [ref=e211]:
+        - button "Close" [active] [ref=e212] [cursor=pointer]:
+          - generic "ปิด" [ref=e213]:
+            - img "close" [ref=e214]:
+              - img [ref=e215]
+        - generic [ref=e218]:
+          - img "check-circle" [ref=e221]:
+            - img [ref=e222]
+          - heading "เข้าสู่ระบบสำเร็จ" [level=2] [ref=e226]
+          - generic [ref=e228]: เข้าสู่ระบบสำเร็จ
+          - button "ตกลง" [ref=e233] [cursor=pointer]:
+            - generic [ref=e234]: ตกลง
 ```
