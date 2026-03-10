@@ -7,7 +7,7 @@ import { PrismaClient } from "@prisma/client";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 console.log("🔧 Initializing Prisma with connection:", {
-  url: process.env.DATABASE_MAIN_URL?.substring(0, 50) + "...",
+  url: process.env.DATABASE_URL?.substring(0, 50) + "...",
   directUrl: process.env.DIRECT_URL?.substring(0, 50) + "...",
 });
 
@@ -15,7 +15,7 @@ export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     adapter: new PrismaPg({
-      connectionString: process.env.DATABASE_MAIN_URL,
+      connectionString: process.env.DATABASE_URL,
     }),
     log: ["error", "warn"],
   });
