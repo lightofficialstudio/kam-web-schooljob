@@ -34,7 +34,7 @@ export default function Navbar() {
       key: "profile",
       label: "โปรไฟล์ของฉัน",
       icon: <UserOutlined />,
-      onClick: () => router.push("/profile"),
+      onClick: () => router.push("/pages/teacher/profile/"),
     },
     {
       key: "logout",
