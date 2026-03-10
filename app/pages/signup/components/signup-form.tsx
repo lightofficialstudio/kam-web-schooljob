@@ -65,11 +65,16 @@ export default function SignupForm() {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
+      const roleMapping: Record<string, string> = {
+        teacher: "EMPLOYEE",
+        school: "EMPLOYER",
+      };
+
       const payload = {
         email: values.email,
         password: values.password,
         full_name: values.fullName || "",
-        role: values.role.toUpperCase(),
+        role: roleMapping[values.role] || values.role.toUpperCase(),
       };
 
       const response = await fetch("/api/v1/authenticate/signup", {

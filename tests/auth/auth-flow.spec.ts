@@ -13,7 +13,10 @@ test.describe("Authentication Automated Testing", () => {
     await page.goto("/pages/signup");
 
     // 2. Select Employee (Teacher) role - Default is already Teacher usually
-    await page.locator("label").filter({ hasText: "ครูผู้สอน" }).click({ force: true });
+    await page
+      .locator("label")
+      .filter({ hasText: "ครูผู้สอน" })
+      .click({ force: true });
 
     // 3. Fill Signup Form
     await page.getByPlaceholder("ชื่อ-นามสกุล").fill(fullName);
@@ -22,12 +25,25 @@ test.describe("Authentication Automated Testing", () => {
     await page.getByPlaceholder("••••••••").last().fill(password);
 
     // 4. Submit Signup
-    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click({ force: true });
+    await page
+      .getByRole("button", { name: "สมัครสมาชิก", exact: true })
+      .click({ force: true });
 
-    // 5. Check Success Modal
-    await expect(page.locator('h2', { hasText: 'สมัครสมาชิกสำเร็จ' })).toBeVisible({
-      timeout: 15000,
-    });
+    // 5. Handle Modal (Success or Error)
+    const successHeader = page.locator("h2", { hasText: "สมัครสมาชิกสำเร็จ" });
+    const errorHeader = page.locator("h2", { hasText: "เกิดข้อผิดพลาด" });
+
+    await Promise.race([
+      successHeader.waitFor({ state: "visible", timeout: 15000 }),
+      errorHeader.waitFor({ state: "visible", timeout: 15000 }),
+    ]).catch(() => {});
+
+    if (await errorHeader.isVisible()) {
+      const errorMsg = await page.locator(".ant-modal-body").innerText();
+      throw new Error(`Signup failed with error: ${errorMsg}`);
+    }
+
+    await expect(successHeader).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "ตกลง" }).click();
 
     // 6. Redirect to Signin or Manual Go
@@ -52,7 +68,10 @@ test.describe("Authentication Automated Testing", () => {
     await page.goto("/pages/signup");
 
     // 2. Select Employer role
-    await page.locator("label").filter({ hasText: "สถานศึกษา" }).click({ force: true });
+    await page
+      .locator("label")
+      .filter({ hasText: "สถานศึกษา" })
+      .click({ force: true });
 
     // 3. Fill Signup Form
     await page.getByPlaceholder("ชื่อ-นามสกุล").fill(fullName);
@@ -61,12 +80,29 @@ test.describe("Authentication Automated Testing", () => {
     await page.getByPlaceholder("••••••••").last().fill(password);
 
     // 4. Submit Signup
-    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click({ force: true });
+    await page
+      .getByRole("button", { name: "สมัครสมาชิก", exact: true })
+      .click({ force: true });
 
-    // 5. Check Success Modal
-    await expect(page.locator('h2', { hasText: 'สมัครสมาชิกสำเร็จ' })).toBeVisible({
-      timeout: 15000,
+    // 5. Handle Modal (Success or Error)
+    const employerSuccessHeader = page.locator("h2", {
+      hasText: "สมัครสมาชิกสำเร็จ",
     });
+    const employerErrorHeader = page.locator("h2", {
+      hasText: "เกิดข้อผิดพลาด",
+    });
+
+    await Promise.race([
+      employerSuccessHeader.waitFor({ state: "visible", timeout: 15000 }),
+      employerErrorHeader.waitFor({ state: "visible", timeout: 15000 }),
+    ]).catch(() => {});
+
+    if (await employerErrorHeader.isVisible()) {
+      const errorMsg = await page.locator(".ant-modal-body").innerText();
+      throw new Error(`Employer Signup failed with error: ${errorMsg}`);
+    }
+
+    await expect(employerSuccessHeader).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "ตกลง" }).click();
 
     // 6. Login
