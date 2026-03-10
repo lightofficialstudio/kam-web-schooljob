@@ -1,0 +1,263 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - link "K KAM SCHOOLJOB" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]:
+          - strong [ref=e12]: K
+          - strong [ref=e15]: KAM SCHOOLJOB
+      - generic [ref=e16]:
+        - link "ค้นหางาน" [ref=e18] [cursor=pointer]:
+          - /url: /pages/job
+          - strong [ref=e20]: ค้นหางาน
+        - link "ฝากประวัติ" [ref=e22] [cursor=pointer]:
+          - /url: /pages/teacher/profile
+          - strong [ref=e24]: ฝากประวัติ
+        - link "บทความ" [ref=e26] [cursor=pointer]:
+          - /url: /pages/blog
+          - strong [ref=e28]: บทความ
+      - generic [ref=e29]:
+        - button "sun" [ref=e31] [cursor=pointer]:
+          - img "sun" [ref=e33]:
+            - img [ref=e34]
+        - link "user เข้าสู่ระบบ" [ref=e37] [cursor=pointer]:
+          - /url: /pages/signin
+          - button "user เข้าสู่ระบบ" [ref=e38]:
+            - img "user" [ref=e40]:
+              - img [ref=e41]
+            - generic [ref=e43]: เข้าสู่ระบบ
+        - link "solution สมัครงานครู" [ref=e45] [cursor=pointer]:
+          - /url: /pages/signup
+          - button "solution สมัครงานครู" [ref=e46]:
+            - img "solution" [ref=e48]:
+              - img [ref=e49]
+            - generic [ref=e51]: สมัครงานครู
+    - main [ref=e52]:
+      - generic [ref=e58]:
+        - generic [ref=e60]:
+          - generic [ref=e62]:
+            - heading "K" [level=2] [ref=e66]
+            - heading "ก้าวสู่ อนาคตใหม่" [level=1] [ref=e68]:
+              - text: ก้าวสู่
+              - text: อนาคตใหม่
+            - generic [ref=e70]:
+              - text: แพลตฟอร์มที่เชื่อมต่อครูคุณภาพ
+              - text: กับสถานศึกษาชั้นนำทั่วประเทศ
+          - generic [ref=e72]:
+            - generic [ref=e74]:
+              - img "check-circle" [ref=e77]:
+                - img [ref=e78]
+              - generic [ref=e80]: ระบบจับคู่ตามวิชาเอกที่แม่นยำ
+            - generic [ref=e82]:
+              - img "check-circle" [ref=e85]:
+                - img [ref=e86]
+              - generic [ref=e88]: สมัครงานง่ายในคลิกเดียว
+            - generic [ref=e90]:
+              - img "check-circle" [ref=e93]:
+                - img [ref=e94]
+              - generic [ref=e96]: ลงประกาศงานฟรีสำหรับโรงเรียน
+        - generic [ref=e98]:
+          - generic [ref=e100]:
+            - heading "ลงทะเบียนผู้ใช้งาน" [level=2] [ref=e102]
+            - generic [ref=e104]:
+              - text: มีบัญชีอยู่แล้ว?
+              - link "เข้าสู่ระบบ" [ref=e105] [cursor=pointer]:
+                - /url: /pages/signin
+          - generic [ref=e107]:
+            - generic [ref=e109]:
+              - strong [ref=e113]: ชื่อ-นามสกุล
+              - generic [ref=e117]:
+                - img "user" [ref=e119]:
+                  - img [ref=e120]
+                - textbox "ชื่อ-นามสกุล" [ref=e122]: Test School Employer
+            - generic [ref=e124]:
+              - strong [ref=e128]: บทบาทผู้ใช้งาน
+              - radiogroup [ref=e132]:
+                - generic [ref=e133]:
+                  - generic [ref=e135] [cursor=pointer]:
+                    - generic [ref=e136]:
+                      - radio "user ครูผู้สอน" [checked]
+                    - generic [ref=e138]:
+                      - img "user" [ref=e140]:
+                        - img [ref=e141]
+                      - generic [ref=e144]: ครูผู้สอน
+                  - generic [ref=e146] [cursor=pointer]:
+                    - generic [ref=e147]:
+                      - radio "bank สถานศึกษา"
+                    - generic [ref=e149]:
+                      - img "bank" [ref=e151]:
+                        - img [ref=e152]
+                      - generic [ref=e155]: สถานศึกษา
+            - separator [ref=e156]:
+              - generic [ref=e158]: ข้อมูลบัญชี
+            - generic [ref=e161]:
+              - strong [ref=e165]: อีเมลสมัครใช้งาน
+              - generic [ref=e169]:
+                - img "mail" [ref=e171]:
+                  - img [ref=e172]
+                - textbox "อีเมลสมัครใช้งาน" [ref=e174]:
+                  - /placeholder: name@domain.com
+                  - text: test-71302@example.com
+            - generic [ref=e175]:
+              - generic [ref=e178]:
+                - strong [ref=e182]: รหัสผ่าน
+                - generic [ref=e186]:
+                  - img "lock" [ref=e188]:
+                    - img [ref=e189]
+                  - textbox "รหัสผ่าน" [ref=e191]:
+                    - /placeholder: ••••••••
+                    - text: Password123!
+                  - img "eye-invisible" [ref=e193] [cursor=pointer]:
+                    - img [ref=e194]
+              - generic [ref=e199]:
+                - strong [ref=e203]: ยืนยันรหัสผ่าน
+                - generic [ref=e207]:
+                  - img "lock" [ref=e209]:
+                    - img [ref=e210]
+                  - textbox "ยืนยันรหัสผ่าน" [ref=e212]:
+                    - /placeholder: ••••••••
+                    - text: Password123!
+                  - img "eye-invisible" [ref=e214] [cursor=pointer]:
+                    - img [ref=e215]
+            - button "สมัครสมาชิก" [ref=e223] [cursor=pointer]:
+              - generic [ref=e224]: สมัครสมาชิก
+            - generic [ref=e230] [cursor=pointer]:
+              - checkbox "ฉันยอมรับ ข้อกำหนดการใช้บริการ และ นโยบายความเป็นส่วนตัว" [ref=e232]
+              - generic [ref=e233]:
+                - text: ฉันยอมรับ
+                - link "ข้อกำหนดการใช้บริการ" [ref=e234]:
+                  - /url: /terms
+                - text: และ
+                - link "นโยบายความเป็นส่วนตัว" [ref=e235]:
+                  - /url: /privacy
+    - contentinfo [ref=e236]:
+      - generic [ref=e237]:
+        - generic [ref=e239]:
+          - generic [ref=e241]:
+            - strong [ref=e246]: K
+            - strong [ref=e249]: KAM SCHOOLJOB
+          - generic [ref=e251]: แพลตฟอร์มหางานสายการศึกษาอันดับ 1 ของไทย ครบทุกตำแหน่งงานครู ติวเตอร์ ธุรการ และบุคลากรทางการศึกษา เชื่อมโยงสถานศึกษาและผู้หางานด้วยเทคโนโลยีที่ทันสมัย
+          - generic [ref=e253]:
+            - img "facebook" [ref=e255]:
+              - img [ref=e256]
+            - img "youtube" [ref=e259]:
+              - img [ref=e260]
+            - img "line" [ref=e263]:
+              - img [ref=e264]
+        - generic [ref=e267]:
+          - heading "สำหรับคนหางาน" [level=5] [ref=e269]
+          - generic [ref=e271]:
+            - generic [ref=e272]: ค้นหาตำแหน่งงาน
+            - generic [ref=e273]: ฝากประวัติ (Resume)
+            - generic [ref=e274]: งานครูตามวิชาเอก
+            - generic [ref=e275]: บทความเตรียมสอบ
+        - generic [ref=e277]:
+          - heading "สำหรับสถานศึกษา" [level=5] [ref=e279]
+          - generic [ref=e281]:
+            - generic [ref=e282]: ประกาศรับสมัครงาน
+            - generic [ref=e283]: ค้นหาประวัติครู
+            - generic [ref=e284]: แพ็กเกจสมาชิก
+            - generic [ref=e285]: คู่มือการใช้งาน
+        - generic [ref=e287]:
+          - heading "ติดต่อเรา" [level=5] [ref=e289]
+          - generic [ref=e291]:
+            - generic [ref=e293]:
+              - img "phone" [ref=e295]:
+                - img [ref=e296]
+              - generic [ref=e298]: 02-XXX-XXXX (ฝ่ายบริการลูกค้า)
+            - generic [ref=e300]:
+              - img "mail" [ref=e302]:
+                - img [ref=e303]
+              - generic [ref=e305]: support@kamschooljob.com
+            - generic [ref=e309]:
+              - strong [ref=e312]: เวลาทำการ
+              - generic [ref=e313]: "จันทร์ - ศุกร์ : 09:00 - 18:00 น."
+      - separator [ref=e314]
+      - generic [ref=e315]:
+        - generic [ref=e316]: © 2026 KAM SCHOOLJOB. All rights reserved.
+        - generic [ref=e318]:
+          - generic [ref=e319]: นโยบายความเป็นส่วนตัว
+          - generic [ref=e320]: ข้อตกลงการใช้งาน
+  - generic [active]:
+    - generic [ref=e323]:
+      - generic [ref=e324]:
+        - generic [ref=e325]:
+          - navigation [ref=e326]:
+            - button "previous" [disabled] [ref=e327]:
+              - img "previous" [ref=e328]
+            - generic [ref=e330]:
+              - generic [ref=e331]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e332]:
+              - img "next" [ref=e333]
+          - img
+        - generic [ref=e335]:
+          - generic [ref=e336]:
+            - img [ref=e337]
+            - generic "Latest available version is detected (16.1.6)." [ref=e339]: Next.js 16.1.6
+            - generic [ref=e340]: Turbopack
+          - img
+      - dialog "Build Error" [ref=e342]:
+        - generic [ref=e345]:
+          - generic [ref=e346]:
+            - generic [ref=e347]:
+              - generic [ref=e349]: Build Error
+              - generic [ref=e350]:
+                - button "Copy Error Info" [ref=e351] [cursor=pointer]:
+                  - img [ref=e352]
+                - button "No related documentation found" [disabled] [ref=e354]:
+                  - img [ref=e355]
+                - button "Attach Node.js inspector" [ref=e357] [cursor=pointer]:
+                  - img [ref=e358]
+            - generic [ref=e367]: Parsing ecmascript source code failed
+          - generic [ref=e369]:
+            - generic [ref=e371]:
+              - img [ref=e373]
+              - generic [ref=e377]: ./app/api/v1/authenticate/signup/route.ts (34:8)
+              - button "Open in editor" [ref=e378] [cursor=pointer]:
+                - img [ref=e380]
+            - generic [ref=e383]:
+              - generic [ref=e384]: Parsing ecmascript source code failed
+              - generic [ref=e385]: 32 |
+              - generic [ref=e386]: "{ status"
+              - text: ": 201"
+              - generic [ref=e387]: "}"
+              - text: ","
+              - generic [ref=e388]: 33 |
+              - generic [ref=e389]: )
+              - text: ; >
+              - generic [ref=e390]: 34 |
+              - generic [ref=e391]: "}"
+              - text: ","
+              - generic [ref=e392]: "|"
+              - text: ^
+              - generic [ref=e393]: 35 |
+              - generic [ref=e394]: "{ status"
+              - text: ": 201"
+              - generic [ref=e395]: "}"
+              - text: ","
+              - generic [ref=e396]: 36 |
+              - generic [ref=e397]: )
+              - text: ;
+              - generic [ref=e398]: 37 |
+              - generic [ref=e399]: "}"
+              - text: catch
+              - generic [ref=e400]: (err
+              - text: ":"
+              - generic [ref=e401]: "unknown) {"
+              - generic [ref=e402]: Expected a semicolon
+        - generic [ref=e403]: "1"
+        - generic [ref=e404]: "2"
+    - generic [ref=e409] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e410]:
+        - img [ref=e411]
+      - button "Open issues overlay" [ref=e415]:
+        - generic [ref=e416]:
+          - generic [ref=e417]: "0"
+          - generic [ref=e418]: "1"
+        - generic [ref=e419]: Issue
+  - alert [ref=e420]
+```

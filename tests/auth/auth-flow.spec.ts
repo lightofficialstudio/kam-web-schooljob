@@ -1,0 +1,83 @@
+import { expect, test } from "@playwright/test";
+
+test.describe("Authentication Automated Testing", () => {
+  const randomEmail = () =>
+    `test-${Math.floor(Math.random() * 100000)}@example.com`;
+
+  test("Employee (Teacher) Signup & Login Flow", async ({ page }) => {
+    const email = randomEmail();
+    const password = "Password123!";
+    const fullName = "Test Employee";
+
+    // 1. Go to Signup Page
+    await page.goto("/pages/signup");
+
+    // 2. Select Employee (Teacher) role - Default is already Teacher usually
+    await page.locator("label").filter({ hasText: "ครูผู้สอน" }).click({ force: true });
+
+    // 3. Fill Signup Form
+    await page.getByPlaceholder("ชื่อ-นามสกุล").fill(fullName);
+    await page.getByPlaceholder("name@domain.com").fill(email);
+    await page.getByPlaceholder("••••••••").first().fill(password);
+    await page.getByPlaceholder("••••••••").last().fill(password);
+
+    // 4. Submit Signup
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click({ force: true });
+
+    // 5. Check Success Modal
+    await expect(page.locator('h2', { hasText: 'สมัครสมาชิกสำเร็จ' })).toBeVisible({
+      timeout: 15000,
+    });
+    await page.getByRole("button", { name: "ตกลง" }).click();
+
+    // 6. Redirect to Signin or Manual Go
+    await page.goto("/pages/signin");
+
+    // 7. Login with new credentials
+    await page.getByPlaceholder("อีเมลสมัครใช้งาน").fill(email);
+    await page.getByPlaceholder("••••••••").fill(password);
+    await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+
+    // 8. Verify Dashboard / Navbar shows name
+    await expect(page.getByText(fullName)).toBeVisible();
+    await expect(page.getByText("ครูผู้สอน")).toBeVisible();
+  });
+
+  test("Employer (School) Signup & Login Flow", async ({ page }) => {
+    const email = randomEmail();
+    const password = "Password123!";
+    const fullName = "Test School Employer";
+
+    // 1. Go to Signup Page
+    await page.goto("/pages/signup");
+
+    // 2. Select Employer role
+    await page.locator("label").filter({ hasText: "สถานศึกษา" }).click({ force: true });
+
+    // 3. Fill Signup Form
+    await page.getByPlaceholder("ชื่อ-นามสกุล").fill(fullName);
+    await page.getByPlaceholder("name@domain.com").fill(email);
+    await page.getByPlaceholder("••••••••").first().fill(password);
+    await page.getByPlaceholder("••••••••").last().fill(password);
+
+    // 4. Submit Signup
+    await page.getByRole("button", { name: "สมัครสมาชิก", exact: true }).click({ force: true });
+
+    // 5. Check Success Modal
+    await expect(page.locator('h2', { hasText: 'สมัครสมาชิกสำเร็จ' })).toBeVisible({
+      timeout: 15000,
+    });
+    await page.getByRole("button", { name: "ตกลง" }).click();
+
+    // 6. Login
+    await page.goto("/pages/signin");
+    await page.getByPlaceholder("อีเมลสมัครใช้งาน").fill(email);
+    await page.getByPlaceholder("••••••••").fill(password);
+    await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+
+    // 7. Verify Employer Dashboard Redirect
+    await expect(page).toHaveURL(/.*\/employer\/job\/read/);
+    await expect(page.getByText(fullName)).toBeVisible();
+    await expect(page.getByText("สถานศึกษา")).toBeVisible();
+  });
+});
