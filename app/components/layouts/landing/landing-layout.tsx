@@ -191,13 +191,14 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
               flexDirection: "column",
             }}
           >
-            <Navbar isDark={isDark} />
+            <Navbar />
             <Layout.Content
               style={{
                 flex: "1 0 auto",
                 width: "100%",
                 maxWidth: "100vw",
                 overflowX: "hidden",
+                paddingTop: 68, // offset for fixed Navbar (12px padding-top + ~44px content + 12px padding-bottom)
               }}
             >
               <div style={{ width: "100%", height: "100%" }}>{children}</div>

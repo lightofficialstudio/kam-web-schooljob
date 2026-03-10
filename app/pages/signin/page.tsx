@@ -210,12 +210,14 @@ function SigninFormContent() {
             </Form.Item>
           </Form>
 
-          <Space wrap justify="center" style={{ width: "100%", marginTop: 16 }}>
-            <Text type="secondary">ยังไม่มีบัญชี?</Text>
-            <Link href="/pages/signup" style={{ fontWeight: 600 }}>
-              สมัครสมาชิก
-            </Link>
-          </Space>
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Space wrap>
+              <Text type="secondary">ยังไม่มีบัญชี?</Text>
+              <Link href="/pages/signup" style={{ fontWeight: 600 }}>
+                สมัครสมาชิก
+              </Link>
+            </Space>
+          </div>
         </Card>
       </div>
     </ConfigProvider>

@@ -57,13 +57,13 @@ export class AuthenticateService {
             where: { userId: authData.user.id },
             update: {
               email,
-              fullName: full_name,
+              firstName: full_name,
               role: role as UserRole,
             },
             create: {
               userId: authData.user.id,
               email,
-              fullName: full_name,
+              firstName: full_name,
               role: role as UserRole,
               password: "", // ❌ ไม่เก็บ password - Supabase จัดการแล้ว
             },
@@ -145,7 +145,7 @@ export class AuthenticateService {
 
       // 3. ✨ [รวมข้อมูล Supabase + Prisma]
       const fullName =
-        data.user?.user_metadata?.full_name || profile?.fullName || "";
+        data.user?.user_metadata?.full_name || profile?.firstName || "";
       const role = data.user?.user_metadata?.role || profile?.role || "TEACHER";
 
       console.log(`✅ [SIGNIN] Ready to return user data:`, {

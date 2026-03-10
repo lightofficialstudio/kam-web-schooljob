@@ -26,16 +26,142 @@ enum JobStatus {
 // --- Models ---
 
 model Profile {
-  id        String   @id @default(uuid())
-  userId    String   @unique @map("user_id") // Link to Supabase Auth ID
-  email     String   @unique
-  password  String? // Hash only - bcrypt (nullable for existing records)
-  fullName  String?  @map("full_name")
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  email           String    @unique
+  password        String?
+  firstName       String?   @map("first_name")
+  lastName        String?   @map("last_name")
+  phoneNumber     String?   @map("phone_number")
+  gender          String? // ชาย, หญิง
+  dateOfBirth     DateTime? @map("date_of_birth")
+  profileImageUrl String?   @map("profile_image_url")
+
+  // Education fields
+  educationLevel  String? @map("education_level")
+  institution     String?
+  major           String?
+  gpa             Float?
+  teachingLicense String? @map("teaching_license") // มี, กำลังดำเนินการ, ไม่มี
+  licenseFileUrl  String? @map("license_file_url")
+
+  // Teaching info fields
+  specialization     String? // วิชาที่สอนได้ (JSON array)
+  gradeCanTeach      String? @map("grade_can_teach") // Multi-select JSON
+  teachingExperience String? @map("teaching_experience")
+  recentSchool       String? @map("recent_school")
+
+  // Skills fields
+  languagesSpoken   String? @map("languages_spoken") // TAG (JSON array)
+  itSkills          String? @map("it_skills") // TAG (JSON array)
+  specialActivities String? @map("special_activities")
+
+  // Work location fields
+  preferredProvinces String?  @map("preferred_provinces") // Multi-select JSON
+  canRelocate        Boolean? @map("can_relocate")
+
+  // General fields
+  resumeUrl String?  @map("resume_url")
   role      UserRole @default(TEACHER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // Relations
+  workExperiences WorkExperience[]
+  educations      Education[]
+  licenses        License[]
+  languages       Language[]
+  skills          Skill[]
+
   @@map("profiles")
+}
+
+// Work Experience Model
+model WorkExperience {
+  id          String    @id @default(uuid())
+  profileId   String    @map("profile_id")
+  jobTitle    String    @map("job_title")
+  companyName String    @map("company_name")
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime? @map("end_date")
+  inPresent   Boolean   @default(false) @map("in_present")
+  description String?
+  workYear    Int?      @map("work_year")
+  isDeleted   Boolean   @default(false) @map("is_deleted")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("work_experiences")
+}
+
+// Education History Model
+model Education {
+  id          String    @id @default(uuid())
+  profileId   String    @map("profile_id")
+  level       String
+  institution String
+  major       String
+  gpa         Float?
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  isDeleted   Boolean   @default(false) @map("is_deleted")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("educations")
+}
+
+// License & Certification Model
+model License {
+  id            String    @id @default(uuid())
+  profileId     String    @map("profile_id")
+  licenseName   String    @map("license_name")
+  issuer        String?
+  licenseNumber String?   @map("license_number")
+  issueDate     DateTime? @map("issue_date")
+  expiryDate    DateTime? @map("expiry_date")
+  credentialUrl String?   @map("credential_url")
+  isDeleted     Boolean   @default(false) @map("is_deleted")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("licenses")
+}
+
+// Languages Model
+model Language {
+  id           String   @id @default(uuid())
+  profileId    String   @map("profile_id")
+  languageName String   @map("language_name")
+  proficiency  String?
+  isDeleted    Boolean  @default(false) @map("is_deleted")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("languages")
+}
+
+// Skills Model
+model Skill {
+  id           String   @id @default(uuid())
+  profileId    String   @map("profile_id")
+  skillName    String   @map("skill_name")
+  endorsements Int?     @default(0)
+  isDeleted    Boolean  @default(false) @map("is_deleted")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("skills")
 }
 
 model Job {
