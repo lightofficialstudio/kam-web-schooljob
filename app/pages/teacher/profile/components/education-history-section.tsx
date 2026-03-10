@@ -1,6 +1,13 @@
 "use client";
 
-import { DeleteOutlined, EditOutlined, PlusOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
+import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
+import {
+  CheckCircleFilled,
+  CloseCircleFilled,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -14,7 +21,6 @@ import {
 } from "antd";
 import React, { useState } from "react";
 import { EducationEntry, useProfileStore } from "../stores/profile-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 
 const EDUCATION_LEVELS = [
   { value: "ประถมศึกษา", label: "ประถมศึกษา" },
@@ -115,8 +121,7 @@ export const EducationHistorySection: React.FC = () => {
           mainTitle: "ลบข้อมูลสำเร็จ",
           description: "ข้อมูลการศึกษาถูกลบเรียบร้อยแล้ว",
           icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
-        }
-        message.success("ลบข้อมูลสำเร็จ");
+        });
       },
     });
   };

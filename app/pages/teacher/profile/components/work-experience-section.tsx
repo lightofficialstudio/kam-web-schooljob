@@ -1,6 +1,13 @@
 "use client";
 
-import { DeleteOutlined, EditOutlined, PlusOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
+import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
+import {
+  CheckCircleFilled,
+  CloseCircleFilled,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -16,7 +23,6 @@ import {
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { WorkExperienceEntry, useProfileStore } from "../stores/profile-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 
 export const WorkExperienceSection: React.FC = () => {
   const [form] = Form.useForm();
@@ -118,8 +124,7 @@ export const WorkExperienceSection: React.FC = () => {
           mainTitle: "ลบข้อมูลสำเร็จ",
           description: "ข้อมูลประสบการณ์ทำงานถูกลบเรียบร้อยแล้ว",
           icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
-        }
-        message.success("ลบข้อมูลสำเร็จ");
+        });
       },
     });
   };
