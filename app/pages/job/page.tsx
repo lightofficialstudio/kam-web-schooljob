@@ -1,13 +1,19 @@
 "use client";
 
 import {
+  CheckCircleFilled,
   ClockCircleOutlined,
+  CloseOutlined,
   DollarCircleOutlined,
   EnvironmentOutlined,
   HeartOutlined,
   HistoryOutlined,
+  InfoCircleOutlined,
+  MoreOutlined,
   SafetyCertificateOutlined,
   SearchOutlined,
+  ShareAltOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -16,6 +22,7 @@ import {
   Card,
   Col,
   Divider,
+  Drawer,
   Input,
   Row,
   Select,
@@ -31,7 +38,7 @@ import { useState } from "react";
 dayjs.extend(relativeTime);
 dayjs.locale("th");
 
-const { Title, Text } = Typography;
+const { Title, Text, Link } = Typography;
 
 // Mock Data 10 รายการ ตามฟิลด์ใน School Board Requirement
 const MOCK_JOBS = [
@@ -239,6 +246,15 @@ const MOCK_JOBS = [
 export default function JobSearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
+  const [selectedJob, setSelectedJob] = useState<(typeof MOCK_JOBS)[0] | null>(
+    null,
+  );
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleOpenJob = (job: (typeof MOCK_JOBS)[0]) => {
+    setSelectedJob(job);
+    setIsDrawerOpen(true);
+  };
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f4f7f9" }}>
@@ -353,6 +369,7 @@ export default function JobSearchPage() {
                   <Card
                     key={job.id}
                     hoverable
+                    onClick={() => handleOpenJob(job)}
                     style={{
                       borderRadius: "12px",
                       border: "1px solid #e5e7eb",
@@ -543,6 +560,314 @@ export default function JobSearchPage() {
           </Row>
         </Col>
       </Row>
+
+      {/* 3. Job Details Drawer (70% Width) */}
+      <Drawer
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        width="70%"
+        closable={false}
+        styles={{ body: { padding: 0 } }}
+      >
+        {selectedJob && (
+          <div style={{ position: "relative", minHeight: "100%" }}>
+            {/* Header Sticky Action Bar */}
+            <div
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 100,
+                backgroundColor: "white",
+                padding: "16px 24px",
+                borderBottom: "1px solid #f0f0f0",
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <Button
+                type="text"
+                icon={<ShareAltOutlined />}
+                style={{ fontSize: "20px" }}
+              />
+              <Button
+                type="text"
+                icon={<MoreOutlined />}
+                style={{ fontSize: "20px" }}
+              />
+              <Divider type="vertical" />
+              <Button
+                type="text"
+                icon={<CloseOutlined />}
+                onClick={() => setIsDrawerOpen(false)}
+                style={{ fontSize: "20px" }}
+              />
+            </div>
+
+            {/* Banner Image Area */}
+            <div
+              style={{
+                height: "240px",
+                backgroundColor: "#e60278",
+                backgroundImage:
+                  "linear-gradient(135deg, #e60278 0%, #001e45 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                textAlign: "center",
+                padding: "40px",
+              }}
+            >
+              <div>
+                <Title level={2} style={{ color: "white", margin: 0 }}>
+                  KEEP LEARNING
+                </Title>
+                <Title
+                  level={4}
+                  style={{ color: "white", opacity: 0.8, marginTop: "8px" }}
+                >
+                  AND CURIOUS ON
+                </Title>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div style={{ padding: "0 40px 80px 40px", marginTop: "-40px" }}>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+                styles={{ body: { padding: "32px" } }}
+              >
+                <Row gutter={24} align="middle">
+                  <Col flex="80px">
+                    <Avatar
+                      shape="square"
+                      size={80}
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${selectedJob.schoolName}&backgroundColor=003366`}
+                    />
+                  </Col>
+                  <Col flex="auto">
+                    <Title level={3} style={{ margin: 0 }}>
+                      {selectedJob.title}
+                    </Title>
+                    <Space size={8}>
+                      <Text strong style={{ fontSize: "16px" }}>
+                        {selectedJob.schoolName}
+                      </Text>
+                      <Badge status="success" />
+                      <Link href="#" style={{ color: "#1890ff" }}>
+                        ดูงานทั้งหมดจากโรงเรียนนี้
+                      </Link>
+                    </Space>
+                  </Col>
+                </Row>
+
+                <div style={{ marginTop: "24px" }}>
+                  <Row gutter={[0, 16]}>
+                    <Col span={24}>
+                      <Space size={12}>
+                        <EnvironmentOutlined style={{ color: "#8c8c8c" }} />
+                        <Text>{selectedJob.address}</Text>
+                      </Space>
+                    </Col>
+                    <Col span={24}>
+                      <Space size={12}>
+                        <TeamOutlined style={{ color: "#8c8c8c" }} />
+                        <Text>
+                          ฝ่ายวิชาการ / {selectedJob.subjects.join(", ")}
+                        </Text>
+                      </Space>
+                    </Col>
+                    <Col span={24}>
+                      <Space size={12}>
+                        <ClockCircleOutlined style={{ color: "#8c8c8c" }} />
+                        <Text>งานเต็มเวลา</Text>
+                      </Space>
+                    </Col>
+                  </Row>
+
+                  <Text
+                    type="secondary"
+                    style={{ display: "block", marginTop: "16px" }}
+                  >
+                    โพสต์เมื่อ {dayjs(selectedJob.postedAt).fromNow()} •
+                    มีผู้สนใจสมัครจำนวนมาก
+                  </Text>
+                </div>
+
+                <div style={{ marginTop: "32px" }}>
+                  <Space size={16}>
+                    <Link href={`/pages/job/${selectedJob.id}/apply`}>
+                      <Button
+                        type="primary"
+                        size="large"
+                        style={{
+                          height: "48px",
+                          padding: "0 40px",
+                          borderRadius: "8px",
+                          backgroundColor: "#e60278",
+                          borderColor: "#e60278",
+                          fontWeight: 600,
+                        }}
+                      >
+                        สมัครด่วน (Quick Apply)
+                      </Button>
+                    </Link>
+                    <Button
+                      size="large"
+                      style={{
+                        height: "48px",
+                        padding: "0 40px",
+                        borderRadius: "8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      บันทึกงาน
+                    </Button>
+                  </Space>
+                </div>
+              </Card>
+
+              {/* How you match section */}
+              <Card
+                style={{
+                  marginTop: "24px",
+                  borderRadius: "12px",
+                  backgroundColor: "#fff",
+                  border: "1px solid #f0f0f0",
+                }}
+                styles={{ body: { padding: "24px" } }}
+              >
+                <Space size={8} style={{ marginBottom: "16px" }}>
+                  <Title level={5} style={{ margin: 0 }}>
+                    ความเหมาะสมของคุณต่อตำแหน่งนี้
+                  </Title>
+                  <InfoCircleOutlined style={{ color: "#8c8c8c" }} />
+                </Space>
+                <Text
+                  type="secondary"
+                  style={{ display: "block", marginBottom: "16px" }}
+                >
+                  2 ทักษะและคุณสมบัติของคุณตรงกับความต้องการของโรงเรียน
+                </Text>
+                <Space size={[8, 12]} wrap>
+                  <Tag
+                    icon={<CheckCircleFilled />}
+                    color="success"
+                    style={{ padding: "4px 12px", borderRadius: "16px" }}
+                  >
+                    ประสบการณ์การสอน {selectedJob.teachingExperience}
+                  </Tag>
+                  <Tag
+                    icon={<CheckCircleFilled />}
+                    color="success"
+                    style={{ padding: "4px 12px", borderRadius: "16px" }}
+                  >
+                    วุฒิ {selectedJob.educationLevel}
+                  </Tag>
+                </Space>
+              </Card>
+
+              {/* Roles and Responsibilities */}
+              <div style={{ marginTop: "40px" }}>
+                <Title level={4}>หน้าที่และความรับผิดชอบ:</Title>
+                <ul
+                  style={{
+                    paddingLeft: "20px",
+                    lineHeight: "2",
+                    color: "#434343",
+                    fontSize: "15px",
+                  }}
+                >
+                  <li>
+                    <strong>จัดการเรียนการสอน:</strong>{" "}
+                    {selectedJob.description} ในระดับชั้น{" "}
+                    {selectedJob.grades.join(", ")}
+                  </li>
+                  <li>
+                    <strong>เตรียมแผนการจัดการเรียนรู้:</strong>{" "}
+                    ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ
+                  </li>
+                  <li>
+                    <strong>วัดและประเมินผล:</strong>{" "}
+                    ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน
+                  </li>
+                  <li>
+                    <strong>ให้คำปรึกษา:</strong>{" "}
+                    ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง
+                  </li>
+                  <li>
+                    เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ
+                  </li>
+                </ul>
+              </div>
+
+              {/* Qualifications */}
+              <div style={{ marginTop: "40px" }}>
+                <Title level={4}>คุณสมบัติผู้สมัคร:</Title>
+                <ul
+                  style={{
+                    paddingLeft: "20px",
+                    lineHeight: "2",
+                    color: "#434343",
+                    fontSize: "15px",
+                  }}
+                >
+                  <li>
+                    วุฒิการศึกษาระดับ {selectedJob.educationLevel}{" "}
+                    ในสาขาที่เกี่ยวข้อง
+                  </li>
+                  <li>มีทักษะในการสื่อสารดีเยี่ยมและมีจิตวิทยาในการสอนเด็ก</li>
+                  <li>
+                    หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired}
+                    ) จะพิจารณาเป็นพิเศษ
+                  </li>
+                  <li>มีประสบการณ์การสอน {selectedJob.teachingExperience}</li>
+                  <li>สามารถทำงานร่วมกับผู้อื่นได้ดีและมีความรับผิดชอบสูง</li>
+                </ul>
+              </div>
+
+              {/* Welfare */}
+              <div style={{ marginTop: "40px" }}>
+                <Title level={4}>สวัสดิการและสถานที่ทำงาน:</Title>
+                <Space wrap size={[24, 12]}>
+                  <Tag color="default" style={{ padding: "4px 12px" }}>
+                    ประกันสังคม
+                  </Tag>
+                  <Tag color="default" style={{ padding: "4px 12px" }}>
+                    ประกันสุขภาพกลุ่ม
+                  </Tag>
+                  <Tag color="default" style={{ padding: "4px 12px" }}>
+                    โบนัสประจำปี
+                  </Tag>
+                  <Tag color="default" style={{ padding: "4px 12px" }}>
+                    ชุดยูนิฟอร์ม
+                  </Tag>
+                  <Tag color="default" style={{ padding: "4px 12px" }}>
+                    อาหารกลางวันฟรี
+                  </Tag>
+                </Space>
+              </div>
+
+              <Divider style={{ margin: "40px 0" }} />
+
+              <div style={{ textAlign: "center" }}>
+                <Title
+                  level={4}
+                  style={{ color: "#d9d9d9", letterSpacing: "2px" }}
+                >
+                  SCHOOL JOB BOARD
+                </Title>
+              </div>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 }

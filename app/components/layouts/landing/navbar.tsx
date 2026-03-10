@@ -103,7 +103,7 @@ export default function Navbar() {
             ค้นหางาน
           </Text>
         </Link>
-        <Link href="/resume" style={{ textDecoration: "none" }}>
+        <Link href="/pages/teacher/profile" style={{ textDecoration: "none" }}>
           <Text strong style={{ cursor: "pointer" }}>
             ฝากประวัติ
           </Text>
