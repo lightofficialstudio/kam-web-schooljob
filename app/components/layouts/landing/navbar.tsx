@@ -113,7 +113,7 @@ export default function Navbar() {
             สำหรับสถานศึกษา
           </Text>
         </Link>
-        <Link href="/blog" style={{ textDecoration: "none" }}>
+        <Link href="/pages/blog" style={{ textDecoration: "none" }}>
           <Text strong style={{ cursor: "pointer" }}>
             บทความ
           </Text>
