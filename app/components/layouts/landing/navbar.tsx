@@ -34,7 +34,13 @@ export default function Navbar() {
       key: "profile",
       label: "โปรไฟล์ของฉัน",
       icon: <UserOutlined />,
-      onClick: () => router.push("/pages/teacher/profile/"),
+      onClick: () => {
+        if (user?.role === "SCHOOL") {
+          router.push("/pages/employer/profile");
+        } else {
+          router.push("/pages/teacher/profile/");
+        }
+      },
     },
     {
       key: "logout",
