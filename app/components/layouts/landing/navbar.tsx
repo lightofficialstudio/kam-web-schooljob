@@ -98,7 +98,7 @@ export default function Navbar() {
       </Link>
 
       <Space size={32}>
-        <Link href="/jobs" style={{ textDecoration: "none" }}>
+        <Link href="/pages/job" style={{ textDecoration: "none" }}>
           <Text strong style={{ cursor: "pointer" }}>
             ค้นหางาน
           </Text>
