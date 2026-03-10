@@ -47,7 +47,7 @@ interface UserRecord {
   userId: string;
   email: string;
   fullName: string | null;
-  role: "TEACHER" | "SCHOOL" | "ADMIN";
+  role: "EMPLOYEE" | "EMPLOYER" | "ADMIN";
   createdAt: string;
   updatedAt: string;
 }
@@ -178,10 +178,10 @@ export default function UserManagementPage() {
         if (role === "ADMIN") {
           color = "red";
           label = "ผู้ดูแล";
-        } else if (role === "SCHOOL") {
+        } else if (role === "EMPLOYER") {
           color = "blue";
           label = "โรงเรียน";
-        } else if (role === "TEACHER") {
+        } else if (role === "EMPLOYEE") {
           color = "green";
           label = "ครู";
         }
@@ -283,7 +283,7 @@ export default function UserManagementPage() {
             <Card>
               <Statistic
                 title="ครู"
-                value={users.filter((u) => u.role === "TEACHER").length}
+                value={users.filter((u) => u.role === "EMPLOYEE").length}
                 valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
@@ -296,7 +296,7 @@ export default function UserManagementPage() {
             <Card>
               <Statistic
                 title="โรงเรียน"
-                value={users.filter((u) => u.role === "SCHOOL").length}
+                value={users.filter((u) => u.role === "EMPLOYER").length}
                 valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
@@ -443,10 +443,10 @@ export default function UserManagementPage() {
                             if (record.role === "ADMIN") {
                               color = "red";
                               label = "ผู้ดูแล";
-                            } else if (record.role === "SCHOOL") {
+                            } else if (record.role === "EMPLOYER") {
                               color = "blue";
                               label = "โรงเรียน";
-                            } else if (record.role === "TEACHER") {
+                            } else if (record.role === "EMPLOYEE") {
                               color = "green";
                               label = "ครู";
                             }

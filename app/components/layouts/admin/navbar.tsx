@@ -118,7 +118,7 @@ export function AdminNavbar({ onMenuClick, title, mode }: AdminNavbarProps) {
                     >
                       {user.role === "ADMIN"
                         ? "ผู้ดูแลระบบ"
-                        : user.role === "SCHOOL"
+                        : user.role === "EMPLOYER"
                           ? "โรงเรียน"
                           : "ครู"}
                     </Typography.Text>

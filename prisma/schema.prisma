@@ -12,8 +12,8 @@ datasource db {
 // --- Enum Definitions ---
 
 enum UserRole {
-  TEACHER // สำหรับคุณครู (หางาน)
-  SCHOOL // สำหรับโรงเรียน (ประกาศงานและหาคน)
+  EMPLOYEE // สำหรับคุณครู (หางาน)
+  EMPLOYER // สำหรับโรงเรียน (ประกาศงานและหาคน)
   ADMIN // สำหรับแอดมิน (จัดการระบบหลังบ้าน)
 }
 
@@ -62,7 +62,7 @@ model Profile {
 
   // General fields
   resumeUrl String?  @map("resume_url")
-  role      UserRole @default(TEACHER)
+  role      UserRole @default(EMPLOYEE)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

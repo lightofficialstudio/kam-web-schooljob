@@ -53,8 +53,8 @@ function SigninFormContent() {
       const { user } = useAuthStore.getState();
       let destinationUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/";
 
-      // 🏢 [ถ้า role เป็น SCHOOL ให้ไปที่หน้าจัดการงาน]
-      if (!redirectUrl && user && user.role === "SCHOOL") {
+      // 🏢 [ถ้า role เป็น EMPLOYER ให้ไปที่หน้าจัดการงาน]
+      if (!redirectUrl && user && user.role === "EMPLOYER") {
         destinationUrl = "/pages/employer/job/read";
       }
 

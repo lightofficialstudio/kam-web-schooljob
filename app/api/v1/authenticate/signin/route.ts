@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         data: {
           user_id: result.user?.id,
           email: result.user?.email,
-          role: result.profile?.role || "TEACHER",
+          role: result.profile?.role || "EMPLOYEE",
           full_name: result.profile?.fullName || "",
         },
       },

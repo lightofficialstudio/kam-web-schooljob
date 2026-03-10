@@ -5,7 +5,7 @@ export const signupSchema = z.object({
   email: z.string().email("อีเมลไม่ถูกต้อง"),
   password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
   full_name: z.string().min(1, "กรุณากรอกชื่อ-นามสกุล"),
-  role: z.enum(["TEACHER", "SCHOOL", "ADMIN"], {
+  role: z.enum(["EMPLOYEE", "EMPLOYER", "ADMIN"], {
     message: "บทบาทไม่ถูกต้อง",
   }),
 });

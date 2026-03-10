@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 },
     );
+      },
+      { status: 201 },
+    );
   } catch (err: unknown) {
     // ✨ [จัดการกรณี validation error หรือ supabase error]
     const errorMessage =

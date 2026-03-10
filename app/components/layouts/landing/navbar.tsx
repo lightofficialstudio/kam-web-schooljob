@@ -35,7 +35,7 @@ export default function Navbar() {
       label: "โปรไฟล์ของฉัน",
       icon: <UserOutlined />,
       onClick: () => {
-        if (user?.role === "SCHOOL") {
+        if (user?.role === "EMPLOYER") {
           router.push("/pages/employer/profile");
         } else {
           router.push("/pages/teacher/profile/");
@@ -104,7 +104,7 @@ export default function Navbar() {
       </Link>
 
       <Space size={32}>
-        {(!user || user.role === "TEACHER") && (
+        {(!user || user.role === "EMPLOYEE") && (
           <>
             <Link href="/pages/job" style={{ textDecoration: "none" }}>
               <Text strong style={{ cursor: "pointer" }}>
@@ -127,7 +127,7 @@ export default function Navbar() {
           </>
         )}
 
-        {user && user.role === "SCHOOL" && (
+        {user && user.role === "EMPLOYER" && (
           <>
             <Link
               href="/pages/employer/job/read"
@@ -179,7 +179,7 @@ export default function Navbar() {
                   {user.full_name}
                 </Text>
                 <Text type="secondary" style={{ fontSize: "12px" }}>
-                  {user.role === "TEACHER" ? "ครูผู้สอน" : "สถานศึกษา"}
+                  {user.role === "EMPLOYEE" ? "ครูผู้สอน" : "สถานศึกษา"}
                 </Text>
               </Space>
             </Space>

@@ -146,7 +146,8 @@ export class AuthenticateService {
       // 3. ✨ [รวมข้อมูล Supabase + Prisma]
       const fullName =
         data.user?.user_metadata?.full_name || profile?.firstName || "";
-      const role = data.user?.user_metadata?.role || profile?.role || "TEACHER";
+      const role =
+        data.user?.user_metadata?.role || profile?.role || "EMPLOYEE";
 
       console.log(`✅ [SIGNIN] Ready to return user data:`, {
         user_id: data.user?.id,
