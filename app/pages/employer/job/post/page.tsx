@@ -78,16 +78,15 @@ export default function PostJobPage() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f4f7f9",
+
         paddingBottom: "100px",
       }}
     >
       {/* 1. Header & Navigation */}
       <div
         style={{
-          backgroundColor: "white",
           padding: "16px 0",
-          borderBottom: "1px solid #e5e7eb",
+
           marginBottom: "40px",
         }}
       >
@@ -547,10 +546,7 @@ export default function PostJobPage() {
                 </div>
               </Card>
 
-              <Card
-                variant="borderless"
-                style={{ borderRadius: "24px", backgroundColor: "white" }}
-              >
+              <Card variant="borderless" style={{ borderRadius: "24px" }}>
                 <Space direction="vertical" size={16}>
                   <Text strong>ทำไมต้องลงประกาศกับเรา?</Text>
                   <Space align="start">
