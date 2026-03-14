@@ -32,22 +32,26 @@ const FONTS = {
 
 const SYSTEM_PALETTE = {
   light: {
-    bgLayout: "#F8FAFC",
+    bgLayout: "#F1F5F9", // Lighter slate for better contrast
     bgContainer: "#FFFFFF",
     bgElevated: "#FFFFFF",
-    textMain: "#0F172A",
-    textSub: "#64748B",
-    border: "#F1F5F9",
-    borderSecondary: "#F8FAFC",
+    textMain: "#0F172A", // Slate 900
+    textSub: "#475569", // Slate 600
+    border: "#E2E8F0", // Slate 200
+    borderSecondary: "#F1F5F9",
+    glassBg: "rgba(255, 255, 255, 0.7)",
+    cardBg: "rgba(255, 255, 255, 0.8)",
   },
   dark: {
-    bgLayout: "#0D1117",
-    bgContainer: "#1A202C",
-    bgElevated: "#2D3748",
-    textMain: "#E2E8F0",
-    textSub: "#A0AEC0",
-    border: "#404854",
-    borderSecondary: "#2D3748",
+    bgLayout: "#020617", // Deeper Slate/Navy (Modern 2026)
+    bgContainer: "#0F172A",
+    bgElevated: "#1E293B",
+    textMain: "#F8FAFC",
+    textSub: "#94A3B8",
+    border: "#1E293B",
+    borderSecondary: "#0F172A",
+    glassBg: "rgba(15, 23, 42, 0.75)",
+    cardBg: "rgba(30, 41, 59, 0.5)",
   },
 };
 
@@ -92,20 +96,32 @@ const getModernTheme = (isDark: boolean): ThemeConfig => {
         paddingInlineLG: 32,
         borderRadius: 12,
         defaultShadow: "none",
-        primaryShadow: "0 4px 12px rgba(0, 102, 255, 0.25)",
+        primaryShadow: isDark
+          ? "0 4px 12px rgba(0, 102, 255, 0.4)"
+          : "0 4px 12px rgba(0, 102, 255, 0.25)",
       },
       Card: {
         paddingLG: 24,
-        colorBgContainer: isDark
-          ? "rgba(15, 23, 42, 0.65)"
-          : "rgba(255, 255, 255, 0.75)",
+        colorBgContainer: isDark ? "#0F172A" : "#FFFFFF",
         boxShadowTertiary: isDark
-          ? "0 4px 24px -2px rgba(0, 0, 0, 0.4)"
-          : "0 4px 24px -2px rgba(0, 0, 0, 0.04)",
+          ? "0 4px 24px -2px rgba(0, 0, 0, 0.6)"
+          : "0 4px 24px -2px rgba(15, 23, 42, 0.06)",
+        borderRadiusLG: 24,
       },
       Layout: {
         bodyBg: palette.bgLayout,
         headerBg: palette.bgContainer,
+      },
+      Input: {
+        borderRadius: 12,
+
+        colorTextPlaceholder: isDark
+          ? "rgba(255, 255, 255, 0.25)"
+          : "rgba(0, 0, 0, 0.25)",
+      },
+      Select: {
+        borderRadius: 12,
+        colorBgContainer: palette.bgContainer,
       },
     },
   };
@@ -136,55 +152,22 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
             {
               "--primary": BRAND_COLORS.primary,
               "--bg-layout": palette.bgLayout,
+              "--bg-container": palette.bgContainer,
               "--border": palette.border,
               "--text-main": palette.textMain,
-              "--glass-bg": isDark
-                ? "rgba(26, 32, 44, 0.75)"
-                : "rgba(255, 255, 255, 0.7)",
-              "--card-glass-bg": isDark
-                ? "rgba(45, 55, 72, 0.7)"
-                : "rgba(255, 255, 255, 0.65)",
+              "--text-sub": palette.textSub,
+              "--glass-bg": palette.glassBg,
+              "--card-bg": palette.cardBg,
               "--modal-mask-bg": isDark
-                ? "rgba(0, 0, 0, 0.5)"
+                ? "rgba(0, 0, 0, 0.7)"
                 : "rgba(0, 0, 0, 0.45)",
-              "--scroll-thumb": isDark ? "#4A5568" : "#CBD5E1",
-              "--scroll-thumb-hover": isDark ? "#718096" : "#94A3B8",
-              "--modal-bg": isDark ? "#2D3748" : "#FFFFFF",
+              "--scroll-thumb": isDark ? "#1E293B" : "#CBD5E1",
+              "--scroll-thumb-hover": isDark ? "#334155" : "#94A3B8",
+              "--modal-bg": palette.bgElevated,
               minHeight: "100vh",
             } as React.CSSProperties
           }
         >
-          <style jsx global>{`
-            :root {
-              --font-family: ${FONTS.kanit};
-            }
-            body {
-              background-color: var(--bg-layout);
-              color: var(--text-main);
-              font-family: var(--font-family);
-              -webkit-font-smoothing: antialiased;
-              margin: 0;
-            }
-
-            .glass-card {
-              background: var(--card-glass-bg) !important;
-              backdrop-filter: blur(1rem) saturate(180%) !important;
-              -webkit-backdrop-filter: blur(1rem) saturate(180%) !important;
-              border: 1px solid var(--border);
-            }
-
-            .ant-card:hover {
-              box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.1) !important;
-            }
-
-            ::-webkit-scrollbar {
-              width: 8px;
-            }
-            ::-webkit-scrollbar-thumb {
-              background: var(--scroll-thumb);
-              border-radius: 10px;
-            }
-          `}</style>
           <Layout
             style={{
               flex: 1,

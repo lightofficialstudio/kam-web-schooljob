@@ -17,6 +17,7 @@ import {
   Flex,
   Row,
   Space,
+  theme,
   Tooltip,
   Typography,
 } from "antd";
@@ -29,6 +30,8 @@ export default function Navbar() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { toggleTheme, mode } = useTheme();
+  const { token } = theme.useToken();
+  const isDark = mode === "dark";
 
   const userMenuItems = [
     {
@@ -65,7 +68,13 @@ export default function Navbar() {
         width: "100%",
         zIndex: 1000,
         backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        backgroundColor: isDark
+          ? "rgba(2, 6, 23, 0.75)"
+          : "rgba(255, 255, 255, 0.75)",
+        borderBottom: `1px solid ${token.colorBorderSecondary}`,
         padding: "12px 60px",
+        transition: "all 0.3s ease",
       }}
     >
       <Link
@@ -86,7 +95,7 @@ export default function Navbar() {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: "10px",
-              backgroundColor: "#1890ff",
+              backgroundColor: token.colorPrimary,
             }}
           >
             <Text
@@ -101,9 +110,10 @@ export default function Navbar() {
             style={{
               fontSize: "18px",
               letterSpacing: "-0.5px",
+              color: token.colorText,
             }}
           >
-            SCHOOL <span>BOARD</span>
+            SCHOOL <span style={{ color: token.colorPrimary }}>BOARD</span>
           </Text>
         </Space>
       </Link>
