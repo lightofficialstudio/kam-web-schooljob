@@ -1,21 +1,19 @@
 "use client";
 
 import {
+  ArrowRightOutlined,
   ArrowUpOutlined,
   BarChartOutlined,
   CheckCircleOutlined,
+  CheckOutlined,
   ClockCircleOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
   SearchOutlined,
   StopOutlined,
-  UserAddOutlined,
-  FileSearchOutlined,
-  TeamOutlined,
   ThunderboltOutlined,
-  ArrowRightOutlined,
-  CheckOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
@@ -25,6 +23,7 @@ import {
   Col,
   Empty,
   Input,
+  Progress,
   Row,
   Space,
   Statistic,
@@ -34,9 +33,6 @@ import {
   theme,
   Tooltip,
   Typography,
-  Progress,
-  List,
-  Avatar,
 } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -275,12 +271,12 @@ export default function MyJobsPage() {
         {/* ✨ [New Section] Recruitment Insights Header */}
         <Row gutter={[24, 24]} style={{ marginBottom: "32px" }}>
           <Col xs={24} lg={16}>
-            <Card 
-              variant="borderless" 
-              style={{ 
+            <Card
+              variant="borderless"
+              style={{
                 borderRadius: "16px",
                 background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`,
-                color: "#fff"
+                color: "#fff",
               }}
             >
               <Row gutter={24} align="middle">
@@ -288,35 +284,68 @@ export default function MyJobsPage() {
                   <Title level={3} style={{ color: "#fff", margin: 0 }}>
                     ความสำเร็จในการรับสมัคร <ThunderboltOutlined />
                   </Title>
-                  <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: "16px" }}>
+                  <Text
+                    style={{
+                      color: "rgba(255,255,255,0.85)",
+                      fontSize: "16px",
+                    }}
+                  >
                     ในเดือนนี้คุณได้รับผู้สมัครใหม่เพิ่มขึ้น 24% จากเดือนที่แล้ว
                   </Text>
                   <div style={{ marginTop: "24px" }}>
                     <Space size={32}>
-                      <Statistic 
-                        title={<span style={{ color: "rgba(255,255,255,0.65)" }}>สัมภาษณ์แล้ว</span>} 
-                        value={12} 
-                        valueStyle={{ color: "#fff" }} 
-                        suffix={<span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)" }}>คน</span>}
+                      <Statistic
+                        title={
+                          <span style={{ color: "rgba(255,255,255,0.65)" }}>
+                            สัมภาษณ์แล้ว
+                          </span>
+                        }
+                        value={12}
+                        styles={{ content: { color: "#fff" } }}
+                        suffix={
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: "rgba(255,255,255,0.65)",
+                            }}
+                          >
+                            คน
+                          </span>
+                        }
                       />
-                      <Statistic 
-                        title={<span style={{ color: "rgba(255,255,255,0.65)" }}>ตอบรับเข้าทำงาน</span>} 
-                        value={4} 
-                        valueStyle={{ color: "#fff" }}
-                        suffix={<span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)" }}>คน</span>}
+                      <Statistic
+                        title={
+                          <span style={{ color: "rgba(255,255,255,0.65)" }}>
+                            ตอบรับเข้าทำงาน
+                          </span>
+                        }
+                        value={4}
+                        styles={{ content: { color: "#fff" } }}
+                        suffix={
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: "rgba(255,255,255,0.65)",
+                            }}
+                          >
+                            คน
+                          </span>
+                        }
                       />
                     </Space>
                   </div>
                 </Col>
                 <Col>
-                  <Progress 
-                    type="circle" 
-                    percent={75} 
-                    strokeColor="#fff" 
-                    trailColor="rgba(255,255,255,0.2)"
+                  <Progress
+                    type="circle"
+                    percent={75}
+                    strokeColor="#fff"
+                    railColor="rgba(255,255,255,0.2)"
                     format={(percent) => (
                       <div style={{ color: "#fff" }}>
-                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>{percent}%</div>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                          {percent}%
+                        </div>
                         <div style={{ fontSize: "10px" }}>เป้าหมาย</div>
                       </div>
                     )}
@@ -326,28 +355,62 @@ export default function MyJobsPage() {
             </Card>
           </Col>
           <Col xs={24} lg={8}>
-            <Card 
-              title={<Space><CheckOutlined /> รีบด่วน (Urgent Action)</Space>} 
-              variant="borderless" 
+            <Card
+              title={
+                <Space>
+                  <CheckOutlined /> รีบด่วน (Urgent Action)
+                </Space>
+              }
+              variant="borderless"
               style={{ borderRadius: "16px", height: "100%" }}
             >
-              <List
-                size="small"
-                dataSource={[
-                  { title: "มีผู้สมัครใหม่ 5 คน", desc: "ตำแหน่งครูอังกฤษ", time: "2 ชม. ที่แล้ว" },
-                  { title: "ประกาศกำลังจะหมดอายุ", desc: "ตำแหน่งครูอนุบาล", time: "ใน 2 วัน" },
-                ]}
-                renderItem={(item) => (
-                  <List.Item
-                    actions={[<Button type="link" size="small" icon={<ArrowRightOutlined />} />]}
+              <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {[
+                  {
+                    title: "มีผู้สมัครใหม่ 5 คน",
+                    desc: "ตำแหน่งครูอังกฤษ",
+                    time: "2 ชม. ที่แล้ว",
+                  },
+                  {
+                    title: "ประกาศกำลังจะหมดอายุ",
+                    desc: "ตำแหน่งครูอนุบาล",
+                    time: "ใน 2 วัน",
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: "12px 0",
+                      borderBottom:
+                        index === 1
+                          ? "none"
+                          : `1px solid ${token.colorBorderSecondary}`,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
                   >
-                    <List.Item.Meta
-                      title={<Text strong style={{ fontSize: "13px" }}>{item.title}</Text>}
-                      description={<Text type="secondary" style={{ fontSize: "12px" }}>{item.desc} • {item.time}</Text>}
+                    <div>
+                      <div style={{ fontWeight: "bold", fontSize: "13px" }}>
+                        {item.title}
+                      </div>
+                      <div
+                        style={{
+                          color: token.colorTextSecondary,
+                          fontSize: "12px",
+                        }}
+                      >
+                        {item.desc} • {item.time}
+                      </div>
+                    </div>
+                    <Button
+                      type="link"
+                      size="small"
+                      icon={<ArrowRightOutlined />}
                     />
-                  </List.Item>
-                )}
-              />
+                  </div>
+                ))}
+              </div>
             </Card>
           </Col>
         </Row>
@@ -446,7 +509,7 @@ export default function MyJobsPage() {
               }}
               styles={{ body: { padding: "12px 20px" } }}
             >
-              <Space direction="vertical" size={2}>
+              <Space orientation="vertical" size={2}>
                 <Text type="warning" strong style={{ fontSize: "12px" }}>
                   <ThunderboltOutlined /> แนะนำด่วน
                 </Text>
