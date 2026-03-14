@@ -17,6 +17,7 @@ import {
   TeamOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
+import type { UploadProps } from "antd";
 import {
   Avatar,
   Button,
@@ -24,12 +25,14 @@ import {
   Col,
   Divider,
   Flex,
+  message,
   Row,
   Space,
   Tabs,
   Tag,
   theme,
   Typography,
+  Upload,
 } from "antd";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,6 +50,38 @@ export default function EmployerProfilePage() {
   const { profile, setProfile, setIsDrawerOpen } = useSchoolProfileStore();
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { token } = theme.useToken();
+
+  const uploadProps: UploadProps = {
+    name: "file",
+    showUploadList: false,
+    beforeUpload: (file) => {
+      const isJpgOrPng =
+        file.type === "image/jpeg" || file.type === "image/png";
+      if (!isJpgOrPng) {
+        message.error("คุณสามารถอัปโหลดได้เฉพาะไฟล์ JPG/PNG เท่านั้น!");
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error("ขนาดรูปภาพต้องไม่เกิน 2MB!");
+      }
+      return isJpgOrPng && isLt2M;
+    },
+    onChange: (info) => {
+      if (info.file.status === "uploading") {
+        return;
+      }
+      if (info.file.status === "done") {
+        // เมื่อต่อ API สำเร็จ ให้เซ็ต URL จาก Response
+        message.success(`${info.file.name} อัปโหลดสำเร็จ (จำลอง)`);
+      }
+    },
+    // จำลอง API
+    customRequest: ({ onSuccess }) => {
+      setTimeout(() => {
+        if (onSuccess) onSuccess("ok");
+      }, 1000);
+    },
+  };
 
   const handleEditClick = () => {
     setIsDrawerOpen(true);
@@ -154,19 +189,45 @@ export default function EmployerProfilePage() {
                 }}
               >
                 <Flex vertical align="center" gap={16}>
-                  <Avatar
-                    size={140}
-                    icon={<BankOutlined />}
-                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
-                    style={{
-                      marginTop: "0", // ลบ Margin ติดลบออกเพื่อให้แสดงภายใน Card ปกติ
-                      borderWidth: "6px",
-                      borderStyle: "solid",
-                      borderColor: "white",
-                      backgroundColor: "#e60278",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                    }}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <Avatar
+                      size={140}
+                      icon={<BankOutlined />}
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
+                      style={{
+                        marginTop: "0", // ลบ Margin ติดลบออกเพื่อให้แสดงภายใน Card ปกติ
+                        borderWidth: "6px",
+                        borderStyle: "solid",
+                        borderColor: "white",
+                        backgroundColor: "#e60278",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "4px",
+                        right: "4px",
+                        zIndex: 2,
+                      }}
+                    >
+                      <Upload {...uploadProps}>
+                        <Button
+                          type="primary"
+                          shape="circle"
+                          icon={<EditOutlined style={{ fontSize: "14px" }} />}
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            backgroundColor: "#001e45",
+                            color: "white",
+                            border: "2px solid white",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                          }}
+                        />
+                      </Upload>
+                    </div>
+                  </div>
                   <Flex
                     vertical
                     align="center"
