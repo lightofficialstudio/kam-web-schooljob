@@ -35,14 +35,27 @@ import {
   Typography,
 } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
+interface JobRecord {
+  key: string;
+  title: string;
+  subjects: string[];
+  grades: string[];
+  publishedAt: string;
+  expiresAt: string;
+  status: string;
+  views: number;
+  applicants: number;
+  newApplicants: number;
+  conversionRate: string;
+  salary: string;
+}
+
 // Mock Data สำหรับงานที่โพสต์
-const MOCK_JOBS = [
+const MOCK_JOBS: JobRecord[] = [
   {
     key: "1",
     title: "ครูสอนภาษาอังกฤษ (Full-time)",
@@ -88,16 +101,14 @@ const MOCK_JOBS = [
 ];
 
 export default function MyJobsPage() {
-  const router = useRouter();
   const { token } = useToken();
-  const [searchText, setSearchText] = useState("");
 
   const columns = [
     {
       title: "รายละเอียดงาน",
       dataIndex: "title",
       key: "title",
-      render: (text: string, record: any) => (
+      render: (text: string, record: JobRecord) => (
         <Space direction="vertical" size={0}>
           <Text strong style={{ fontSize: "16px", color: token.colorPrimary }}>
             {text}
@@ -150,7 +161,7 @@ export default function MyJobsPage() {
       title: "สถิติการเข้าชม",
       key: "stats",
       width: 250,
-      render: (record: any) => (
+      render: (record: JobRecord) => (
         <Row gutter={16}>
           <Col span={12}>
             <Statistic
@@ -191,7 +202,7 @@ export default function MyJobsPage() {
       title: "จัดการ",
       key: "action",
       width: 180,
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: JobRecord) => (
         <Space size="middle">
           <Tooltip title="แก้ไขประกาศ">
             <Link href={`/pages/employer/job/post/${record.key}`}>
@@ -486,7 +497,7 @@ export default function MyJobsPage() {
                     items={[
                       {
                         key: "1",
-                        label: `เปิดรับสมัคร (${MOCK_JOBS.filter((j) => (j as any).status === "ACTIVE").length})`,
+                        label: `เปิดรับสมัคร (${MOCK_JOBS.filter((j: JobRecord) => j.status === "ACTIVE").length})`,
                       },
                       { key: "2", label: "ปิดรับสมัครแล้ว" },
                       { key: "3", label: "ฉบับร่าง" },
@@ -509,12 +520,12 @@ export default function MyJobsPage() {
               }}
               styles={{ body: { padding: "12px 20px" } }}
             >
-              <Space orientation="vertical" size={2}>
+              <Space direction="vertical" size={2}>
                 <Text type="warning" strong style={{ fontSize: "12px" }}>
                   <ThunderboltOutlined /> แนะนำด่วน
                 </Text>
                 <Text style={{ fontSize: "14px" }}>
-                  เพิ่ม <b>"สวัสดิการ"</b> ในประกาศ <br />
+                  เพิ่ม <b>&quot;สวัสดิการ&quot;</b> ในประกาศ <br />
                   เพื่อดึงดูดผู้สมัครเพิ่ม <b>30%</b>
                 </Text>
               </Space>
