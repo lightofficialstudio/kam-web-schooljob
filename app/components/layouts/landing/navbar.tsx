@@ -85,10 +85,14 @@ export default function Navbar() {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: "10px",
+              backgroundColor: "#1890ff",
             }}
           >
-            <Text strong style={{ fontSize: "18px", lineHeight: 1 }}>
-              K
+            <Text
+              strong
+              style={{ fontSize: "18px", lineHeight: 1, color: "#fff" }}
+            >
+              S
             </Text>
           </Card>
           <Text
@@ -98,7 +102,7 @@ export default function Navbar() {
               letterSpacing: "-0.5px",
             }}
           >
-            KAM <span>SCHOOLJOB</span>
+            SCHOOL <span>BOARD</span>
           </Text>
         </Space>
       </Link>

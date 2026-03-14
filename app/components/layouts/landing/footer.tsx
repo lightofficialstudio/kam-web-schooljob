@@ -34,14 +34,15 @@ export default function Footer() {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: "8px",
+                  backgroundColor: "#1890ff",
                 }}
               >
-                <Text strong style={{ fontSize: "16px" }}>
-                  K
+                <Text strong style={{ fontSize: "16px", color: "#fff" }}>
+                  S
                 </Text>
               </Card>
               <Text strong style={{ fontSize: "18px" }}>
-                KAM <span>SCHOOLJOB</span>
+                SCHOOL <span>BOARD</span>
               </Text>
             </Space>
             <Paragraph style={{ lineHeight: "1.8" }}>
@@ -113,7 +114,7 @@ export default function Footer() {
               </Space>
               <Space>
                 <MailOutlined />
-                <Text type="secondary">support@kamschooljob.com</Text>
+                <Text type="secondary">support@schoolboard.com</Text>
               </Space>
               <Card
                 size="small"
@@ -141,7 +142,7 @@ export default function Footer() {
       >
         <Col>
           <Text type="secondary" style={{ fontSize: "13px" }}>
-            © 2026 KAM SCHOOLJOB. All rights reserved.
+            © 2026 SCHOOL BOARD. All rights reserved.
           </Text>
         </Col>
         <Col>

@@ -252,7 +252,7 @@ export default function TeacherProfilePage() {
                           <Space size={12}>
                             <LinkOutlined style={{ color: "#9ca3af" }} />
                             <Link href="#" style={{ color: "#3b82f6" }}>
-                              th.schooljob.com/profiles/
+                              schoolboard.com/profiles/
                               {(profile.firstName || "").toLowerCase()}
                             </Link>
                           </Space>

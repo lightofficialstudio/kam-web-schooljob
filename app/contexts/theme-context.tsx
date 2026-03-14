@@ -46,81 +46,77 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     token: {
       fontFamily:
         "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      fontSize: 14,
-      colorPrimary: mode === "dark" ? "#1890ff" : "#1890ff",
-      borderRadius: 8,
-      // ✨ [Enhanced color tokens for dark mode]
-      colorBgBase: mode === "dark" ? "#1A202C" : "#ffffff",
-      colorTextBase: mode === "dark" ? "#E2E8F0" : "#000000",
-      colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
-      colorBgElevated: mode === "dark" ? "#2D3748" : "#fafafa",
-      colorBgContainer: mode === "dark" ? "#2D3748" : "#f6f6f6",
-      colorBgLayout: mode === "dark" ? "#0D1117" : "#f5f5f5",
+      fontSize: 16,
+      colorPrimary: "#1890ff",
+      borderRadius: 12,
+      // ✨ [Enhanced color tokens for high visibility & Modern look]
+      colorBgBase: mode === "dark" ? "#0F172A" : "#ffffff",
+      colorTextBase: mode === "dark" ? "#F8FAFC" : "#1E293B",
+      colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+      colorBgElevated: mode === "dark" ? "#1E293B" : "#ffffff",
+      colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+      colorBgLayout: mode === "dark" ? "#0F172A" : "#F8FAFC",
     },
     algorithm:
       mode === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
     components: {
       // ✨ [Layout Colors]
       Layout: {
-        headerBg: mode === "dark" ? "#1A202C" : "#fafafa",
-        headerColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
-        headerHeight: 64,
-        siderBg: mode === "dark" ? "#1A202C" : "#ffffff",
+        headerBg: mode === "dark" ? "#0F172A" : "#ffffff",
+        headerColor: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        headerHeight: 72,
+        siderBg: mode === "dark" ? "#0F172A" : "#ffffff",
         lightSiderBg: "#ffffff",
-        bodyBg: mode === "dark" ? "#0D1117" : "#f5f5f5",
+        bodyBg: mode === "dark" ? "#0F172A" : "#F8FAFC",
         triggerHeight: 64,
-        triggerBg: mode === "dark" ? "#2D3748" : "#fafafa",
-        triggerColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
+        triggerBg: mode === "dark" ? "#1E293B" : "#fafafa",
+        triggerColor: mode === "dark" ? "#F8FAFC" : "#1E293B",
       },
 
       // ✨ [Menu Styling]
       Menu: {
-        itemBg: mode === "dark" ? "transparent" : "transparent",
+        itemBg: "transparent",
         itemSelectedBg:
           mode === "dark"
             ? "rgba(24, 144, 255, 0.2)"
             : "rgba(24, 144, 255, 0.1)",
         itemSelectedColor: mode === "dark" ? "#52B8FF" : "#1890ff",
         itemHoverBg:
-          mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.04)",
-        itemHoverColor: mode === "dark" ? "#E2E8F0" : "rgba(0, 0, 0, 0.88)",
+          mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
+        itemHoverColor: mode === "dark" ? "#F8FAFC" : "#1E293B",
       },
 
-      // ✨ [Card Styling]
+      // ✨ [Card Styling - Clean & No Shadow Hover]
       Card: {
-        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
-        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
-        boxShadow:
-          mode === "dark"
-            ? "0 2px 8px rgba(0, 0, 0, 0.3)"
-            : "0 2px 8px rgba(0, 0, 0, 0.08)",
-        borderRadiusLG: 8,
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBorderSecondary: mode === "dark" ? "#334155" : "#E2E8F0",
+        boxShadow: "none",
+        boxShadowCard: "none",
+        boxShadowTertiary: "none",
+        borderRadiusLG: 16,
         paddingLG: 24,
       },
 
       // ✨ [Button Styling]
       Button: {
-        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
-        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
-        controlHeight: 40,
-        borderRadius: 8,
+        controlHeight: 44,
+        borderRadius: 10,
+        fontWeight: 600,
       },
 
       // ✨ [Input Styling]
       Input: {
-        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
-        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
-        colorTextPlaceholder:
-          mode === "dark" ? "#718096" : "rgba(0, 0, 0, 0.45)",
-        colorBgElevated: mode === "dark" ? "#374151" : "#f5f5f5",
-        borderRadius: 8,
-        controlHeight: 40,
+        controlHeight: 48,
+        borderRadius: 10,
+        colorBgContainer: mode === "dark" ? "#0F172A" : "#ffffff",
+        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
       },
 
       // ✨ [Form Styling]
       Form: {
-        labelFontSize: 14,
+        labelFontSize: 15,
         labelHeight: 32,
+        itemMarginBottom: 24,
       },
 
       // ✨ [Select Styling]

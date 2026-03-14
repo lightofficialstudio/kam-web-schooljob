@@ -1,6 +1,7 @@
 "use client";
 
 import ResultModal from "@/app/components/layouts/modal/result-modal";
+import { useTheme } from "@/app/contexts/theme-context";
 import {
   BankOutlined,
   CheckCircleFilled,
@@ -47,6 +48,8 @@ export default function SignupForm() {
   });
   const router = useRouter();
   const { token } = antTheme.useToken();
+  const { mode } = useTheme();
+  const isDark = mode === "dark";
 
   const showModal = (
     type: "success" | "error" | "warning" | "info",
@@ -73,7 +76,7 @@ export default function SignupForm() {
       const payload = {
         email: values.email,
         password: values.password,
-        full_name: values.fullName || "",
+        full_name: `${values.firstName} ${values.lastName}`.trim(),
         role: roleMapping[values.role] || values.role.toUpperCase(),
       };
 
@@ -119,26 +122,34 @@ export default function SignupForm() {
         width={420}
       />
       <Card
-        variant="borderless"
         style={{
-          maxWidth: 1100,
+          maxWidth: 1200,
           width: "100%",
-          borderRadius: token.borderRadiusLG * 2,
-          boxShadow: "0 40px 80px -20px rgba(0,0,0,0.08)",
+          borderRadius: 24,
+          boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
           overflow: "hidden",
-          margin: "80px auto",
+          margin: "40px auto",
+          border: `2px solid ${token.colorBorderSecondary || "#f0f0f0"}`,
         }}
         styles={{ body: { padding: 0 } }}
       >
         <Row align="stretch">
           {/* 🎨 Branding Side */}
-          <Col xs={0} lg={10} style={{ padding: 60 }}>
+          <Col
+            xs={0}
+            lg={9}
+            style={{
+              padding: "60px 40px",
+              background: isDark ? "#1A202C" : "#f8fbff",
+              borderRight: `1px solid ${token.colorBorderSecondary || "#f0f0f0"}`,
+            }}
+          >
             <Space
-              orientation="vertical"
+              direction="vertical"
               size={48}
               style={{ height: "100%", justifyContent: "center" }}
             >
-              <Space orientation="vertical" size={24}>
+              <Space direction="vertical" size={24}>
                 <Card
                   size="small"
                   variant="borderless"
@@ -150,20 +161,14 @@ export default function SignupForm() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    backgroundColor: "#1890ff",
                   }}
                 >
-                  <Title level={2} style={{ margin: 0 }}>
-                    K
+                  <Title level={2} style={{ margin: 0, color: "#fff" }}>
+                    S
                   </Title>
                 </Card>
-                <Title
-                  level={1}
-                  style={{
-                    margin: 0,
-                    fontSize: 38,
-                    fontWeight: 800,
-                  }}
-                >
+                <Title level={1}>
                   ก้าวสู่ <br /> อนาคตใหม่
                 </Title>
                 <Paragraph
@@ -177,7 +182,7 @@ export default function SignupForm() {
                 </Paragraph>
               </Space>
 
-              <Space orientation="vertical" size={24}>
+              <Space direction="vertical" size={24}>
                 {[
                   {
                     icon: <CheckCircleFilled />,
@@ -202,15 +207,16 @@ export default function SignupForm() {
           </Col>
 
           {/* 📝 Form Side */}
-          <Col xs={24} lg={14} style={{ padding: "60px 80px" }}>
+          <Col xs={24} lg={15} style={{ padding: "60px 80px" }}>
             <Space direction="vertical" size={40} style={{ width: "100%" }}>
               <Space direction="vertical" size={8}>
-                <Title level={2} style={{ margin: 0, fontWeight: 700 }}>
-                  ลงทะเบียนผู้ใช้งาน
-                </Title>
-                <Text type="secondary" style={{ fontSize: 16 }}>
+                <Title level={2}>ลงทะเบียนผู้ใช้งาน</Title>
+                <Text type="secondary" style={{ fontSize: 18 }}>
                   มีบัญชีอยู่แล้ว?{" "}
-                  <Link href="/pages/signin" style={{ fontWeight: 600 }}>
+                  <Link
+                    href="/pages/signin"
+                    style={{ fontWeight: 600, color: token.colorPrimary }}
+                  >
                     เข้าสู่ระบบ
                   </Link>
                 </Text>
@@ -220,28 +226,46 @@ export default function SignupForm() {
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
-                requiredMark={false}
+                requiredMark="optional"
                 size="large"
+                style={{ maxWidth: "100%" }}
               >
-                <Form.Item
-                  name="fullName"
-                  label={<Text strong>ชื่อ-นามสกุล</Text>}
-                  rules={[{ required: true, message: "กรุณาระบุชื่อ-นามสกุล" }]}
-                >
-                  <Input
-                    prefix={
-                      <UserOutlined
-                        style={{ color: token.colorTextDescription }}
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="firstName"
+                      label="ชื่อ"
+                      rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
+                    >
+                      <Input
+                        prefix={
+                          <UserOutlined style={{ color: token.colorPrimary }} />
+                        }
+                        placeholder="กรอกชื่อของคุณ"
+                        style={{ borderRadius: 12 }}
                       />
-                    }
-                    placeholder="ชื่อ-นามสกุล"
-                    variant="filled"
-                  />
-                </Form.Item>
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="lastName"
+                      label="นามสกุล"
+                      rules={[{ required: true, message: "กรุณาระบุนามสกุล" }]}
+                    >
+                      <Input
+                        prefix={
+                          <UserOutlined style={{ color: token.colorPrimary }} />
+                        }
+                        placeholder="กรอกนามสกุลของคุณ"
+                        style={{ borderRadius: 12 }}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
 
                 <Form.Item
                   name="role"
-                  label={<Text strong>บทบาทผู้ใช้งาน</Text>}
+                  label="คุณสมัครใช้งานในฐานะ?"
                   initialValue="teacher"
                   rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}
                 >
@@ -254,19 +278,27 @@ export default function SignupForm() {
                           style={{
                             width: "100%",
                             height: "auto",
-                            padding: "24px 0",
+                            padding: "32px 0",
                             textAlign: "center",
-                            borderRadius: token.borderRadiusLG,
+                            borderRadius: 20,
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
                             justifyContent: "center",
-                            lineHeight: 1.5,
+                            borderWidth: 2,
+                            transition: "none",
                           }}
                         >
-                          <Space orientation="vertical" size={4}>
-                            <UserOutlined style={{ fontSize: 24 }} />
-                            <div style={{ fontWeight: 600 }}>ครูผู้สอน</div>
+                          <Space direction="vertical" size={12}>
+                            <UserOutlined
+                              style={{
+                                fontSize: 44,
+                                color: token.colorPrimary,
+                              }}
+                            />
+                            <Text strong style={{ fontSize: 18 }}>
+                              ครูผู้สอน
+                            </Text>
                           </Space>
                         </Radio.Button>
                       </Col>
@@ -277,19 +309,27 @@ export default function SignupForm() {
                           style={{
                             width: "100%",
                             height: "auto",
-                            padding: "24px 0",
+                            padding: "32px 0",
                             textAlign: "center",
-                            borderRadius: token.borderRadiusLG,
+                            borderRadius: 20,
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
                             justifyContent: "center",
-                            lineHeight: 1.5,
+                            borderWidth: 2,
+                            transition: "none",
                           }}
                         >
-                          <Space orientation="vertical" size={4}>
-                            <BankOutlined style={{ fontSize: 24 }} />
-                            <div style={{ fontWeight: 600 }}>สถานศึกษา</div>
+                          <Space direction="vertical" size={12}>
+                            <BankOutlined
+                              style={{
+                                fontSize: 44,
+                                color: token.colorPrimary,
+                              }}
+                            />
+                            <Text strong style={{ fontSize: 18 }}>
+                              สถานศึกษา
+                            </Text>
                           </Space>
                         </Radio.Button>
                       </Col>
@@ -297,52 +337,53 @@ export default function SignupForm() {
                   </Radio.Group>
                 </Form.Item>
 
-                <Divider style={{ margin: "32px 0" }}>ข้อมูลบัญชี</Divider>
+                <Divider style={{ margin: "40px 0" }}>
+                  <Text type="secondary">ข้อมูลการติดต่อและรหัสผ่าน</Text>
+                </Divider>
 
                 <Form.Item
                   name="email"
-                  label={<Text strong>อีเมลสมัครใช้งาน</Text>}
+                  label="อีเมล (ใช้เป็น Username)"
                   rules={[
                     { required: true, message: "กรุณาระบุอีเมล" },
-                    { type: "email", message: "อีเมลไม่ถูกต้อง" },
+                    { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง" },
                   ]}
                 >
                   <Input
                     prefix={
-                      <MailOutlined
-                        style={{ color: token.colorTextDescription }}
-                      />
+                      <MailOutlined style={{ color: token.colorPrimary }} />
                     }
-                    placeholder="name@domain.com"
-                    variant="filled"
+                    placeholder="example@email.com"
+                    style={{ borderRadius: 12 }}
                   />
                 </Form.Item>
 
-                <Row gutter={16}>
+                <Row gutter={24}>
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="password"
-                      label={<Text strong>รหัสผ่าน</Text>}
+                      label="รหัสผ่าน"
                       rules={[
                         { required: true, message: "กรุณาระบุรหัสผ่าน" },
-                        { min: 8, message: "ต้องมีอย่างน้อย 8 ตัวอักษร" },
+                        {
+                          min: 8,
+                          message: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
+                        },
                       ]}
                     >
                       <Input.Password
                         prefix={
-                          <LockOutlined
-                            style={{ color: token.colorTextDescription }}
-                          />
+                          <LockOutlined style={{ color: token.colorPrimary }} />
                         }
-                        placeholder="••••••••"
-                        variant="filled"
+                        placeholder="อย่างน้อย 8 ตัวอักษร"
+                        style={{ borderRadius: 12 }}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={12}>
                     <Form.Item
                       name="confirm"
-                      label={<Text strong>ยืนยันรหัสผ่าน</Text>}
+                      label="ยืนยันรหัสผ่านอีกครั้ง"
                       dependencies={["password"]}
                       rules={[
                         { required: true, message: "กรุณายืนยันรหัสผ่าน" },
@@ -351,7 +392,7 @@ export default function SignupForm() {
                             if (!value || getFieldValue("password") === value)
                               return Promise.resolve();
                             return Promise.reject(
-                              new Error("รหัสผ่านไม่ตรงกัน"),
+                              new Error("รหัสผ่านที่ป้อนไม่ตรงกัน"),
                             );
                           },
                         }),
@@ -359,56 +400,71 @@ export default function SignupForm() {
                     >
                       <Input.Password
                         prefix={
-                          <LockOutlined
-                            style={{ color: token.colorTextDescription }}
-                          />
+                          <LockOutlined style={{ color: token.colorPrimary }} />
                         }
-                        placeholder="••••••••"
-                        variant="filled"
+                        placeholder="กรอกรหัสผ่านอีกครั้ง"
+                        style={{ borderRadius: 12 }}
                       />
                     </Form.Item>
                   </Col>
                 </Row>
 
-                <Form.Item>
+                <Form.Item
+                  name="agreement"
+                  valuePropName="checked"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error("กรุณายอมรับข้อกำหนดและนโยบาย"),
+                            ),
+                    },
+                  ]}
+                  style={{ marginBottom: 32 }}
+                >
+                  <Checkbox>
+                    ฉันยอมรับ{" "}
+                    <Link
+                      href="/terms"
+                      style={{ fontWeight: 700, color: token.colorPrimary }}
+                    >
+                      ข้อกำหนดการใช้บริการ
+                    </Link>{" "}
+                    และ{" "}
+                    <Link
+                      href="/privacy"
+                      style={{ fontWeight: 700, color: token.colorPrimary }}
+                    >
+                      นโยบายความเป็นส่วนตัว
+                    </Link>
+                  </Checkbox>
+                </Form.Item>
+
+                <Form.Item style={{ marginBottom: 0 }}>
                   <Button
                     type="primary"
                     htmlType="submit"
                     block
                     loading={loading}
                     size="large"
+                    style={{
+                      height: 60,
+                      borderRadius: 16,
+                      boxShadow: `0 10px 20px ${token.colorPrimary}33`,
+                    }}
                   >
-                    สมัครสมาชิก
+                    <Title level={4} style={{ margin: 0, color: "#fff" }}>
+                      สมัครสมาชิก
+                    </Title>
                   </Button>
-                </Form.Item>
-
-                <Form.Item>
-                  <Checkbox style={{ color: token.colorTextDescription }}>
-                    ฉันยอมรับ{" "}
-                    <Link href="/terms" style={{ fontWeight: 600 }}>
-                      ข้อกำหนดการใช้บริการ
-                    </Link>{" "}
-                    และ{" "}
-                    <Link href="/privacy" style={{ fontWeight: 600 }}>
-                      นโยบายความเป็นส่วนตัว
-                    </Link>
-                  </Checkbox>
                 </Form.Item>
               </Form>
             </Space>
           </Col>
         </Row>
       </Card>
-
-      <style jsx global>{`
-        .role-selection-button.ant-radio-button-wrapper-checked {
-          border-color: ${token.colorPrimary} !important;
-          background: ${token.colorPrimary}08 !important;
-        }
-        .role-selection-button::before {
-          display: none !important;
-        }
-      `}</style>
     </ConfigProvider>
   );
 }

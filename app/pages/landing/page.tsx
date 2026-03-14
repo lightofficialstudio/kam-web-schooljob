@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useTheme } from "@/app/contexts/theme-context";
 import {
-  AppstoreOutlined,
   GlobalOutlined,
-  MessageOutlined,
   RocketOutlined,
   SearchOutlined,
   SolutionOutlined,
-  TrophyOutlined,
 } from "@ant-design/icons";
 import {
+  theme as antTheme,
   Badge,
   Button,
   Card,
@@ -23,6 +21,7 @@ import {
   Tag,
   Typography,
 } from "antd";
+import { useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -61,6 +60,10 @@ const JOB_CATEGORIES = [
 ];
 
 export default function LandingPage() {
+  const { mode, toggleTheme } = useTheme();
+  const { token } = antTheme.useToken();
+  const isDark = mode === "dark";
+
   const [searchParams, setSearchParams] = useState({
     keyword: "",
     category: [] as string[][],
@@ -92,7 +95,9 @@ export default function LandingPage() {
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)",
+          background: isDark
+            ? `linear-gradient(180deg, #1A202C 0%, ${token.colorBgBase} 100%)`
+            : "linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)",
         }}
       >
         {/* Decorative elements - Minimal Abstract using Local SVG */}
@@ -110,7 +115,10 @@ export default function LandingPage() {
           <img
             src="/images/flat/undraw_web-search_7oif.svg"
             alt="Search Illustration"
-            style={{ width: "100%", filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.05))" }}
+            style={{
+              width: "100%",
+              filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.05))",
+            }}
           />
         </div>
 
@@ -122,7 +130,8 @@ export default function LandingPage() {
             width: "500px",
             height: "500px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(24,144,255,0.1) 0%, rgba(255,255,255,0) 70%)",
+            background:
+              "radial-gradient(circle, rgba(24,144,255,0.1) 0%, rgba(255,255,255,0) 70%)",
             filter: "blur(100px)",
           }}
         />
@@ -174,31 +183,49 @@ export default function LandingPage() {
             style={{
               maxWidth: "1100px",
               margin: "0 auto",
-              background: "#fff",
-              boxShadow: "0 30px 60px rgba(0, 0, 0, 0.12)",
+              background: token.colorBgContainer,
+              boxShadow: isDark
+                ? "0 30px 60px rgba(0, 0, 0, 0.4)"
+                : "0 30px 60px rgba(0, 0, 0, 0.12)",
               borderRadius: "32px",
               padding: "24px",
+              border: isDark ? `1px solid ${token.colorBorder}` : "none",
             }}
           >
             <Row gutter={[0, 0]} align="middle">
               {/* 💻 Search Input */}
               <Col xs={24} lg={8}>
                 <div style={{ padding: "0 24px", textAlign: "left" }}>
-                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "14px",
+                      color: isDark ? "#A0AEC0" : "#8c8c8c",
+                    }}
+                  >
                     ค้นหางานที่คุณสนใจ
                   </Text>
                   <Input
-                    prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
+                    prefix={
+                      <SearchOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
                     value={searchParams.keyword}
-                    onChange={(e) => setSearchParams({ ...searchParams, keyword: e.target.value })}
+                    onChange={(e) =>
+                      setSearchParams({
+                        ...searchParams,
+                        keyword: e.target.value,
+                      })
+                    }
                     style={{
                       fontSize: "16px",
                       padding: "12px 16px",
                       fontWeight: "500",
                       borderRadius: "12px",
-                      border: "1px solid #e8e8e8",
-                      backgroundColor: "#f5f5f5",
+                      border: isDark
+                        ? `1px solid ${token.colorBorder}`
+                        : "1px solid #e8e8e8",
+                      backgroundColor: isDark ? "#1A202C" : "#f5f5f5",
                     }}
                   />
                 </div>
@@ -207,7 +234,13 @@ export default function LandingPage() {
               {/* 📂 Job Categories (Cascader) */}
               <Col xs={24} lg={9}>
                 <div style={{ padding: "0 24px", textAlign: "left" }}>
-                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "14px",
+                      color: isDark ? "#A0AEC0" : "#8c8c8c",
+                    }}
+                  >
                     ประเภทงาน
                   </Text>
                   <Cascader
@@ -215,7 +248,12 @@ export default function LandingPage() {
                     multiple
                     maxTagCount={1}
                     value={searchParams.category}
-                    onChange={(value) => setSearchParams({ ...searchParams, category: value as string[][] })}
+                    onChange={(value) =>
+                      setSearchParams({
+                        ...searchParams,
+                        category: value as string[][],
+                      })
+                    }
                     maxTagPlaceholder={(omittedValues) => (
                       <Tag color="processing" style={{ borderRadius: "6px" }}>
                         +{omittedValues.length} ประเภท
@@ -229,7 +267,7 @@ export default function LandingPage() {
                     size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}
                     suffixIcon={
-                      <SolutionOutlined style={{ color: "#1890ff" }} />
+                      <SolutionOutlined style={{ color: token.colorPrimary }} />
                     }
                     expandTrigger="click"
                   />
@@ -239,7 +277,13 @@ export default function LandingPage() {
               {/* 📍 Location Select */}
               <Col xs={24} lg={7}>
                 <div style={{ padding: "0 24px", textAlign: "left" }}>
-                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "14px",
+                      color: isDark ? "#A0AEC0" : "#8c8c8c",
+                    }}
+                  >
                     สถานที่
                   </Text>
                   <Select
@@ -250,8 +294,12 @@ export default function LandingPage() {
                     }}
                     size="large"
                     value={searchParams.location}
-                    onChange={(value) => setSearchParams({ ...searchParams, location: value })}
-                    suffixIcon={<GlobalOutlined style={{ color: "#1890ff" }} />}
+                    onChange={(value) =>
+                      setSearchParams({ ...searchParams, location: value })
+                    }
+                    suffixIcon={
+                      <GlobalOutlined style={{ color: token.colorPrimary }} />
+                    }
                   >
                     <Option value="bkk">กรุงเทพมหานคร</Option>
                     <Option value="center">ภาคกลาง</Option>
@@ -268,7 +316,7 @@ export default function LandingPage() {
                 marginTop: "24px",
                 padding: "0 24px",
                 paddingTop: "16px",
-                borderTop: "1px solid #f0f0f0",
+                borderTop: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
               }}
             >
               <Row gutter={[16, 16]}>
@@ -279,7 +327,12 @@ export default function LandingPage() {
                     size="large"
                     allowClear
                     value={searchParams.employmentType}
-                    onChange={(value) => setSearchParams({ ...searchParams, employmentType: value })}
+                    onChange={(value) =>
+                      setSearchParams({
+                        ...searchParams,
+                        employmentType: value,
+                      })
+                    }
                   >
                     <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
                     <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
@@ -293,7 +346,9 @@ export default function LandingPage() {
                     size="large"
                     allowClear
                     value={searchParams.license}
-                    onChange={(value) => setSearchParams({ ...searchParams, license: value })}
+                    onChange={(value) =>
+                      setSearchParams({ ...searchParams, license: value })
+                    }
                   >
                     <Option value="required">ต้องมีใบประกอบฯ</Option>
                     <Option value="not-required">ไม่ต้องมีใบประกอบฯ</Option>
@@ -307,7 +362,9 @@ export default function LandingPage() {
                     size="large"
                     allowClear
                     value={searchParams.salaryRange}
-                    onChange={(value) => setSearchParams({ ...searchParams, salaryRange: value })}
+                    onChange={(value) =>
+                      setSearchParams({ ...searchParams, salaryRange: value })
+                    }
                   >
                     <Option value="0-15000">ต่ำกว่า 15,000</Option>
                     <Option value="15000-25000">15,000 - 25,000</Option>
@@ -322,7 +379,9 @@ export default function LandingPage() {
                     size="large"
                     allowClear
                     value={searchParams.postedAt}
-                    onChange={(value) => setSearchParams({ ...searchParams, postedAt: value })}
+                    onChange={(value) =>
+                      setSearchParams({ ...searchParams, postedAt: value })
+                    }
                   >
                     <Option value="today">วันนี้</Option>
                     <Option value="3days">3 วันที่ผ่านมา</Option>
@@ -331,7 +390,12 @@ export default function LandingPage() {
                   </Select>
                 </Col>
                 <Col xs={24} lg={4}>
-                  <Button type="link" block style={{ color: "#8c8c8c" }} onClick={handleReset}>
+                  <Button
+                    type="link"
+                    block
+                    style={{ color: "#8c8c8c" }}
+                    onClick={handleReset}
+                  >
                     รีเซ็ตเงื่อนไข
                   </Button>
                 </Col>
@@ -373,6 +437,10 @@ export default function LandingPage() {
                     cursor: "pointer",
                     padding: "4px 12px",
                     borderRadius: "6px",
+                    backgroundColor: isDark ? "#2D3748" : "#fff",
+                    border: isDark
+                      ? `1px solid ${token.colorBorder}`
+                      : "1px solid #d9d9d9",
                   }}
                 >
                   {tag}
@@ -387,9 +455,9 @@ export default function LandingPage() {
       <div
         style={{
           padding: "80px 24px",
-          background: "#fdfdfd",
-          borderTop: "1px solid #f0f0f0",
-          borderBottom: "1px solid #f0f0f0",
+          background: isDark ? "#0D1117" : "#fdfdfd",
+          borderTop: `1px solid ${token.colorBorder}`,
+          borderBottom: `1px solid ${token.colorBorder}`,
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -545,7 +613,9 @@ export default function LandingPage() {
       <div
         style={{
           padding: "100px 24px",
-          background: "linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)",
+          background: isDark
+            ? `linear-gradient(135deg, #1A202C 0%, ${token.colorBgBase} 100%)`
+            : "linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)",
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -611,12 +681,12 @@ export default function LandingPage() {
                 }}
               >
                 {/* Minimalist Abstract Image for Employers using Local SVG */}
-                <div 
-                   style={{
-                     width: "100%",
-                     maxWidth: "400px",
-                     zIndex: 1
-                   }}
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: "400px",
+                    zIndex: 1,
+                  }}
                 >
                   <img
                     src="/images/flat/undraw_hiring_8szx.svg"
@@ -625,17 +695,19 @@ export default function LandingPage() {
                   />
                 </div>
                 {/* Background Decoration */}
-                <div style={{
-                  position: "absolute",
-                  width: "150%",
-                  height: "150%",
-                  backgroundColor: "#fff",
-                  borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
-                  top: "10%",
-                  left: "10%",
-                  zIndex: 0,
-                  opacity: 0.5
-                }} />
+                <div
+                  style={{
+                    position: "absolute",
+                    width: "150%",
+                    height: "150%",
+                    backgroundColor: isDark ? "#1A202C" : "#fff",
+                    borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
+                    top: "10%",
+                    left: "10%",
+                    zIndex: 0,
+                    opacity: isDark ? 0.3 : 0.5,
+                  }}
+                />
               </div>
             </Col>
           </Row>
@@ -646,8 +718,8 @@ export default function LandingPage() {
       <div
         style={{
           padding: "80px 24px",
-          background: "#fafafa",
-          borderTop: "1px solid #f0f0f0",
+          background: isDark ? "#101622" : "#fafafa",
+          borderTop: `1px solid ${token.colorBorder}`,
         }}
       >
         <div
@@ -695,24 +767,34 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size={24}
                   >
-                      <div
+                    <div
+                      style={{
+                        width: "64px",
+                        height: "64px",
+                        borderRadius: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "28px",
+                        marginBottom: "16px",
+                        background: isDark
+                          ? "rgba(24, 144, 255, 0.15)"
+                          : "#f0f7ff",
+                        border: isDark
+                          ? "1px solid rgba(24, 144, 255, 0.3)"
+                          : "none",
+                      }}
+                    >
+                      <img
+                        src={item.localIcon}
+                        alt={item.title}
                         style={{
-                          width: "60px",
-                          height: "60px",
-                          borderRadius: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "28px",
-                          marginBottom: "10px"
+                          width: "36px",
+                          height: "36px",
+                          objectFit: "contain",
                         }}
-                      >
-                        <img 
-                          src={item.localIcon} 
-                          alt={item.title} 
-                          style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-                        />
-                      </div>
+                      />
+                    </div>
                     <Space
                       direction="vertical"
                       align="center"
@@ -737,28 +819,6 @@ export default function LandingPage() {
             สร้างโปรไฟล์หางานฟรีเลยตอนนี้
           </Button>
         </div>
-      </div>
-
-      {/* 💬 Support Floating */}
-      <div
-        style={{
-          position: "fixed",
-          right: "24px",
-          bottom: "24px",
-          zIndex: 1000,
-        }}
-      >
-        <Badge dot status="processing">
-          <Button
-            type="primary"
-            shape="circle"
-            icon={<MessageOutlined style={{ fontSize: "24px" }} />}
-            style={{
-              width: "64px",
-              height: "64px",
-            }}
-          />
-        </Badge>
       </div>
     </>
   );

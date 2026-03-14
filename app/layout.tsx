@@ -13,8 +13,8 @@ const kanit = Kanit({
 });
 
 export const metadata: Metadata = {
-  title: "Kam SchoolJob - ค้นหาคอร์สเรียนที่ใช่",
-  description: "ศูนย์รวมคอร์สเรียนออนไลน์และติวเตอร์คุณภาพ",
+  title: "School Board - แพลตฟอร์มหางานสายการศึกษา",
+  description: "ศูนย์รวมงานครูและบุคลากรทางการศึกษาอันดับ 1",
 };
 
 export default function RootLayout({
