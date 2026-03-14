@@ -24,7 +24,6 @@ import {
   Col,
   Divider,
   Flex,
-  List,
   Row,
   Space,
   Tabs,
@@ -101,9 +100,17 @@ export default function EmployerProfilePage() {
           <Flex
             vertical
             justify="center"
-            style={{ height: "100%", padding: "0 40px", position: "relative", zIndex: 1 }}
+            style={{
+              height: "100%",
+              padding: "0 40px",
+              position: "relative",
+              zIndex: 1,
+            }}
           >
-            <Title level={1} style={{ color: "white", margin: 0, fontSize: "48px" }}>
+            <Title
+              level={1}
+              style={{ color: "white", margin: 0, fontSize: "48px" }}
+            >
               โปรไฟล์โรงเรียน
             </Title>
             <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "20px" }}>
@@ -153,20 +160,47 @@ export default function EmployerProfilePage() {
                     gap={8}
                     style={{ width: "100%" }}
                   >
-                    <Title level={2} style={{ margin: 0, textAlign: "center", fontSize: "28px" }}>
+                    <Title
+                      level={2}
+                      style={{
+                        margin: 0,
+                        textAlign: "center",
+                        fontSize: "28px",
+                      }}
+                    >
                       {profile.name}
                     </Title>
                     <Space wrap justify="center">
-                      <Tag color="blue" style={{ fontSize: "14px", padding: "4px 12px", borderRadius: "4px", fontWeight: "bold" }}>
+                      <Tag
+                        color="blue"
+                        style={{
+                          fontSize: "14px",
+                          padding: "4px 12px",
+                          borderRadius: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
                         <CheckCircleFilled /> ยืนยันตัวตนแล้ว
                       </Tag>
-                      <Tag style={{ fontSize: "14px", padding: "4px 12px", borderRadius: "4px", fontWeight: "bold" }}>
+                      <Tag
+                        style={{
+                          fontSize: "14px",
+                          padding: "4px 12px",
+                          borderRadius: "4px",
+                          fontWeight: "bold",
+                        }}
+                      >
                         {profile.type}
                       </Tag>
                     </Space>
                   </Flex>
 
-                  <Divider style={{ margin: "16px 0", borderBlockStart: `2px solid ${token.colorBorderSecondary}` }} />
+                  <Divider
+                    style={{
+                      margin: "16px 0",
+                      borderBlockStart: `2px solid ${token.colorBorderSecondary}`,
+                    }}
+                  />
 
                   <Flex
                     vertical
@@ -182,7 +216,9 @@ export default function EmployerProfilePage() {
                           marginTop: "4px",
                         }}
                       />
-                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.location}</Text>
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>
+                        {profile.location}
+                      </Text>
                     </Space>
                     {profile.website && (
                       <Space size={12}>
@@ -193,7 +229,11 @@ export default function EmployerProfilePage() {
                           href={`https://${profile.website}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ fontSize: "16px", fontWeight: 500, color: token.colorPrimary }}
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: 500,
+                            color: token.colorPrimary,
+                          }}
                         >
                           {profile.website}
                         </a>
@@ -203,13 +243,17 @@ export default function EmployerProfilePage() {
                       <MailOutlined
                         style={{ color: "#e60278", fontSize: "20px" }}
                       />
-                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.email}</Text>
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>
+                        {profile.email}
+                      </Text>
                     </Space>
                     <Space size={12}>
                       <PhoneOutlined
                         style={{ color: "#e60278", fontSize: "20px" }}
                       />
-                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.phone}</Text>
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>
+                        {profile.phone}
+                      </Text>
                     </Space>
                   </Flex>
 
@@ -236,7 +280,11 @@ export default function EmployerProfilePage() {
               {/* Section 5: School Photos */}
               {profile.gallery && profile.gallery.length > 0 && (
                 <Card
-                  title={<Title level={4} style={{ margin: 0 }}>ภาพถ่ายโรงเรียน</Title>}
+                  title={
+                    <Title level={4} style={{ margin: 0 }}>
+                      ภาพถ่ายโรงเรียน
+                    </Title>
+                  }
                   variant="borderless"
                   style={{
                     borderRadius: "16px",
@@ -271,36 +319,59 @@ export default function EmployerProfilePage() {
               defaultActiveKey="2"
               size="large"
               type="card" // แบบ Card เห็นชัดกว่า
-              tabBarStyle={{ 
+              tabBarStyle={{
                 marginBottom: "24px",
                 background: token.colorBgContainer, // พื้นหลังของแถบ Tabs
                 borderRadius: "12px 12px 0 0",
                 padding: "8px 8px 0 8px",
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderBottom: "none"
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: token.colorBorderSecondary,
+                borderBottom: "none",
               }}
               items={[
                 {
                   key: "2",
-                  label: <span style={{ padding: "0 20px", fontSize: "18px", fontWeight: "bold" }}>ประกาศรับสมัครงาน</span>,
+                  label: (
+                    <span
+                      style={{
+                        padding: "0 20px",
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ประกาศรับสมัครงาน
+                    </span>
+                  ),
                   children: (
                     <Card
                       variant="borderless"
                       style={{
                         borderRadius: "0 0 16px 16px",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        border: `2px solid ${token.colorBorderSecondary}`,
+                        borderWidth: "2px",
+                        borderStyle: "solid",
+                        borderColor: token.colorBorderSecondary,
                         borderTop: "none",
                         backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
                       }}
                     >
-                      <Flex align="center" justify="space-between" style={{ marginBottom: "20px" }}>
-                        <Title level={3} style={{ margin: 0 }}>ตำแหน่งที่เปิดรับ</Title>
-                        <img src="/images/flat/undraw_job-offers_55y0.svg" style={{ height: "60px" }} alt="Jobs" />
+                      <Flex
+                        align="center"
+                        justify="space-between"
+                        style={{ marginBottom: "20px" }}
+                      >
+                        <Title level={3} style={{ margin: 0 }}>
+                          ตำแหน่งที่เปิดรับ
+                        </Title>
+                        <img
+                          src="/images/flat/undraw_job-offers_55y0.svg"
+                          style={{ height: "60px" }}
+                          alt="Jobs"
+                        />
                       </Flex>
-                      <List
-                        itemLayout="horizontal"
-                        dataSource={[
+                      <Flex vertical gap={16}>
+                        {[
                           {
                             title: "ครูสอนภาษาอังกฤษ (Full-time)",
                             date: "2 วันที่แล้ว",
@@ -311,55 +382,98 @@ export default function EmployerProfilePage() {
                             date: "5 วันที่แล้ว",
                             applicants: 3,
                           },
-                        ]}
-                        renderItem={(item) => (
-                          <List.Item
+                        ].map((item, index) => (
+                          <Card
+                            key={index}
+                            size="small"
                             style={{
-                              padding: "20px",
-                              border: `1px solid ${token.colorBorderSecondary}`,
+                              padding: "12px",
+                              borderWidth: "1px",
+                              borderStyle: "solid",
+                              borderColor: token.colorBorderSecondary,
                               borderRadius: "12px",
-                              marginBottom: "16px",
-                              background: token.colorBgContainer
+                              background: token.colorBgContainer,
                             }}
-                            actions={[
-                              <Link href="/pages/employer/job/read" key="view">
-                                <Button type="primary" size="middle" style={{ borderRadius: "6px", fontWeight: "bold" }}>ดูรายละเอียด</Button>
-                              </Link>,
-                            ]}
                           >
-                            <List.Item.Meta
-                              avatar={
+                            <Flex align="center" justify="space-between">
+                              <Flex align="center" gap={16}>
                                 <Avatar
                                   size={48}
                                   icon={<TeamOutlined />}
                                   style={{
                                     backgroundColor: "#f0f5ff",
                                     color: "#2f54eb",
-                                    border: "1px solid #adc6ff"
+                                    border: "1px solid #adc6ff",
                                   }}
                                 />
-                              }
-                              title={<Text style={{ fontSize: "18px", fontWeight: "bold" }}>{item.title}</Text>}
-                              description={
-                                <Space split={<Divider type="vertical" />} style={{ marginTop: "4px" }}>
-                                  <Text style={{ fontSize: "14px", color: token.colorTextSecondary }}>
-                                    <CalendarOutlined /> {item.date}
+                                <Flex vertical>
+                                  <Text
+                                    style={{
+                                      fontSize: "18px",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {item.title}
                                   </Text>
-                                  <Text style={{ fontSize: "14px", color: "#e60278", fontWeight: "bold" }}>
-                                    <TeamOutlined /> {item.applicants} ผู้สมัคร
-                                  </Text>
-                                </Space>
-                              }
-                            />
-                          </List.Item>
-                        )}
-                      />
+                                  <Space
+                                    separator={
+                                      <Divider orientation="vertical" />
+                                    }
+                                    style={{ marginTop: "4px" }}
+                                  >
+                                    <Text
+                                      style={{
+                                        fontSize: "14px",
+                                        color: token.colorTextSecondary,
+                                      }}
+                                    >
+                                      <CalendarOutlined /> {item.date}
+                                    </Text>
+                                    <Text
+                                      style={{
+                                        fontSize: "14px",
+                                        color: "#e60278",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      <TeamOutlined /> {item.applicants}{" "}
+                                      ผู้สมัคร
+                                    </Text>
+                                  </Space>
+                                </Flex>
+                              </Flex>
+                              <Link href="/pages/employer/job/read">
+                                <Button
+                                  type="primary"
+                                  size="middle"
+                                  style={{
+                                    borderRadius: "6px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  ดูรายละเอียด
+                                </Button>
+                              </Link>
+                            </Flex>
+                          </Card>
+                        ))}
+                      </Flex>
                     </Card>
                   ),
                 },
                 {
                   key: "1",
-                  label: <span style={{ padding: "0 20px", fontSize: "18px", fontWeight: "bold" }}>ข้อมูลโรงเรียน</span>,
+                  label: (
+                    <span
+                      style={{
+                        padding: "0 20px",
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ข้อมูลโรงเรียน
+                    </span>
+                  ),
                   children: (
                     <Flex vertical gap={24}>
                       {/* Section 3: About School */}
@@ -369,15 +483,34 @@ export default function EmployerProfilePage() {
                           style={{
                             borderRadius: "16px",
                             boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                            border: `2px solid ${token.colorBorderSecondary}`,
+                            borderWidth: "2px",
+                            borderStyle: "solid",
+                            borderColor: token.colorBorderSecondary,
                             backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
                           }}
                         >
                           {profile.description && (
                             <Flex vertical gap={16}>
-                              <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
-                                <div style={{ background: "#e60278", padding: "8px", borderRadius: "8px", display: "flex" }}>
-                                  <SafetyCertificateOutlined style={{ color: "white" }} />
+                              <Title
+                                level={3}
+                                style={{
+                                  margin: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "12px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    background: "#e60278",
+                                    padding: "8px",
+                                    borderRadius: "8px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  <SafetyCertificateOutlined
+                                    style={{ color: "white" }}
+                                  />
                                 </div>
                                 เกี่ยวกับเรา
                               </Title>
@@ -394,11 +527,39 @@ export default function EmployerProfilePage() {
                             </Flex>
                           )}
                           {profile.vision && (
-                            <Flex vertical gap={16} style={{ marginTop: "32px" }}>
-                              <Divider style={{ borderBlockStart: `2px solid ${token.colorBorderSecondary}` }} />
-                              <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
-                                <div style={{ background: "#001e45", padding: "8px", borderRadius: "8px", display: "flex" }}>
-                                  <ThunderboltOutlined style={{ color: "white" }} />
+                            <Flex
+                              vertical
+                              gap={16}
+                              style={{ marginTop: "32px" }}
+                            >
+                              <Divider
+                                style={{
+                                  borderBlockStartWidth: "2px",
+                                  borderBlockStartStyle: "solid",
+                                  borderBlockStartColor:
+                                    token.colorBorderSecondary,
+                                }}
+                              />
+                              <Title
+                                level={3}
+                                style={{
+                                  margin: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "12px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    background: "#001e45",
+                                    padding: "8px",
+                                    borderRadius: "8px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  <ThunderboltOutlined
+                                    style={{ color: "white" }}
+                                  />
                                 </div>
                                 วิสัยทัศน์
                               </Title>
@@ -420,9 +581,26 @@ export default function EmployerProfilePage() {
                       {profile.benefits && profile.benefits.length > 0 && (
                         <Card
                           title={
-                            <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
-                              <div style={{ background: "#52c41a", padding: "8px", borderRadius: "8px", display: "flex" }}>
-                                <MedicineBoxOutlined style={{ color: "white" }} />
+                            <Title
+                              level={3}
+                              style={{
+                                margin: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  background: "#52c41a",
+                                  padding: "8px",
+                                  borderRadius: "8px",
+                                  display: "flex",
+                                }}
+                              >
+                                <MedicineBoxOutlined
+                                  style={{ color: "white" }}
+                                />
                               </div>
                               สวัสดิการและจุดเด่น
                             </Title>
@@ -440,9 +618,19 @@ export default function EmployerProfilePage() {
                               <Col xs={24} sm={12} key={index}>
                                 <Space size={12}>
                                   <CheckCircleFilled
-                                    style={{ color: "#52c41a", fontSize: "20px" }}
+                                    style={{
+                                      color: "#52c41a",
+                                      fontSize: "20px",
+                                    }}
                                   />
-                                  <Text style={{ fontSize: "17px", fontWeight: 500 }}>{benefit}</Text>
+                                  <Text
+                                    style={{
+                                      fontSize: "17px",
+                                      fontWeight: 500,
+                                    }}
+                                  >
+                                    {benefit}
+                                  </Text>
                                 </Space>
                               </Col>
                             ))}
@@ -453,8 +641,23 @@ export default function EmployerProfilePage() {
                       {/* Section 6: Additional Info */}
                       <Card
                         title={
-                          <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
-                            <div style={{ background: "#fa8c16", padding: "8px", borderRadius: "8px", display: "flex" }}>
+                          <Title
+                            level={3}
+                            style={{
+                              margin: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                            }}
+                          >
+                            <div
+                              style={{
+                                background: "#fa8c16",
+                                padding: "8px",
+                                borderRadius: "8px",
+                                display: "flex",
+                              }}
+                            >
                               <InfoCircleOutlined style={{ color: "white" }} />
                             </div>
                             ข้อมูลเพิ่มเติม
@@ -474,7 +677,9 @@ export default function EmployerProfilePage() {
                               <StatisticItem
                                 label="ประเภทโรงเรียน"
                                 value={profile.type}
-                                icon={<BankOutlined style={{ fontSize: "24px" }} />}
+                                icon={
+                                  <BankOutlined style={{ fontSize: "24px" }} />
+                                }
                               />
                             </Col>
                           )}
@@ -483,7 +688,9 @@ export default function EmployerProfilePage() {
                               <StatisticItem
                                 label="จำนวนบุคลากร"
                                 value={profile.size}
-                                icon={<TeamOutlined style={{ fontSize: "24px" }} />}
+                                icon={
+                                  <TeamOutlined style={{ fontSize: "24px" }} />
+                                }
                               />
                             </Col>
                           )}
@@ -492,7 +699,9 @@ export default function EmployerProfilePage() {
                               <StatisticItem
                                 label="หลักสูตร"
                                 value={profile.curriculum}
-                                icon={<BookOutlined style={{ fontSize: "24px" }} />}
+                                icon={
+                                  <BookOutlined style={{ fontSize: "24px" }} />
+                                }
                               />
                             </Col>
                           )}
@@ -501,7 +710,11 @@ export default function EmployerProfilePage() {
                               <StatisticItem
                                 label="ก่อตั้งเมื่อปี"
                                 value={profile.established}
-                                icon={<CalendarOutlined style={{ fontSize: "24px" }} />}
+                                icon={
+                                  <CalendarOutlined
+                                    style={{ fontSize: "24px" }}
+                                  />
+                                }
                               />
                             </Col>
                           )}
@@ -510,7 +723,9 @@ export default function EmployerProfilePage() {
                               <StatisticItem
                                 label="ระดับชั้นที่เปิดสอน"
                                 value={profile.levels.join(", ")}
-                                icon={<EditOutlined style={{ fontSize: "24px" }} />}
+                                icon={
+                                  <EditOutlined style={{ fontSize: "24px" }} />
+                                }
                               />
                             </Col>
                           )}
@@ -518,7 +733,11 @@ export default function EmployerProfilePage() {
                       </Card>
 
                       <Card
-                        title={<Title level={4} style={{ margin: 0 }}>ที่ตั้งโรงเรียน</Title>}
+                        title={
+                          <Title level={4} style={{ margin: 0 }}>
+                            ที่ตั้งโรงเรียน
+                          </Title>
+                        }
                         variant="borderless"
                         style={{
                           borderRadius: "16px",
@@ -528,25 +747,29 @@ export default function EmployerProfilePage() {
                         }}
                       >
                         <Flex vertical gap={20}>
-                          <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.address}</Text>
+                          <Text style={{ fontSize: "16px", fontWeight: 500 }}>
+                            {profile.address}
+                          </Text>
                           <Flex
                             align="center"
                             justify="center"
                             style={{
                               borderRadius: "12px",
-                              height: "300px",
-                              backgroundColor: "#f5f5f5",
-                              border: "1px solid #d9d9d9"
+                              heightWidth: "1px",
+                              borderStyle: "solid",
+                              borderColor: "#d9d9d9",
                             }}
                           >
-                            <Space direction="vertical" align="center">
+                            <Flex vertical align="center" gap={8}>
                               <EnvironmentOutlined
                                 style={{ fontSize: "48px", color: "#e60278" }}
                               />
-                              <Text style={{ fontSize: "18px", color: "#8c8c8c" }}>
+                              <Text
+                                style={{ fontSize: "18px", color: "#8c8c8c" }}
+                              >
                                 Google Map Placeholder
                               </Text>
-                            </Space>
+                            </Flex>
                           </Flex>
                         </Flex>
                       </Card>

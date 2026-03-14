@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   Dropdown,
+  Flex,
   Row,
   Space,
   Tooltip,
@@ -184,17 +185,17 @@ export default function Navbar() {
         {user ? (
           <>
             {/* ✨ [แสดง user info เมื่อ login แล้ว] */}
-            <Space size={12} style={{ paddingRight: "16px" }}>
+            <Flex align="center" gap={12} style={{ paddingRight: "16px" }}>
               <Avatar>{user.full_name.charAt(0).toUpperCase()}</Avatar>
-              <Space direction="vertical" size={0}>
+              <Flex vertical gap={0}>
                 <Text strong style={{ fontSize: "14px" }}>
                   {user.full_name}
                 </Text>
                 <Text type="secondary" style={{ fontSize: "12px" }}>
                   {user.role === "EMPLOYEE" ? "ครูผู้สอน" : "สถานศึกษา"}
                 </Text>
-              </Space>
-            </Space>
+              </Flex>
+            </Flex>
 
             {/* ✨ [Dropdown menu สำหรับ logout] */}
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">

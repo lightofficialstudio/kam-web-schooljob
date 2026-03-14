@@ -47,7 +47,7 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       placement="right"
       onClose={() => setIsDrawerOpen(false)}
       open={isDrawerOpen}
-      width={600}
+      size="large"
       extra={
         <Space>
           <Button onClick={() => setIsDrawerOpen(false)}>ยกเลิก</Button>

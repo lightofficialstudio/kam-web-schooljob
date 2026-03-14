@@ -7,7 +7,7 @@ import {
   PhoneOutlined,
   YoutubeOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Divider, Row, Space, Typography } from "antd";
+import { Card, Col, Divider, Flex, Row, Space, Typography } from "antd";
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -21,7 +21,7 @@ export default function Footer() {
     >
       <Row gutter={[48, 32]} style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <Col xs={24} lg={8}>
-          <Space direction="vertical" size={24} style={{ width: "100%" }}>
+          <Flex vertical gap={24} style={{ width: "100%" }}>
             <Space size="small">
               <Card
                 size="small"
@@ -55,15 +55,15 @@ export default function Footer() {
               <YoutubeOutlined style={{ fontSize: "20px" }} />
               <LineOutlined style={{ fontSize: "20px" }} />
             </Space>
-          </Space>
+          </Flex>
         </Col>
 
         <Col xs={12} lg={4}>
-          <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+          <Flex vertical gap={24} style={{ width: "100%" }}>
             <Title level={5} style={{ margin: 0 }}>
               สำหรับคนหางาน
             </Title>
-            <Space orientation="vertical" size={12}>
+            <Flex vertical gap={12}>
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 ค้นหาตำแหน่งงาน
               </Text>
@@ -76,16 +76,16 @@ export default function Footer() {
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 บทความเตรียมสอบ
               </Text>
-            </Space>
-          </Space>
+            </Flex>
+          </Flex>
         </Col>
 
         <Col xs={12} lg={4}>
-          <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+          <Flex vertical gap={24} style={{ width: "100%" }}>
             <Title level={5} style={{ margin: 0 }}>
               สำหรับสถานศึกษา
             </Title>
-            <Space orientation="vertical" size={12}>
+            <Flex vertical gap={12}>
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 ประกาศรับสมัครงาน
               </Text>
@@ -98,16 +98,16 @@ export default function Footer() {
               <Text type="secondary" style={{ cursor: "pointer" }}>
                 คู่มือการใช้งาน
               </Text>
-            </Space>
-          </Space>
+            </Flex>
+          </Flex>
         </Col>
 
         <Col xs={24} lg={8}>
-          <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+          <Flex vertical gap={24} style={{ width: "100%" }}>
             <Title level={5} style={{ margin: 0 }}>
               ติดต่อเรา
             </Title>
-            <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+            <Flex vertical gap={16} style={{ width: "100%" }}>
               <Space>
                 <PhoneOutlined />
                 <Text type="secondary">02-XXX-XXXX (ฝ่ายบริการลูกค้า)</Text>
@@ -121,15 +121,15 @@ export default function Footer() {
                 variant="borderless"
                 style={{ borderRadius: "12px" }}
               >
-                <Space orientation="vertical" size={4}>
+                <Flex vertical gap={4}>
                   <Text strong>เวลาทำการ</Text>
                   <Text type="secondary" style={{ fontSize: "13px" }}>
                     จันทร์ - ศุกร์ : 09:00 - 18:00 น.
                   </Text>
-                </Space>
+                </Flex>
               </Card>
-            </Space>
-          </Space>
+            </Flex>
+          </Flex>
         </Col>
       </Row>
 
