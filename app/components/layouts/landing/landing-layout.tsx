@@ -2,7 +2,7 @@
 
 import { ThemeProvider, useTheme } from "@/app/contexts/theme-context";
 import type { ThemeConfig } from "antd";
-import { App, ConfigProvider, Layout, theme } from "antd";
+import { App, ConfigProvider, Flex, Layout, theme } from "antd";
 import thTH from "antd/locale/th_TH";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
@@ -129,7 +129,8 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
       input={{ autoComplete: "off" }}
     >
       <App>
-        <div
+        <Flex
+          vertical
           className="ant-theme-root"
           style={
             {
@@ -149,6 +150,7 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
               "--scroll-thumb": isDark ? "#4A5568" : "#CBD5E1",
               "--scroll-thumb-hover": isDark ? "#718096" : "#94A3B8",
               "--modal-bg": isDark ? "#2D3748" : "#FFFFFF",
+              minHeight: "100vh",
             } as React.CSSProperties
           }
         >
@@ -172,7 +174,6 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
             }
 
             .ant-card:hover {
-              transform: translateY(-4px);
               box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.1) !important;
             }
 
@@ -186,7 +187,7 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
           `}</style>
           <Layout
             style={{
-              minHeight: "100vh",
+              flex: 1,
               display: "flex",
               flexDirection: "column",
             }}
@@ -201,11 +202,13 @@ function LandingLayoutInner({ children }: { children: React.ReactNode }) {
                 paddingTop: 68, // offset for fixed Navbar (12px padding-top + ~44px content + 12px padding-bottom)
               }}
             >
-              <div style={{ width: "100%", height: "100%" }}>{children}</div>
+              <Flex vertical style={{ width: "100%", height: "100%" }}>
+                {children}
+              </Flex>
             </Layout.Content>
             <Footer />
           </Layout>
-        </div>
+        </Flex>
       </App>
     </ConfigProvider>
   );
