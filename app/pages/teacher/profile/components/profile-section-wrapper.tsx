@@ -1,8 +1,10 @@
 "use client";
 
 import { EditOutlined } from "@ant-design/icons";
-import { Button, Card } from "antd";
+import { Button, Card, Space, Typography, theme as antTheme } from "antd";
 import React, { ReactNode } from "react";
+
+const { Title } = Typography;
 
 interface ProfileSectionWrapperProps {
   title: string;
@@ -19,47 +21,60 @@ export const ProfileSectionWrapper: React.FC<ProfileSectionWrapperProps> = ({
   id,
   extra,
 }) => {
+  const { token } = antTheme.useToken();
+
   return (
     <Card
       id={id}
-      bordered={true}
       style={{
-        borderRadius: "12px",
-        boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
-        border: "1px solid #f0f0f0",
+        marginBottom: token.marginLG,
+        borderRadius: token.borderRadiusLG,
+        border: `1px solid ${token.colorBorderSecondary}`,
       }}
-      className="mb-8"
       styles={{
         header: {
-          borderBottom: "1px solid #f5f5f5",
           padding: "16px 24px",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
         },
         body: {
           padding: "24px",
         },
       }}
       title={
-        <span className="text-xl font-bold text-gray-800 tracking-tight">
+        <Title 
+          level={4} 
+          style={{ 
+            margin: 0, 
+            fontWeight: 700, 
+            color: token.colorTextHeading,
+            letterSpacing: "-0.02em"
+          }}
+        >
           {title}
-        </span>
+        </Title>
       }
       extra={
-        <div className="flex items-center gap-2">
+        <Space size="middle">
           {extra}
           {onEdit && (
             <Button
               type="text"
               shape="circle"
               icon={
-                <EditOutlined className="text-gray-400 text-lg hover:text-blue-500" />
+                <EditOutlined 
+                  style={{ 
+                    color: token.colorTextDescription,
+                    fontSize: "18px"
+                  }} 
+                />
               }
               onClick={onEdit}
             />
           )}
-        </div>
+        </Space>
       }
     >
-      <div className="py-2">{children}</div>
+      {children}
     </Card>
   );
 };

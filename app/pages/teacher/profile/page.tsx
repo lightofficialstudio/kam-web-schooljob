@@ -12,16 +12,20 @@ import {
 } from "@ant-design/icons";
 import {
   Avatar,
+  Badge,
   Button,
   Card,
   Col,
   Divider,
+  Flex,
   Form,
+  Layout,
   Progress,
   Row,
   Space,
   Tag,
   Typography,
+  theme as antTheme,
 } from "antd";
 import { useState } from "react";
 import {
@@ -37,6 +41,7 @@ import {
 import { useProfileStore } from "./stores/profile-store";
 
 const { Title, Text, Link } = Typography;
+const { Content } = Layout;
 
 type SectionId =
   | "basic-info"
@@ -48,6 +53,7 @@ type SectionId =
   | "personal-summary";
 
 export default function TeacherProfilePage() {
+  const { token } = antTheme.useToken();
   const { profile, setProfile } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
   const [form] = Form.useForm();
@@ -55,7 +61,6 @@ export default function TeacherProfilePage() {
   const [editSection, setEditSection] = useState<SectionId | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Profile strength calculation
   const calculateStrength = () => {
     let score = 0;
     if (profile.firstName) score += 10;
@@ -73,8 +78,6 @@ export default function TeacherProfilePage() {
 
   const handleOpenEdit = (sectionId: SectionId) => {
     setEditSection(sectionId);
-
-    // Initialize form with current data
     if (sectionId === "basic-info") {
       form.setFieldsValue({
         firstName: profile.firstName,
@@ -100,24 +103,19 @@ export default function TeacherProfilePage() {
         preferredProvinces: profile.preferredProvinces,
       });
     }
-
     setIsDrawerOpen(true);
   };
 
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
-
-      // Update store
       setProfile({ ...profile, ...values });
-
       openNotification({
         type: "success",
         mainTitle: "บันทึกข้อมูลสำเร็จ",
         description: "ข้อมูลโปรไฟล์ของคุณถูกอัปเดตเรียบร้อยแล้ว",
-        icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
       });
-
       setIsDrawerOpen(false);
       setEditSection(null);
     } catch (err) {
@@ -126,429 +124,403 @@ export default function TeacherProfilePage() {
         type: "error",
         mainTitle: "เกิดข้อผิดพลาด",
         description: "กรุณาตรวจสอบข้อมูลในฟอร์มให้ถูกต้องอีกครั้ง",
-        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />,
+        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
       });
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#fff",
-        paddingBottom: "80px",
-      }}
-    >
-      {/* 1. Header Banner Area */}
-      <div
+    <Layout style={{ minHeight: "100vh", paddingBottom: 80 }}>
+      {/* 1. Header Banner */}
+      <Flex
         style={{
-          backgroundColor: "#001529",
-          height: "224px",
+          height: 224,
           position: "relative",
           overflow: "hidden",
+          backgroundColor: token.colorPrimary,
         }}
       >
-        <div
+        <Avatar
+          size={256}
           style={{
             position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "256px",
-            height: "256px",
-            backgroundColor: "#ff006e",
-            borderRadius: "50%",
+            top: -80,
+            right: -80,
+            backgroundColor: token.colorError,
             opacity: 0.8,
           }}
         />
-        <div
+        <Avatar
+          size={128}
           style={{
             position: "absolute",
-            bottom: "40px",
+            bottom: 40,
             right: "25%",
-            width: "128px",
-            height: "128px",
-            backgroundColor: "#3a0ca3",
-            borderRadius: "50%",
+            backgroundColor: token.colorInfo,
             opacity: 0.6,
           }}
         />
-      </div>
+      </Flex>
 
-      <Row justify="center">
-        <Col span={24} style={{ maxWidth: "1152px", padding: "0 24px" }}>
-          <Row gutter={40}>
-            {/* LEFT COLUMN: Main Profile Content */}
-            <Col span={16} style={{ marginTop: "-64px", zIndex: 10 }}>
-              {/* Header Identity Card */}
-              <Card
-                bordered={true}
-                style={{
-                  borderRadius: "12px",
-                  marginBottom: "32px",
-                  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
-                  border: "1px solid #f0f0f0",
-                }}
-                styles={{ body: { padding: "32px" } }}
-              >
-                <Row justify="space-between" align="top">
-                  <Col>
-                    <Space size={32} align="start">
-                      <div style={{ position: "relative" }}>
-                        <Avatar
-                          size={140}
-                          icon={<UserOutlined />}
-                          src={profile.profileImageUrl || null}
-                          style={{
-                            border: "4px solid #fff",
-                            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                            backgroundColor: "#f3f4f6",
-                            borderRadius: "16px",
-                          }}
-                        />
-                        <Button
-                          shape="circle"
-                          icon={<EditOutlined style={{ color: "#6b7280" }} />}
-                          style={{
-                            position: "absolute",
-                            bottom: "8px",
-                            right: "8px",
-                            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                            border: "1px solid #e5e7eb",
-                          }}
-                        />
-                      </div>
-                      <div style={{ paddingTop: "8px" }}>
-                        <Title
-                          level={1}
-                          style={{
-                            margin: 0,
-                            textTransform: "uppercase",
-                            fontSize: "36px",
-                            fontWeight: 700,
-                            letterSpacing: "-0.025em",
-                          }}
-                        >
-                          {profile.firstName || "THANAT"}{" "}
-                          {profile.lastName || "PROMPIRIYA"}
-                        </Title>
-                        <Space
-                          direction="vertical"
-                          size={8}
-                          style={{ marginTop: "16px" }}
-                        >
-                          <Space size={12}>
-                            <EnvironmentOutlined style={{ color: "#9ca3af" }} />
-                            <Text type="secondary">
-                              {profile.preferredProvinces?.[0] ||
-                                "Bang Sue, Bangkok"}
-                            </Text>
-                          </Space>
-                          <Space size={12}>
-                            <MailOutlined style={{ color: "#9ca3af" }} />
-                            <Text type="secondary">
-                              {profile.email || "lightofficialstudio@gmail.com"}
-                            </Text>
-                          </Space>
-                          <Space size={12}>
-                            <LinkOutlined style={{ color: "#9ca3af" }} />
-                            <Link href="#" style={{ color: "#3b82f6" }}>
-                              schoolboard.com/profiles/
-                              {(profile.firstName || "").toLowerCase()}
-                            </Link>
-                          </Space>
-                        </Space>
-                      </div>
-                    </Space>
-                  </Col>
-                  <Col>
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      onClick={() => handleOpenEdit("basic-info")}
-                    />
-                  </Col>
-                </Row>
-              </Card>
-
-              <Space direction="vertical" size={32} style={{ width: "100%" }}>
-                {/* Personal Summary Section */}
-                <ProfileSectionWrapper
-                  title="สรุปข้อมูลส่วนตัว"
-                  onEdit={() => handleOpenEdit("skills")}
-                  id="personal-summary"
+      <Content>
+        <Row justify="center">
+          <Col span={24} style={{ maxWidth: 1152, padding: "0 24px" }}>
+            <Row gutter={40}>
+              {/* LEFT COLUMN */}
+              <Col span={16} style={{ marginTop: -64, zIndex: 10 }}>
+                {/* Header Identity Card */}
+                <Card
+                  variant="outlined"
+                  style={{
+                    borderRadius: token.borderRadiusLG,
+                    marginBottom: 32,
+                    boxShadow: token.boxShadowTertiary,
+                    borderColor: token.colorBorderSecondary,
+                  }}
+                  styles={{ body: { padding: 32 } }}
                 >
-                  <Text
-                    style={{
-                      fontSize: "15px",
-                      color: "#4b5563",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {profile.specialActivities ||
-                      "ยังไม่มีข้อมูลสรุปเบื้องต้น แนะนำประสบการณ์การสอนของคุณเพื่อให้ทางโรงเรียนรู้จักคุณมากขึ้น..."}
-                  </Text>
-                </ProfileSectionWrapper>
-
-                {/* 3. ประสบการณ์การทำงาน */}
-                <ProfileSectionWrapper
-                  id="work-experience"
-                  title="ประวัติการทำงาน"
-                  onEdit={() => handleOpenEdit("work-experience")}
-                >
-                  <WorkExperienceSection />
-                </ProfileSectionWrapper>
-
-                {/* 4. ประวัติการศึกษา */}
-                <ProfileSectionWrapper
-                  id="education"
-                  title="ประวัติการศึกษา"
-                  onEdit={() => handleOpenEdit("education")}
-                >
-                  <EducationHistorySection />
-                </ProfileSectionWrapper>
-
-                {/* 5. ข้อมูลการสอน & Skills */}
-                <ProfileSectionWrapper
-                  title="ความเชี่ยวชาญการสอนและทักษะ"
-                  onEdit={() => handleOpenEdit("teaching")}
-                >
-                  <Space
-                    direction="vertical"
-                    size={24}
-                    style={{ width: "100%" }}
-                  >
-                    <div>
-                      <Text
-                        strong
-                        style={{ display: "block", marginBottom: "12px" }}
-                      >
-                        วิชาที่เชี่ยวชาญ
-                      </Text>
-                      <Space size={[8, 8]} wrap>
-                        {profile.specialization?.length ? (
-                          profile.specialization.map((s) => (
-                            <Tag
-                              key={s}
-                              color="blue"
+                  <Row justify="space-between" align="top">
+                    <Col>
+                      <Space size={32} align="start">
+                        <Badge
+                          count={
+                            <Button
+                              shape="circle"
+                              size="small"
+                              icon={
+                                <EditOutlined
+                                  style={{
+                                    color: token.colorTextDescription,
+                                  }}
+                                />
+                              }
                               style={{
-                                padding: "4px 12px",
-                                borderRadius: "999px",
-                                border: "1px solid #bfdbfe",
+                                boxShadow: token.boxShadowSecondary,
+                                borderColor: token.colorBorderSecondary,
                               }}
-                            >
-                              {s}
-                            </Tag>
-                          ))
-                        ) : (
-                          <Text type="secondary" italic>
-                            ยังไม่ได้ระบุ
-                          </Text>
-                        )}
+                            />
+                          }
+                          offset={[-8, 120]}
+                        >
+                          <Avatar
+                            size={140}
+                            shape="square"
+                            icon={<UserOutlined />}
+                            src={profile.profileImageUrl || null}
+                            style={{
+                              border: `4px solid ${token.colorBgContainer}`,
+                              boxShadow: token.boxShadowSecondary,
+                              backgroundColor: token.colorBgLayout,
+                              borderRadius: token.borderRadiusLG,
+                            }}
+                          />
+                        </Badge>
+
+                        <Flex
+                          vertical
+                          style={{ paddingTop: 8 }}
+                        >
+                          <Title
+                            level={1}
+                            style={{
+                              margin: 0,
+                              textTransform: "uppercase",
+                              fontSize: 36,
+                              fontWeight: 700,
+                              letterSpacing: "-0.025em",
+                            }}
+                          >
+                            {profile.firstName || "THANAT"}{" "}
+                            {profile.lastName || "PROMPIRIYA"}
+                          </Title>
+                          <Flex
+                            vertical
+                            gap={8}
+                            style={{ marginTop: 16 }}
+                          >
+                            <Space size={12}>
+                              <EnvironmentOutlined
+                                style={{ color: token.colorTextDescription }}
+                              />
+                              <Text type="secondary">
+                                {profile.preferredProvinces?.[0] ||
+                                  "Bang Sue, Bangkok"}
+                              </Text>
+                            </Space>
+                            <Space size={12}>
+                              <MailOutlined
+                                style={{ color: token.colorTextDescription }}
+                              />
+                              <Text type="secondary">
+                                {profile.email ||
+                                  "lightofficialstudio@gmail.com"}
+                              </Text>
+                            </Space>
+                            <Space size={12}>
+                              <LinkOutlined
+                                style={{ color: token.colorTextDescription }}
+                              />
+                              <Link href="#">
+                                schoolboard.com/profiles/
+                                {(profile.firstName || "").toLowerCase()}
+                              </Link>
+                            </Space>
+                          </Flex>
+                        </Flex>
                       </Space>
-                    </div>
-                    <div>
-                      <Text
-                        strong
-                        style={{ display: "block", marginBottom: "12px" }}
-                      >
-                        ทักษะด้านภาษาและไอที
-                      </Text>
-                      <Space size={[8, 8]} wrap>
-                        {profile.languagesSpoken?.length
-                          ? profile.languagesSpoken.map((l) => (
+                    </Col>
+                    <Col>
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => handleOpenEdit("basic-info")}
+                      />
+                    </Col>
+                  </Row>
+                </Card>
+
+                <Flex vertical gap={32} style={{ width: "100%" }}>
+                  {/* Personal Summary */}
+                  <ProfileSectionWrapper
+                    title="สรุปข้อมูลส่วนตัว"
+                    onEdit={() => handleOpenEdit("skills")}
+                    id="personal-summary"
+                  >
+                    <Text style={{ fontSize: 15, lineHeight: 1.6 }}>
+                      {profile.specialActivities ||
+                        "ยังไม่มีข้อมูลสรุปเบื้องต้น แนะนำประสบการณ์การสอนของคุณเพื่อให้ทางโรงเรียนรู้จักคุณมากขึ้น..."}
+                    </Text>
+                  </ProfileSectionWrapper>
+
+                  {/* Work Experience */}
+                  <ProfileSectionWrapper
+                    id="work-experience"
+                    title="ประวัติการทำงาน"
+                    onEdit={() => handleOpenEdit("work-experience")}
+                  >
+                    <WorkExperienceSection />
+                  </ProfileSectionWrapper>
+
+                  {/* Education */}
+                  <ProfileSectionWrapper
+                    id="education"
+                    title="ประวัติการศึกษา"
+                    onEdit={() => handleOpenEdit("education")}
+                  >
+                    <EducationHistorySection />
+                  </ProfileSectionWrapper>
+
+                  {/* Teaching & Skills */}
+                  <ProfileSectionWrapper
+                    title="ความเชี่ยวชาญการสอนและทักษะ"
+                    onEdit={() => handleOpenEdit("teaching")}
+                  >
+                    <Flex vertical gap={24} style={{ width: "100%" }}>
+                      <Flex vertical gap={12} style={{ width: "100%" }}>
+                        <Text strong style={{ display: "block" }}>
+                          วิชาที่เชี่ยวชาญ
+                        </Text>
+                        <Space size={[8, 8]} wrap>
+                          {profile.specialization?.length ? (
+                            profile.specialization.map((s) => (
                               <Tag
-                                key={l}
-                                icon={<EnvironmentOutlined />}
+                                key={s}
+                                color="blue"
                                 style={{
                                   padding: "4px 12px",
-                                  borderRadius: "999px",
+                                  borderRadius: 999,
                                 }}
                               >
-                                {l}
+                                {s}
                               </Tag>
                             ))
-                          : null}
-                        {profile.itSkills?.length
-                          ? profile.itSkills.map((i) => (
-                              <Tag
-                                key={i}
-                                color="orange"
-                                style={{
-                                  padding: "4px 12px",
-                                  borderRadius: "999px",
-                                }}
-                              >
-                                {i}
-                              </Tag>
-                            ))
-                          : null}
-                        {!profile.languagesSpoken?.length &&
-                          !profile.itSkills?.length && (
+                          ) : (
                             <Text type="secondary" italic>
                               ยังไม่ได้ระบุ
                             </Text>
                           )}
-                      </Space>
-                    </div>
-                  </Space>
-                </ProfileSectionWrapper>
-              </Space>
-            </Col>
+                        </Space>
+                      </Flex>
+                      <Flex vertical gap={12} style={{ width: "100%" }}>
+                        <Text strong style={{ display: "block" }}>
+                          ทักษะด้านภาษาและไอที
+                        </Text>
+                        <Space size={[8, 8]} wrap>
+                          {profile.languagesSpoken?.length
+                            ? profile.languagesSpoken.map((l) => (
+                                <Tag
+                                  key={l}
+                                  icon={<EnvironmentOutlined />}
+                                  style={{
+                                    padding: "4px 12px",
+                                    borderRadius: 999,
+                                  }}
+                                >
+                                  {l}
+                                </Tag>
+                              ))
+                            : null}
+                          {profile.itSkills?.length
+                            ? profile.itSkills.map((i) => (
+                                <Tag
+                                  key={i}
+                                  color="orange"
+                                  style={{
+                                    padding: "4px 12px",
+                                    borderRadius: 999,
+                                  }}
+                                >
+                                  {i}
+                                </Tag>
+                              ))
+                            : null}
+                          {!profile.languagesSpoken?.length &&
+                            !profile.itSkills?.length && (
+                              <Text type="secondary" italic>
+                                ยังไม่ได้ระบุ
+                              </Text>
+                            )}
+                        </Space>
+                      </Flex>
+                    </Flex>
+                  </ProfileSectionWrapper>
+                </Flex>
+              </Col>
 
-            {/* RIGHT COLUMN: Sidebar Stats & Tools */}
-            <Col span={8} style={{ paddingTop: "40px" }}>
-              <Space
-                direction="vertical"
-                size={32}
-                style={{ width: "100%", position: "sticky", top: "24px" }}
-              >
-                {/* 1. Profile Visibility */}
-                <div style={{ cursor: "pointer" }}>
-                  <Row
-                    justify="space-between"
-                    align="middle"
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <Text strong style={{ fontSize: "16px" }}>
-                      การมองเห็นโปรไฟล์
-                    </Text>
-                    <LinkOutlined style={{ color: "#9ca3af" }} />
-                  </Row>
-                  <Text type="secondary">ระดับเริ่มต้น</Text>
-                  <Divider style={{ margin: "24px 0 0 0" }} />
-                </div>
-
-                {/* 2. Profile Activity */}
-                <div style={{ cursor: "pointer" }}>
-                  <Row
-                    justify="space-between"
-                    align="middle"
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <Text strong style={{ fontSize: "16px" }}>
-                      ความเคลื่อนไหวโปรไฟล์
-                    </Text>
-                    <LinkOutlined style={{ color: "#9ca3af" }} />
-                  </Row>
-                  <Text type="secondary">
-                    คุณปรากฏในการค้นหา <Text strong>109 ครั้ง</Text> สัปดาห์นี้
-                  </Text>
-                  <Divider style={{ margin: "24px 0 0 0" }} />
-                </div>
-
-                {/* 3. Verifications */}
-                <div style={{ cursor: "pointer" }}>
-                  <Row
-                    justify="space-between"
-                    align="middle"
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <Text strong style={{ fontSize: "16px" }}>
-                      การยืนยันตัวตน
-                    </Text>
-                    <LinkOutlined style={{ color: "#9ca3af" }} />
-                  </Row>
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: "14px",
-                      display: "block",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    โปรไฟล์ที่มีการยืนยันตัวตน มีโอกาสถูกเลือกโดยโรงเรียนมากกว่า
-                  </Text>
-                  <Button
-                    block
-                    style={{
-                      height: "40px",
-                      borderColor: "#001529",
-                      color: "#001529",
-                      fontWeight: 600,
-                    }}
-                  >
-                    ยืนยันตัวตนเลย
-                  </Button>
-                  <Divider style={{ margin: "24px 0 0 0" }} />
-                </div>
-
-                {/* 4. Profile Strength */}
-                <Card bordered={false} styles={{ body: { padding: "8px 0" } }}>
-                  <Title
-                    level={4}
-                    style={{ margin: "0 0 16px 0", fontSize: "16px" }}
-                  >
-                    ความสมบูรณ์ของโปรไฟล์
-                  </Title>
-                  <Progress
-                    percent={strengthScore}
-                    strokeColor="#10b981"
-                    showInfo={false}
-                    style={{ marginBottom: "16px" }}
-                  />
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: "14px",
-                      display: "block",
-                      marginBottom: "24px",
-                    }}
-                  >
-                    เพิ่มข้อมูลใบอนุญาตประกอบวิชาชีพเพื่อให้โรงเรียนมั่นใจมากขึ้น
-                  </Text>
-                  <Button
-                    block
-                    style={{
-                      height: "40px",
-                      borderColor: "#001529",
-                      color: "#001529",
-                      fontWeight: 600,
-                    }}
-                  >
-                    เพิ่มใบประกอบวิชาชีพ
-                  </Button>
-                </Card>
-
-                {/* Search promotion card */}
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: "#f9fafb",
-                    borderRadius: "12px",
-                    border: "1px solid #f3f4f6",
-                  }}
-                  styles={{ body: { padding: "24px", textAlign: "center" } }}
-                >
-                  <Space direction="vertical" size={16} align="center">
-                    <Avatar.Group>
-                      <Avatar
-                        style={{ backgroundColor: "#f472b6" }}
-                        icon={<UserOutlined />}
+              {/* RIGHT COLUMN: Sidebar */}
+              <Col span={8} style={{ paddingTop: 40 }}>
+                <Flex vertical gap={32} style={{ position: "sticky", top: 24 }}>
+                  {/* Profile Visibility */}
+                  <Flex vertical gap={8} style={{ cursor: "pointer" }}>
+                    <Row justify="space-between" align="middle">
+                      <Text strong style={{ fontSize: 16 }}>
+                        การมองเห็นโปรไฟล์
+                      </Text>
+                      <LinkOutlined
+                        style={{ color: token.colorTextDescription }}
                       />
-                      <Avatar
-                        style={{ backgroundColor: "#60a5fa" }}
-                        icon={<UserOutlined />}
-                      />
-                      <Avatar
-                        style={{ backgroundColor: "#a78bfa" }}
-                        icon={<UserOutlined />}
-                      />
-                    </Avatar.Group>
-                    <Text strong style={{ fontSize: "16px" }}>
-                      ค้นหาคุณครูท่านอื่น
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: "13px" }}>
-                      ค้นหาคุณครูที่เปิดโปรไฟล์เป็นสาธารณะเพื่อแลกเปลี่ยนเทคนิค
-                    </Text>
-                  </Space>
-                </Card>
-              </Space>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+                    </Row>
+                    <Text type="secondary">ระดับเริ่มต้น</Text>
+                    <Divider style={{ margin: "24px 0 0 0" }} />
+                  </Flex>
 
-      {/* Unified Edit Drawer */}
+                  {/* Profile Activity */}
+                  <Flex vertical gap={8} style={{ cursor: "pointer" }}>
+                    <Row justify="space-between" align="middle">
+                      <Text strong style={{ fontSize: 16 }}>
+                        ความเคลื่อนไหวโปรไฟล์
+                      </Text>
+                      <LinkOutlined
+                        style={{ color: token.colorTextDescription }}
+                      />
+                    </Row>
+                    <Text type="secondary">
+                      คุณปรากฏในการค้นหา <Text strong>109 ครั้ง</Text>{" "}
+                      สัปดาห์นี้
+                    </Text>
+                    <Divider style={{ margin: "24px 0 0 0" }} />
+                  </Flex>
+
+                  {/* Verifications */}
+                  <Flex vertical gap={16} style={{ cursor: "pointer" }}>
+                    <Row justify="space-between" align="middle">
+                      <Text strong style={{ fontSize: 16 }}>
+                        การยืนยันตัวตน
+                      </Text>
+                      <LinkOutlined
+                        style={{ color: token.colorTextDescription }}
+                      />
+                    </Row>
+                    <Text type="secondary" style={{ fontSize: 14 }}>
+                      โปรไฟล์ที่มีการยืนยันตัวตน
+                      มีโอกาสถูกเลือกโดยโรงเรียนมากกว่า
+                    </Text>
+                    <Button
+                      block
+                      style={{
+                        height: 40,
+                        borderColor: token.colorText,
+                        color: token.colorText,
+                        fontWeight: 600,
+                      }}
+                    >
+                      ยืนยันตัวตนเลย
+                    </Button>
+                    <Divider style={{ margin: "8px 0 0 0" }} />
+                  </Flex>
+
+                  {/* Profile Strength */}
+                  <Card>
+                    <Title level={4}>ความสมบูรณ์ของโปรไฟล์</Title>
+                    <Progress
+                      percent={strengthScore}
+                      strokeColor={token.colorSuccess}
+                      showInfo={false}
+                      style={{ marginBottom: 16 }}
+                    />
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 14,
+                        display: "block",
+                        marginBottom: 24,
+                      }}
+                    >
+                      เพิ่มข้อมูลใบอนุญาตประกอบวิชาชีพเพื่อให้โรงเรียนมั่นใจมากขึ้น
+                    </Text>
+                    <Button
+                      block
+                      style={{
+                        height: 40,
+                        borderColor: token.colorText,
+                        color: token.colorText,
+                        fontWeight: 600,
+                      }}
+                    >
+                      เพิ่มใบประกอบวิชาชีพ
+                    </Button>
+                  </Card>
+
+                  {/* Search promotion card */}
+                  <Card
+                    variant="borderless"
+                    style={{
+                      borderRadius: token.borderRadiusLG,
+                      borderColor: token.colorBorderSecondary,
+                    }}
+                    styles={{ body: { padding: 24, textAlign: "center" } }}
+                  >
+                    <Flex vertical gap={16} align="center">
+                      <Avatar.Group>
+                        <Avatar
+                          icon={<UserOutlined />}
+                          style={{ backgroundColor: token.colorError }}
+                        />
+                        <Avatar
+                          icon={<UserOutlined />}
+                          style={{ backgroundColor: token.colorInfo }}
+                        />
+                        <Avatar
+                          icon={<UserOutlined />}
+                          style={{ backgroundColor: token.colorWarning }}
+                        />
+                      </Avatar.Group>
+                      <Text strong style={{ fontSize: 16 }}>
+                        ค้นหาคุณครูท่านอื่น
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 13 }}>
+                        ค้นหาคุณครูที่เปิดโปรไฟล์เป็นสาธารณะเพื่อแลกเปลี่ยนเทคนิค
+                      </Text>
+                    </Flex>
+                  </Card>
+                </Flex>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Content>
+
+      {/* Edit Drawer */}
       <ProfileEditDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -574,6 +546,6 @@ export default function TeacherProfilePage() {
           {editSection === "skills" && <SkillsLocationSection form={form} />}
         </Form>
       </ProfileEditDrawer>
-    </div>
+    </Layout>
   );
 }
