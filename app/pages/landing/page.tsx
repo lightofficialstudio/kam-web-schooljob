@@ -2,21 +2,18 @@
 
 import {
   AppstoreOutlined,
-  BankOutlined,
-  CalendarOutlined,
-  FileSearchOutlined,
   GlobalOutlined,
   MessageOutlined,
   RocketOutlined,
   SearchOutlined,
   SolutionOutlined,
   TrophyOutlined,
-  UsergroupAddOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
   Button,
   Card,
+  Cascader,
   Col,
   Input,
   Row,
@@ -28,6 +25,39 @@ import {
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
+
+const JOB_CATEGORIES = [
+  {
+    value: "academic",
+    label: "การสอน / วิชาการ",
+    children: [
+      { value: "math", label: "ครูคณิตศาสตร์" },
+      { value: "english", label: "ครูภาษาอังกฤษ" },
+      { value: "thai", label: "ครูภาษาไทย" },
+      { value: "science", label: "ครูวิทยาศาสตร์" },
+      { value: "early-childhood", label: "ครูปฐมวัย" },
+    ],
+  },
+  {
+    value: "support",
+    label: "ธุรการ / สนับสนุน",
+    children: [
+      { value: "admin", label: "ธุรการโรงเรียน" },
+      { value: "hr", label: "ฝ่ายบุคคล (HR)" },
+      { value: "finance", label: "การเงิน / บัญชี" },
+      { value: "it-support", label: "IT Support" },
+    ],
+  },
+  {
+    value: "construction",
+    label: "งานก่อสร้างสถาปัตยกรรม",
+    children: [
+      { value: "const-tech", label: "งานช่างก่อสร้าง/อาคาร" },
+      { value: "proj-mgmt", label: "งานบริหารโครงการ" },
+      { value: "arch", label: "งานสถาปนิก" },
+    ],
+  },
+];
 
 export default function LandingPage() {
   return (
@@ -96,86 +126,137 @@ export default function LandingPage() {
             อาจารย์, ติวเตอร์ หรือเจ้าหน้าที่สนับสนุน ครบจบในที่เดียว
           </Paragraph>
 
-          {/* 🔍 Premium Search Bar */}
-          <Card
+          {/* 🔍 Premium Search Bar - Redesigned for better UX */}
+          <div
             style={{
               maxWidth: "1100px",
               margin: "0 auto",
-              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.06)",
-              borderRadius: "24px",
-              padding: "12px",
+              background: "#fff",
+              boxShadow: "0 30px 60px rgba(0, 0, 0, 0.12)",
+              borderRadius: "32px",
+              padding: "16px",
             }}
           >
-            <Row gutter={[16, 16]} align="middle">
-              <Col xs={24} lg={9}>
-                <Input
-                  prefix={<SearchOutlined />}
-                  placeholder="ชื่อตำแหน่งงาน, วิชาเอก หรือชื่อโรงเรียน"
-                  variant="borderless"
-                  style={{ fontSize: "16px", padding: "8px 12px" }}
-                />
+            <Row gutter={[0, 0]} align="middle">
+              {/* 💻 Search Input */}
+              <Col xs={24} lg={8}>
+                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                    ค้นหางานที่คุณสนใจ
+                  </Text>
+                  <Input
+                    prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
+                    placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
+                    variant="borderless"
+                    style={{
+                      fontSize: "17px",
+                      padding: "8px 0",
+                      fontWeight: "500",
+                    }}
+                  />
+                </div>
               </Col>
+
+              {/* 📏 Vertical Divider */}
               <Col xs={0} lg={1}>
                 <div
                   style={{
                     width: "1px",
-                    height: "30px",
+                    height: "48px",
+                    background: "#f0f0f0",
                     margin: "0 auto",
                   }}
                 />
               </Col>
-              <Col xs={24} lg={5}>
-                <Select
-                  placeholder="ตำแหน่งที่สนใจ"
-                  variant="borderless"
-                  style={{ width: "100%", textAlign: "left" }}
-                  suffixIcon={<SolutionOutlined />}
-                >
-                  <Option value="teacher">ครูผู้สอน / อาจารย์</Option>
-                  <Option value="tutor">ติวเตอร์ / ครูอัตราจ้าง</Option>
-                  <Option value="admin">ธุรการ / การเงิน</Option>
-                  <Option value="it">ไอที / ตลาดดิจิทัล</Option>
-                </Select>
+
+              {/* 📂 Job Categories (Cascader) */}
+              <Col xs={24} lg={7}>
+                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                    ประเภทงาน
+                  </Text>
+                  <Cascader
+                    options={JOB_CATEGORIES}
+                    multiple
+                    maxTagCount={1}
+                    // แก้ปัญหา +3 +4 โดยการปรับแต่งการแสดงผล Tag
+                    maxTagPlaceholder={(omittedValues) => (
+                      <Tag color="processing" style={{ borderRadius: "6px" }}>
+                        +{omittedValues.length} ประเภท
+                      </Tag>
+                    )}
+                    placeholder="เลือกตำแหน่งที่สนใจ"
+                    variant="borderless"
+                    style={{
+                      width: "100%",
+                      fontSize: "17px",
+                      padding: "8px 0",
+                    }}
+                    showCheckedStrategy={Cascader.SHOW_CHILD}
+                    suffixIcon={<SolutionOutlined style={{ color: "#1890ff" }} />}
+                    expandTrigger="click"
+                  />
+                </div>
               </Col>
+
+              {/* 📏 Vertical Divider */}
               <Col xs={0} lg={1}>
                 <div
                   style={{
                     width: "1px",
-                    height: "30px",
+                    height: "48px",
+                    background: "#f0f0f0",
                     margin: "0 auto",
                   }}
                 />
               </Col>
-              <Col xs={24} lg={5}>
-                <Select
-                  placeholder="ทุกจังหวัด"
-                  variant="borderless"
-                  style={{ width: "100%", textAlign: "left" }}
-                  suffixIcon={<GlobalOutlined />}
-                >
-                  <Option value="bkk">กรุงเทพมหานคร</Option>
-                  <Option value="center">ภาคกลาง</Option>
-                  <Option value="north">ภาคเหนือ</Option>
-                  <Option value="east">ภาคตะวันออก</Option>
-                </Select>
+
+              {/* 📍 Location Select */}
+              <Col xs={24} lg={4}>
+                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                  <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                    สถานที่
+                  </Text>
+                  <Select
+                    placeholder="ทุกจังหวัด"
+                    variant="borderless"
+                    style={{
+                      width: "100%",
+                      fontSize: "17px",
+                      padding: "8px 0",
+                    }}
+                    suffixIcon={<GlobalOutlined style={{ color: "#1890ff" }} />}
+                  >
+                    <Option value="bkk">กรุงเทพมหานคร</Option>
+                    <Option value="center">ภาคกลาง</Option>
+                    <Option value="north">ภาคเหนือ</Option>
+                    <Option value="east">ภาคตะวันออก</Option>
+                  </Select>
+                </div>
               </Col>
+
+              {/* 🔘 Search Button */}
               <Col xs={24} lg={3}>
-                <Button
-                  type="primary"
-                  block
-                  size="large"
-                  icon={<SearchOutlined />}
-                  style={{
-                    height: "54px",
-                    borderRadius: "16px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ค้นหางาน
-                </Button>
+                <div style={{ padding: "8px" }}>
+                  <Button
+                    type="primary"
+                    block
+                    size="large"
+                    icon={<SearchOutlined style={{ fontSize: "20px" }} />}
+                    style={{
+                      height: "70px",
+                      borderRadius: "24px",
+                      fontWeight: "800",
+                      fontSize: "18px",
+                      boxShadow: "0 10px 20px rgba(24, 144, 255, 0.3)",
+                    }}
+                  >
+                    ค้นหา
+                  </Button>
+                </div>
               </Col>
             </Row>
-          </Card>
+          </div>
 
           <Space direction="vertical" size={8} style={{ marginTop: "24px" }}>
             <Text type="secondary">อาชีพยอดนิยม: </Text>
@@ -202,51 +283,106 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* 📊 Statistics Section */}
-      <div style={{ padding: "40px 24px" }}>
+      {/* 🆕 Latest Job Posts Section */}
+      <div style={{ padding: "80px 24px", backgroundColor: "#f8f9fa" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <Row gutter={[32, 32]}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              marginBottom: "40px",
+            }}
+          >
+            <div>
+              <Badge status="processing" text="อัปเดตล่าสุด" />
+              <Title level={2} style={{ marginTop: "12px", marginBottom: 0 }}>
+                ตำแหน่งงานใหม่ที่น่าสนใจ
+              </Title>
+            </div>
+            <Button type="link" size="large">
+              ดูงานทั้งหมด <RocketOutlined />
+            </Button>
+          </div>
+
+          <Row gutter={[24, 24]}>
             {[
               {
-                label: "ตำแหน่งงานเปิดรับ",
-                value: "2,500+",
-                icon: <FileSearchOutlined />,
+                title: "ครูสอนภาษาอังกฤษ (EP)",
+                school: "โรงเรียนนานาชาติแสงดาว",
+                location: "กรุงเทพมหานคร",
+                salary: "35,000 - 50,000",
+                tags: ["Full-time", "English"],
               },
               {
-                label: "สถาบันการศึกษา",
-                value: "1,200+",
-                icon: <BankOutlined />,
+                title: "ครูอาสาสมัครสอนคณิตศาสตร์",
+                school: "โรงเรียนบ้านนาพัฒนา",
+                location: "เชียงใหม่",
+                salary: "18,000 - 25,000",
+                tags: ["Contract", "Math"],
               },
               {
-                label: "ผู้สมัครโปรไฟล์คุณภาพ",
-                value: "45,000+",
-                icon: <UsergroupAddOutlined />,
+                title: "เจ้าหน้าที่ธุรการประสานงานวิจัย",
+                school: "มหาวิทยาลัยนวัตกรรม",
+                location: "นนทบุรี",
+                salary: "22,000 - 30,000",
+                tags: ["Full-time", "Admin"],
               },
-              {
-                label: "นัดสัมภาษณ์งาน/เดือน",
-                value: "850+",
-                icon: <CalendarOutlined />,
-              },
-            ].map((stat, idx) => (
-              <Col xs={12} md={6} key={idx}>
+            ].map((job, idx) => (
+              <Col xs={24} md={8} key={idx}>
                 <Card
-                  variant="borderless"
-                  style={{ textAlign: "center", borderRadius: "20px" }}
+                  hoverable
+                  style={{ borderRadius: "20px", height: "100%" }}
+                  bodyStyle={{ padding: "24px" }}
                 >
-                  <div
-                    style={{
-                      fontSize: "24px",
-                      marginBottom: "8px",
-                    }}
+                  <Space
+                    direction="vertical"
+                    size={16}
+                    style={{ width: "100%" }}
                   >
-                    {stat.icon}
-                  </div>
-                  <Title level={2} style={{ margin: 0 }}>
-                    {stat.value}
-                  </Title>
-                  <Text type="secondary" strong>
-                    {stat.label}
-                  </Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Badge count="New" color="#52c41a" />
+                      <Text type="secondary" style={{ fontSize: "12px" }}>
+                        2 ชม. ที่แล้ว
+                      </Text>
+                    </div>
+                    <div>
+                      <Title level={4} style={{ marginBottom: "4px" }}>
+                        {job.title}
+                      </Title>
+                      <Text strong style={{ color: "#1890ff" }}>
+                        {job.school}
+                      </Text>
+                    </div>
+                    <Space direction="vertical" size={4}>
+                      <Text type="secondary">
+                        <GlobalOutlined /> {job.location}
+                      </Text>
+                      <Text strong style={{ color: "#52c41a" }}>
+                        ฿ {job.salary}
+                      </Text>
+                    </Space>
+                    <Space size={[4, 4]} wrap>
+                      {job.tags.map((tag) => (
+                        <Tag key={tag} color="blue">
+                          {tag}
+                        </Tag>
+                      ))}
+                    </Space>
+                    <Button
+                      type="primary"
+                      block
+                      style={{ borderRadius: "10px" }}
+                    >
+                      ดูรายละเอียด
+                    </Button>
+                  </Space>
                 </Card>
               </Col>
             ))}
