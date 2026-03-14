@@ -10,6 +10,7 @@ import {
   theme as antTheme,
 } from "antd";
 import { SchoolCard } from "./components/school-card";
+import { SchoolJobsDrawer } from "./components/school-jobs-drawer";
 import { SchoolSearch } from "./components/school-search";
 import { useSchoolStore } from "./stores/school-store";
 
@@ -99,6 +100,7 @@ export default function SchoolDirectoryPage() {
           </Col>
         </Row>
       </Content>
+      <SchoolJobsDrawer />
     </Layout>
   );
 }
