@@ -26,6 +26,7 @@ import {
   Table,
   Tabs,
   Tag,
+  theme,
   Tooltip,
   Typography,
 } from "antd";
@@ -34,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
 // Mock Data สำหรับงานที่โพสต์
 const MOCK_JOBS = [
@@ -83,6 +85,7 @@ const MOCK_JOBS = [
 
 export default function MyJobsPage() {
   const router = useRouter();
+  const { token } = useToken();
   const [searchText, setSearchText] = useState("");
 
   const columns = [
@@ -92,12 +95,12 @@ export default function MyJobsPage() {
       key: "title",
       render: (text: string, record: any) => (
         <Space direction="vertical" size={0}>
-          <Text strong style={{ fontSize: "16px", color: "#1890ff" }}>
+          <Text strong style={{ fontSize: "16px", color: token.colorPrimary }}>
             {text}
           </Text>
           <Space wrap>
             {record.subjects.map((s: string) => (
-              <Tag key={s} color="blue" bordered={false}>
+              <Tag key={s} color="blue" variant="filled">
                 {s}
               </Tag>
             ))}
@@ -150,7 +153,7 @@ export default function MyJobsPage() {
               title="ยอดเข้าชม"
               value={record.views}
               prefix={<EyeOutlined />}
-              valueStyle={{ fontSize: "16px" }}
+              styles={{ content: { fontSize: "16px" } }}
             />
           </Col>
           <Col span={12}>
@@ -159,7 +162,7 @@ export default function MyJobsPage() {
                 title="ผู้สมัคร"
                 value={record.applicants}
                 prefix={<UserAddOutlined />}
-                valueStyle={{ fontSize: "16px" }}
+                styles={{ content: { fontSize: "16px" } }}
               />
             </Badge>
           </Col>
@@ -206,16 +209,16 @@ export default function MyJobsPage() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f4f7f9",
+        backgroundColor: token.colorBgLayout,
         paddingBottom: "100px",
       }}
     >
       {/* Header section */}
       <div
         style={{
-          backgroundColor: "white",
+          backgroundColor: token.colorBgContainer,
           padding: "24px 0",
-          borderBottom: "1px solid #e5e7eb",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
           marginBottom: "32px",
         }}
       >
@@ -249,8 +252,6 @@ export default function MyJobsPage() {
                   size="large"
                   icon={<PlusOutlined />}
                   style={{
-                    backgroundColor: "#e60278",
-                    borderColor: "#e60278",
                     borderRadius: "8px",
                   }}
                 >
@@ -320,7 +321,7 @@ export default function MyJobsPage() {
             <Col flex="auto">
               <Input
                 placeholder="ค้นหาตามชื่อตำแหน่งงาน หรือวิชาที่สอน..."
-                prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
+                prefix={<SearchOutlined style={{ color: token.colorTextPlaceholder }} />}
                 size="large"
                 style={{ borderRadius: "8px" }}
               />
