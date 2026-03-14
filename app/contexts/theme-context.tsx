@@ -91,7 +91,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
         colorBorderSecondary: mode === "dark" ? "#334155" : "#E2E8F0",
         boxShadow: "none",
-        boxShadowCard: "none",
         boxShadowTertiary: "none",
         borderRadiusLG: 16,
         paddingLG: 24,

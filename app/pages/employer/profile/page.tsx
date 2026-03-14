@@ -244,29 +244,31 @@ export default function EmployerProfilePage() {
                     >
                       {profile.name}
                     </Title>
-                    <Space wrap justify="center">
-                      <Tag
-                        color="blue"
-                        style={{
-                          fontSize: "14px",
-                          padding: "4px 12px",
-                          borderRadius: "4px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        <CheckCircleFilled /> ยืนยันตัวตนแล้ว
-                      </Tag>
-                      <Tag
-                        style={{
-                          fontSize: "14px",
-                          padding: "4px 12px",
-                          borderRadius: "4px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {profile.type}
-                      </Tag>
-                    </Space>
+                    <Row justify="center">
+                      <Space wrap>
+                        <Tag
+                          color="blue"
+                          style={{
+                            fontSize: "14px",
+                            padding: "4px 12px",
+                            borderRadius: "4px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          <CheckCircleFilled /> ยืนยันตัวตนแล้ว
+                        </Tag>
+                        <Tag
+                          style={{
+                            fontSize: "14px",
+                            padding: "4px 12px",
+                            borderRadius: "4px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {profile.type}
+                        </Tag>
+                      </Space>
+                    </Row>
                   </Flex>
 
                   <Divider

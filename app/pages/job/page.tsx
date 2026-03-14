@@ -39,7 +39,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 dayjs.extend(relativeTime);
 dayjs.locale("th");
@@ -284,6 +284,14 @@ const MOCK_JOBS = [
 ];
 
 export default function JobSearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <JobSearchPageContent />
+    </Suspense>
+  );
+}
+
+function JobSearchPageContent() {
   const searchParams = useSearchParams();
   const { token } = antTheme.useToken();
 
