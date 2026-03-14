@@ -138,7 +138,9 @@ export default function EmployerProfilePage() {
                 style={{
                   borderRadius: "16px",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)", // เน้นเงาชัดเจนขึ้น
-                  border: `2px solid ${token.colorBorderSecondary}`, // มีขอบให้ตัดชัด
+                  borderWidth: "2px",
+                  borderStyle: "solid",
+                  borderColor: token.colorBorderSecondary, // มีขอบให้ตัดชัด
                   backgroundColor: token.colorBgContainer, // มั่นใจว่ามีพื้นหลังทึบ
                 }}
               >
@@ -149,7 +151,9 @@ export default function EmployerProfilePage() {
                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
                     style={{
                       marginTop: "0", // ลบ Margin ติดลบออกเพื่อให้แสดงภายใน Card ปกติ
-                      border: `6px solid white`,
+                      borderWidth: "6px",
+                      borderStyle: "solid",
+                      borderColor: "white",
                       backgroundColor: "#e60278",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                     }}
@@ -289,7 +293,9 @@ export default function EmployerProfilePage() {
                   style={{
                     borderRadius: "16px",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    border: `2px solid ${token.colorBorderSecondary}`,
+                    borderWidth: "2px",
+                    borderStyle: "solid",
+                    borderColor: token.colorBorderSecondary,
                   }}
                 >
                   <Flex vertical gap={16}>
@@ -324,10 +330,12 @@ export default function EmployerProfilePage() {
                 background: token.colorBgContainer, // พื้นหลังของแถบ Tabs
                 borderRadius: "12px 12px 0 0",
                 padding: "8px 8px 0 8px",
-                borderWidth: "1px",
+                borderTopWidth: "1px",
+                borderLeftWidth: "1px",
+                borderRightWidth: "1px",
+                borderBottomWidth: "0px",
                 borderStyle: "solid",
                 borderColor: token.colorBorderSecondary,
-                borderBottom: "none",
               }}
               items={[
                 {
@@ -349,10 +357,12 @@ export default function EmployerProfilePage() {
                       style={{
                         borderRadius: "0 0 16px 16px",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        borderWidth: "2px",
+                        borderLeftWidth: "2px",
+                        borderRightWidth: "2px",
+                        borderBottomWidth: "2px",
+                        borderTopWidth: "0px",
                         borderStyle: "solid",
                         borderColor: token.colorBorderSecondary,
-                        borderTop: "none",
                         backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
                       }}
                     >
@@ -610,7 +620,9 @@ export default function EmployerProfilePage() {
                             borderRadius: "16px",
                             boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                             backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
-                            border: `2px solid ${token.colorBorderSecondary}`,
+                            borderWidth: "2px",
+                            borderStyle: "solid",
+                            borderColor: token.colorBorderSecondary,
                           }}
                         >
                           <Row gutter={[20, 20]}>
@@ -668,7 +680,9 @@ export default function EmployerProfilePage() {
                           borderRadius: "16px",
                           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                           backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
-                          border: `2px solid ${token.colorBorderSecondary}`,
+                          borderWidth: "2px",
+                          borderStyle: "solid",
+                          borderColor: token.colorBorderSecondary,
                         }}
                       >
                         <Row gutter={[24, 24]}>
@@ -743,7 +757,9 @@ export default function EmployerProfilePage() {
                           borderRadius: "16px",
                           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                           backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
-                          border: `2px solid ${token.colorBorderSecondary}`,
+                          borderWidth: "2px",
+                          borderStyle: "solid",
+                          borderColor: token.colorBorderSecondary,
                         }}
                       >
                         <Flex vertical gap={20}>
@@ -755,7 +771,7 @@ export default function EmployerProfilePage() {
                             justify="center"
                             style={{
                               borderRadius: "12px",
-                              heightWidth: "1px",
+                              borderWidth: "1px",
                               borderStyle: "solid",
                               borderColor: "#d9d9d9",
                             }}
