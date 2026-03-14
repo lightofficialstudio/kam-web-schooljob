@@ -26,7 +26,13 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
 
   return (
     <Drawer
-      title={<span style={{ fontSize: "18px", fontWeight: 700, color: token.colorText }}>{title}</span>}
+      title={
+        <span
+          style={{ fontSize: "18px", fontWeight: 700, color: token.colorText }}
+        >
+          {title}
+        </span>
+      }
       placement="right"
       onClose={onClose}
       open={isOpen}
@@ -34,32 +40,35 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       styles={{
         header: { borderBottom: `1px solid ${token.colorBorderSecondary}` },
         body: { padding: "24px" },
-        footer: { borderTop: `1px solid ${token.colorBorderSecondary}`, padding: "16px 24px" }
+        footer: {
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
+          padding: "16px 24px",
+        },
       }}
       footer={
         <Space size={12} style={{ width: "100%", justifyContent: "flex-end" }}>
-          <Button 
-            onClick={onClose} 
+          <Button
+            onClick={onClose}
             size="large"
-            style={{ 
-              minWidth: "120px", 
-              height: "48px", 
+            style={{
+              minWidth: "120px",
+              height: "48px",
               fontSize: "16px",
-              borderRadius: token.borderRadiusLG
+              borderRadius: token.borderRadiusLG,
             }}
           >
             ยกเลิก
           </Button>
-          <Button 
-            type="primary" 
-            onClick={onSave} 
+          <Button
+            type="primary"
+            onClick={onSave}
             loading={loading}
             size="large"
-            style={{ 
-              minWidth: "160px", 
-              height: "48px", 
+            style={{
+              minWidth: "160px",
+              height: "48px",
               fontSize: "16px",
-              borderRadius: token.borderRadiusLG
+              borderRadius: token.borderRadiusLG,
             }}
           >
             บันทึกข้อมูล

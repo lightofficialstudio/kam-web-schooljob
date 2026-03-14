@@ -134,6 +134,14 @@ export default function Navbar() {
                 ฝากประวัติ
               </Text>
             </Link>
+            <Link
+              href="/pages/teacher/school"
+              style={{ textDecoration: "none" }}
+            >
+              <Text strong style={{ cursor: "pointer" }}>
+                โรงเรียน
+              </Text>
+            </Link>
             <Link href="/pages/blog" style={{ textDecoration: "none" }}>
               <Text strong style={{ cursor: "pointer" }}>
                 บทความ
