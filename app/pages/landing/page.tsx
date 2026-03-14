@@ -69,6 +69,7 @@ export default function LandingPage() {
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
+          background: "linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)",
         }}
       >
         {/* Decorative elements */}
@@ -134,7 +135,7 @@ export default function LandingPage() {
               background: "#fff",
               boxShadow: "0 30px 60px rgba(0, 0, 0, 0.12)",
               borderRadius: "32px",
-              padding: "16px",
+              padding: "24px",
             }}
           >
             <Row gutter={[0, 0]} align="middle">
@@ -147,30 +148,20 @@ export default function LandingPage() {
                   <Input
                     prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
                     placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
-                    variant="borderless"
                     style={{
-                      fontSize: "17px",
-                      padding: "8px 0",
+                      fontSize: "16px",
+                      padding: "12px 16px",
                       fontWeight: "500",
+                      borderRadius: "12px",
+                      border: "1px solid #e8e8e8",
+                      backgroundColor: "#f5f5f5",
                     }}
                   />
                 </div>
               </Col>
 
-              {/* 📏 Vertical Divider */}
-              <Col xs={0} lg={1}>
-                <div
-                  style={{
-                    width: "1px",
-                    height: "48px",
-                    background: "#f0f0f0",
-                    margin: "0 auto",
-                  }}
-                />
-              </Col>
-
               {/* 📂 Job Categories (Cascader) */}
-              <Col xs={24} lg={7}>
+              <Col xs={24} lg={9}>
                 <div style={{ padding: "0 24px", textAlign: "left" }}>
                   <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
                     ประเภทงาน
@@ -179,52 +170,39 @@ export default function LandingPage() {
                     options={JOB_CATEGORIES}
                     multiple
                     maxTagCount={1}
-                    // แก้ปัญหา +3 +4 โดยการปรับแต่งการแสดงผล Tag
                     maxTagPlaceholder={(omittedValues) => (
                       <Tag color="processing" style={{ borderRadius: "6px" }}>
                         +{omittedValues.length} ประเภท
                       </Tag>
                     )}
                     placeholder="เลือกตำแหน่งที่สนใจ"
-                    variant="borderless"
                     style={{
                       width: "100%",
-                      fontSize: "17px",
-                      padding: "8px 0",
+                      fontSize: "16px",
                     }}
+                    size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}
-                    suffixIcon={<SolutionOutlined style={{ color: "#1890ff" }} />}
+                    suffixIcon={
+                      <SolutionOutlined style={{ color: "#1890ff" }} />
+                    }
                     expandTrigger="click"
                   />
                 </div>
               </Col>
 
-              {/* 📏 Vertical Divider */}
-              <Col xs={0} lg={1}>
-                <div
-                  style={{
-                    width: "1px",
-                    height: "48px",
-                    background: "#f0f0f0",
-                    margin: "0 auto",
-                  }}
-                />
-              </Col>
-
               {/* 📍 Location Select */}
-              <Col xs={24} lg={4}>
+              <Col xs={24} lg={7}>
                 <div style={{ padding: "0 24px", textAlign: "left" }}>
                   <Text strong style={{ fontSize: "14px", color: "#8c8c8c" }}>
                     สถานที่
                   </Text>
                   <Select
                     placeholder="ทุกจังหวัด"
-                    variant="borderless"
                     style={{
                       width: "100%",
-                      fontSize: "17px",
-                      padding: "8px 0",
+                      fontSize: "16px",
                     }}
+                    size="large"
                     suffixIcon={<GlobalOutlined style={{ color: "#1890ff" }} />}
                   >
                     <Option value="bkk">กรุงเทพมหานคร</Option>
@@ -234,28 +212,94 @@ export default function LandingPage() {
                   </Select>
                 </div>
               </Col>
-
-              {/* 🔘 Search Button */}
-              <Col xs={24} lg={3}>
-                <div style={{ padding: "8px" }}>
-                  <Button
-                    type="primary"
-                    block
-                    size="large"
-                    icon={<SearchOutlined style={{ fontSize: "20px" }} />}
-                    style={{
-                      height: "70px",
-                      borderRadius: "24px",
-                      fontWeight: "800",
-                      fontSize: "18px",
-                      boxShadow: "0 10px 20px rgba(24, 144, 255, 0.3)",
-                    }}
-                  >
-                    ค้นหา
-                  </Button>
-                </div>
-              </Col>
             </Row>
+
+            {/* � Advanced Filters Row */}
+            <div
+              style={{
+                marginTop: "24px",
+                padding: "0 24px",
+                paddingTop: "16px",
+                borderTop: "1px solid #f0f0f0",
+              }}
+            >
+              <Row gutter={[16, 16]}>
+                <Col xs={12} md={6} lg={5}>
+                  <Select
+                    placeholder="รูปแบบการจ้างงาน"
+                    style={{ width: "100%" }}
+                    size="large"
+                    allowClear
+                  >
+                    <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
+                    <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
+                    <Option value="contract">สัญญาจ้าง / อัตราจ้าง</Option>
+                  </Select>
+                </Col>
+                <Col xs={12} md={6} lg={5}>
+                  <Select
+                    placeholder="ใบประกอบวิชาชีพ"
+                    style={{ width: "100%" }}
+                    size="large"
+                    allowClear
+                  >
+                    <Option value="required">ต้องมีใบประกอบฯ</Option>
+                    <Option value="not-required">ไม่ต้องมีใบประกอบฯ</Option>
+                    <Option value="pending">อยู่ระหว่างขอรับใบประกอบฯ</Option>
+                  </Select>
+                </Col>
+                <Col xs={12} md={6} lg={5}>
+                  <Select
+                    placeholder="ช่วงเงินเดือน"
+                    style={{ width: "100%" }}
+                    size="large"
+                    allowClear
+                  >
+                    <Option value="0-15000">ต่ำกว่า 15,000</Option>
+                    <Option value="15000-25000">15,000 - 25,000</Option>
+                    <Option value="25000-40000">25,000 - 40,000</Option>
+                    <Option value="40000+">40,000 ขึ้นไป</Option>
+                  </Select>
+                </Col>
+                <Col xs={12} md={6} lg={5}>
+                  <Select
+                    placeholder="ประกาศเมื่อ"
+                    style={{ width: "100%" }}
+                    size="large"
+                    allowClear
+                  >
+                    <Option value="today">วันนี้</Option>
+                    <Option value="3days">3 วันที่ผ่านมา</Option>
+                    <Option value="7days">7 วันที่ผ่านมา</Option>
+                    <Option value="30days">30 วันที่ผ่านมา</Option>
+                  </Select>
+                </Col>
+                <Col xs={24} lg={4}>
+                  <Button type="link" block style={{ color: "#8c8c8c" }}>
+                    รีเซ็ตเงื่อนไข
+                  </Button>
+                </Col>
+              </Row>
+            </div>
+
+            {/* �🔘 Search Button - Moved to bottom */}
+            <div style={{ marginTop: "24px", padding: "0 8px" }}>
+              <Button
+                type="primary"
+                block
+                size="large"
+                icon={<SearchOutlined style={{ fontSize: "20px" }} />}
+                style={{
+                  height: "60px",
+                  borderRadius: "20px",
+                  fontWeight: "800",
+                  fontSize: "18px",
+                  boxShadow: "0 10px 20px rgba(24, 144, 255, 0.2)",
+                }}
+              >
+                ค้นหาตำแหน่งงานเลยตอนนี้
+              </Button>
+            </div>
           </div>
 
           <Space direction="vertical" size={8} style={{ marginTop: "24px" }}>
@@ -284,7 +328,14 @@ export default function LandingPage() {
       </div>
 
       {/* 🆕 Latest Job Posts Section */}
-      <div style={{ padding: "80px 24px", backgroundColor: "#f8f9fa" }}>
+      <div
+        style={{
+          padding: "80px 24px",
+          background: "#fdfdfd",
+          borderTop: "1px solid #f0f0f0",
+          borderBottom: "1px solid #f0f0f0",
+        }}
+      >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div
             style={{
@@ -305,7 +356,18 @@ export default function LandingPage() {
             </Button>
           </div>
 
-          <Row gutter={[24, 24]}>
+          <div
+            style={{
+              overflowX: "auto",
+              paddingBottom: "20px",
+              display: "flex",
+              gap: "24px",
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+            className="job-scroll-container"
+          >
             {[
               {
                 title: "ครูสอนภาษาอังกฤษ (EP)",
@@ -328,8 +390,28 @@ export default function LandingPage() {
                 salary: "22,000 - 30,000",
                 tags: ["Full-time", "Admin"],
               },
+              {
+                title: "ครูสอนศิลปะ (Part-time)",
+                school: "สถาบันอาร์ตดีล",
+                location: "กรุงเทพมหานคร",
+                salary: "500 - 800 / ชม.",
+                tags: ["Part-time", "Art"],
+              },
+              {
+                title: "หัวหน้าฝ่ายวิชาการ",
+                school: "โรงเรียนปัญญาวิมล",
+                location: "ชลบุรี",
+                salary: "45,000 - 60,000",
+                tags: ["Full-time", "Management"],
+              },
             ].map((job, idx) => (
-              <Col xs={24} md={8} key={idx}>
+              <div
+                key={idx}
+                style={{
+                  minWidth: "350px",
+                  flexShrink: 0,
+                }}
+              >
                 <Card
                   hoverable
                   style={{ borderRadius: "20px", height: "100%" }}
@@ -353,7 +435,7 @@ export default function LandingPage() {
                       </Text>
                     </div>
                     <div>
-                      <Title level={4} style={{ marginBottom: "4px" }}>
+                      <Title level={4} style={{ marginBottom: "4px", height: "56px", overflow: "hidden" }}>
                         {job.title}
                       </Title>
                       <Text strong style={{ color: "#1890ff" }}>
@@ -384,14 +466,25 @@ export default function LandingPage() {
                     </Button>
                   </Space>
                 </Card>
-              </Col>
+              </div>
             ))}
-          </Row>
+          </div>
+          
+          <style jsx global>{`
+            .job-scroll-container::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
         </div>
       </div>
 
       {/* 🏢 Employer Solutions Section */}
-      <div style={{ padding: "100px 24px" }}>
+      <div
+        style={{
+          padding: "100px 24px",
+          background: "linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)",
+        }}
+      >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <Row gutter={[64, 48]} align="middle">
             <Col xs={24} md={12}>
@@ -470,7 +563,13 @@ export default function LandingPage() {
       </div>
 
       {/* 🎓 Job Seeker Features */}
-      <div style={{ padding: "80px 24px" }}>
+      <div
+        style={{
+          padding: "80px 24px",
+          background: "#fafafa",
+          borderTop: "1px solid #f0f0f0",
+        }}
+      >
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center" }}
         >
