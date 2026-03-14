@@ -1,6 +1,6 @@
 "use client";
 
-import { Space, Typography, theme } from "antd";
+import { Flex, Typography, theme } from "antd";
 import React from "react";
 
 const { Text } = Typography;
@@ -19,7 +19,7 @@ export const StatisticItem: React.FC<StatisticItemProps> = ({
   const { token } = theme.useToken();
 
   return (
-    <Space align="start" size={12}>
+    <Flex align="flex-start" gap={12}>
       <div
         style={{
           padding: "8px",
@@ -33,14 +33,14 @@ export const StatisticItem: React.FC<StatisticItemProps> = ({
       >
         {icon}
       </div>
-      <Space direction="vertical" size={0}>
+      <Flex vertical gap={0}>
         <Text type="secondary" style={{ fontSize: "12px", display: "block" }}>
           {label}
         </Text>
         <Text strong style={{ fontSize: "15px" }}>
           {value}
         </Text>
-      </Space>
-    </Space>
+      </Flex>
+    </Flex>
   );
 };
