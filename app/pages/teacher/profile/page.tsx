@@ -197,7 +197,7 @@ export default function TeacherProfilePage() {
                         <Avatar
                           size={140}
                           icon={<UserOutlined />}
-                          src={profile.profileImageUrl}
+                          src={profile.profileImageUrl || null}
                           style={{
                             border: "4px solid #fff",
                             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
