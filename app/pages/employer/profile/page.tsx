@@ -1,16 +1,21 @@
 "use client";
 
+import BaseModal from "@/app/components/layouts/modal/base-modal";
 import {
   BankOutlined,
+  BookOutlined,
   CalendarOutlined,
   CheckCircleFilled,
   EditOutlined,
   EnvironmentOutlined,
   GlobalOutlined,
+  InfoCircleOutlined,
   MailOutlined,
+  MedicineBoxOutlined,
   PhoneOutlined,
   SafetyCertificateOutlined,
   TeamOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -18,81 +23,100 @@ import {
   Card,
   Col,
   Divider,
+  Flex,
   List,
   Row,
   Space,
   Tabs,
   Tag,
+  theme,
   Typography,
 } from "antd";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
+import { ProfileEditDrawer } from "./components/profile-edit-drawer";
+import { StatisticItem } from "./components/statistic-item";
+import {
+  SchoolProfile,
+  useSchoolProfileStore,
+} from "./stores/school-profile-store";
 
 const { Title, Text, Paragraph } = Typography;
 
-const MOCK_SCHOOL_PROFILE = {
-  name: "โรงเรียนนานาชาติคัมสคูล (Kam School International)",
-  type: "โรงเรียนเอกชน (นานาชาติ)",
-  location: "เขตจตุจักร, กรุงเทพมหานคร",
-  address: "123/45 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900",
-  website: "www.kamschool.ac.th",
-  email: "hr@kamschool.ac.th",
-  phone: "02-123-4567",
-  established: "2545 (24 ปี)",
-  size: "500 - 1,000 คน",
-  description:
-    "โรงเรียนนานาชาติคัมสคูล มุ่งเน้นการพัฒนาศักยภาพผู้เรียนสู่ความเป็นเลิศในระดับสากล ผ่านนวัตกรรมการเรียนรู้ที่ทันสมัยและสภาพแวดล้อมที่เอื้อต่อการสร้างสรรค์ เรากำลังมองหาบุคลากรทางการศึกษาที่มีความมุ่งมั่นเพื่อมาร่วมเป็นส่วนหนึ่งของครอบครัวเรา",
-  vision: "สร้างผู้นำแห่งอนาคต ด้วยคุณธรรมและนวัตกรรม",
-  gallery: [
-    "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1523050335392-9bf5675f42ec?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop",
-  ],
-};
-
 export default function EmployerProfilePage() {
+  const { profile, setProfile, setIsDrawerOpen } = useSchoolProfileStore();
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const { token } = theme.useToken();
+
+  const handleEditClick = () => {
+    setIsDrawerOpen(true);
+  };
+
+  const handleSave = (values: SchoolProfile) => {
+    setProfile(values);
+    setIsDrawerOpen(false);
+    setIsSuccessModalOpen(true);
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f8fafc",
+        backgroundColor: token.colorBgLayout,
         paddingBottom: "80px",
       }}
     >
       {/* 🌟 Header Banner Section */}
-      <div
+      <Flex
+        vertical
+        align="center"
+        justify="center"
         style={{
           height: "280px",
-          background: "linear-gradient(135deg, #001e45 0%, #003370 100%)",
+          background: "#001e45", // ทึบ มองง่าย
           position: "relative",
+          overflow: "hidden",
         }}
       >
         <div
           style={{
             maxWidth: "1200px",
+            width: "100%",
             margin: "0 auto",
             height: "100%",
             position: "relative",
           }}
         >
           <img
-            src="https://illustrations.popsy.co/white/work-from-home.svg"
+            src="/images/flat/undraw_hiring_8szx.svg"
             alt="Decoration"
             style={{
               position: "absolute",
               right: "40px",
-              bottom: "0",
-              height: "100%",
-              opacity: 0.2,
+              bottom: "20px",
+              height: "200px",
+              zIndex: 0,
             }}
           />
+          <Flex
+            vertical
+            justify="center"
+            style={{ height: "100%", padding: "0 40px", position: "relative", zIndex: 1 }}
+          >
+            <Title level={1} style={{ color: "white", margin: 0, fontSize: "48px" }}>
+              โปรไฟล์โรงเรียน
+            </Title>
+            <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "20px" }}>
+              จัดการข้อมูลและประกาศรับสมัครงานของคุณ
+            </Text>
+          </Flex>
         </div>
-      </div>
+      </Flex>
 
       <div
         style={{
           maxWidth: "1100px",
-          margin: "-80px auto 0",
+          margin: "-40px auto 0", // ดัน Card ลงมาเพิ่มขึ้น (จากเดิม -60px เป็น -40px) เพื่อให้มีพื้นที่ห่างจากขอบบนมากขึ้น
           padding: "0 24px",
           position: "relative",
           zIndex: 1,
@@ -101,224 +125,179 @@ export default function EmployerProfilePage() {
         <Row gutter={[24, 24]}>
           {/* 🟦 Left Column: Profile Info Card */}
           <Col xs={24} lg={8}>
-            <Card
-              variant="borderless"
-              style={{
-                borderRadius: "24px",
-                textAlign: "center",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
-              }}
-            >
-              <Avatar
-                size={140}
-                icon={<BankOutlined />}
-                src="https://api.dicebear.com/7.x/initials/svg?seed=KS"
+            <Flex vertical gap={24}>
+              <Card
+                variant="borderless"
                 style={{
-                  marginTop: "-110px",
-                  border: "6px solid white",
-                  backgroundColor: "#e60278",
-                  boxShadow: "0 8px 24px rgba(230,2,120,0.2)",
-                }}
-              />
-              <div style={{ marginTop: "16px" }}>
-                <Title level={3} style={{ margin: 0 }}>
-                  {MOCK_SCHOOL_PROFILE.name}
-                </Title>
-                <Tag
-                  color="blue"
-                  style={{ marginTop: "8px", borderRadius: "4px" }}
-                >
-                  <CheckCircleFilled /> ยืนยันตัวตนแล้ว
-                </Tag>
-              </div>
-
-              <Divider />
-
-              <div style={{ textAlign: "left" }}>
-                <Space direction="vertical" size={16} style={{ width: "100%" }}>
-                  <Space>
-                    <EnvironmentOutlined style={{ color: "#8c8c8c" }} />{" "}
-                    <Text>{MOCK_SCHOOL_PROFILE.location}</Text>
-                  </Space>
-                  <Space>
-                    <GlobalOutlined style={{ color: "#8c8c8c" }} />{" "}
-                    <a href={MOCK_SCHOOL_PROFILE.website}>
-                      {MOCK_SCHOOL_PROFILE.website}
-                    </a>
-                  </Space>
-                  <Space>
-                    <MailOutlined style={{ color: "#8c8c8c" }} />{" "}
-                    <Text>{MOCK_SCHOOL_PROFILE.email}</Text>
-                  </Space>
-                  <Space>
-                    <PhoneOutlined style={{ color: "#8c8c8c" }} />{" "}
-                    <Text>{MOCK_SCHOOL_PROFILE.phone}</Text>
-                  </Space>
-                </Space>
-              </div>
-
-              <Button
-                block
-                type="primary"
-                icon={<EditOutlined />}
-                style={{
-                  marginTop: "24px",
-                  height: "45px",
-                  borderRadius: "12px",
-                  backgroundColor: "#001e45",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)", // เน้นเงาชัดเจนขึ้น
+                  border: `2px solid ${token.colorBorderSecondary}`, // มีขอบให้ตัดชัด
+                  backgroundColor: token.colorBgContainer, // มั่นใจว่ามีพื้นหลังทึบ
                 }}
               >
-                แก้ไขข้อมูลโปรไฟล์
-              </Button>
-            </Card>
+                <Flex vertical align="center" gap={16}>
+                  <Avatar
+                    size={140}
+                    icon={<BankOutlined />}
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
+                    style={{
+                      marginTop: "-90px",
+                      border: `6px solid white`,
+                      backgroundColor: "#e60278",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    }}
+                  />
+                  <Flex
+                    vertical
+                    align="center"
+                    gap={8}
+                    style={{ width: "100%" }}
+                  >
+                    <Title level={2} style={{ margin: 0, textAlign: "center", fontSize: "28px" }}>
+                      {profile.name}
+                    </Title>
+                    <Space wrap justify="center">
+                      <Tag color="blue" style={{ fontSize: "14px", padding: "4px 12px", borderRadius: "4px", fontWeight: "bold" }}>
+                        <CheckCircleFilled /> ยืนยันตัวตนแล้ว
+                      </Tag>
+                      <Tag style={{ fontSize: "14px", padding: "4px 12px", borderRadius: "4px", fontWeight: "bold" }}>
+                        {profile.type}
+                      </Tag>
+                    </Space>
+                  </Flex>
 
-            <Card
-              title="ภาพถ่ายโรงเรียน"
-              variant="borderless"
-              style={{
-                borderRadius: "24px",
-                marginTop: "24px",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
-              }}
-            >
-              <Row gutter={[8, 8]}>
-                {MOCK_SCHOOL_PROFILE.gallery.map((img, idx) => (
-                  <Col span={24} key={idx}>
-                    <img
-                      src={img}
-                      alt="School"
-                      style={{
-                        width: "100%",
-                        height: "120px",
-                        objectFit: "cover",
-                        borderRadius: "12px",
-                      }}
-                    />
-                  </Col>
-                ))}
-              </Row>
-            </Card>
+                  <Divider style={{ margin: "16px 0", borderBlockStart: `2px solid ${token.colorBorderSecondary}` }} />
+
+                  <Flex
+                    vertical
+                    gap={20}
+                    style={{ width: "100%" }}
+                    align="start"
+                  >
+                    <Space align="start" size={12}>
+                      <EnvironmentOutlined
+                        style={{
+                          color: "#e60278",
+                          fontSize: "20px",
+                          marginTop: "4px",
+                        }}
+                      />
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.location}</Text>
+                    </Space>
+                    {profile.website && (
+                      <Space size={12}>
+                        <GlobalOutlined
+                          style={{ color: "#e60278", fontSize: "20px" }}
+                        />
+                        <a
+                          href={`https://${profile.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ fontSize: "16px", fontWeight: 500, color: token.colorPrimary }}
+                        >
+                          {profile.website}
+                        </a>
+                      </Space>
+                    )}
+                    <Space size={12}>
+                      <MailOutlined
+                        style={{ color: "#e60278", fontSize: "20px" }}
+                      />
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.email}</Text>
+                    </Space>
+                    <Space size={12}>
+                      <PhoneOutlined
+                        style={{ color: "#e60278", fontSize: "20px" }}
+                      />
+                      <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.phone}</Text>
+                    </Space>
+                  </Flex>
+
+                  <Button
+                    block
+                    type="primary"
+                    size="large"
+                    icon={<EditOutlined />}
+                    onClick={handleEditClick}
+                    style={{
+                      marginTop: "16px",
+                      height: "54px",
+                      borderRadius: "8px",
+                      background: "#001e45",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    แก้ไขข้อมูลโปรไฟล์
+                  </Button>
+                </Flex>
+              </Card>
+
+              {/* Section 5: School Photos */}
+              {profile.gallery && profile.gallery.length > 0 && (
+                <Card
+                  title={<Title level={4} style={{ margin: 0 }}>ภาพถ่ายโรงเรียน</Title>}
+                  variant="borderless"
+                  style={{
+                    borderRadius: "16px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    border: `2px solid ${token.colorBorderSecondary}`,
+                  }}
+                >
+                  <Flex vertical gap={16}>
+                    {profile.gallery.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt="School"
+                        style={{
+                          width: "100%",
+                          height: "180px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                          border: `1px solid ${token.colorBorder}`,
+                        }}
+                      />
+                    ))}
+                  </Flex>
+                </Card>
+              )}
+            </Flex>
           </Col>
 
           {/* ⬜ Right Column: Details & Jobs */}
           <Col xs={24} lg={16}>
             <Tabs
-              defaultActiveKey="1"
+              defaultActiveKey="2"
               size="large"
-              tabBarStyle={{ marginBottom: "24px" }}
+              type="card" // แบบ Card เห็นชัดกว่า
+              tabBarStyle={{ 
+                marginBottom: "24px",
+                background: token.colorBgContainer, // พื้นหลังของแถบ Tabs
+                borderRadius: "12px 12px 0 0",
+                padding: "8px 8px 0 8px",
+                border: `1px solid ${token.colorBorderSecondary}`,
+                borderBottom: "none"
+              }}
               items={[
                 {
-                  key: "1",
-                  label: "ข้อมูลโรงเรียน",
-                  children: (
-                    <Space
-                      direction="vertical"
-                      size={24}
-                      style={{ width: "100%" }}
-                    >
-                      <Card
-                        variant="borderless"
-                        style={{
-                          borderRadius: "24px",
-                          boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
-                        }}
-                      >
-                        <Title level={4}>
-                          <SafetyCertificateOutlined
-                            style={{ color: "#e60278" }}
-                          />{" "}
-                          เกี่ยวกับเรา
-                        </Title>
-                        <Paragraph
-                          style={{
-                            color: "#4b5563",
-                            fontSize: "16px",
-                            lineHeight: "1.8",
-                          }}
-                        >
-                          {MOCK_SCHOOL_PROFILE.description}
-                        </Paragraph>
-
-                        <Divider />
-
-                        <Row gutter={[24, 24]}>
-                          <Col span={12}>
-                            <StatisticItem
-                              label="ประเภทโรงเรียน"
-                              value={MOCK_SCHOOL_PROFILE.type}
-                              icon={<BankOutlined />}
-                            />
-                          </Col>
-                          <Col span={12}>
-                            <StatisticItem
-                              label="จำนวนบุคลากร"
-                              value={MOCK_SCHOOL_PROFILE.size}
-                              icon={<TeamOutlined />}
-                            />
-                          </Col>
-                          <Col span={12}>
-                            <StatisticItem
-                              label="ก่อตั้งเมื่อปี"
-                              value={MOCK_SCHOOL_PROFILE.established}
-                              icon={<CalendarOutlined />}
-                            />
-                          </Col>
-                          <Col span={12}>
-                            <StatisticItem
-                              label="วิสัยทัศน์"
-                              value={MOCK_SCHOOL_PROFILE.vision}
-                              icon={<GlobalOutlined />}
-                            />
-                          </Col>
-                        </Row>
-                      </Card>
-
-                      <Card
-                        variant="borderless"
-                        style={{
-                          borderRadius: "24px",
-                          boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
-                        }}
-                      >
-                        <Title level={4}>ที่ตั้งโรงเรียน</Title>
-                        <Text type="secondary">
-                          {MOCK_SCHOOL_PROFILE.address}
-                        </Text>
-                        <div
-                          style={{
-                            marginTop: "16px",
-                            borderRadius: "16px",
-                            overflow: "hidden",
-                            height: "250px",
-                            backgroundColor: "#eef2f6",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Space direction="vertical" align="center">
-                            <EnvironmentOutlined
-                              style={{ fontSize: "32px", color: "#e60278" }}
-                            />
-                            <Text type="secondary">Google Map Placeholder</Text>
-                          </Space>
-                        </div>
-                      </Card>
-                    </Space>
-                  ),
-                },
-                {
                   key: "2",
-                  label: "ประกาศรับสมัครงาน",
+                  label: <span style={{ padding: "0 20px", fontSize: "18px", fontWeight: "bold" }}>ประกาศรับสมัครงาน</span>,
                   children: (
                     <Card
                       variant="borderless"
                       style={{
-                        borderRadius: "24px",
-                        boxShadow: "0 20px 40px rgba(0,0,0,0.05)",
+                        borderRadius: "0 0 16px 16px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        border: `2px solid ${token.colorBorderSecondary}`,
+                        borderTop: "none",
+                        backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
                       }}
                     >
-                      <Title level={4}>ตำแหน่งที่กำลังเปิดรับ</Title>
+                      <Flex align="center" justify="space-between" style={{ marginBottom: "20px" }}>
+                        <Title level={3} style={{ margin: 0 }}>ตำแหน่งที่เปิดรับ</Title>
+                        <img src="/images/flat/undraw_job-offers_55y0.svg" style={{ height: "60px" }} alt="Jobs" />
+                      </Flex>
                       <List
                         itemLayout="horizontal"
                         dataSource={[
@@ -335,29 +314,38 @@ export default function EmployerProfilePage() {
                         ]}
                         renderItem={(item) => (
                           <List.Item
+                            style={{
+                              padding: "20px",
+                              border: `1px solid ${token.colorBorderSecondary}`,
+                              borderRadius: "12px",
+                              marginBottom: "16px",
+                              background: token.colorBgContainer
+                            }}
                             actions={[
                               <Link href="/pages/employer/job/read" key="view">
-                                ดูรายละเอียด
+                                <Button type="primary" size="middle" style={{ borderRadius: "6px", fontWeight: "bold" }}>ดูรายละเอียด</Button>
                               </Link>,
                             ]}
                           >
                             <List.Item.Meta
                               avatar={
                                 <Avatar
+                                  size={48}
                                   icon={<TeamOutlined />}
                                   style={{
-                                    backgroundColor: "#f0f9ff",
-                                    color: "#0369a1",
+                                    backgroundColor: "#f0f5ff",
+                                    color: "#2f54eb",
+                                    border: "1px solid #adc6ff"
                                   }}
                                 />
                               }
-                              title={<Text strong>{item.title}</Text>}
+                              title={<Text style={{ fontSize: "18px", fontWeight: "bold" }}>{item.title}</Text>}
                               description={
-                                <Space split={<Divider type="vertical" />}>
-                                  <Text type="secondary">
+                                <Space split={<Divider type="vertical" />} style={{ marginTop: "4px" }}>
+                                  <Text style={{ fontSize: "14px", color: token.colorTextSecondary }}>
                                     <CalendarOutlined /> {item.date}
                                   </Text>
-                                  <Text type="secondary">
+                                  <Text style={{ fontSize: "14px", color: "#e60278", fontWeight: "bold" }}>
                                     <TeamOutlined /> {item.applicants} ผู้สมัคร
                                   </Text>
                                 </Space>
@@ -369,44 +357,227 @@ export default function EmployerProfilePage() {
                     </Card>
                   ),
                 },
+                {
+                  key: "1",
+                  label: <span style={{ padding: "0 20px", fontSize: "18px", fontWeight: "bold" }}>ข้อมูลโรงเรียน</span>,
+                  children: (
+                    <Flex vertical gap={24}>
+                      {/* Section 3: About School */}
+                      {(profile.description || profile.vision) && (
+                        <Card
+                          variant="borderless"
+                          style={{
+                            borderRadius: "16px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            border: `2px solid ${token.colorBorderSecondary}`,
+                            backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
+                          }}
+                        >
+                          {profile.description && (
+                            <Flex vertical gap={16}>
+                              <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ background: "#e60278", padding: "8px", borderRadius: "8px", display: "flex" }}>
+                                  <SafetyCertificateOutlined style={{ color: "white" }} />
+                                </div>
+                                เกี่ยวกับเรา
+                              </Title>
+                              <Paragraph
+                                style={{
+                                  color: token.colorText,
+                                  fontSize: "18px",
+                                  lineHeight: "1.8",
+                                  whiteSpace: "pre-line",
+                                }}
+                              >
+                                {profile.description}
+                              </Paragraph>
+                            </Flex>
+                          )}
+                          {profile.vision && (
+                            <Flex vertical gap={16} style={{ marginTop: "32px" }}>
+                              <Divider style={{ borderBlockStart: `2px solid ${token.colorBorderSecondary}` }} />
+                              <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ background: "#001e45", padding: "8px", borderRadius: "8px", display: "flex" }}>
+                                  <ThunderboltOutlined style={{ color: "white" }} />
+                                </div>
+                                วิสัยทัศน์
+                              </Title>
+                              <Paragraph
+                                style={{
+                                  color: token.colorText,
+                                  fontSize: "18px",
+                                  lineHeight: "1.8",
+                                }}
+                              >
+                                {profile.vision}
+                              </Paragraph>
+                            </Flex>
+                          )}
+                        </Card>
+                      )}
+
+                      {/* Section 4: Benefits */}
+                      {profile.benefits && profile.benefits.length > 0 && (
+                        <Card
+                          title={
+                            <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+                              <div style={{ background: "#52c41a", padding: "8px", borderRadius: "8px", display: "flex" }}>
+                                <MedicineBoxOutlined style={{ color: "white" }} />
+                              </div>
+                              สวัสดิการและจุดเด่น
+                            </Title>
+                          }
+                          variant="borderless"
+                          style={{
+                            borderRadius: "16px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
+                            border: `2px solid ${token.colorBorderSecondary}`,
+                          }}
+                        >
+                          <Row gutter={[20, 20]}>
+                            {profile.benefits.map((benefit, index) => (
+                              <Col xs={24} sm={12} key={index}>
+                                <Space size={12}>
+                                  <CheckCircleFilled
+                                    style={{ color: "#52c41a", fontSize: "20px" }}
+                                  />
+                                  <Text style={{ fontSize: "17px", fontWeight: 500 }}>{benefit}</Text>
+                                </Space>
+                              </Col>
+                            ))}
+                          </Row>
+                        </Card>
+                      )}
+
+                      {/* Section 6: Additional Info */}
+                      <Card
+                        title={
+                          <Title level={3} style={{ margin: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{ background: "#fa8c16", padding: "8px", borderRadius: "8px", display: "flex" }}>
+                              <InfoCircleOutlined style={{ color: "white" }} />
+                            </div>
+                            ข้อมูลเพิ่มเติม
+                          </Title>
+                        }
+                        variant="borderless"
+                        style={{
+                          borderRadius: "16px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
+                          border: `2px solid ${token.colorBorderSecondary}`,
+                        }}
+                      >
+                        <Row gutter={[24, 24]}>
+                          {profile.type && (
+                            <Col xs={24} sm={12}>
+                              <StatisticItem
+                                label="ประเภทโรงเรียน"
+                                value={profile.type}
+                                icon={<BankOutlined style={{ fontSize: "24px" }} />}
+                              />
+                            </Col>
+                          )}
+                          {profile.size && (
+                            <Col xs={24} sm={12}>
+                              <StatisticItem
+                                label="จำนวนบุคลากร"
+                                value={profile.size}
+                                icon={<TeamOutlined style={{ fontSize: "24px" }} />}
+                              />
+                            </Col>
+                          )}
+                          {profile.curriculum && (
+                            <Col xs={24} sm={12}>
+                              <StatisticItem
+                                label="หลักสูตร"
+                                value={profile.curriculum}
+                                icon={<BookOutlined style={{ fontSize: "24px" }} />}
+                              />
+                            </Col>
+                          )}
+                          {profile.established && (
+                            <Col xs={24} sm={12}>
+                              <StatisticItem
+                                label="ก่อตั้งเมื่อปี"
+                                value={profile.established}
+                                icon={<CalendarOutlined style={{ fontSize: "24px" }} />}
+                              />
+                            </Col>
+                          )}
+                          {profile.levels && profile.levels.length > 0 && (
+                            <Col span={24}>
+                              <StatisticItem
+                                label="ระดับชั้นที่เปิดสอน"
+                                value={profile.levels.join(", ")}
+                                icon={<EditOutlined style={{ fontSize: "24px" }} />}
+                              />
+                            </Col>
+                          )}
+                        </Row>
+                      </Card>
+
+                      <Card
+                        title={<Title level={4} style={{ margin: 0 }}>ที่ตั้งโรงเรียน</Title>}
+                        variant="borderless"
+                        style={{
+                          borderRadius: "16px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          backgroundColor: token.colorBgContainer, // เพิ่มพื้นหลังทึบ
+                          border: `2px solid ${token.colorBorderSecondary}`,
+                        }}
+                      >
+                        <Flex vertical gap={20}>
+                          <Text style={{ fontSize: "16px", fontWeight: 500 }}>{profile.address}</Text>
+                          <Flex
+                            align="center"
+                            justify="center"
+                            style={{
+                              borderRadius: "12px",
+                              height: "300px",
+                              backgroundColor: "#f5f5f5",
+                              border: "1px solid #d9d9d9"
+                            }}
+                          >
+                            <Space direction="vertical" align="center">
+                              <EnvironmentOutlined
+                                style={{ fontSize: "48px", color: "#e60278" }}
+                              />
+                              <Text style={{ fontSize: "18px", color: "#8c8c8c" }}>
+                                Google Map Placeholder
+                              </Text>
+                            </Space>
+                          </Flex>
+                        </Flex>
+                      </Card>
+                    </Flex>
+                  ),
+                },
               ]}
             />
           </Col>
         </Row>
       </div>
-    </div>
-  );
-}
 
-function StatisticItem({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Space align="start" size={12}>
-      <div
-        style={{
-          padding: "8px",
-          backgroundColor: "#f1f5f9",
-          borderRadius: "8px",
-          color: "#1e293b",
-        }}
+      <ProfileEditDrawer onSave={handleSave} />
+
+      <BaseModal
+        open={isSuccessModalOpen}
+        onCancel={() => setIsSuccessModalOpen(false)}
+        type="success"
+        mainTitle="อัปเดตข้อมูลสำเร็จ"
+        subTitle="ข้อมูลโปรไฟล์โรงเรียนของคุณถูกบันทึกเรียบร้อยแล้ว"
+        icon={<CheckCircleFilled style={{ color: token.colorSuccess }} />}
       >
-        {icon}
-      </div>
-      <div>
-        <Text type="secondary" style={{ fontSize: "12px", display: "block" }}>
-          {label}
-        </Text>
-        <Text strong style={{ fontSize: "15px" }}>
-          {value}
-        </Text>
-      </div>
-    </Space>
+        <Button
+          block
+          type="primary"
+          size="large"
+          onClick={() => setIsSuccessModalOpen(false)}
+        >
+          ตกลง
+        </Button>
+      </BaseModal>
+    </div>
   );
 }
