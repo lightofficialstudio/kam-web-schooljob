@@ -539,7 +539,7 @@ export default function LandingPage() {
                 <Card
                   hoverable
                   style={{ borderRadius: "20px", height: "100%" }}
-                  bodyStyle={{ padding: "24px" }}
+                  styles={{ body: { padding: "24px" } }}
                 >
                   <Space
                     direction="vertical"
