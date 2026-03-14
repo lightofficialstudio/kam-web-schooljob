@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Drawer, Space } from "antd";
+import { Button, Drawer, Space, theme as antTheme } from "antd";
 import React, { ReactNode } from "react";
 
 interface ProfileEditDrawerProps {
@@ -22,33 +22,52 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
   children,
   width = 520,
 }) => {
+  const { token } = antTheme.useToken();
+
   return (
     <Drawer
-      title={<span className="text-lg font-bold text-gray-800">{title}</span>}
+      title={<span style={{ fontSize: "18px", fontWeight: 700, color: token.colorText }}>{title}</span>}
       placement="right"
       onClose={onClose}
       open={isOpen}
       width={width}
-      extra={
-        <Space>
-          <Button onClick={onClose}>ยกเลิก</Button>
-          <Button type="primary" onClick={onSave} loading={loading}>
-            บันทึก
+      styles={{
+        header: { borderBottom: `1px solid ${token.colorBorderSecondary}` },
+        body: { padding: "24px" },
+        footer: { borderTop: `1px solid ${token.colorBorderSecondary}`, padding: "16px 24px" }
+      }}
+      footer={
+        <Space size={12} style={{ width: "100%", justifyContent: "flex-end" }}>
+          <Button 
+            onClick={onClose} 
+            size="large"
+            style={{ 
+              minWidth: "120px", 
+              height: "48px", 
+              fontSize: "16px",
+              borderRadius: token.borderRadiusLG
+            }}
+          >
+            ยกเลิก
+          </Button>
+          <Button 
+            type="primary" 
+            onClick={onSave} 
+            loading={loading}
+            size="large"
+            style={{ 
+              minWidth: "160px", 
+              height: "48px", 
+              fontSize: "16px",
+              borderRadius: token.borderRadiusLG
+            }}
+          >
+            บันทึกข้อมูล
           </Button>
         </Space>
       }
-      footer={
-        <div className="flex justify-end p-2 px-4 border-t border-gray-100">
-          <Space>
-            <Button onClick={onClose}>ปิด</Button>
-            <Button type="primary" onClick={onSave} loading={loading}>
-              บันทึกข้อมูล
-            </Button>
-          </Space>
-        </div>
-      }
     >
-      <div className="py-2">{children}</div>
+      {children}
     </Drawer>
   );
 };
