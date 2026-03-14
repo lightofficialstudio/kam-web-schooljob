@@ -15,19 +15,35 @@ import {
   Card,
   Col,
   Divider,
+  Empty,
   Input,
   Row,
   Space,
   Tabs,
   Tag,
+  theme,
   Typography,
 } from "antd";
 import Link from "next/link";
 import { useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
+const { useToken } = theme;
 
 // Mock Data สำหรับบทความ
+interface Blog {
+  id: number;
+  title: string;
+  excerpt: string;
+  category: string;
+  author: string;
+  date: string;
+  views: string;
+  readingTime: string;
+  image: string;
+  featured: boolean;
+}
+
 const CATEGORIES = [
   { key: "all", label: "ทั้งหมด" },
   { key: "career", label: "การพัฒนาวิชาชีพ" },
@@ -37,7 +53,7 @@ const CATEGORIES = [
   { key: "news", label: "ข่าวการศึกษา" },
 ];
 
-const MOCK_BLOGS = [
+const MOCK_BLOGS: Blog[] = [
   {
     id: 1,
     title: "5 เทคนิครับมือการสอนเด็ก Gen Alpha ให้สนุกและได้ความรู้",
@@ -111,11 +127,12 @@ const MOCK_BLOGS = [
 ];
 
 export default function BlogListPage() {
+  const { token } = useToken();
   const [activeTab, setActiveTab] = useState("all");
   const [searchText, setSearchText] = useState("");
 
   const filteredBlogs = MOCK_BLOGS.filter(
-    (blog) =>
+    (blog: Blog) =>
       (activeTab === "all" ||
         blog.category === CATEGORIES.find((c) => c.key === activeTab)?.label) &&
       (blog.title.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -128,55 +145,89 @@ export default function BlogListPage() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f9f9f9",
+        backgroundColor: token.colorBgLayout,
         paddingBottom: "80px",
       }}
     >
       {/* 1. Hero Section */}
       <div
         style={{
-          backgroundColor: "#001e45",
-          padding: "60px 0 100px 0",
-          color: "white",
+          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive || token.colorPrimary} 100%)`,
+          padding: "80px 0 120px 0",
+          color: token.colorWhite,
           textAlign: "center",
-          background: "linear-gradient(135deg, #001e45 0%, #003366 100%)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <Title level={1} style={{ color: "white", marginBottom: "16px" }}>
-          บทความเพื่อคุณครู
-        </Title>
-        <Text
+        <div
           style={{
-            color: "rgba(255,255,255,0.8)",
-            fontSize: "18px",
-            display: "block",
-            marginBottom: "32px",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.1,
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+            backgroundSize: "32px 32px",
           }}
-        >
-          แหล่งรวมความรู้ เทคนิคการสอน และแรงบันดาลใจเพื่อการพัฒนาวิชาชีพครู
-        </Text>
-        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "0 20px" }}>
-          <Input
-            prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
-            placeholder="ค้นหาบทความที่คุณสนใจ..."
-            size="large"
+        />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <Title
+            level={1}
             style={{
-              borderRadius: "30px",
-              height: "54px",
-              border: "none",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              color: token.colorWhite,
+              marginBottom: "16px",
+              fontWeight: 800,
             }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+          >
+            บทความเพื่อคุณครู
+          </Title>
+          <Text
+            style={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "18px",
+              display: "block",
+              marginBottom: "40px",
+              maxWidth: "800px",
+              margin: "0 auto 40px auto",
+              padding: "0 20px",
+            }}
+          >
+            แหล่งรวมความรู้ เทคนิคการสอน
+            และแรงบันดาลใจเพื่อการพัฒนาวิชาชีพครูในยุคดิจิทัล
+          </Text>
+          <div
+            style={{ maxWidth: "600px", margin: "0 auto", padding: "0 20px" }}
+          >
+            <Input
+              prefix={
+                <SearchOutlined style={{ color: token.colorTextPlaceholder }} />
+              }
+              placeholder="ค้นหาบทความที่คุณสนใจ..."
+              size="large"
+              style={{
+                borderRadius: "12px",
+                height: "56px",
+                border: "none",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                fontSize: "16px",
+              }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
       <div
         style={{
-          maxWidth: "1200px",
-          margin: "-40px auto 0 auto",
+          maxWidth: "1240px",
+          margin: "-60px auto 0 auto",
           padding: "0 20px",
+          position: "relative",
+          zIndex: 2,
         }}
       >
         {/* 2. Featured Post */}
@@ -185,10 +236,11 @@ export default function BlogListPage() {
             <Card
               hoverable
               style={{
-                borderRadius: "16px",
+                borderRadius: "20px",
                 border: "none",
                 overflow: "hidden",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+                boxShadow: token.boxShadowSecondary,
+                background: token.colorBgContainer,
               }}
               styles={{ body: { padding: 0 } }}
             >
@@ -196,7 +248,7 @@ export default function BlogListPage() {
                 <Col xs={24} md={12}>
                   <div
                     style={{
-                      height: "400px",
+                      height: "450px",
                       backgroundImage: `url(${featuredBlog.image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
@@ -207,35 +259,62 @@ export default function BlogListPage() {
                   xs={24}
                   md={12}
                   style={{
-                    padding: "40px",
+                    padding: "48px",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                   }}
                 >
-                  <Space style={{ marginBottom: "16px" }}>
-                    <Tag color="volcano" style={{ borderRadius: "4px" }}>
+                  <Space style={{ marginBottom: "20px" }}>
+                    <Tag
+                      color="volcano"
+                      style={{ borderRadius: "6px", padding: "4px 12px" }}
+                    >
                       บทความแนะนำ <FireOutlined />
                     </Tag>
-                    <Tag color="blue">{featuredBlog.category}</Tag>
+                    <Tag
+                      color="processing"
+                      style={{ borderRadius: "6px", padding: "4px 12px" }}
+                    >
+                      {featuredBlog.category}
+                    </Tag>
                   </Space>
-                  <Title level={2}>{featuredBlog.title}</Title>
-                  <Paragraph style={{ color: "#666", fontSize: "16px" }}>
+                  <Title
+                    level={2}
+                    style={{ marginBottom: "20px", lineHeight: 1.3 }}
+                  >
+                    {featuredBlog.title}
+                  </Title>
+                  <Paragraph
+                    style={{
+                      color: token.colorTextSecondary,
+                      fontSize: "17px",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     {featuredBlog.excerpt}
                   </Paragraph>
-                  <div style={{ marginTop: "auto" }}>
+                  <div style={{ marginTop: "32px" }}>
                     <Space
-                      split={<Divider type="vertical" />}
-                      style={{ color: "#8c8c8c" }}
+                      split={
+                        <Divider
+                          type="vertical"
+                          style={{ borderColor: token.colorBorder }}
+                        />
+                      }
+                      style={{ color: token.colorTextDescription }}
                     >
                       <Space>
-                        <UserOutlined /> {featuredBlog.author}
+                        <UserOutlined />{" "}
+                        <Text type="secondary">{featuredBlog.author}</Text>
                       </Space>
                       <Space>
-                        <CalendarOutlined /> {featuredBlog.date}
+                        <CalendarOutlined />{" "}
+                        <Text type="secondary">{featuredBlog.date}</Text>
                       </Space>
                       <Space>
-                        <ClockCircleOutlined /> {featuredBlog.readingTime}
+                        <ClockCircleOutlined />{" "}
+                        <Text type="secondary">{featuredBlog.readingTime}</Text>
                       </Space>
                     </Space>
                   </div>
@@ -245,8 +324,8 @@ export default function BlogListPage() {
           </Link>
         )}
 
-        {/* 3. Category Tabs & Filters */}
-        <div style={{ marginTop: "60px", marginBottom: "40px" }}>
+        {/* 3. Category Tabs */}
+        <div style={{ marginTop: "64px", marginBottom: "48px" }}>
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
@@ -255,12 +334,15 @@ export default function BlogListPage() {
               label: cat.label,
             }))}
             size="large"
-            tabBarStyle={{ borderBottom: "2px solid #e8e8e8" }}
+            tabBarStyle={{
+              borderBottom: `2px solid ${token.colorBorderSecondary}`,
+              marginBottom: "32px",
+            }}
           />
         </div>
 
         {/* 4. Blog Grid */}
-        <Row gutter={[24, 48]}>
+        <Row gutter={[32, 48]}>
           {filteredBlogs
             .filter((b) => !b.featured || searchText)
             .map((blog) => (
@@ -269,49 +351,85 @@ export default function BlogListPage() {
                   <Card
                     hoverable
                     style={{
-                      borderRadius: "12px",
+                      borderRadius: "16px",
                       border: "none",
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
+                      background: token.colorBgContainer,
                     }}
                     cover={
                       <div
                         style={{
-                          height: "240px",
+                          height: "230px",
                           backgroundImage: `url(${blog.image})`,
                           backgroundSize: "cover",
                           backgroundPosition: "center",
-                          borderTopLeftRadius: "12px",
-                          borderTopRightRadius: "12px",
+                          borderTopLeftRadius: "16px",
+                          borderTopRightRadius: "16px",
+                          position: "relative",
                         }}
-                      />
+                      >
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "16px",
+                            left: "16px",
+                          }}
+                        >
+                          <Tag
+                            color="blue"
+                            variant="filled"
+                            style={{
+                              borderRadius: "6px",
+                              backdropFilter: "blur(4px)",
+                              background: "rgba(24, 144, 255, 0.85)",
+                              border: "none",
+                            }}
+                          >
+                            {blog.category}
+                          </Tag>
+                        </div>
+                      </div>
                     }
                   >
-                    <div style={{ marginBottom: "12px" }}>
-                      <Tag color="blue" style={{ borderRadius: "4px" }}>
-                        {blog.category}
-                      </Tag>
-                    </div>
                     <Title
                       level={4}
-                      style={{ margin: "0 0 12px 0", minHeight: "64px" }}
+                      style={{
+                        margin: "0 0 16px 0",
+                        minHeight: "64px",
+                        lineHeight: 1.4,
+                      }}
                     >
                       {blog.title}
                     </Title>
                     <Paragraph
                       ellipsis={{ rows: 3 }}
-                      style={{ color: "#666", marginBottom: "24px" }}
+                      style={{
+                        color: token.colorTextSecondary,
+                        marginBottom: "24px",
+                        fontSize: "14px",
+                        lineHeight: 1.6,
+                      }}
                     >
                       {blog.excerpt}
                     </Paragraph>
                     <div style={{ marginTop: "auto" }}>
-                      <Divider style={{ margin: "16px 0" }} />
-                      <Row justify="space-between">
+                      <Divider
+                        style={{
+                          margin: "16px 0",
+                          borderColor: token.colorBorderSecondary,
+                        }}
+                      />
+                      <Row justify="space-between" align="middle">
                         <Col>
                           <Space size={8}>
-                            <Avatar size="small" icon={<UserOutlined />} />
+                            <Avatar
+                              size="small"
+                              icon={<UserOutlined />}
+                              style={{ backgroundColor: token.colorPrimary }}
+                            />
                             <Text type="secondary" style={{ fontSize: "12px" }}>
                               {blog.author}
                             </Text>
@@ -320,12 +438,15 @@ export default function BlogListPage() {
                         <Col>
                           <Space
                             size={12}
-                            style={{ color: "#bfbfbf", fontSize: "12px" }}
+                            style={{
+                              color: token.colorTextDescription,
+                              fontSize: "12px",
+                            }}
                           >
-                            <Space>
+                            <Space size={4}>
                               <ClockCircleOutlined /> {blog.readingTime}
                             </Space>
-                            <Space>
+                            <Space size={4}>
                               <EyeOutlined /> {blog.views}
                             </Space>
                           </Space>
@@ -340,67 +461,91 @@ export default function BlogListPage() {
 
         {/* 5. Empty State */}
         {filteredBlogs.length === 0 && (
-          <div style={{ textAlign: "center", padding: "100px 0" }}>
-            <BookOutlined
-              style={{
-                fontSize: "64px",
-                color: "#d9d9d9",
-                marginBottom: "24px",
-              }}
-            />
-            <Title level={4} style={{ color: "#bfbfbf" }}>
-              ไม่พบบทความที่คุณกำลังค้นหา
-            </Title>
-            <Button
-              type="primary"
-              onClick={() => {
-                setActiveTab("all");
-                setSearchText("");
-              }}
+          <div style={{ textAlign: "center", padding: "120px 0" }}>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <Text type="secondary" style={{ fontSize: "16px" }}>
+                  ไม่พบบทความที่คุณกำลังค้นหา
+                </Text>
+              }
             >
-              แสดงบทความทั้งหมด
-            </Button>
+              <Button
+                type="primary"
+                size="large"
+                shape="round"
+                style={{ marginTop: "16px" }}
+                onClick={() => {
+                  setActiveTab("all");
+                  setSearchText("");
+                }}
+              >
+                แสดงบทความทั้งหมด
+              </Button>
+            </Empty>
           </div>
         )}
 
         {/* 6. Newsletter / CTA */}
         <Card
           style={{
-            marginTop: "80px",
-            borderRadius: "16px",
-            backgroundColor: "#fff",
-            border: "1px solid #f0f0f0",
+            marginTop: "100px",
+            borderRadius: "24px",
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
             textAlign: "center",
-            padding: "40px",
+            padding: "48px",
+            boxShadow: "0 4px 30px rgba(0,0,0,0.03)",
           }}
         >
-          <Title level={3}>รับบทความใหม่ๆ ก่อนใคร</Title>
-          <Paragraph
-            type="secondary"
-            style={{ fontSize: "16px", marginBottom: "32px" }}
-          >
-            ลงทะเบียนเพื่อรับข่าวสารและบทความดีๆ
-            สำหรับครูส่งตรงถึงอีเมลของคุณทุกสัปดาห์
-          </Paragraph>
-          <Space.Compact style={{ width: "100%", maxWidth: "500px" }}>
-            <Input
-              size="large"
-              placeholder="ระบุอีเมลของคุณที่นี่..."
-              style={{ height: "48px" }}
-            />
-            <Button
-              type="primary"
-              size="large"
+          <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+            <div
               style={{
-                height: "48px",
-                backgroundColor: "#e60278",
-                borderColor: "#e60278",
-                fontWeight: 600,
+                width: "64px",
+                height: "64px",
+                background: token.colorPrimaryBg,
+                borderRadius: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 24px auto",
+                fontSize: "24px",
+                color: token.colorPrimary,
               }}
             >
-              ติดตามเลย
-            </Button>
-          </Space.Compact>
+              <BookOutlined />
+            </div>
+            <Title level={2} style={{ marginBottom: "16px" }}>
+              รับความรู้ใหม่ๆ ก่อนใคร
+            </Title>
+            <Paragraph
+              type="secondary"
+              style={{ fontSize: "16px", marginBottom: "40px" }}
+            >
+              ลงทะเบียนเพื่อรับข่าวสารและบทความดีๆ
+              สำหรับครูส่งตรงถึงอีเมลของคุณทุกสัปดาห์
+              ร่วมเป็นส่วนหนึ่งของชุมชนครูคุณภาพ
+            </Paragraph>
+            <Space.Compact style={{ width: "100%" }}>
+              <Input
+                size="large"
+                placeholder="ระบุอีเมลของคุณที่นี่..."
+                style={{ height: "54px", borderRadius: "12px 0 0 12px" }}
+              />
+              <Button
+                type="primary"
+                size="large"
+                style={{
+                  height: "54px",
+                  borderRadius: "0 12px 12px 0",
+                  fontWeight: 600,
+                  padding: "0 32px",
+                }}
+              >
+                ติดตามเลย
+              </Button>
+            </Space.Compact>
+          </div>
         </Card>
       </div>
     </div>
