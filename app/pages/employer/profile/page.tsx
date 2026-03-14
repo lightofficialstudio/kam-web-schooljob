@@ -123,7 +123,7 @@ export default function EmployerProfilePage() {
       <div
         style={{
           maxWidth: "1100px",
-          margin: "-40px auto 0", // ดัน Card ลงมาเพิ่มขึ้น (จากเดิม -60px เป็น -40px) เพื่อให้มีพื้นที่ห่างจากขอบบนมากขึ้น
+          margin: "40px auto 0", // เปลี่ยนจาก -40px เป็น 40px เพื่อให้ไม่ทับกับส่วน Header
           padding: "0 24px",
           position: "relative",
           zIndex: 1,
@@ -148,7 +148,7 @@ export default function EmployerProfilePage() {
                     icon={<BankOutlined />}
                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
                     style={{
-                      marginTop: "-90px",
+                      marginTop: "0", // ลบ Margin ติดลบออกเพื่อให้แสดงภายใน Card ปกติ
                       border: `6px solid white`,
                       backgroundColor: "#e60278",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
