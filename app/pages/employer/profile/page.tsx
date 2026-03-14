@@ -31,6 +31,7 @@ import {
   theme,
   Typography,
 } from "antd";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ProfileEditDrawer } from "./components/profile-edit-drawer";
@@ -86,17 +87,25 @@ export default function EmployerProfilePage() {
             position: "relative",
           }}
         >
-          <img
-            src="/images/flat/undraw_hiring_8szx.svg"
-            alt="Decoration"
+          <div
             style={{
               position: "absolute",
               right: "40px",
               bottom: "20px",
               height: "200px",
+              width: "300px",
               zIndex: 0,
             }}
-          />
+          >
+            <Image
+              src="/images/flat/undraw_hiring_8szx.svg"
+              alt="Decoration"
+              fill
+              style={{
+                objectFit: "contain",
+              }}
+            />
+          </div>
           <Flex
             vertical
             justify="center"
@@ -300,18 +309,28 @@ export default function EmployerProfilePage() {
                 >
                   <Flex vertical gap={16}>
                     {profile.gallery.map((img, idx) => (
-                      <img
+                      <div
                         key={idx}
-                        src={img}
-                        alt="School"
                         style={{
                           width: "100%",
                           height: "180px",
-                          objectFit: "cover",
+                          position: "relative",
                           borderRadius: "8px",
-                          border: `1px solid ${token.colorBorder}`,
+                          overflow: "hidden",
+                          borderWidth: "1px",
+                          borderStyle: "solid",
+                          borderColor: token.colorBorder,
                         }}
-                      />
+                      >
+                        <Image
+                          src={img}
+                          alt="School"
+                          fill
+                          style={{
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
                     ))}
                   </Flex>
                 </Card>
@@ -374,11 +393,22 @@ export default function EmployerProfilePage() {
                         <Title level={3} style={{ margin: 0 }}>
                           ตำแหน่งที่เปิดรับ
                         </Title>
-                        <img
-                          src="/images/flat/undraw_job-offers_55y0.svg"
-                          style={{ height: "60px" }}
-                          alt="Jobs"
-                        />
+                        <div
+                          style={{
+                            height: "60px",
+                            width: "100px",
+                            position: "relative",
+                          }}
+                        >
+                          <Image
+                            src="/images/flat/undraw_job-offers_55y0.svg"
+                            alt="Jobs"
+                            fill
+                            style={{
+                              objectFit: "contain",
+                            }}
+                          />
+                        </div>
                       </Flex>
                       <Flex vertical gap={16}>
                         {[
