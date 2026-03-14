@@ -11,6 +11,11 @@ import {
   SearchOutlined,
   StopOutlined,
   UserAddOutlined,
+  FileSearchOutlined,
+  TeamOutlined,
+  ThunderboltOutlined,
+  ArrowRightOutlined,
+  CheckOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
@@ -29,6 +34,9 @@ import {
   theme,
   Tooltip,
   Typography,
+  Progress,
+  List,
+  Avatar,
 } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -264,6 +272,86 @@ export default function MyJobsPage() {
       </div>
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+        {/* ✨ [New Section] Recruitment Insights Header */}
+        <Row gutter={[24, 24]} style={{ marginBottom: "32px" }}>
+          <Col xs={24} lg={16}>
+            <Card 
+              variant="borderless" 
+              style={{ 
+                borderRadius: "16px",
+                background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`,
+                color: "#fff"
+              }}
+            >
+              <Row gutter={24} align="middle">
+                <Col flex="auto">
+                  <Title level={3} style={{ color: "#fff", margin: 0 }}>
+                    ความสำเร็จในการรับสมัคร <ThunderboltOutlined />
+                  </Title>
+                  <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: "16px" }}>
+                    ในเดือนนี้คุณได้รับผู้สมัครใหม่เพิ่มขึ้น 24% จากเดือนที่แล้ว
+                  </Text>
+                  <div style={{ marginTop: "24px" }}>
+                    <Space size={32}>
+                      <Statistic 
+                        title={<span style={{ color: "rgba(255,255,255,0.65)" }}>สัมภาษณ์แล้ว</span>} 
+                        value={12} 
+                        valueStyle={{ color: "#fff" }} 
+                        suffix={<span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)" }}>คน</span>}
+                      />
+                      <Statistic 
+                        title={<span style={{ color: "rgba(255,255,255,0.65)" }}>ตอบรับเข้าทำงาน</span>} 
+                        value={4} 
+                        valueStyle={{ color: "#fff" }}
+                        suffix={<span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)" }}>คน</span>}
+                      />
+                    </Space>
+                  </div>
+                </Col>
+                <Col>
+                  <Progress 
+                    type="circle" 
+                    percent={75} 
+                    strokeColor="#fff" 
+                    trailColor="rgba(255,255,255,0.2)"
+                    format={(percent) => (
+                      <div style={{ color: "#fff" }}>
+                        <div style={{ fontSize: "20px", fontWeight: "bold" }}>{percent}%</div>
+                        <div style={{ fontSize: "10px" }}>เป้าหมาย</div>
+                      </div>
+                    )}
+                  />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+          <Col xs={24} lg={8}>
+            <Card 
+              title={<Space><CheckOutlined /> รีบด่วน (Urgent Action)</Space>} 
+              variant="borderless" 
+              style={{ borderRadius: "16px", height: "100%" }}
+            >
+              <List
+                size="small"
+                dataSource={[
+                  { title: "มีผู้สมัครใหม่ 5 คน", desc: "ตำแหน่งครูอังกฤษ", time: "2 ชม. ที่แล้ว" },
+                  { title: "ประกาศกำลังจะหมดอายุ", desc: "ตำแหน่งครูอนุบาล", time: "ใน 2 วัน" },
+                ]}
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[<Button type="link" size="small" icon={<ArrowRightOutlined />} />]}
+                  >
+                    <List.Item.Meta
+                      title={<Text strong style={{ fontSize: "13px" }}>{item.title}</Text>}
+                      description={<Text type="secondary" style={{ fontSize: "12px" }}>{item.desc} • {item.time}</Text>}
+                    />
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+        </Row>
+
         {/* Overall Statistics */}
         <Row gutter={24} style={{ marginBottom: "32px" }}>
           <Col span={6}>
@@ -313,34 +401,63 @@ export default function MyJobsPage() {
         </Row>
 
         {/* Filters & Search */}
-        <Card
-          variant="borderless"
-          style={{ borderRadius: "12px", marginBottom: "24px" }}
-        >
-          <Row gutter={16} align="middle">
-            <Col flex="auto">
-              <Input
-                placeholder="ค้นหาตามชื่อตำแหน่งงาน หรือวิชาที่สอน..."
-                prefix={<SearchOutlined style={{ color: token.colorTextPlaceholder }} />}
-                size="large"
-                style={{ borderRadius: "8px" }}
-              />
-            </Col>
-            <Col>
-              <Tabs
-                defaultActiveKey="1"
-                items={[
-                  {
-                    key: "1",
-                    label: `เปิดรับสมัคร (${MOCK_JOBS.filter((j) => j.status === "ACTIVE").length})`,
-                  },
-                  { key: "2", label: "ปิดรับสมัครแล้ว" },
-                  { key: "3", label: "ฉบับร่าง" },
-                ]}
-              />
-            </Col>
-          </Row>
-        </Card>
+        <Row gutter={24} align="middle" style={{ marginBottom: "24px" }}>
+          <Col flex="auto">
+            <Card variant="borderless" style={{ borderRadius: "12px" }}>
+              <Row gutter={16} align="middle">
+                <Col flex="auto">
+                  <Input
+                    placeholder="ค้นหาตามชื่อตำแหน่งงาน หรือวิชาที่สอน..."
+                    prefix={
+                      <SearchOutlined
+                        style={{ color: token.colorTextPlaceholder }}
+                      />
+                    }
+                    size="large"
+                    style={{ borderRadius: "8px" }}
+                  />
+                </Col>
+                <Col>
+                  <Tabs
+                    defaultActiveKey="1"
+                    items={[
+                      {
+                        key: "1",
+                        label: `เปิดรับสมัคร (${MOCK_JOBS.filter((j) => (j as any).status === "ACTIVE").length})`,
+                      },
+                      { key: "2", label: "ปิดรับสมัครแล้ว" },
+                      { key: "3", label: "ฉบับร่าง" },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card
+              variant="borderless"
+              style={{
+                borderRadius: "12px",
+                backgroundColor: token.colorWarningBg,
+                border: `1px solid ${token.colorWarningBorder}`,
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+              }}
+              styles={{ body: { padding: "12px 20px" } }}
+            >
+              <Space direction="vertical" size={2}>
+                <Text type="warning" strong style={{ fontSize: "12px" }}>
+                  <ThunderboltOutlined /> แนะนำด่วน
+                </Text>
+                <Text style={{ fontSize: "14px" }}>
+                  เพิ่ม <b>"สวัสดิการ"</b> ในประกาศ <br />
+                  เพื่อดึงดูดผู้สมัครเพิ่ม <b>30%</b>
+                </Text>
+              </Space>
+            </Card>
+          </Col>
+        </Row>
 
         {/* Job Table */}
         <Card
