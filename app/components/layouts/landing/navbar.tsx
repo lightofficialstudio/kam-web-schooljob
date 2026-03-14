@@ -149,6 +149,14 @@ export default function Navbar() {
                 ประกาศงาน
               </Text>
             </Link>
+            <Link
+              href="/pages/employer/profile"
+              style={{ textDecoration: "none" }}
+            >
+              <Text strong style={{ cursor: "pointer" }}>
+                โปรไฟล์ของฉัน
+              </Text>
+            </Link>
             <Link href="/pages/blog" style={{ textDecoration: "none" }}>
               <Text strong style={{ cursor: "pointer" }}>
                 บทความ
