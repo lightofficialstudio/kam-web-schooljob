@@ -1,14 +1,18 @@
 "use client";
 
-import { DownOutlined, FileTextOutlined, ProfileOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  FileTextOutlined,
+  ProfileOutlined,
+} from "@ant-design/icons";
 import {
   theme as antTheme,
+  Card,
   Layout,
   Radio,
   Select,
   Space,
   Typography,
-  Card,
 } from "antd";
 import { useApplyStore } from "../stores/apply-store";
 
@@ -35,8 +39,12 @@ export default function DocumentSection() {
       <Card
         title={
           <Space size={12}>
-            <FileTextOutlined style={{ color: token.colorPrimary, fontSize: "20px" }} />
-            <Text strong style={{ fontSize: "18px" }}>เรซูเม่ (Resumé)</Text>
+            <FileTextOutlined
+              style={{ color: token.colorPrimary, fontSize: "20px" }}
+            />
+            <Text strong style={{ fontSize: "18px" }}>
+              เรซูเม่ (Resumé)
+            </Text>
           </Space>
         }
         variant="outlined"
@@ -46,9 +54,12 @@ export default function DocumentSection() {
           backgroundColor: token.colorBgContainer,
           boxShadow: token.boxShadowTertiary,
         }}
-        styles={{ 
-          header: { borderBottom: `1px solid ${token.colorBorderSecondary}`, padding: "16px 24px" },
-          body: { padding: "24px" } 
+        styles={{
+          header: {
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            padding: "16px 24px",
+          },
+          body: { padding: "24px" },
         }}
       >
         <Radio.Group
@@ -58,25 +69,30 @@ export default function DocumentSection() {
         >
           <Space direction="vertical" style={{ width: "100%" }} size={20}>
             <Radio value="upload">
-              <Text style={{ color: token.colorText, fontSize: "16px", marginLeft: "8px" }}>
+              <Text
+                style={{
+                  color: token.colorText,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
                 อัปโหลดเรซูเม่ใหม่ (.pdf, .doc)
               </Text>
             </Radio>
 
-            <Radio
-              value="select"
-              style={{ width: "100%" }}
-            >
+            <Radio value="select" style={{ width: "100%" }}>
               <Layout
                 style={{
                   backgroundColor: "transparent",
                   width: "100%",
                   display: "inline-flex",
                   flexDirection: "column",
-                  paddingLeft: "8px"
+                  paddingLeft: "8px",
                 }}
               >
-                <Text style={{ color: token.colorText, fontSize: "16px" }}>เลือกเรซูเม่ที่มีอยู่ในระบบ</Text>
+                <Text style={{ color: token.colorText, fontSize: "16px" }}>
+                  เลือกเรซูเม่ที่มีอยู่ในระบบ
+                </Text>
                 {resumeOption === "select" && (
                   <Select
                     placeholder="กรุณาเลือกเรซูเม่"
@@ -98,7 +114,13 @@ export default function DocumentSection() {
             </Radio>
 
             <Radio value="none">
-              <Text style={{ color: token.colorTextSecondary, fontSize: "16px", marginLeft: "8px" }}>
+              <Text
+                style={{
+                  color: token.colorTextSecondary,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
                 ไม่รวมเรซูเม่ (ฉันจะส่งภายหลัง)
               </Text>
             </Radio>
@@ -110,8 +132,12 @@ export default function DocumentSection() {
       <Card
         title={
           <Space size={12}>
-            <ProfileOutlined style={{ color: token.colorPrimary, fontSize: "20px" }} />
-            <Text strong style={{ fontSize: "18px" }}>จดหมายนำหน้า (Cover letter)</Text>
+            <ProfileOutlined
+              style={{ color: token.colorPrimary, fontSize: "20px" }}
+            />
+            <Text strong style={{ fontSize: "18px" }}>
+              จดหมายนำหน้า (Cover letter)
+            </Text>
           </Space>
         }
         variant="outlined"
@@ -121,9 +147,12 @@ export default function DocumentSection() {
           backgroundColor: token.colorBgContainer,
           boxShadow: token.boxShadowTertiary,
         }}
-        styles={{ 
-          header: { borderBottom: `1px solid ${token.colorBorderSecondary}`, padding: "16px 24px" },
-          body: { padding: "24px" } 
+        styles={{
+          header: {
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            padding: "16px 24px",
+          },
+          body: { padding: "24px" },
         }}
       >
         <Radio.Group
@@ -133,17 +162,35 @@ export default function DocumentSection() {
         >
           <Space direction="vertical" style={{ width: "100%" }} size={20}>
             <Radio value="upload">
-              <Text style={{ color: token.colorText, fontSize: "16px", marginLeft: "8px" }}>
+              <Text
+                style={{
+                  color: token.colorText,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
                 อัปโหลดจดหมายนำหน้า
               </Text>
             </Radio>
             <Radio value="write">
-              <Text style={{ color: token.colorText, fontSize: "16px", marginLeft: "8px" }}>
+              <Text
+                style={{
+                  color: token.colorText,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
                 เขียนจดหมายแนะนำตัวหน้าเว็บ
               </Text>
             </Radio>
             <Radio value="none">
-              <Text style={{ color: token.colorTextSecondary, fontSize: "16px", marginLeft: "8px" }}>
+              <Text
+                style={{
+                  color: token.colorTextSecondary,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
                 ไม่รวมจดหมายนำหน้า
               </Text>
             </Radio>
@@ -153,4 +200,3 @@ export default function DocumentSection() {
     </Space>
   );
 }
-
