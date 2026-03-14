@@ -21,6 +21,7 @@ import {
   Tag,
   Typography,
 } from "antd";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
@@ -60,6 +61,7 @@ const JOB_CATEGORIES = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
   const { mode, toggleTheme } = useTheme();
   const { token } = antTheme.useToken();
   const isDark = mode === "dark";
@@ -84,6 +86,25 @@ export default function LandingPage() {
       salaryRange: null,
       postedAt: null,
     });
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchParams.keyword) params.append("keyword", searchParams.keyword);
+    if (searchParams.location) params.append("location", searchParams.location);
+    if (searchParams.employmentType)
+      params.append("employmentType", searchParams.employmentType);
+    if (searchParams.license) params.append("license", searchParams.license);
+    if (searchParams.salaryRange)
+      params.append("salaryRange", searchParams.salaryRange);
+    if (searchParams.postedAt) params.append("postedAt", searchParams.postedAt);
+
+    // Encode category array
+    if (searchParams.category.length > 0) {
+      params.append("category", JSON.stringify(searchParams.category));
+    }
+
+    router.push(`/pages/job?${params.toString()}`);
   };
 
   return (
@@ -409,6 +430,7 @@ export default function LandingPage() {
                 block
                 size="large"
                 icon={<SearchOutlined style={{ fontSize: "20px" }} />}
+                onClick={handleSearch}
                 style={{
                   height: "60px",
                   borderRadius: "20px",

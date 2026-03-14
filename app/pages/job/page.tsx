@@ -6,6 +6,7 @@ import {
   CloseOutlined,
   DollarCircleOutlined,
   EnvironmentOutlined,
+  GlobalOutlined,
   HeartOutlined,
   HistoryOutlined,
   InfoCircleOutlined,
@@ -13,17 +14,21 @@ import {
   SafetyCertificateOutlined,
   SearchOutlined,
   ShareAltOutlined,
+  SolutionOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import {
+  theme as antTheme,
   Avatar,
   Badge,
   Button,
   Card,
+  Cascader,
   Col,
   Divider,
   Drawer,
   Input,
+  Layout,
   Row,
   Select,
   Space,
@@ -33,12 +38,47 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 dayjs.extend(relativeTime);
 dayjs.locale("th");
 
-const { Title, Text, Link } = Typography;
+const { Title, Text, Link, Paragraph } = Typography;
+const { Option } = Select;
+
+const JOB_CATEGORIES = [
+  {
+    value: "academic",
+    label: "การสอน / วิชาการ",
+    children: [
+      { value: "math", label: "ครูคณิตศาสตร์" },
+      { value: "english", label: "ครูภาษาอังกฤษ" },
+      { value: "thai", label: "ครูภาษาไทย" },
+      { value: "science", label: "ครูวิทยาศาสตร์" },
+      { value: "early-childhood", label: "ครูปฐมวัย" },
+    ],
+  },
+  {
+    value: "support",
+    label: "ธุรการ / สนับสนุน",
+    children: [
+      { value: "admin", label: "ธุรการโรงเรียน" },
+      { value: "hr", label: "ฝ่ายบุคคล (HR)" },
+      { value: "finance", label: "การเงิน / บัญชี" },
+      { value: "it-support", label: "IT Support" },
+    ],
+  },
+  {
+    value: "construction",
+    label: "งานก่อสร้างสถาปัตยกรรม",
+    children: [
+      { value: "const-tech", label: "งานช่างก่อสร้าง/อาคาร" },
+      { value: "proj-mgmt", label: "งานบริหารโครงการ" },
+      { value: "arch", label: "งานสถาปนิก" },
+    ],
+  },
+];
 
 // Mock Data 10 รายการ ตามฟิลด์ใน School Board Requirement
 const MOCK_JOBS = [
@@ -244,8 +284,32 @@ const MOCK_JOBS = [
 ];
 
 export default function JobSearchPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [location, setLocation] = useState("");
+  const searchParams = useSearchParams();
+  const { token } = antTheme.useToken();
+
+  const [filters, setFilters] = useState({
+    keyword: searchParams.get("keyword") || "",
+    category: [] as string[][],
+    location: searchParams.get("location") || (null as string | null),
+    employmentType:
+      searchParams.get("employmentType") || (null as string | null),
+    license: searchParams.get("license") || (null as string | null),
+    salaryRange: searchParams.get("salaryRange") || (null as string | null),
+    postedAt: searchParams.get("postedAt") || (null as string | null),
+  });
+
+  // ✨ [Sync initial category from URL]
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat) {
+      try {
+        setFilters((prev) => ({ ...prev, category: JSON.parse(cat) }));
+      } catch (e) {
+        console.error("Failed to parse category from URL", e);
+      }
+    }
+  }, [searchParams]);
+
   const [selectedJob, setSelectedJob] = useState<(typeof MOCK_JOBS)[0] | null>(
     null,
   );
@@ -256,310 +320,564 @@ export default function JobSearchPage() {
     setIsDrawerOpen(true);
   };
 
+  const handleReset = () => {
+    setFilters({
+      keyword: "",
+      category: [],
+      location: null,
+      employmentType: null,
+      license: null,
+      salaryRange: null,
+      postedAt: null,
+    });
+  };
+
+  const filteredJobs = useMemo(() => {
+    return MOCK_JOBS.filter((job) => {
+      if (
+        filters.keyword &&
+        !job.title.toLowerCase().includes(filters.keyword.toLowerCase()) &&
+        !job.schoolName.toLowerCase().includes(filters.keyword.toLowerCase())
+      ) {
+        return false;
+      }
+      if (filters.location) {
+        const locationMap: Record<string, string[]> = {
+          bkk: ["กรุงเทพมหานคร"],
+          center: ["นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "นครปฐม"],
+          north: ["เชียงใหม่"],
+        };
+        const provinces = locationMap[filters.location] || [filters.location];
+        if (!provinces.includes(job.province)) return false;
+      }
+      if (filters.license) {
+        if (
+          filters.license === "required" &&
+          job.licenseRequired !== "จำเป็นต้องมี"
+        )
+          return false;
+        if (
+          filters.license === "not-required" &&
+          job.licenseRequired !== "ไม่จำเป็นต้องมี"
+        )
+          return false;
+      }
+      if (filters.salaryRange && job.salaryType === "ระบุเงินเดือน") {
+        const [min, max] = filters.salaryRange.split("-").map(Number);
+        const sMin = job.salaryMin ?? 0;
+        const sMax = job.salaryMax ?? 0;
+        if (max) {
+          if (sMin > max || sMax < min) return false;
+        } else if (filters.salaryRange === "40000+" && sMax < 40000) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [filters]);
+
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f4f7f9" }}>
-      {/* 1. Header Search Area (JobsDB Blue Style) */}
-      <div
+    <Layout
+      style={{
+        minHeight: "100vh",
+        backgroundColor: token.colorBgLayout,
+      }}
+    >
+      {/* 1. Adjusted Header Search Area - Aligned with Landing Page */}
+      <Layout.Header
         style={{
-          backgroundColor: "#001e45",
-          padding: "48px 0",
-          color: "white",
+          backgroundColor: token.colorPrimary,
+          height: "auto",
+          padding: "40px 0",
+          color: token.colorTextLightSolid,
         }}
       >
         <Row justify="center">
+          <Col span={24} style={{ maxWidth: "1200px", padding: "0 24px" }}>
+            <Card
+              styles={{
+                body: {
+                  padding: "32px",
+                },
+              }}
+              style={{
+                borderRadius: token.borderRadiusLG * 2,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                backgroundColor: token.colorBgContainer,
+                boxShadow: token.boxShadowSecondary,
+              }}
+            >
+              <Row gutter={[20, 20]} align="middle">
+                {/* 💻 Search Input */}
+                <Col xs={24} lg={8}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "13px",
+                      color: token.colorTextDescription,
+                      display: "block",
+                      marginBottom: "8px",
+                      marginLeft: "4px",
+                    }}
+                  >
+                    ค้นหางานที่คุณสนใจ
+                  </Text>
+                  <Input
+                    prefix={
+                      <SearchOutlined style={{ color: token.colorPrimary }} />
+                    }
+                    placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
+                    value={filters.keyword}
+                    onChange={(e) =>
+                      setFilters({ ...filters, keyword: e.target.value })
+                    }
+                    size="large"
+                    style={{
+                      borderRadius: token.borderRadius,
+                      height: "52px",
+                      fontSize: "15px",
+                      border: `1px solid ${token.colorBorder}`,
+                      backgroundColor: token.colorBgContainer,
+                      color: token.colorText,
+                    }}
+                  />
+                </Col>
+
+                {/* 📂 Job Categories */}
+                <Col xs={24} lg={9}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "13px",
+                      color: token.colorTextDescription,
+                      display: "block",
+                      marginBottom: "8px",
+                      marginLeft: "4px",
+                    }}
+                  >
+                    ประเภทงาน
+                  </Text>
+                  <Cascader
+                    options={JOB_CATEGORIES}
+                    multiple
+                    maxTagCount={1}
+                    value={filters.category}
+                    onChange={(value) =>
+                      setFilters({ ...filters, category: value as string[][] })
+                    }
+                    placeholder="เลือกตำแหน่งที่สนใจ"
+                    style={{ width: "100%" }}
+                    size="large"
+                    showCheckedStrategy={Cascader.SHOW_CHILD}
+                    suffixIcon={
+                      <SolutionOutlined style={{ color: token.colorPrimary }} />
+                    }
+                  />
+                </Col>
+
+                {/* 📍 Location */}
+                <Col xs={24} lg={7}>
+                  <Text
+                    strong
+                    style={{
+                      fontSize: "13px",
+                      color: token.colorTextDescription,
+                      display: "block",
+                      marginBottom: "8px",
+                      marginLeft: "4px",
+                    }}
+                  >
+                    สถานที่
+                  </Text>
+                  <Select
+                    placeholder="ทุกจังหวัด"
+                    style={{ width: "100%" }}
+                    size="large"
+                    value={filters.location}
+                    onChange={(value) =>
+                      setFilters({ ...filters, location: value })
+                    }
+                    suffixIcon={
+                      <GlobalOutlined style={{ color: token.colorPrimary }} />
+                    }
+                    allowClear
+                  >
+                    <Option value="bkk">กรุงเทพมหานคร</Option>
+                    <Option value="center">ภาคกลาง</Option>
+                    <Option value="north">ภาคเหนือ</Option>
+                    <Option value="east">ภาคตะวันออก</Option>
+                  </Select>
+                </Col>
+
+                {/* Advanced Filters Row */}
+                <Col span={24}>
+                  <Layout
+                    style={{
+                      marginTop: "8px",
+                      paddingTop: "24px",
+                      borderTop: `1px solid ${token.colorBorderSecondary}`,
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    <Row gutter={[16, 16]} align="middle">
+                      <Col xs={12} md={6}>
+                        <Select
+                          placeholder="รูปแบบการจ้างงาน"
+                          style={{ width: "100%" }}
+                          size="large"
+                          allowClear
+                          value={filters.employmentType}
+                          onChange={(value) =>
+                            setFilters({ ...filters, employmentType: value })
+                          }
+                        >
+                          <Option value="fulltime">
+                            งานเต็มเวลา (Full-time)
+                          </Option>
+                          <Option value="parttime">
+                            พาร์ทไทม์ (Part-time)
+                          </Option>
+                          <Option value="contract">
+                            สัญญาจ้าง / อัตราจ้าง
+                          </Option>
+                        </Select>
+                      </Col>
+                      <Col xs={12} md={6}>
+                        <Select
+                          placeholder="ใบประกอบวิชาชีพ"
+                          style={{ width: "100%" }}
+                          size="large"
+                          allowClear
+                          value={filters.license}
+                          onChange={(value) =>
+                            setFilters({ ...filters, license: value })
+                          }
+                        >
+                          <Option value="required">ต้องมีใบประกอบฯ</Option>
+                          <Option value="not-required">
+                            ไม่ต้องมีใบประกอบฯ
+                          </Option>
+                          <Option value="pending">
+                            อยู่ระหว่างขอรับใบประกอบฯ
+                          </Option>
+                        </Select>
+                      </Col>
+                      <Col xs={12} md={6}>
+                        <Select
+                          placeholder="ช่วงเงินเดือน"
+                          style={{ width: "100%" }}
+                          size="large"
+                          allowClear
+                          value={filters.salaryRange}
+                          onChange={(value) =>
+                            setFilters({ ...filters, salaryRange: value })
+                          }
+                        >
+                          <Option value="0-15000">ต่ำกว่า 15,000</Option>
+                          <Option value="15000-25000">15,000 - 25,000</Option>
+                          <Option value="25000-40000">25,000 - 40,000</Option>
+                          <Option value="40000+">40,000 ขึ้นไป</Option>
+                        </Select>
+                      </Col>
+                      <Col xs={12} md={6}>
+                        <Button
+                          type="link"
+                          onClick={handleReset}
+                          style={{
+                            color: token.colorTextDescription,
+                            fontSize: "14px",
+                          }}
+                        >
+                          รีเซ็ตเงื่อนไขทั้งหมด
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Layout>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+      </Layout.Header>
+
+      {/* 2. Main content Area */}
+      <Layout.Content>
+        <Row
+          justify="center"
+          style={{ marginTop: "40px", paddingBottom: "80px" }}
+        >
           <Col span={24} style={{ maxWidth: "1152px", padding: "0 24px" }}>
-            <Row gutter={[16, 16]}>
-              <Col span={10}>
-                <Text
+            <Row gutter={40}>
+              {/* LEFT COLUMN: Job Listings */}
+              <Col span={16}>
+                <Layout
                   style={{
-                    color: "white",
-                    display: "block",
-                    marginBottom: "8px",
-                    fontWeight: 600,
+                    marginBottom: "20px",
+                    backgroundColor: "transparent",
                   }}
                 >
-                  ค้นหางาน
-                </Text>
-                <Input
-                  size="large"
-                  placeholder="ค้นหาชื่อตำแหน่งงาน, คีย์เวิร์ด..."
-                  prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ height: "48px" }}
-                />
+                  <Title
+                    level={4}
+                    style={{
+                      display: "inline-block",
+                      marginRight: "8px",
+                      margin: 0,
+                    }}
+                  >
+                    {filters.keyword
+                      ? `ผลการค้นหาสำหรับ "${filters.keyword}"`
+                      : "งานที่แนะนำสำหรับคุณ"}
+                  </Title>
+                  <Badge
+                    count={filteredJobs.length}
+                    style={{ backgroundColor: token.colorTextQuaternary }}
+                  />
+                </Layout>
+
+                <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                  {filteredJobs.length > 0 ? (
+                    filteredJobs.map((job) => (
+                      <Card
+                        key={job.id}
+                        hoverable
+                        onClick={() => handleOpenJob(job)}
+                        style={{
+                          borderRadius: token.borderRadiusLG,
+                          border: `1px solid ${token.colorBorderSecondary}`,
+                        }}
+                        styles={{ body: { padding: "24px" } }}
+                      >
+                        <Row gutter={16}>
+                          <Col flex="auto">
+                            <Space
+                              direction="vertical"
+                              size={4}
+                              style={{ width: "100%" }}
+                            >
+                              <Title
+                                level={4}
+                                style={{
+                                  margin: 0,
+                                  color: token.colorTextHeading,
+                                }}
+                              >
+                                {job.title}
+                              </Title>
+                              <Text
+                                strong
+                                style={{ color: token.colorTextSecondary }}
+                              >
+                                {job.schoolName}
+                              </Text>
+
+                              <Space
+                                size={12}
+                                wrap
+                                style={{ marginTop: "12px" }}
+                              >
+                                {job.isNew && (
+                                  <Tag
+                                    color="success"
+                                    style={{
+                                      borderRadius: token.borderRadiusSM,
+                                      margin: 0,
+                                      border: "none",
+                                    }}
+                                  >
+                                    มาใหม่
+                                  </Tag>
+                                )}
+                                {job.educationLevel.includes("ปริญญาโท") && (
+                                  <Tag
+                                    color="processing"
+                                    style={{
+                                      borderRadius: token.borderRadiusSM,
+                                      margin: 0,
+                                      border: "none",
+                                    }}
+                                  >
+                                    เน้นวุฒิสูง
+                                  </Tag>
+                                )}
+                              </Space>
+
+                              <Layout
+                                style={{
+                                  marginTop: "16px",
+                                  backgroundColor: "transparent",
+                                }}
+                              >
+                                <Space direction="vertical" size={4}>
+                                  <Space size={12}>
+                                    <ClockCircleOutlined
+                                      style={{ color: token.colorTextTertiary }}
+                                    />
+                                    <Text type="secondary">งานเต็มเวลา</Text>
+                                  </Space>
+                                  <Space size={12}>
+                                    <EnvironmentOutlined
+                                      style={{ color: token.colorTextTertiary }}
+                                    />
+                                    <Text type="secondary">{job.address}</Text>
+                                  </Space>
+                                  <Space size={12}>
+                                    <DollarCircleOutlined
+                                      style={{ color: token.colorTextTertiary }}
+                                    />
+                                    <Text type="secondary">
+                                      {job.salaryType === "ระบุเงินเดือน"
+                                        ? `฿${job.salaryMin?.toLocaleString()} - ฿${job.salaryMax?.toLocaleString()} ต่อเดือน`
+                                        : "ตามประสบการณ์ / ไม่ระบุ"}
+                                    </Text>
+                                  </Space>
+                                </Space>
+                              </Layout>
+
+                              <Layout
+                                style={{
+                                  marginTop: "16px",
+                                  color: token.colorTextSecondary,
+                                  fontSize: "14px",
+                                  backgroundColor: "transparent",
+                                }}
+                              >
+                                <ul style={{ paddingLeft: "18px", margin: 0 }}>
+                                  <li>รับทั้งสิ้น {job.vacancyCount} อัตรา</li>
+                                  <li>ประสบการณ์: {job.teachingExperience}</li>
+                                  <li>ใบอนุญาต: {job.licenseRequired}</li>
+                                </ul>
+                              </Layout>
+                            </Space>
+                          </Col>
+                          <Col flex="100px" style={{ textAlign: "right" }}>
+                            <Avatar
+                              shape="square"
+                              size={80}
+                              src={`https://api.dicebear.com/7.x/initials/svg?seed=${job.schoolName}&backgroundColor=003366`}
+                            />
+                          </Col>
+                        </Row>
+
+                        <Divider style={{ margin: "20px 0" }} />
+
+                        <Row justify="space-between" align="middle">
+                          <Col>
+                            <Text type="secondary" style={{ fontSize: "12px" }}>
+                              <HistoryOutlined />{" "}
+                              {dayjs(job.postedAt).fromNow()}
+                            </Text>
+                          </Col>
+                          <Col>
+                            <Space size={12}>
+                              <Button icon={<HeartOutlined />} />
+                              <Button
+                                type="link"
+                                style={{
+                                  color: token.colorTextSecondary,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                ไม่สนใจ
+                              </Button>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Card>
+                    ))
+                  ) : (
+                    <Card
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        borderRadius: token.borderRadiusLG,
+                      }}
+                    >
+                      <TeamOutlined
+                        style={{
+                          fontSize: "48px",
+                          color: token.colorTextQuaternary,
+                          marginBottom: "16px",
+                        }}
+                      />
+                      <Title level={4}>ไม่พบงานที่ตรงตามเงื่อนไข</Title>
+                      <Text type="secondary">
+                        ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองใหม่อีกครั้ง
+                      </Text>
+                    </Card>
+                  )}
+                </Space>
               </Col>
-              <Col span={10}>
-                <Text
-                  style={{
-                    color: "white",
-                    display: "block",
-                    marginBottom: "8px",
-                    fontWeight: 600,
-                  }}
-                >
-                  สถานที่ทำงาน
-                </Text>
-                <Select
-                  size="large"
-                  placeholder="ทุกจังหวัด / เขตพื้นที่"
-                  prefix={<EnvironmentOutlined />}
-                  style={{ width: "100%", height: "48px" }}
-                  showSearch
-                  value={location || undefined}
-                  onChange={setLocation}
-                  options={[
-                    { value: "กรุงเทพมหานคร", label: "กรุงเทพมหานคร" },
-                    { value: "นนทบุรี", label: "นนทบุรี" },
-                    { value: "สมุทรปราการ", label: "สมุทรปราการ" },
-                    { value: "ปทุมธานี", label: "ปทุมธานี" },
-                  ]}
-                />
-              </Col>
-              <Col span={4} style={{ display: "flex", alignItems: "flex-end" }}>
-                <Button
-                  type="primary"
-                  size="large"
-                  block
-                  style={{
-                    height: "48px",
-                    backgroundColor: "#e60278",
-                    borderColor: "#e60278",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  ค้นหาเลย
-                </Button>
-              </Col>
-              <Col span={24}>
-                <Button type="link" style={{ color: "white", padding: 0 }}>
-                  ตัวเลือกเพิ่มเติม <SearchOutlined />
-                </Button>
+
+              {/* RIGHT COLUMN: Sidebar Tools */}
+              <Col span={8}>
+                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                  {/* 1. Saved Searches */}
+                  <Card
+                    bordered={false}
+                    style={{ borderRadius: token.borderRadiusLG }}
+                  >
+                    <Title level={5}>การค้นหาที่บันทึกไว้</Title>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: "14px",
+                        display: "block",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      ใช้ปุ่มบันทึกการค้นหาด้านล่างผลการค้นหาเพื่อบันทึกและรับงานใหม่ทางอีเมล
+                    </Text>
+                  </Card>
+
+                  {/* 2. Saved Jobs */}
+                  <Card
+                    bordered={false}
+                    style={{ borderRadius: token.borderRadiusLG }}
+                  >
+                    <Title level={5}>งานที่บันทึกไว้</Title>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: "14px",
+                        display: "block",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      คลิกไอคอนหัวใจในแต่ละประกาศงานเพื่อบันทึกไว้ดูภายหลังได้ในทุกอุปกรณ์ของคุณ
+                    </Text>
+                  </Card>
+
+                  {/* 3. Safety Tip */}
+                  <Card
+                    bordered={false}
+                    style={{
+                      backgroundColor: token.colorBgLayout,
+                      borderRadius: token.borderRadiusLG,
+                      border: `1px solid ${token.colorBorderSecondary}`,
+                    }}
+                    styles={{ body: { padding: "24px" } }}
+                  >
+                    <Space direction="vertical" size={16}>
+                      <SafetyCertificateOutlined
+                        style={{ fontSize: "32px", color: token.colorSuccess }}
+                      />
+                      <Text strong style={{ fontSize: "16px" }}>
+                        ปลอดภัยไว้ก่อน!
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: "13px" }}>
+                        อย่าโอนเงินหรือให้ข้อมูลส่วนตัวที่สำคัญหากพบพิรุธในการรับสมัครงาน
+                      </Text>
+                      <Button type="link" style={{ padding: 0 }}>
+                        อ่านคำแนะนำเพิ่มเติม
+                      </Button>
+                    </Space>
+                  </Card>
+                </Space>
               </Col>
             </Row>
           </Col>
         </Row>
-      </div>
-
-      {/* 2. Main content Area */}
-      <Row
-        justify="center"
-        style={{ marginTop: "40px", paddingBottom: "80px" }}
-      >
-        <Col span={24} style={{ maxWidth: "1152px", padding: "0 24px" }}>
-          <Row gutter={40}>
-            {/* LEFT COLUMN: Job Listings */}
-            <Col span={16}>
-              <div style={{ marginBottom: "20px" }}>
-                <Title
-                  level={4}
-                  style={{ display: "inline-block", marginRight: "8px" }}
-                >
-                  งานที่แนะนำสำหรับคุณ
-                </Title>
-                <Badge
-                  count={MOCK_JOBS.length}
-                  style={{ backgroundColor: "#9ca3af" }}
-                />
-              </div>
-
-              <Space direction="vertical" size={16} style={{ width: "100%" }}>
-                {MOCK_JOBS.map((job) => (
-                  <Card
-                    key={job.id}
-                    hoverable
-                    onClick={() => handleOpenJob(job)}
-                    style={{
-                      borderRadius: "12px",
-                      border: "1px solid #e5e7eb",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                    }}
-                    styles={{ body: { padding: "24px" } }}
-                  >
-                    <Row gutter={16}>
-                      <Col flex="auto">
-                        <Space
-                          direction="vertical"
-                          size={4}
-                          style={{ width: "100%" }}
-                        >
-                          <Title
-                            level={4}
-                            style={{ margin: 0, color: "#001e45" }}
-                          >
-                            {job.title}
-                          </Title>
-                          <Text strong style={{ color: "#4B5563" }}>
-                            {job.schoolName}
-                          </Text>
-
-                          <Space size={12} wrap style={{ marginTop: "12px" }}>
-                            {job.isNew && (
-                              <Tag
-                                color="green"
-                                style={{
-                                  borderRadius: "4px",
-                                  margin: 0,
-                                  border: "none",
-                                }}
-                              >
-                                มาใหม่
-                              </Tag>
-                            )}
-                            {job.educationLevel.includes("ปริญญาโท") && (
-                              <Tag
-                                color="purple"
-                                style={{
-                                  borderRadius: "4px",
-                                  margin: 0,
-                                  border: "none",
-                                }}
-                              >
-                                เน้นวุฒิสูง
-                              </Tag>
-                            )}
-                          </Space>
-
-                          <div style={{ marginTop: "16px" }}>
-                            <Space direction="vertical" size={4}>
-                              <Space size={12}>
-                                <ClockCircleOutlined
-                                  style={{ color: "#9ca3af" }}
-                                />
-                                <Text type="secondary">งานเต็มเวลา</Text>
-                              </Space>
-                              <Space size={12}>
-                                <EnvironmentOutlined
-                                  style={{ color: "#9ca3af" }}
-                                />
-                                <Text type="secondary">{job.address}</Text>
-                              </Space>
-                              <Space size={12}>
-                                <DollarCircleOutlined
-                                  style={{ color: "#9ca3af" }}
-                                />
-                                <Text type="secondary">
-                                  {job.salaryType === "ระบุเงินเดือน"
-                                    ? `฿${job.salaryMin?.toLocaleString()} - ฿${job.salaryMax?.toLocaleString()} ต่อเดือน`
-                                    : "ตามประสบการณ์ / ไม่ระบุ"}
-                                </Text>
-                              </Space>
-                            </Space>
-                          </div>
-
-                          <div
-                            style={{
-                              marginTop: "16px",
-                              color: "#6b7280",
-                              fontSize: "14px",
-                            }}
-                          >
-                            <ul style={{ paddingLeft: "18px", margin: 0 }}>
-                              <li>รับทั้งสิ้น {job.vacancyCount} อัตรา</li>
-                              <li>ประสบการณ์: {job.teachingExperience}</li>
-                              <li>ใบอนุญาต: {job.licenseRequired}</li>
-                            </ul>
-                          </div>
-                        </Space>
-                      </Col>
-                      <Col flex="100px" style={{ textAlign: "right" }}>
-                        <Avatar
-                          shape="square"
-                          size={80}
-                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${job.schoolName}&backgroundColor=003366`}
-                        />
-                      </Col>
-                    </Row>
-
-                    <Divider style={{ margin: "20px 0" }} />
-
-                    <Row justify="space-between" align="middle">
-                      <Col>
-                        <Text type="secondary" style={{ fontSize: "12px" }}>
-                          <HistoryOutlined /> {dayjs(job.postedAt).fromNow()}
-                        </Text>
-                      </Col>
-                      <Col>
-                        <Space size={12}>
-                          <Button icon={<HeartOutlined />} />
-                          <Button
-                            type="link"
-                            style={{ color: "#4b5563", fontWeight: 600 }}
-                          >
-                            ไม่สนใจ
-                          </Button>
-                        </Space>
-                      </Col>
-                    </Row>
-                  </Card>
-                ))}
-              </Space>
-            </Col>
-
-            {/* RIGHT COLUMN: Sidebar Tools */}
-            <Col span={8}>
-              <Space direction="vertical" size={24} style={{ width: "100%" }}>
-                {/* 1. Saved Searches */}
-                <Card bordered={false} style={{ borderRadius: "12px" }}>
-                  <Title level={5}>การค้นหาที่บันทึกไว้</Title>
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: "14px",
-                      display: "block",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    ใช้ปุ่มบันทึกการค้นหาด้านล่างผลการค้นหาเพื่อบันทึกและรับงานใหม่ทางอีเมล
-                  </Text>
-                </Card>
-
-                {/* 2. Saved Jobs */}
-                <Card bordered={false} style={{ borderRadius: "12px" }}>
-                  <Title level={5}>งานที่บันทึกไว้</Title>
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: "14px",
-                      display: "block",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    คลิกไอคอนหัวใจในแต่ละประกาศงานเพื่อบันทึกไว้ดูภายหลังได้ในทุกอุปกรณ์ของคุณ
-                  </Text>
-                </Card>
-
-                {/* 3. Safety Tip */}
-                <Card
-                  bordered={false}
-                  style={{
-                    backgroundColor: "#f9fafb",
-                    borderRadius: "12px",
-                    border: "1px solid #f3f4f6",
-                  }}
-                  styles={{ body: { padding: "24px" } }}
-                >
-                  <Space direction="vertical" size={16}>
-                    <SafetyCertificateOutlined
-                      style={{ fontSize: "32px", color: "#10b981" }}
-                    />
-                    <Text strong style={{ fontSize: "16px" }}>
-                      ปลอดภัยไว้ก่อน!
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: "13px" }}>
-                      อย่าโอนเงินหรือให้ข้อมูลส่วนตัวที่สำคัญหากพบพิรุธในการรับสมัครงาน
-                    </Text>
-                    <Button type="link" style={{ padding: 0 }}>
-                      อ่านคำแนะนำเพิ่มเติม
-                    </Button>
-                  </Space>
-                </Card>
-              </Space>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+      </Layout.Content>
 
       {/* 3. Job Details Drawer (70% Width) */}
       <Drawer
@@ -570,20 +888,27 @@ export default function JobSearchPage() {
         styles={{ body: { padding: 0 } }}
       >
         {selectedJob && (
-          <div style={{ position: "relative", minHeight: "100%" }}>
+          <Layout
+            style={{
+              position: "relative",
+              minHeight: "100%",
+              backgroundColor: token.colorBgContainer,
+            }}
+          >
             {/* Header Sticky Action Bar */}
-            <div
+            <Layout.Header
               style={{
                 position: "sticky",
                 top: 0,
                 zIndex: 100,
-                backgroundColor: "white",
+                backgroundColor: token.colorBgContainer,
                 padding: "16px 24px",
-                borderBottom: "1px solid #f0f0f0",
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
                 display: "flex",
                 justifyContent: "flex-end",
                 alignItems: "center",
                 gap: "12px",
+                height: "auto",
               }}
             >
               <Button
@@ -603,43 +928,55 @@ export default function JobSearchPage() {
                 onClick={() => setIsDrawerOpen(false)}
                 style={{ fontSize: "20px" }}
               />
-            </div>
+            </Layout.Header>
 
             {/* Banner Image Area */}
-            <div
+            <Layout
               style={{
                 height: "240px",
-                backgroundColor: "#e60278",
-                backgroundImage:
-                  "linear-gradient(135deg, #e60278 0%, #001e45 100%)",
+                background: `linear-gradient(135deg, ${token.colorError} 0%, ${token.colorPrimary} 100%)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "white",
+                color: token.colorTextLightSolid,
                 textAlign: "center",
                 padding: "40px",
               }}
             >
-              <div>
-                <Title level={2} style={{ color: "white", margin: 0 }}>
+              <Layout style={{ backgroundColor: "transparent" }}>
+                <Title
+                  level={2}
+                  style={{ color: token.colorTextLightSolid, margin: 0 }}
+                >
                   KEEP LEARNING
                 </Title>
                 <Title
                   level={4}
-                  style={{ color: "white", opacity: 0.8, marginTop: "8px" }}
+                  style={{
+                    color: token.colorTextLightSolid,
+                    opacity: 0.8,
+                    marginTop: "8px",
+                  }}
                 >
                   AND CURIOUS ON
                 </Title>
-              </div>
-            </div>
+              </Layout>
+            </Layout>
 
             {/* Content Area */}
-            <div style={{ padding: "0 40px 80px 40px", marginTop: "-40px" }}>
+            <Layout.Content
+              style={{
+                padding: "0 40px 80px 40px",
+                marginTop: "-40px",
+                backgroundColor: "transparent",
+              }}
+            >
               <Card
                 bordered={false}
                 style={{
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  borderRadius: token.borderRadiusLG,
+                  boxShadow: token.boxShadowTertiary,
+                  backgroundColor: token.colorBgContainer,
                 }}
                 styles={{ body: { padding: "32px" } }}
               >
@@ -859,15 +1196,18 @@ export default function JobSearchPage() {
               <div style={{ textAlign: "center" }}>
                 <Title
                   level={4}
-                  style={{ color: "#d9d9d9", letterSpacing: "2px" }}
+                  style={{
+                    color: token.colorTextQuaternary,
+                    letterSpacing: "2px",
+                  }}
                 >
                   SCHOOL JOB BOARD
                 </Title>
               </div>
-            </div>
-          </div>
+            </Layout.Content>
+          </Layout>
         )}
       </Drawer>
-    </div>
+    </Layout>
   );
 }
