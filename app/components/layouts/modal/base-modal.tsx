@@ -32,9 +32,11 @@ export default function BaseModal({
       closable={true}
       footer={null}
       width={420}
-      bodyStyle={{
-        padding: "40px 32px",
-        textAlign: "center",
+      styles={{
+        body: {
+          padding: "40px 32px",
+          textAlign: "center",
+        },
       }}
       {...props}
     >
