@@ -435,7 +435,14 @@ export default function LandingPage() {
                       </Text>
                     </div>
                     <div>
-                      <Title level={4} style={{ marginBottom: "4px", height: "56px", overflow: "hidden" }}>
+                      <Title
+                        level={4}
+                        style={{
+                          marginBottom: "4px",
+                          height: "56px",
+                          overflow: "hidden",
+                        }}
+                      >
                         {job.title}
                       </Title>
                       <Text strong style={{ color: "#1890ff" }}>
@@ -469,7 +476,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          
+
           <style jsx global>{`
             .job-scroll-container::-webkit-scrollbar {
               display: none;
