@@ -270,7 +270,7 @@ export default function MyJobsPage() {
               <Statistic
                 title="งานที่กำลังเปิดรับ"
                 value={2}
-                valueStyle={{ color: "#3f8600" }}
+                styles={{ content: { color: "#3f8600" } }}
                 prefix={<CheckCircleOutlined />}
               />
             </Card>

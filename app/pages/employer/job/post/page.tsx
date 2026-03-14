@@ -408,7 +408,7 @@ export default function PostJobPage() {
                   }}
                 >
                   <Alert
-                    message="ดึงข้อมูลอัตโนมัติจาก School Profile ของคุณ"
+                    title="ดึงข้อมูลอัตโนมัติจาก School Profile ของคุณ"
                     type="info"
                     showIcon
                     style={{ marginBottom: "24px" }}
