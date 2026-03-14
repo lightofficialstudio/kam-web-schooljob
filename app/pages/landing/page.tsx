@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   AppstoreOutlined,
   GlobalOutlined,
@@ -60,6 +61,28 @@ const JOB_CATEGORIES = [
 ];
 
 export default function LandingPage() {
+  const [searchParams, setSearchParams] = useState({
+    keyword: "",
+    category: [] as string[][],
+    location: null as string | null,
+    employmentType: null as string | null,
+    license: null as string | null,
+    salaryRange: null as string | null,
+    postedAt: null as string | null,
+  });
+
+  const handleReset = () => {
+    setSearchParams({
+      keyword: "",
+      category: [],
+      location: null,
+      employmentType: null,
+      license: null,
+      salaryRange: null,
+      postedAt: null,
+    });
+  };
+
   return (
     <>
       {/* 🚀 Hero Section - The "One-Stop" Job Portal for Education */}
@@ -72,7 +95,25 @@ export default function LandingPage() {
           background: "linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)",
         }}
       >
-        {/* Decorative elements */}
+        {/* Decorative elements - Minimal Abstract using Local SVG */}
+        <div
+          style={{
+            position: "absolute",
+            top: "12%",
+            right: "5%",
+            width: "320px",
+            opacity: 0.8,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        >
+          <img
+            src="/images/flat/undraw_web-search_7oif.svg"
+            alt="Search Illustration"
+            style={{ width: "100%", filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.05))" }}
+          />
+        </div>
+
         <div
           style={{
             position: "absolute",
@@ -81,6 +122,7 @@ export default function LandingPage() {
             width: "500px",
             height: "500px",
             borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(24,144,255,0.1) 0%, rgba(255,255,255,0) 70%)",
             filter: "blur(100px)",
           }}
         />
@@ -148,6 +190,8 @@ export default function LandingPage() {
                   <Input
                     prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
                     placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
+                    value={searchParams.keyword}
+                    onChange={(e) => setSearchParams({ ...searchParams, keyword: e.target.value })}
                     style={{
                       fontSize: "16px",
                       padding: "12px 16px",
@@ -170,6 +214,8 @@ export default function LandingPage() {
                     options={JOB_CATEGORIES}
                     multiple
                     maxTagCount={1}
+                    value={searchParams.category}
+                    onChange={(value) => setSearchParams({ ...searchParams, category: value as string[][] })}
                     maxTagPlaceholder={(omittedValues) => (
                       <Tag color="processing" style={{ borderRadius: "6px" }}>
                         +{omittedValues.length} ประเภท
@@ -203,6 +249,8 @@ export default function LandingPage() {
                       fontSize: "16px",
                     }}
                     size="large"
+                    value={searchParams.location}
+                    onChange={(value) => setSearchParams({ ...searchParams, location: value })}
                     suffixIcon={<GlobalOutlined style={{ color: "#1890ff" }} />}
                   >
                     <Option value="bkk">กรุงเทพมหานคร</Option>
@@ -230,6 +278,8 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size="large"
                     allowClear
+                    value={searchParams.employmentType}
+                    onChange={(value) => setSearchParams({ ...searchParams, employmentType: value })}
                   >
                     <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
                     <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
@@ -242,6 +292,8 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size="large"
                     allowClear
+                    value={searchParams.license}
+                    onChange={(value) => setSearchParams({ ...searchParams, license: value })}
                   >
                     <Option value="required">ต้องมีใบประกอบฯ</Option>
                     <Option value="not-required">ไม่ต้องมีใบประกอบฯ</Option>
@@ -254,6 +306,8 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size="large"
                     allowClear
+                    value={searchParams.salaryRange}
+                    onChange={(value) => setSearchParams({ ...searchParams, salaryRange: value })}
                   >
                     <Option value="0-15000">ต่ำกว่า 15,000</Option>
                     <Option value="15000-25000">15,000 - 25,000</Option>
@@ -267,6 +321,8 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size="large"
                     allowClear
+                    value={searchParams.postedAt}
+                    onChange={(value) => setSearchParams({ ...searchParams, postedAt: value })}
                   >
                     <Option value="today">วันนี้</Option>
                     <Option value="3days">3 วันที่ผ่านมา</Option>
@@ -275,7 +331,7 @@ export default function LandingPage() {
                   </Select>
                 </Col>
                 <Col xs={24} lg={4}>
-                  <Button type="link" block style={{ color: "#8c8c8c" }}>
+                  <Button type="link" block style={{ color: "#8c8c8c" }} onClick={handleReset}>
                     รีเซ็ตเงื่อนไข
                   </Button>
                 </Col>
@@ -542,28 +598,45 @@ export default function LandingPage() {
               </Button>
             </Col>
             <Col xs={24} md={12}>
-              <Card
-                cover={
-                  <div
-                    style={{
-                      height: "350px",
-                      borderRadius: "24px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <SolutionOutlined
-                      style={{
-                        fontSize: "120px",
-                        opacity: 0.3,
-                      }}
-                    />
-                  </div>
-                }
-                style={{ borderRadius: "24px" }}
-                variant="borderless"
-              />
+              <div
+                style={{
+                  height: "450px",
+                  borderRadius: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "40px",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Minimalist Abstract Image for Employers using Local SVG */}
+                <div 
+                   style={{
+                     width: "100%",
+                     maxWidth: "400px",
+                     zIndex: 1
+                   }}
+                >
+                  <img
+                    src="/images/flat/undraw_hiring_8szx.svg"
+                    alt="Employer Solutions"
+                    style={{ width: "100%", height: "auto" }}
+                  />
+                </div>
+                {/* Background Decoration */}
+                <div style={{
+                  position: "absolute",
+                  width: "150%",
+                  height: "150%",
+                  backgroundColor: "#fff",
+                  borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
+                  top: "10%",
+                  left: "10%",
+                  zIndex: 0,
+                  opacity: 0.5
+                }} />
+              </div>
             </Col>
           </Row>
         </div>
@@ -589,22 +662,22 @@ export default function LandingPage() {
               {
                 title: "ฝากประวัติฟรี",
                 desc: "สร้าง Resume ออนไลน์ระดับมืออาชีพ",
-                icon: <SolutionOutlined />,
+                localIcon: "/images/flat/undraw_resume_jrgi.svg",
               },
               {
                 title: "แจ้งเตือนงานตรงใจ",
                 desc: "รับค่างานใหม่ตามวิชาเอกที่คุณระบุ",
-                icon: <MessageOutlined />,
+                localIcon: "/images/flat/undraw_job-offers_55y0.svg",
               },
               {
                 title: "ติดตามสถานะ",
                 desc: "ดูประวัติการสมัครและนัดสัมภาษณ์งาน",
-                icon: <AppstoreOutlined />,
+                localIcon: "/images/flat/undraw_interview_yz52.svg",
               },
               {
                 title: "ประกาศเกียรติคุณ",
                 desc: "ระบบยืนยันวิทยฐานะและการเข้าอบรม",
-                icon: <TrophyOutlined />,
+                localIcon: "/images/flat/undraw_project-completed_ug9i.svg",
               },
             ].map((item, i) => (
               <Col xs={24} sm={12} md={6} key={i}>
@@ -622,19 +695,24 @@ export default function LandingPage() {
                     style={{ width: "100%" }}
                     size={24}
                   >
-                    <div
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        borderRadius: "12px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "28px",
-                      }}
-                    >
-                      {item.icon}
-                    </div>
+                      <div
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          borderRadius: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "28px",
+                          marginBottom: "10px"
+                        }}
+                      >
+                        <img 
+                          src={item.localIcon} 
+                          alt={item.title} 
+                          style={{ width: "100%", height: "100%", objectFit: "contain" }} 
+                        />
+                      </div>
                     <Space
                       direction="vertical"
                       align="center"
