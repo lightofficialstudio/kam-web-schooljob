@@ -185,7 +185,7 @@ export default function LandingPage() {
             }}
           >
             ศูนย์รวมงานสายการศึกษา <br />
-            <span>อันดับ 1 ในประเทศไทย</span>
+            <span>จากโรงเรียนทั่วประเทศ</span>
           </Title>
 
           <Paragraph
@@ -195,8 +195,8 @@ export default function LandingPage() {
               margin: "0 auto 40px auto",
             }}
           >
-            เชื่อมต่อโรงเรียนชั้นนำกับบุคลาการคุณภาพ ไม่ว่าจะเป็นงานครู,
-            อาจารย์, ติวเตอร์ หรือเจ้าหน้าที่สนับสนุน ครบจบในที่เดียว
+            เชื่อมต่อโรงเรียนชั้นนำกับบุคลากรคุณภาพ ไม่ว่าจะเป็นครู อาจารย์
+            ติวเตอร์ หรือบุคลากรทางการศึกษา ค้นหาและสมัครงานได้ในที่เดียว
           </Paragraph>
 
           {/* 🔍 Premium Search Bar - Redesigned for better UX */}
@@ -224,7 +224,7 @@ export default function LandingPage() {
                       color: isDark ? "#A0AEC0" : "#8c8c8c",
                     }}
                   >
-                    ค้นหางานที่คุณสนใจ
+                    ค้นหางานที่สนใจ
                   </Text>
                   <Input
                     prefix={
@@ -262,7 +262,7 @@ export default function LandingPage() {
                       color: isDark ? "#A0AEC0" : "#8c8c8c",
                     }}
                   >
-                    ประเภทงาน
+                    ตำแหน่งงาน
                   </Text>
                   <Cascader
                     options={JOB_CATEGORIES}
@@ -439,13 +439,13 @@ export default function LandingPage() {
                   boxShadow: "0 10px 20px rgba(24, 144, 255, 0.2)",
                 }}
               >
-                ค้นหาตำแหน่งงานเลยตอนนี้
+                ค้นหาตำแหน่งงาน
               </Button>
             </div>
           </div>
 
           <Space direction="vertical" size={8} style={{ marginTop: "24px" }}>
-            <Text type="secondary">อาชีพยอดนิยม: </Text>
+            <Text type="secondary">ตำแหน่งยอดนิยม: </Text>
             <Space size={[8, 8]} wrap>
               {[
                 "ครูภาษาอังกฤษ",
