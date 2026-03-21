@@ -122,26 +122,6 @@ export default function LandingPage() {
         }}
       >
         {/* Decorative elements - Minimal Abstract using Local SVG */}
-        <div
-          style={{
-            position: "absolute",
-            top: "12%",
-            right: "5%",
-            width: "320px",
-            opacity: 0.8,
-            zIndex: 0,
-            pointerEvents: "none",
-          }}
-        >
-          <img
-            src="/images/flat/undraw_web-search_7oif.svg"
-            alt="Search Illustration"
-            style={{
-              width: "100%",
-              filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.05))",
-            }}
-          />
-        </div>
 
         <div
           style={{
