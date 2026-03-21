@@ -679,25 +679,31 @@ function JobSearchPageContent() {
                         }}
                         styles={{ body: { padding: "24px" } }}
                       >
-                        <Row gutter={16}>
+                        <Row gutter={24}>
                           <Col flex="auto">
                             <Space
                               direction="vertical"
-                              size={4}
+                              size={8}
                               style={{ width: "100%" }}
                             >
                               <Title
-                                level={4}
+                                level={3}
                                 style={{
                                   margin: 0,
-                                  color: token.colorTextHeading,
+                                  color: token.colorPrimary,
+                                  fontSize: "22px",
                                 }}
                               >
                                 {job.title}
                               </Title>
                               <Text
                                 strong
-                                style={{ color: token.colorTextSecondary }}
+                                style={{
+                                  color: token.colorTextSecondary,
+                                  fontSize: "17px",
+                                  display: "block",
+                                  marginBottom: "8px",
+                                }}
                               >
                                 {job.schoolName}
                               </Text>
@@ -705,7 +711,7 @@ function JobSearchPageContent() {
                               <Space
                                 size={12}
                                 wrap
-                                style={{ marginTop: "12px" }}
+                                style={{ marginBottom: "12px" }}
                               >
                                 {job.isNew && (
                                   <Tag
@@ -713,6 +719,9 @@ function JobSearchPageContent() {
                                     style={{
                                       borderRadius: token.borderRadiusSM,
                                       margin: 0,
+                                      padding: "4px 12px",
+                                      fontSize: "14px",
+                                      fontWeight: 600,
                                       border: "none",
                                     }}
                                   >
@@ -725,6 +734,9 @@ function JobSearchPageContent() {
                                     style={{
                                       borderRadius: token.borderRadiusSM,
                                       margin: 0,
+                                      padding: "4px 12px",
+                                      fontSize: "14px",
+                                      fontWeight: 600,
                                       border: "none",
                                     }}
                                   >
@@ -735,28 +747,56 @@ function JobSearchPageContent() {
 
                               <Layout
                                 style={{
-                                  marginTop: "16px",
                                   backgroundColor: "transparent",
                                 }}
                               >
-                                <Space direction="vertical" size={4}>
-                                  <Space size={12}>
+                                <Space direction="vertical" size={10}>
+                                  <Space size={12} align="center">
                                     <ClockCircleOutlined
-                                      style={{ color: token.colorTextTertiary }}
+                                      style={{
+                                        color: token.colorPrimary,
+                                        fontSize: "18px",
+                                      }}
                                     />
-                                    <Text type="secondary">งานเต็มเวลา</Text>
+                                    <Text
+                                      style={{
+                                        fontSize: "16px",
+                                        color: token.colorText,
+                                      }}
+                                    >
+                                      งานเต็มเวลา
+                                    </Text>
                                   </Space>
-                                  <Space size={12}>
+                                  <Space size={12} align="center">
                                     <EnvironmentOutlined
-                                      style={{ color: token.colorTextTertiary }}
+                                      style={{
+                                        color: token.colorPrimary,
+                                        fontSize: "18px",
+                                      }}
                                     />
-                                    <Text type="secondary">{job.address}</Text>
+                                    <Text
+                                      style={{
+                                        fontSize: "16px",
+                                        color: token.colorText,
+                                      }}
+                                    >
+                                      {job.address}
+                                    </Text>
                                   </Space>
-                                  <Space size={12}>
+                                  <Space size={12} align="center">
                                     <DollarCircleOutlined
-                                      style={{ color: token.colorTextTertiary }}
+                                      style={{
+                                        color: "#52c41a",
+                                        fontSize: "20px",
+                                      }}
                                     />
-                                    <Text type="secondary">
+                                    <Text
+                                      strong
+                                      style={{
+                                        fontSize: "18px",
+                                        color: "#52c41a",
+                                      }}
+                                    >
                                       {job.salaryType === "ระบุเงินเดือน"
                                         ? `฿${job.salaryMin?.toLocaleString()} - ฿${job.salaryMax?.toLocaleString()} ต่อเดือน`
                                         : "ตามประสบการณ์ / ไม่ระบุ"}
@@ -767,49 +807,87 @@ function JobSearchPageContent() {
 
                               <Layout
                                 style={{
-                                  marginTop: "16px",
+                                  marginTop: "8px",
+                                  padding: "16px",
+                                  backgroundColor: token.colorBgLayout,
+                                  borderRadius: token.borderRadiusLG,
                                   color: token.colorTextSecondary,
-                                  fontSize: "14px",
-                                  backgroundColor: "transparent",
+                                  fontSize: "15px",
                                 }}
                               >
-                                <ul style={{ paddingLeft: "18px", margin: 0 }}>
-                                  <li>รับทั้งสิ้น {job.vacancyCount} อัตรา</li>
-                                  <li>ประสบการณ์: {job.teachingExperience}</li>
-                                  <li>ใบอนุญาต: {job.licenseRequired}</li>
+                                <ul
+                                  style={{
+                                    paddingLeft: "20px",
+                                    margin: 0,
+                                    lineHeight: "1.8",
+                                  }}
+                                >
+                                  <li>
+                                    <Text style={{ fontSize: "15px" }}>
+                                      รับทั้งสิ้น{" "}
+                                      <Text strong>{job.vacancyCount}</Text>{" "}
+                                      อัตรา
+                                    </Text>
+                                  </li>
+                                  <li>
+                                    <Text style={{ fontSize: "15px" }}>
+                                      ประสบการณ์:{" "}
+                                      <Text strong>
+                                        {job.teachingExperience}
+                                      </Text>
+                                    </Text>
+                                  </li>
+                                  <li>
+                                    <Text style={{ fontSize: "15px" }}>
+                                      ใบอนุญาต:{" "}
+                                      <Text strong>{job.licenseRequired}</Text>
+                                    </Text>
+                                  </li>
                                 </ul>
                               </Layout>
                             </Space>
                           </Col>
-                          <Col flex="100px" style={{ textAlign: "right" }}>
+                          <Col flex="120px" style={{ textAlign: "right" }}>
                             <Avatar
                               shape="square"
-                              size={80}
+                              size={100}
                               src={`https://api.dicebear.com/7.x/initials/svg?seed=${job.schoolName}&backgroundColor=003366`}
+                              style={{
+                                border: `1px solid ${token.colorBorderSecondary}`,
+                              }}
                             />
                           </Col>
                         </Row>
 
-                        <Divider style={{ margin: "20px 0" }} />
+                        <Divider style={{ margin: "24px 0" }} />
 
                         <Row justify="space-between" align="middle">
                           <Col>
-                            <Text type="secondary" style={{ fontSize: "12px" }}>
+                            <Text
+                              type="secondary"
+                              style={{ fontSize: "14px" }}
+                            >
                               <HistoryOutlined />{" "}
                               {dayjs(job.postedAt).fromNow()}
                             </Text>
                           </Col>
                           <Col>
-                            <Space size={12}>
-                              <Button icon={<HeartOutlined />} />
+                            <Space size={16}>
                               <Button
-                                type="link"
+                                size="large"
+                                icon={<HeartOutlined />}
+                                style={{ borderRadius: token.borderRadius }}
+                              />
+                              <Button
+                                type="primary"
+                                size="large"
                                 style={{
-                                  color: token.colorTextSecondary,
-                                  fontWeight: 600,
+                                  fontWeight: 700,
+                                  padding: "0 32px",
+                                  borderRadius: token.borderRadius,
                                 }}
                               >
-                                ไม่สนใจ
+                                รายละเอียดงาน
                               </Button>
                             </Space>
                           </Col>
