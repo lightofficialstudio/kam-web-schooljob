@@ -19,6 +19,9 @@ export { ResumeUploadSection } from "./resume-upload-section";
 // Work Experience (multiple entries)
 export { WorkExperienceSection } from "./work-experience-section";
 
+// Personal Summary Section
+export { PersonalSummarySection } from "./personal-summary-section";
+
 // Section Form Wrapper
 export { SectionForm } from "./section-form";
 

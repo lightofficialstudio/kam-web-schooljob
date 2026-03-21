@@ -27,7 +27,7 @@ export const SkillsLocationSection: React.FC<SkillsLocationSectionProps> = ({
       {/* Skills Section */}
       <Row gutter={16}>
         <Col xs={24} sm={12}>
-          <Form.Item label="ภาษาที่สอนได้" name="languagesSpoken">
+          <Form.Item label="ภาษาที่พูดได้" name="languagesSpoken">
             <Select
               mode="multiple"
               placeholder="เช่น ไทย, อังกฤษ, จีน..."
@@ -57,17 +57,6 @@ export const SkillsLocationSection: React.FC<SkillsLocationSectionProps> = ({
                 { label: "Canva", value: "canva" },
                 { label: "Coding", value: "coding" },
               ]}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col xs={24}>
-          <Form.Item label="กิจกรรม / ทักษะพิเศษ" name="specialActivities">
-            <Input.TextArea
-              placeholder="เช่น ดนตรี, กีฬา, ศิลปะ, นวัตกรรมอื่นๆ..."
-              rows={3}
             />
           </Form.Item>
         </Col>

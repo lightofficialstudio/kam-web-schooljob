@@ -33,6 +33,7 @@ import {
   BasicInfoSection,
   EducationHistorySection,
   GenderDobPhotoSection,
+  PersonalSummarySection,
   ProfileEditDrawer,
   ProfileSectionWrapper,
   SkillsLocationSection,
@@ -110,8 +111,11 @@ export default function EmployeeProfilePage() {
       form.setFieldsValue({
         languagesSpoken: profile.languagesSpoken,
         itSkills: profile.itSkills,
-        specialActivities: profile.specialActivities,
         preferredProvinces: profile.preferredProvinces,
+      });
+    } else if (sectionId === "personal-summary") {
+      form.setFieldsValue({
+        specialActivities: profile.specialActivities,
       });
     }
     setIsDrawerOpen(true);
@@ -305,7 +309,7 @@ export default function EmployeeProfilePage() {
                   {/* Personal Summary */}
                   <ProfileSectionWrapper
                     title="สรุปข้อมูลส่วนตัว"
-                    onEdit={() => handleOpenEdit("skills")}
+                    onEdit={() => handleOpenEdit("personal-summary")}
                     id="personal-summary"
                   >
                     <Text style={{ fontSize: 15, lineHeight: 1.6 }}>
@@ -542,17 +546,19 @@ export default function EmployeeProfilePage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSave={handleSave}
-        title={`แก้ไข${
+        title={
           editSection === "basic-info"
-            ? "ข้อมูลพื้นฐาน"
+            ? "แก้ไขข้อมูลพื้นฐาน"
             : editSection === "personal-info"
-              ? "ข้อมูลส่วนตัว"
+              ? "แก้ไขข้อมูลส่วนตัว"
               : editSection === "teaching"
-                ? "ข้อมูลการสอน"
+                ? "แก้ไขข้อมูลการสอน"
                 : editSection === "skills"
-                  ? "ทักษะและสถานที่ทำงาน"
-                  : "ข้อมูล"
-        }`}
+                  ? "แก้ไขทักษะและสถานที่ทำงาน"
+                  : editSection === "personal-summary"
+                    ? "แก้ไขสรุปข้อมูลส่วนตัว"
+                    : "แก้ไขข้อมูล"
+        }
       >
         <Form form={form} layout="vertical">
           {editSection === "basic-info" && <BasicInfoSection form={form} />}
@@ -561,6 +567,9 @@ export default function EmployeeProfilePage() {
           )}
           {editSection === "teaching" && <TeachingInfoSection form={form} />}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
+          {editSection === "personal-summary" && (
+            <PersonalSummarySection form={form} />
+          )}
         </Form>
       </ProfileEditDrawer>
     </Layout>
