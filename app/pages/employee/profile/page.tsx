@@ -289,7 +289,6 @@ export default function EmployeeProfilePage() {
                   <ProfileSectionWrapper
                     id="work-experience"
                     title="ประวัติการทำงาน"
-                    onEdit={() => handleOpenEdit("work-experience")}
                   >
                     <WorkExperienceSection />
                   </ProfileSectionWrapper>

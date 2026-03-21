@@ -4,6 +4,7 @@ import { useNotificationModalStore } from "@/app/stores/notification-modal-store
 import {
   CheckCircleFilled,
   CloseCircleFilled,
+  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
@@ -12,19 +13,29 @@ import {
   Button,
   Card,
   Checkbox,
+  Col,
   DatePicker,
   Divider,
+  Drawer,
   Empty,
+  Flex,
   Form,
   Input,
+  Layout,
   Modal,
+  Row,
   Space,
+  Typography,
+  theme as antTheme,
 } from "antd";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { WorkExperienceEntry, useProfileStore } from "../stores/profile-store";
 
+const { Title, Text, Paragraph } = Typography;
+
 export const WorkExperienceSection: React.FC = () => {
+  const { token } = antTheme.useToken();
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -130,154 +141,238 @@ export const WorkExperienceSection: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Form for Adding/Editing */}
-      {isAddingNew && (
-        <Card className="border-2 border-blue-300 bg-blue-50">
-          <h3 className="text-lg font-semibold mb-4">
-            {editingIndex !== null
-              ? "แก้ไขประสบการณ์การทำงาน"
-              : "เพิ่มประสบการณ์การทำงาน"}
-          </h3>
-          <Form form={form} layout="vertical" requiredMark="optional">
-            <Form.Item
-              label="ตำแหน่งงาน"
-              name="jobTitle"
-              rules={[{ required: true, message: "กรุณากรอกตำแหน่งงาน" }]}
-            >
-              <Input placeholder="เช่น ครูสอนภาษาอังกฤษ" />
-            </Form.Item>
+    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+      {/* 1. Add/Edit Drawer (UX following job page pattern) */}
+      <Drawer
+        open={isAddingNew}
+        onClose={handleCancel}
+        width="60%"
+        closable={false}
+        placement="right"
+        styles={{ body: { padding: 0 } }}
+      >
+        <Layout
+          style={{
+            position: "relative",
+            minHeight: "100%",
+            backgroundColor: token.colorBgContainer,
+          }}
+        >
+          {/* Header Sticky Action Bar */}
+          <Layout.Header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+              backgroundColor: token.colorBgContainer,
+              padding: "16px 24px",
+              borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "12px",
+              height: "auto",
+            }}
+          >
+            <Title level={4} style={{ margin: 0 }}>
+              {editingIndex !== null
+                ? "แก้ไขประสบการณ์การทำงาน"
+                : "เพิ่มประสบการณ์การทำงาน"}
+            </Title>
+            <Button
+              type="text"
+              icon={<CloseOutlined style={{ fontSize: "20px" }} />}
+              onClick={handleCancel}
+            />
+          </Layout.Header>
 
-            <Form.Item
-              label="ชื่อบริษัท / สถาบัน"
-              name="companyName"
-              rules={[{ required: true, message: "กรุณากรอกชื่อบริษัท" }]}
-            >
-              <Input placeholder="เช่น โรงเรียน ABC" />
-            </Form.Item>
-
-            <div className="grid grid-cols-2 gap-4">
+          {/* Content Area */}
+          <Layout.Content
+            style={{
+              padding: "32px 40px 80px 40px",
+              backgroundColor: token.colorBgContainer,
+            }}
+          >
+            <Form form={form} layout="vertical">
               <Form.Item
-                label="วันเดือนปีที่เริ่มงาน"
-                name="startDate"
-                rules={[
-                  { required: true, message: "กรุณาเลือกวันที่เริ่มงาน" },
-                ]}
+                label="ตำแหน่งงาน"
+                name="jobTitle"
+                required
+                rules={[{ required: true, message: "กรุณากรอกตำแหน่งงาน" }]}
               >
-                <DatePicker className="w-full" />
+                <Input placeholder="เช่น ครูสอนภาษาอังกฤษ" size="large" />
               </Form.Item>
 
               <Form.Item
-                label="วันเดือนปีที่สิ้นสุด"
-                name="endDate"
-                rules={[
-                  {
-                    required: false,
-                  },
-                ]}
+                label="ชื่อบริษัท / สถาบัน"
+                name="companyName"
+                required
+                rules={[{ required: true, message: "กรุณากรอกชื่อบริษัท" }]}
               >
-                <DatePicker
-                  className="w-full"
-                  disabled={form.getFieldValue("inPresent")}
+                <Input placeholder="เช่น โรงเรียน ABC" size="large" />
+              </Form.Item>
+
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="วันที่เริ่มงาน"
+                    name="startDate"
+                    required
+                    rules={[
+                      { required: true, message: "กรุณาเลือกวันที่เริ่มงาน" },
+                    ]}
+                  >
+                    <DatePicker style={{ width: "100%" }} size="large" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="วันที่สิ้นสุด" name="endDate">
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      size="large"
+                      disabled={form.getFieldValue("inPresent")}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Form.Item
+                name="inPresent"
+                valuePropName="checked"
+                initialValue={false}
+              >
+                <Checkbox
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      form.setFieldValue("endDate", null);
+                    }
+                  }}
+                >
+                  ยังคงทำงานที่นี่
+                </Checkbox>
+              </Form.Item>
+
+              <Form.Item label="คำอธิบายหน้าที่การทำงาน" name="description">
+                <Input.TextArea
+                  rows={6}
+                  placeholder="อธิบายความรับผิดชอบและสำเร็จการงาน..."
                 />
               </Form.Item>
-            </div>
 
-            <Form.Item
-              name="inPresent"
-              valuePropName="checked"
-              initialValue={false}
-            >
-              <Checkbox>ยังคงทำงานที่นี่</Checkbox>
-            </Form.Item>
+              <Divider style={{ margin: "32px 0 24px 0" }} />
 
-            <Form.Item label="คำอธิบายหน้าที่การทำงาน" name="description">
-              <Input.TextArea
-                rows={4}
-                placeholder="อธิบายความรับผิดชอบและสำเร็จการงาน..."
-              />
-            </Form.Item>
-
-            <Form.Item>
-              <Space>
-                <Button type="primary" onClick={handleSave}>
-                  {editingIndex !== null ? "บันทึกการแก้ไข" : "เพิ่มรายการ"}
+              <Flex justify="end" gap={12}>
+                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
+                  ยกเลิก
                 </Button>
-                <Button onClick={handleCancel}>ยกเลิก</Button>
-              </Space>
-            </Form.Item>
-          </Form>
-        </Card>
-      )}
+                <Button
+                  type="primary"
+                  onClick={handleSave}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
+                  บันทึก
+                </Button>
+              </Flex>
+            </Form>
+          </Layout.Content>
+        </Layout>
+      </Drawer>
 
-      {/* List of Work Experiences */}
-      <div className="space-y-4">
+      {/* 2. List of Work Experiences */}
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
         {workExperiences.length > 0 ? (
-          <>
-            <h3 className="text-lg font-semibold">
-              ประสบการณ์การทำงาน ({workExperiences.length})
-            </h3>
-            {workExperiences.map((experience, index) => (
-              <Card
-                key={index}
-                className="border border-gray-200 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-900">
+          workExperiences.map((experience, index) => (
+            <Card
+              key={index}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                border: `1px solid ${token.colorBorderSecondary}`,
+              }}
+              styles={{ body: { padding: "20px" } }}
+              hoverable
+            >
+              <Row justify="space-between" align="top">
+                <Col flex="auto">
+                  <Space direction="vertical" size={2}>
+                    <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
                       {experience.jobTitle}
-                    </h4>
-                    <p className="text-sm text-gray-600 mb-2">
+                    </Title>
+                    <Text strong style={{ color: token.colorTextSecondary }}>
                       {experience.companyName}
-                    </p>
-                    <p className="text-xs text-gray-500 mb-3">
-                      {experience.startDate} ถึง{" "}
-                      {experience.inPresent ? "ปัจจุบัน" : experience.endDate}
-                    </p>
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: "13px" }}>
+                      {dayjs(experience.startDate).format("MMM YYYY")} -{" "}
+                      {experience.inPresent
+                        ? "ปัจจุบัน"
+                        : experience.endDate
+                          ? dayjs(experience.endDate).format("MMM YYYY")
+                          : ""}
+                    </Text>
                     {experience.description && (
-                      <>
-                        <Divider className="my-2" />
-                        <p className="text-sm text-gray-700">
-                          {experience.description}
-                        </p>
-                      </>
+                      <Paragraph
+                        ellipsis={{
+                          rows: 2,
+                          expandable: true,
+                          symbol: "ดูเพิ่ม",
+                        }}
+                        style={{
+                          marginTop: "12px",
+                          color: token.colorTextTertiary,
+                          fontSize: "14px",
+                        }}
+                      >
+                        {experience.description}
+                      </Paragraph>
                     )}
-                  </div>
-                  <Space className="ml-4">
+                  </Space>
+                </Col>
+                <Col>
+                  <Space>
                     <Button
                       type="text"
-                      icon={<EditOutlined />}
+                      shape="circle"
+                      icon={
+                        <EditOutlined style={{ color: token.colorPrimary }} />
+                      }
                       onClick={() => handleEdit(index)}
-                      className="text-blue-600 hover:text-blue-800"
                     />
                     <Button
                       type="text"
+                      shape="circle"
+                      danger
                       icon={<DeleteOutlined />}
                       onClick={() => handleDelete(index)}
-                      className="text-red-600 hover:text-red-800"
                     />
                   </Space>
-                </div>
-              </Card>
-            ))}
-          </>
+                </Col>
+              </Row>
+            </Card>
+          ))
         ) : (
-          !isAddingNew && <Empty description="ยังไม่มีประสบการณ์การทำงาน" />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="ยังไม่มีข้อมูลประสบการณ์การทำงาน"
+          />
         )}
-      </div>
+      </Space>
 
-      {/* Add Button */}
-      {!isAddingNew && (
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          block
-          onClick={handleAddNew}
-          size="large"
-        >
-          เพิ่มประสบการณ์การทำงาน
-        </Button>
-      )}
-    </div>
+      {/* 3. Global Add Button */}
+      <Button
+        type="dashed"
+        icon={<PlusOutlined />}
+        block
+        onClick={handleAddNew}
+        size="large"
+        style={{
+          height: "54px",
+          borderRadius: token.borderRadiusLG,
+          fontSize: "16px",
+          fontWeight: 600,
+        }}
+      >
+        เพิ่มประสบการณ์การทำงาน
+      </Button>
+    </Space>
   );
 };
