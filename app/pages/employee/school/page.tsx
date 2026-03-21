@@ -147,7 +147,7 @@ export default function SchoolDirectoryPage() {
               ) : (
                 <Col span={24}>
                   <Card
-                    bordered={false}
+                    variant="borderless"
                     style={{
                       borderRadius: token.borderRadiusLG,
                       textAlign: "center",
