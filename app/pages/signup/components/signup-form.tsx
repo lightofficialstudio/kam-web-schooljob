@@ -34,7 +34,7 @@ interface ModalState {
   open: boolean;
   type: "success" | "error" | "warning" | "info";
   mainTitle: string;
-  description: string;
+  description: string | React.ReactNode;
 }
 
 export default function SignupForm() {
@@ -54,7 +54,7 @@ export default function SignupForm() {
   const showModal = (
     type: "success" | "error" | "warning" | "info",
     mainTitle: string,
-    description: string,
+    description: string | React.ReactNode,
   ) => {
     setModal({ open: true, type, mainTitle, description });
   };
@@ -94,8 +94,25 @@ export default function SignupForm() {
 
       showModal(
         "success",
-        "สมัครสมาชิกสำเร็จ",
-        result.message_th || "บัญชีของคุณได้สร้างเรียบร้อย",
+        "ตรวจสอบอีเมลของคุณ เพื่อยืนยันการสมัครสมาชิก",
+        <div style={{ textAlign: "center", marginTop: "12px" }}>
+          <Paragraph style={{ marginBottom: "16px", fontSize: "15px" }}>
+            School Board ได้ส่งอีเมลเพื่อยืนยันการสมัครสมาชิกไปที่ <br />
+            <Text strong style={{ color: token.colorPrimary }}>
+              {values.email}
+            </Text>
+          </Paragraph>
+          <Paragraph
+            type="secondary"
+            style={{ fontSize: "14px", lineHeight: "1.6" }}
+          >
+            หากไม่พบอีเมลจาก School Board ในกล่องจดหมาย <br />
+            ให้ตรวจสอบที่ "อีเมลขยะ" หรือ "โปรโมชัน"
+          </Paragraph>
+          <Text strong style={{ display: "block", marginTop: "16px" }}>
+            (และยืนยันการสมัครภายใน 72 ชม.)
+          </Text>
+        </div>,
       );
     } catch (err: any) {
       showModal(
@@ -119,12 +136,12 @@ export default function SignupForm() {
         onCancel={() => setModal({ ...modal, open: false })}
         confirmText="ตกลง"
         centered
-        width={420}
+        width={650}
       />
       <Card
         style={{
-          maxWidth: 1200,
-          width: "100%",
+          maxWidth: 1400,
+          width: "95%",
           borderRadius: 24,
           boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
           overflow: "hidden",
@@ -137,7 +154,7 @@ export default function SignupForm() {
           {/* 🎨 Branding Side */}
           <Col
             xs={0}
-            lg={9}
+            lg={8}
             style={{
               padding: "60px 40px",
               background: isDark ? "#1A202C" : "#f8fbff",
@@ -207,7 +224,7 @@ export default function SignupForm() {
           </Col>
 
           {/* 📝 Form Side */}
-          <Col xs={24} lg={15} style={{ padding: "60px 80px" }}>
+          <Col xs={24} lg={16} style={{ padding: "60px 100px" }}>
             <Space direction="vertical" size={40} style={{ width: "100%" }}>
               <Space direction="vertical" size={8}>
                 <Title level={2}>ลงทะเบียนผู้ใช้งาน</Title>
@@ -226,7 +243,6 @@ export default function SignupForm() {
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
-                requiredMark="optional"
                 size="large"
                 style={{ maxWidth: "100%" }}
               >
