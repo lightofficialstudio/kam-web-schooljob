@@ -6,12 +6,14 @@ export interface User {
   email: string;
   full_name: string;
   role: string;
+  is_first_login?: boolean;
 }
 
 interface AuthStore {
   user: User | null;
   isAuthenticated: boolean;
   setUser: (user: User) => void;
+  setFirstLogin: (isFirst: boolean) => void;
   logout: () => void;
 }
 
@@ -34,6 +36,13 @@ export const useAuthStore = create<AuthStore>()(
           "role:",
           user.role,
         );
+      },
+
+      // ✨ [กำหนดสถานะการเข้าสู่ระบบครั้งแรก]
+      setFirstLogin: (isFirst: boolean) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, is_first_login: isFirst } : null,
+        }));
       },
 
       // ✨ [เคลียร์ user info เมื่อ logout]

@@ -49,13 +49,19 @@ function SigninFormContent() {
 
   const handleModalConfirm = () => {
     if (modal.type === "success") {
-      // ✨ [ถ้ามี redirect URL จากการพยายามเข้า admin route ให้ return ไปหน้านั้น]
       const { user } = useAuthStore.getState();
       let destinationUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/";
 
-      // 🏢 [ถ้า role เป็น EMPLOYER ให้ไปที่หน้าจัดการงาน]
-      if (!redirectUrl && user && user.role === "EMPLOYER") {
-        destinationUrl = "/pages/employer/job/read";
+      // 🏢 [ถ้า role เป็น EMPLOYER และเป็นการเข้าสู่ระบบครั้งแรก ให้ไปที่หน้า Profile]
+      // ✨ ใช้ is_first_login จาก backend response (ถ้าไม่มีให้ check role อย่างเดียว)
+      if (user && user.role === "EMPLOYER") {
+        if (user.is_first_login) {
+          destinationUrl = "/pages/employer/profile";
+          // หลังนำไปหน้าแรกแล้ว ให้เคลียร์สถานะ first login
+          useAuthStore.getState().setFirstLogin(false);
+        } else if (!redirectUrl) {
+          destinationUrl = "/pages/employer/job/read";
+        }
       }
 
       console.log(
@@ -89,6 +95,7 @@ function SigninFormContent() {
           email: result.data.email,
           full_name: result.data.full_name,
           role: result.data.role,
+          is_first_login: result.data.is_first_login || false,
         };
         setUser(userInfo);
 
