@@ -34,6 +34,26 @@ import { WorkExperienceEntry, useProfileStore } from "../stores/profile-store";
 
 const { Title, Text, Paragraph } = Typography;
 
+const calculateDuration = (
+  startDate: string,
+  endDate: string | null,
+  inPresent: boolean,
+) => {
+  const start = dayjs(startDate);
+  const end = inPresent ? dayjs() : dayjs(endDate);
+
+  const years = end.diff(start, "year");
+  const months = end.diff(start.add(years, "year"), "month");
+  const days = end.diff(start.add(years, "year").add(months, "month"), "day");
+
+  const parts = [];
+  if (years > 0) parts.push(`${years} ปี`);
+  if (months > 0) parts.push(`${months} เดือน`);
+  if (days > 0) parts.push(`${days} วัน`);
+
+  return parts.length > 0 ? parts.join(" ") : "0 วัน";
+};
+
 export const WorkExperienceSection: React.FC = () => {
   const { token } = antTheme.useToken();
   const [form] = Form.useForm();
@@ -298,58 +318,117 @@ export const WorkExperienceSection: React.FC = () => {
             >
               <Row justify="space-between" align="top">
                 <Col flex="auto">
-                  <Space direction="vertical" size={2}>
-                    <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
-                      {experience.jobTitle}
-                    </Title>
-                    <Text strong style={{ color: token.colorTextSecondary }}>
+                  <Flex vertical gap={12}>
+                    {/* Header Row: Job Title (Left) and Date Range + Duration (Right) */}
+                    <Row justify="space-between" align="middle" gutter={16}>
+                      <Col flex="1">
+                        <Title
+                          level={5}
+                          style={{
+                            margin: 0,
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            color: token.colorTextHeading,
+                          }}
+                        >
+                          {experience.jobTitle}
+                        </Title>
+                      </Col>
+                      <Col>
+                        <Flex vertical align="end">
+                          <Text
+                            strong
+                            style={{
+                              color: token.colorPrimary,
+                              fontSize: "14px",
+                            }}
+                          >
+                            {dayjs(experience.startDate).format("MMM YYYY")} -{" "}
+                            {experience.inPresent
+                              ? "ปัจจุบัน"
+                              : experience.endDate
+                                ? dayjs(experience.endDate).format("MMM YYYY")
+                                : ""}
+                          </Text>
+                          <Text
+                            type="secondary"
+                            style={{ fontSize: "12px", fontWeight: 500 }}
+                          >
+                            (
+                            {calculateDuration(
+                              experience.startDate,
+                              experience.endDate,
+                              experience.inPresent,
+                            )}
+                            )
+                          </Text>
+                        </Flex>
+                      </Col>
+                    </Row>
+
+                    {/* Company Name */}
+                    <Text
+                      strong
+                      style={{
+                        color: token.colorTextSecondary,
+                        fontSize: "16px",
+                        display: "block",
+                      }}
+                    >
                       {experience.companyName}
                     </Text>
-                    <Text type="secondary" style={{ fontSize: "13px" }}>
-                      {dayjs(experience.startDate).format("MMM YYYY")} -{" "}
-                      {experience.inPresent
-                        ? "ปัจจุบัน"
-                        : experience.endDate
-                          ? dayjs(experience.endDate).format("MMM YYYY")
-                          : ""}
-                    </Text>
+
+                    {/* Description */}
                     {experience.description && (
                       <Paragraph
                         ellipsis={{
-                          rows: 2,
+                          rows: 3,
                           expandable: true,
-                          symbol: "ดูเพิ่ม",
+                          symbol: "อ่านเพิ่มเติม",
                         }}
                         style={{
-                          marginTop: "12px",
-                          color: token.colorTextTertiary,
-                          fontSize: "14px",
+                          margin: 0,
+                          color: token.colorText,
+                          fontSize: "15px",
+                          lineHeight: 1.6,
+                          backgroundColor: token.colorFillAlter,
+                          padding: "12px 16px",
+                          borderRadius: token.borderRadius,
+                          borderLeft: `3px solid ${token.colorBorder}`,
                         }}
                       >
                         {experience.description}
                       </Paragraph>
                     )}
-                  </Space>
+                  </Flex>
                 </Col>
-                <Col>
-                  <Space>
-                    <Button
-                      type="text"
-                      shape="circle"
-                      icon={
-                        <EditOutlined style={{ color: token.colorPrimary }} />
-                      }
-                      onClick={() => handleEdit(index)}
-                    />
-                    <Button
-                      type="text"
-                      shape="circle"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDelete(index)}
-                    />
-                  </Space>
-                </Col>
+              </Row>
+
+              <Divider style={{ margin: "16px 0" }} />
+
+              <Row justify="end">
+                <Space size={12}>
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEdit(index)}
+                    style={{
+                      color: token.colorPrimary,
+                      fontWeight: 600,
+                    }}
+                  >
+                    แก้ไขข้อมูล
+                  </Button>
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDelete(index)}
+                    style={{ fontWeight: 600 }}
+                  >
+                    ลบ
+                  </Button>
+                </Space>
               </Row>
             </Card>
           ))
