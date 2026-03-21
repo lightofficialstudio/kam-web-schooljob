@@ -297,7 +297,6 @@ export default function EmployeeProfilePage() {
                   <ProfileSectionWrapper
                     id="education"
                     title="ประวัติการศึกษา"
-                    onEdit={() => handleOpenEdit("education")}
                   >
                     <EducationHistorySection />
                   </ProfileSectionWrapper>
