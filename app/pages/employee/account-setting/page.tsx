@@ -7,7 +7,7 @@ import AccountSettingForm from "./components/account-setting-form";
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
-const TeacherAccountSettingPage = () => {
+const EmployeeAccountSettingPage = () => {
   return (
     <Content style={{ padding: "40px 24px", minHeight: "100vh" }}>
       <Row justify="center">
@@ -30,7 +30,7 @@ const TeacherAccountSettingPage = () => {
                     title: (
                       <Space size={4}>
                         <UserOutlined style={{ fontSize: "14px" }} />
-                        <span>โปรไฟล์ครู</span>
+                        <span>โปรไฟล์ผู้สมัคร</span>
                       </Space>
                     ),
                   },
@@ -81,4 +81,4 @@ const TeacherAccountSettingPage = () => {
   );
 };
 
-export default TeacherAccountSettingPage;
+export default EmployeeAccountSettingPage;

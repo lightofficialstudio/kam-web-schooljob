@@ -25,7 +25,7 @@ const AccountSettingForm = () => {
     setLoading(true);
     try {
       // TODO: Connect with API /api/v1/user/update-email
-      console.log("Updating email for teacher:", values.email);
+      console.log("Updating email for employee:", values.email);
       message.success("อัปเดตอีเมลเรียบร้อยแล้ว");
     } catch (error) {
       message.error("ไม่สามารถอัปเดตอีเมลได้");
@@ -38,7 +38,7 @@ const AccountSettingForm = () => {
     setLoading(true);
     try {
       // TODO: Connect with API /api/v1/user/update-password
-      console.log("Updating password for teacher");
+      console.log("Updating password for employee");
       message.success("เปลี่ยนรหัสผ่านเรียบร้อยแล้ว");
       passwordForm.resetFields();
     } catch (error) {

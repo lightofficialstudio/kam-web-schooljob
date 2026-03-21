@@ -52,7 +52,7 @@ type SectionId =
   | "skills"
   | "personal-summary";
 
-export default function TeacherProfilePage() {
+export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
   const { profile, setProfile } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
@@ -216,10 +216,7 @@ export default function TeacherProfilePage() {
                           />
                         </Badge>
 
-                        <Flex
-                          vertical
-                          style={{ paddingTop: 8 }}
-                        >
+                        <Flex vertical style={{ paddingTop: 8 }}>
                           <Title
                             level={1}
                             style={{
@@ -233,11 +230,7 @@ export default function TeacherProfilePage() {
                             {profile.firstName || "THANAT"}{" "}
                             {profile.lastName || "PROMPIRIYA"}
                           </Title>
-                          <Flex
-                            vertical
-                            gap={8}
-                            style={{ marginTop: 16 }}
-                          >
+                          <Flex vertical gap={8} style={{ marginTop: 16 }}>
                             <Space size={12}>
                               <EnvironmentOutlined
                                 style={{ color: token.colorTextDescription }}

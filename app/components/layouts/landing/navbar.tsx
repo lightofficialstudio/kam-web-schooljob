@@ -43,7 +43,7 @@ export default function Navbar() {
         if (user?.role === "EMPLOYER") {
           router.push("/pages/employer/profile");
         } else {
-          router.push("/pages/teacher/profile/");
+          router.push("/pages/employee/profile/");
         }
       },
     },
@@ -55,7 +55,7 @@ export default function Navbar() {
         if (user?.role === "EMPLOYER") {
           router.push("/pages/employer/account-setting");
         } else {
-          router.push("/pages/teacher/account-setting");
+          router.push("/pages/employee/account-setting");
         }
       },
     },
@@ -140,7 +140,7 @@ export default function Navbar() {
               </Text>
             </Link>
             <Link
-              href="/pages/teacher/profile"
+              href="/pages/employee/profile"
               style={{ textDecoration: "none" }}
             >
               <Text strong style={{ cursor: "pointer" }}>
@@ -148,7 +148,7 @@ export default function Navbar() {
               </Text>
             </Link>
             <Link
-              href="/pages/teacher/school"
+              href="/pages/employee/school"
               style={{ textDecoration: "none" }}
             >
               <Text strong style={{ cursor: "pointer" }}>

@@ -53,7 +53,7 @@ export interface SkillEntry {
   isDeleted?: boolean;
 }
 
-interface TeacherProfile {
+interface EmployeeProfile {
   // Basic info
   id: string;
   userId: string;
@@ -103,9 +103,9 @@ interface TeacherProfile {
 }
 
 interface ProfileStore {
-  profile: Partial<TeacherProfile>;
-  setProfile: (profile: Partial<TeacherProfile>) => void;
-  updateField: (field: keyof TeacherProfile, value: any) => void;
+  profile: Partial<EmployeeProfile>;
+  setProfile: (profile: Partial<EmployeeProfile>) => void;
+  updateField: (field: keyof EmployeeProfile, value: any) => void;
   resetProfile: () => void;
 
   // Work Experience helpers
@@ -137,7 +137,7 @@ interface ProfileStore {
   removeSkill: (index: number) => void;
 }
 
-const initialProfile: Partial<TeacherProfile> = {
+const initialProfile: Partial<EmployeeProfile> = {
   firstName: "",
   lastName: "",
   phoneNumber: "",
