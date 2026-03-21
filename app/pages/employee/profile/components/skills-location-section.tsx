@@ -1,4 +1,4 @@
-import { Checkbox, Col, Form, Input, Row, Select } from "antd";
+import { Checkbox, Col, Form, Row, Select } from "antd";
 import React from "react";
 
 interface SkillsLocationSectionProps {
