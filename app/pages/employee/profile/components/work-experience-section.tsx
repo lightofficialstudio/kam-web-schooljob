@@ -166,7 +166,7 @@ export const WorkExperienceSection: React.FC = () => {
       <Drawer
         open={isAddingNew}
         onClose={handleCancel}
-        width="60%"
+        size="large"
         closable={false}
         placement="right"
         styles={{ body: { padding: 0 } }}
