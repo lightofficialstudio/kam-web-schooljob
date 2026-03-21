@@ -161,7 +161,7 @@ export const WorkExperienceSection: React.FC = () => {
   };
 
   return (
-    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
       {/* 1. Add/Edit Drawer (UX following job page pattern) */}
       <Drawer
         open={isAddingNew}

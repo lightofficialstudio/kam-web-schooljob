@@ -36,7 +36,7 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       placement="right"
       onClose={onClose}
       open={isOpen}
-      width={width}
+      size={width}
       styles={{
         header: { borderBottom: `1px solid ${token.colorBorderSecondary}` },
         body: { padding: "24px" },

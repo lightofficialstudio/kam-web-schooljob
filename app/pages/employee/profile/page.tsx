@@ -545,7 +545,7 @@ export default function EmployeeProfilePage() {
       <ProfileEditDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        onSave={handleSave}
+        onSave={() => form.submit()}
         title={
           editSection === "basic-info"
             ? "แก้ไขข้อมูลพื้นฐาน"
@@ -560,7 +560,7 @@ export default function EmployeeProfilePage() {
                     : "แก้ไขข้อมูล"
         }
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" onFinish={handleSave}>
           {editSection === "basic-info" && <BasicInfoSection form={form} />}
           {editSection === "personal-info" && (
             <GenderDobPhotoSection form={form} />
