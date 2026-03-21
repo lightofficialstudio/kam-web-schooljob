@@ -618,29 +618,42 @@ function JobSearchPageContent() {
             <Row gutter={40}>
               {/* LEFT COLUMN: Job Listings */}
               <Col span={16}>
-                <Layout
+                <Row
+                  justify="space-between"
+                  align="middle"
                   style={{
-                    marginBottom: "20px",
-                    backgroundColor: "transparent",
+                    marginBottom: "24px",
                   }}
                 >
-                  <Title
-                    level={4}
-                    style={{
-                      display: "inline-block",
-                      marginRight: "8px",
-                      margin: 0,
-                    }}
-                  >
-                    {filters.keyword
-                      ? `ผลการค้นหาสำหรับ "${filters.keyword}"`
-                      : "งานที่แนะนำสำหรับคุณ"}
-                  </Title>
-                  <Badge
-                    count={filteredJobs.length}
-                    style={{ backgroundColor: token.colorTextQuaternary }}
-                  />
-                </Layout>
+                  <Col>
+                    <Space size={12} align="center">
+                      <Title
+                        level={4}
+                        style={{
+                          margin: 0,
+                        }}
+                      >
+                        {filters.keyword
+                          ? `ผลการค้นหาสำหรับ "${filters.keyword}"`
+                          : "งานที่แนะนำสำหรับคุณ"}
+                      </Title>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Badge
+                      count={`ค้นหางานเจอทั้งหมด ${filteredJobs.length} งาน`}
+                      style={{
+                        backgroundColor: "#f50",
+                        padding: "0 12px",
+                        height: "28px",
+                        lineHeight: "28px",
+                        borderRadius: "14px",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                      }}
+                    />
+                  </Col>
+                </Row>
 
                 <Space direction="vertical" size={16} style={{ width: "100%" }}>
                   {filteredJobs.length > 0 ? (
