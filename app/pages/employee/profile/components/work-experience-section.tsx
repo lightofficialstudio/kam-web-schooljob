@@ -262,7 +262,11 @@ export const WorkExperienceSection: React.FC = () => {
               <Divider style={{ margin: "32px 0 24px 0" }} />
 
               <Flex justify="end" gap={12}>
-                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
+                <Button
+                  onClick={handleCancel}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
                   ยกเลิก
                 </Button>
                 <Button
