@@ -8,6 +8,7 @@ import {
   EnvironmentOutlined,
   LinkOutlined,
   MailOutlined,
+  PlayCircleOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -54,9 +55,19 @@ type SectionId =
 
 export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
-  const { profile, setProfile } = useProfileStore();
+  const { profile, setProfile, setMockupData } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
   const [form] = Form.useForm();
+
+  const handleMockup = () => {
+    setMockupData();
+    openNotification({
+      type: "success",
+      mainTitle: "จำลองข้อมูลสำเร็จ",
+      description: "ระบบได้จำลองข้อมูลโปรไฟล์ให้คุณเรียบร้อยแล้ว",
+      icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
+    });
+  };
 
   const [editSection, setEditSection] = useState<SectionId | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -230,6 +241,24 @@ export default function EmployeeProfilePage() {
                             {profile.firstName || "THANAT"}{" "}
                             {profile.lastName || "PROMPIRIYA"}
                           </Title>
+
+                          {/* Mockup Button */}
+                          <div style={{ marginTop: 8 }}>
+                            <Button
+                              type="primary"
+                              ghost
+                              size="small"
+                              icon={<PlayCircleOutlined />}
+                              onClick={handleMockup}
+                              style={{
+                                borderRadius: token.borderRadiusSM,
+                                fontSize: "12px",
+                              }}
+                            >
+                              จำลองข้อมูล (Mockup Data)
+                            </Button>
+                          </div>
+
                           <Flex vertical gap={8} style={{ marginTop: 16 }}>
                             <Space size={12}>
                               <EnvironmentOutlined

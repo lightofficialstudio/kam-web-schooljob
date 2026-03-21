@@ -135,6 +135,9 @@ interface ProfileStore {
   addSkill: (skill: SkillEntry) => void;
   updateSkill: (index: number, skill: SkillEntry) => void;
   removeSkill: (index: number) => void;
+
+  // Mockup Data Helper
+  setMockupData: () => void;
 }
 
 const initialProfile: Partial<EmployeeProfile> = {
@@ -314,6 +317,118 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       profile: {
         ...state.profile,
         skills: state.profile.skills?.filter((_, i) => i !== index),
+      },
+    })),
+
+  // Mockup Data Implementation
+  setMockupData: () =>
+    set(() => ({
+      profile: {
+        firstName: "ธนวัฒน์",
+        lastName: "เรียนรู้ดี",
+        phoneNumber: "081-234-5678",
+        gender: "ชาย",
+        dateOfBirth: "1995-05-15",
+        profileImageUrl:
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=ธนวัฒน์",
+        email: "thanawat.learn@example.com",
+        specialActivities:
+          "ครูผู้เชี่ยวชาญด้านการสอนภาษาอังกฤษและเทคโนโลยีการศึกษา มีความมุ่งมั่นในการพัฒนาทักษะการเรียนรู้ของผู้เรียนผ่านนวัตกรรมการสอนสมัยใหม่ (Active Learning) ชอบการทำกิจกรรมจิตอาสาและแนะแนวการศึกษา",
+        workExperiences: [
+          {
+            jobTitle: "ครูสอนภาษาอังกฤษ (English Teacher)",
+            companyName: "โรงเรียนนานาชาติเซนต์แมรี่",
+            startDate: "2022-05-01",
+            endDate: "",
+            inPresent: true,
+            description:
+              "รับผิดชอบการสอนวิชาภาษาอังกฤษระดับมัธยมศึกษาตอนปลาย (G10-12) ออกแบบหลักสูตรเน้นการสื่อสารและการใช้ภาษาในชีวิตจริง จัดกิจกรรมค่ายภาษาอังกฤษประจำปี และเป็นที่ปรึกษาชมรมโต้วาทีภาษาอังกฤษ",
+          },
+          {
+            jobTitle: "วิทยากรพิเศษ (Educational Content Creator)",
+            companyName: "สถาบันกวดวิชาเอกวิทย์",
+            startDate: "2020-06-01",
+            endDate: "2022-04-30",
+            inPresent: false,
+            description:
+              "ออกแบบเนื้อหาการสอนและผลิตสื่อวิดีโอเพื่อการเรียนรู้ออนไลน์สำหรับ เตรียมสอบเข้ามหาวิทยาลัย (TCAS) มีนักเรียนติดตามและเข้าร่วมคอร์สมากกว่า 500 คนต่อเทอม",
+          },
+          {
+            jobTitle: "ครูอัตราจ้าง วิชาภาษาอังกฤษ",
+            companyName: "โรงเรียนสาธิตพุทธมณฑล",
+            startDate: "2018-05-15",
+            endDate: "2020-04-30",
+            inPresent: false,
+            description:
+              "สอนวิชาภาษาอังกฤษพื้นฐานและภาษาอังกฤษเพิ่มเติมสำหรับนักเรียนมัธยมต้น ดูแลโครงการนักเรียนแลกเปลี่ยนต่างชาติ และร่วมพัฒนาหลักสูตรท้องถิ่น",
+          },
+          {
+            jobTitle: "ผู้ช่วยวิจัยด้านการศึกษา (Research Assistant)",
+            companyName: "คณะครุศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย",
+            startDate: "2017-06-01",
+            endDate: "2018-04-30",
+            inPresent: false,
+            description:
+              "ช่วยเก็บรวบรวมข้อมูลงานวิจัยเกี่ยวกับการพัฒนาทักษะการอ่านของเด็กไทย จัดทำรายงานสรุปผลการวิจัย และช่วยงานฝ่ายวิชาการของคณะ",
+          },
+          {
+            jobTitle: "ติวเตอร์อาสา (Volunteer Tutor)",
+            companyName: "มูลนิธิเด็กไทยเติบโต",
+            startDate: "2016-01-01",
+            endDate: "2017-05-01",
+            inPresent: false,
+            description:
+              "สอนเสริมวิชาภาษาอังกฤษและทักษะชีวิตให้กับเด็กในชุมชนขาดแคลนช่วงวันหยุดสุดสัปดาห์ จัดกิจกรรมส่งเสริมการอ่านและศิลปะเพื่อการเรียนรู้",
+          },
+        ],
+        educations: [
+          {
+            level: "ปริญญาโท",
+            institution: "มหาวิทยาลัยธรรมศาสตร์",
+            major: "ศิลปศาสตร์มหาบัณฑิต (การสอนภาษาอังกฤษ)",
+            gpa: 3.85,
+          },
+          {
+            level: "ปริญญาตรี",
+            institution: "จุฬาลงกรณ์มหาวิทยาลัย",
+            major: "ครุศาสตร์บัณฑิต (สาขาวิชาภาษาอังกฤษ-ภาษาไทย)",
+            gpa: 3.75,
+          },
+          {
+            level: "มัธยมศึกษา",
+            institution: "โรงเรียนเตรียมอุดมศึกษา",
+            major: "ศิลป์-ภาษา (อังกฤษ-เยอรมัน)",
+            gpa: 3.9,
+          },
+          {
+            level: "อื่นๆ",
+            institution: "British Council Thailand",
+            major: "CELTA (Certificate in English Language Teaching)",
+            gpa: 4.0,
+          },
+        ],
+        specialization: [
+          "การสอนภาษาอังกฤษ (ESL/EFL)",
+          "การออกแบบบทเรียนออนไลน์",
+          "เทคโนโลยีเพื่อการศึกษา (EdTech)",
+          "แนะแนวการศึกษาต่อ",
+        ],
+        gradeCanTeach: ["ประถมศึกษา", "มัธยมศึกษาตอนต้น", "มัธยมศึกษาตอนปลาย"],
+        teachingExperience: "5-10 ปี",
+        languagesSpoken: ["ไทย (Native)", "อังกฤษ (Fluent)", "เยอรมัน (Basic)"],
+        itSkills: [
+          "Microsoft Office Specialist",
+          "Google Classroom / Canvas",
+          "Canva for Education",
+          "Zoom / MS Teams Expert",
+        ],
+        preferredProvinces: [
+          "กรุงเทพมหานคร",
+          "เชียงใหม่",
+          "นนทบุรี",
+          "ปทุมธานี",
+        ],
+        canRelocate: true,
       },
     })),
 }));
