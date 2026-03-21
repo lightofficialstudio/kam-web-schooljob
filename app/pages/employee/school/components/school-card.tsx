@@ -7,6 +7,7 @@ import {
   Card,
   Col,
   Divider,
+  Flex,
   Row,
   Space,
   Tag,
@@ -50,8 +51,8 @@ export const SchoolCard = ({
       style={{
         borderRadius: token.borderRadiusLG,
         marginBottom: 16,
-        border: `1px solid ${token.colorBorder}`, // ใช้สี border ที่เข้มขึ้น
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)", // เพิ่มเงาเล็กน้อยเพื่อให้มีมิติ
+        border: `1px solid ${token.colorBorder}`,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
         overflow: "hidden",
       }}
@@ -67,7 +68,7 @@ export const SchoolCard = ({
             alignItems: "center",
             justifyContent: "center",
             padding: 24,
-            borderRight: `1px solid ${token.colorBorder}`, // เส้นคั่นระหว่างรูปกับเนื้อหาเข้มขึ้น
+            borderRight: `1px solid ${token.colorBorder}`,
           }}
         >
           <Avatar
@@ -76,9 +77,9 @@ export const SchoolCard = ({
             src={logo}
             style={{
               borderRadius: 12,
-              border: `2px solid #fff`,
+              border: `2px solid ${token.colorWhite}`,
               boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              backgroundColor: "#fff",
+              backgroundColor: token.colorWhite,
             }}
           />
         </Col>
@@ -132,21 +133,23 @@ export const SchoolCard = ({
               </Space>
             </Col>
             <Col>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ marginBottom: 12 }}>
+              <Flex vertical align="flex-end">
+                <Flex vertical style={{ marginBottom: 12, textAlign: "right" }}>
                   <Text type="secondary" style={{ fontSize: 14 }}>
                     กำลังเปิดรับ
                   </Text>
-                  <div
-                    style={{
-                      fontSize: 24,
-                      fontWeight: 800,
-                      color: token.colorPrimary,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {jobCount}{" "}
-                    <span
+                  <Flex align="baseline" gap={4} justify="flex-end">
+                    <Text
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 800,
+                        color: token.colorPrimary,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {jobCount}
+                    </Text>
+                    <Text
                       style={{
                         fontSize: 14,
                         fontWeight: 400,
@@ -154,9 +157,9 @@ export const SchoolCard = ({
                       }}
                     >
                       ตำแหน่ง
-                    </span>
-                  </div>
-                </div>
+                    </Text>
+                  </Flex>
+                </Flex>
                 <Button
                   type="primary"
                   ghost
@@ -169,7 +172,7 @@ export const SchoolCard = ({
                 >
                   ดูตำแหน่งงาน
                 </Button>
-              </div>
+              </Flex>
             </Col>
           </Row>
         </Col>

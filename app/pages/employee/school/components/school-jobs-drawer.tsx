@@ -12,6 +12,7 @@ import {
   Divider,
   Drawer,
   Empty,
+  Flex,
   Row,
   Space,
   Tag,
@@ -48,13 +49,13 @@ export const SchoolJobsDrawer = () => {
                 src={selectedSchool.logo}
                 style={{
                   borderRadius: 12,
-                  border: `1px solid ${token.colorBorderSecondary}`,
-                  backgroundColor: "#fff",
+                  border: `1px solid ${token.colorBorder}`,
+                  backgroundColor: token.colorWhite,
                 }}
               />
             </Col>
             <Col flex="auto">
-              <div>
+              <Flex vertical>
                 <Title
                   level={4}
                   style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}
@@ -78,7 +79,7 @@ export const SchoolJobsDrawer = () => {
                     {selectedSchool.type}
                   </Tag>
                 </Space>
-              </div>
+              </Flex>
             </Col>
           </Row>
         )
@@ -86,7 +87,7 @@ export const SchoolJobsDrawer = () => {
       styles={{
         header: {
           padding: "24px",
-          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          borderBottom: `1px solid ${token.colorBorder}`,
         },
         body: {
           padding: "32px 24px",
@@ -95,14 +96,11 @@ export const SchoolJobsDrawer = () => {
       }}
     >
       {selectedSchool && (
-        <div style={{ width: "100%" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 24,
-            }}
+        <Flex vertical style={{ width: "100%" }}>
+          <Flex
+            justify="space-between"
+            align="center"
+            style={{ marginBottom: 24 }}
           >
             <Title
               level={5}
@@ -116,7 +114,7 @@ export const SchoolJobsDrawer = () => {
             >
               {selectedSchool.jobs.length} ตำแหน่ง
             </Tag>
-          </div>
+          </Flex>
 
           <Space direction="vertical" size={16} style={{ width: "100%" }}>
             {selectedSchool.jobs.length > 0 ? (
@@ -126,18 +124,14 @@ export const SchoolJobsDrawer = () => {
                   hoverable
                   style={{
                     borderRadius: token.borderRadiusLG,
-                    border: `1px solid ${token.colorBorderSecondary}`,
+                    border: `1px solid ${token.colorBorder}`,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   }}
                   styles={{ body: { padding: "20px 24px" } }}
                 >
                   <Row justify="space-between" align="top">
                     <Col flex="auto">
-                      <Space
-                        direction="vertical"
-                        size={12}
-                        style={{ width: "100%" }}
-                      >
+                      <Flex vertical gap={12} style={{ width: "100%" }}>
                         <Title
                           level={5}
                           style={{
@@ -171,7 +165,7 @@ export const SchoolJobsDrawer = () => {
                             </Space>
                           </Col>
                         </Row>
-                      </Space>
+                      </Flex>
                     </Col>
                   </Row>
                 </Card>
@@ -184,7 +178,7 @@ export const SchoolJobsDrawer = () => {
               />
             )}
           </Space>
-        </div>
+        </Flex>
       )}
     </Drawer>
   );

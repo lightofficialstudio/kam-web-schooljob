@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Col,
+  Flex,
   Input,
   Row,
   Select,
@@ -32,14 +33,14 @@ export const SchoolSearch = () => {
     >
       <Row gutter={[20, 20]} align="bottom">
         <Col xs={24} md={10}>
-          <div style={{ marginBottom: 8 }}>
+          <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
               style={{ fontSize: 13, color: token.colorTextSecondary }}
             >
               ค้นหาด้วยชื่อโรงเรียน
             </Text>
-          </div>
+          </Flex>
           <Input
             size="large"
             placeholder="เช่น นานาชาติเซนต์แอนดรูว์ส..."
@@ -58,14 +59,14 @@ export const SchoolSearch = () => {
           />
         </Col>
         <Col xs={12} md={5}>
-          <div style={{ marginBottom: 8 }}>
+          <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
               style={{ fontSize: 13, color: token.colorTextSecondary }}
             >
               เลือกจังหวัด
             </Text>
-          </div>
+          </Flex>
           <Select
             size="large"
             placeholder="กรุงเทพมหานคร"
@@ -80,14 +81,14 @@ export const SchoolSearch = () => {
           />
         </Col>
         <Col xs={12} md={5}>
-          <div style={{ marginBottom: 8 }}>
+          <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
               style={{ fontSize: 13, color: token.colorTextSecondary }}
             >
               ประเภทสถาบัน
             </Text>
-          </div>
+          </Flex>
           <Select
             size="large"
             placeholder="ทุกประเภท"

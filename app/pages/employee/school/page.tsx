@@ -3,6 +3,7 @@
 import {
   Card,
   Col,
+  Flex,
   Layout,
   Row,
   Space,
@@ -40,17 +41,20 @@ export default function SchoolDirectoryPage() {
       }}
     >
       {/* 1. Header Hero Section */}
-      <div
+      <Flex
+        vertical
+        align="center"
+        justify="center"
         style={{
-          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryDark} 100%)`,
+          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorInfoBgHover} 100%)`,
           padding: "120px 24px 80px",
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Decorative elements */}
-        <div
+        {/* Decorative elements using Flex/Box pattern */}
+        <Flex
           style={{
             position: "absolute",
             top: -50,
@@ -58,10 +62,11 @@ export default function SchoolDirectoryPage() {
             width: 300,
             height: 300,
             borderRadius: "50%",
-            background: "rgba(255,255,255,0.05)",
+            background: token.colorWhite,
+            opacity: 0.05,
           }}
         />
-        <div
+        <Flex
           style={{
             position: "absolute",
             bottom: -80,
@@ -69,15 +74,19 @@ export default function SchoolDirectoryPage() {
             width: 250,
             height: 250,
             borderRadius: "50%",
-            background: "rgba(255,255,255,0.03)",
+            background: token.colorWhite,
+            opacity: 0.03,
           }}
         />
 
-        <div style={{ maxWidth: 800, margin: "0 auto", position: "relative" }}>
+        <Flex
+          vertical
+          style={{ maxWidth: 800, margin: "0 auto", position: "relative" }}
+        >
           <Title
             level={1}
             style={{
-              color: "#fff",
+              color: token.colorWhite,
               fontSize: "48px",
               fontWeight: 800,
               marginBottom: 16,
@@ -88,7 +97,8 @@ export default function SchoolDirectoryPage() {
           </Title>
           <Text
             style={{
-              color: "rgba(255,255,255,0.85)",
+              color: token.colorWhite,
+              opacity: 0.85,
               fontSize: "18px",
               display: "block",
               maxWidth: 600,
@@ -98,15 +108,15 @@ export default function SchoolDirectoryPage() {
             สำรวจสถานศึกษาในระบบที่กำลังเปิดรับสมัครงานครูทั่วมุมโลก
             พร้อมดูข้อมูลเบื้องต้นและตำแหน่งงานที่รอคุณอยู่
           </Text>
-        </div>
-      </div>
+        </Flex>
+      </Flex>
 
       <Content style={{ marginTop: -40, padding: "0 24px 80px" }}>
         <Row justify="center">
           <Col span={24} style={{ maxWidth: 1100 }}>
             <SchoolSearch />
 
-            <div style={{ marginBottom: 24 }}>
+            <Flex vertical style={{ marginBottom: 24 }}>
               <Row justify="space-between" align="middle">
                 <Col>
                   <Space size={8}>
@@ -125,7 +135,7 @@ export default function SchoolDirectoryPage() {
                   <Text type="secondary">เรียงตาม: ล่าสุด</Text>
                 </Col>
               </Row>
-            </div>
+            </Flex>
 
             <Row gutter={[24, 24]}>
               {filteredSchools.length > 0 ? (
@@ -145,11 +155,13 @@ export default function SchoolDirectoryPage() {
                       background: token.colorBgContainer,
                     }}
                   >
-                    <div style={{ fontSize: 48, marginBottom: 16 }}>🏫</div>
-                    <Title level={4}>ไม่พบสถานศึกษา</Title>
-                    <Text type="secondary">
-                      ลองเปลี่ยนคำค้นหาหรือตัวกรองเพื่อให้เราพบโรงเรียนที่คุณต้องการ
-                    </Text>
+                    <Flex vertical align="center">
+                      <Text style={{ fontSize: 48, marginBottom: 16 }}>🏫</Text>
+                      <Title level={4}>ไม่พบสถานศึกษา</Title>
+                      <Text type="secondary">
+                        ลองเปลี่ยนคำค้นหาหรือตัวกรองเพื่อให้เราพบโรงเรียนที่คุณต้องการ
+                      </Text>
+                    </Flex>
                   </Card>
                 </Col>
               )}
