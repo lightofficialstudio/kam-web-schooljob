@@ -5,6 +5,7 @@ import { useAuthStore } from "@/app/stores/auth-store";
 import {
   LogoutOutlined,
   MoonOutlined,
+  SettingOutlined,
   SolutionOutlined,
   SunOutlined,
   UserOutlined,
@@ -43,6 +44,18 @@ export default function Navbar() {
           router.push("/pages/employer/profile");
         } else {
           router.push("/pages/teacher/profile/");
+        }
+      },
+    },
+    {
+      key: "account-settings",
+      label: "ตั้งค่าบัญชี",
+      icon: <SettingOutlined />,
+      onClick: () => {
+        if (user?.role === "EMPLOYER") {
+          router.push("/pages/employer/account-setting");
+        } else {
+          router.push("/pages/teacher/account-setting");
         }
       },
     },
