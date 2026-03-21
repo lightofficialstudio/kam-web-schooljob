@@ -294,10 +294,7 @@ export default function EmployeeProfilePage() {
                   </ProfileSectionWrapper>
 
                   {/* Education */}
-                  <ProfileSectionWrapper
-                    id="education"
-                    title="ประวัติการศึกษา"
-                  >
+                  <ProfileSectionWrapper id="education" title="ประวัติการศึกษา">
                     <EducationHistorySection />
                   </ProfileSectionWrapper>
 
