@@ -863,10 +863,7 @@ function JobSearchPageContent() {
 
                         <Row justify="space-between" align="middle">
                           <Col>
-                            <Text
-                              type="secondary"
-                              style={{ fontSize: "14px" }}
-                            >
+                            <Text type="secondary" style={{ fontSize: "14px" }}>
                               <HistoryOutlined />{" "}
                               {dayjs(job.postedAt).fromNow()}
                             </Text>
