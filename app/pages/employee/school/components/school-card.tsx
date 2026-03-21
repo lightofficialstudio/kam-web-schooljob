@@ -50,7 +50,8 @@ export const SchoolCard = ({
       style={{
         borderRadius: token.borderRadiusLG,
         marginBottom: 16,
-        border: `1px solid ${token.colorBorderSecondary}`,
+        border: `1px solid ${token.colorBorder}`, // ใช้สี border ที่เข้มขึ้น
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)", // เพิ่มเงาเล็กน้อยเพื่อให้มีมิติ
         transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
         overflow: "hidden",
       }}
@@ -66,7 +67,7 @@ export const SchoolCard = ({
             alignItems: "center",
             justifyContent: "center",
             padding: 24,
-            borderRight: `1px solid ${token.colorBorderSecondary}`,
+            borderRight: `1px solid ${token.colorBorder}`, // เส้นคั่นระหว่างรูปกับเนื้อหาเข้มขึ้น
           }}
         >
           <Avatar
