@@ -285,6 +285,12 @@ export default function PostJobPage() {
                           <Form.Item
                             label="เงินเดือนเริ่มต้น (บาท)"
                             name="salaryFrom"
+                            rules={[
+                              {
+                                required: salaryType === "SPECIFY",
+                                message: "กรุณาระบุเงินเดือนเริ่มต้น",
+                              },
+                            ]}
                           >
                             <InputNumber
                               size="large"
