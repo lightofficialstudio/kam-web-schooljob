@@ -6,7 +6,10 @@ import {
   EnvironmentOutlined,
 } from "@ant-design/icons";
 import {
+  Avatar,
+  Card,
   Col,
+  Divider,
   Drawer,
   Empty,
   Row,
@@ -33,7 +36,7 @@ export const SchoolJobsDrawer = () => {
     <Drawer
       open={isDrawerOpen}
       onClose={handleClose}
-      width={640}
+      size="large"
       placement="right"
       title={
         selectedSchool && (
@@ -58,7 +61,7 @@ export const SchoolJobsDrawer = () => {
                 >
                   {selectedSchool.name}
                 </Title>
-                <Space size={12} split={<Divider type="vertical" />}>
+                <Space size={12} split={<Divider orientation="vertical" />}>
                   <Space size={4}>
                     <EnvironmentOutlined
                       style={{ color: token.colorPrimary, fontSize: 13 }}
@@ -69,8 +72,8 @@ export const SchoolJobsDrawer = () => {
                   </Space>
                   <Tag
                     color="blue"
-                    bordered={false}
-                    style={{ borderRadius: 6, margin: 0 }}
+                    variant="filled"
+                    style={{ borderRadius: 6, margin: 0, border: "none" }}
                   >
                     {selectedSchool.type}
                   </Tag>

@@ -100,27 +100,29 @@ export const SchoolCard = ({
                       {province}
                     </Text>
                   </Space>
-                  <Divider type="vertical" />
+                  <Divider orientation="vertical" />
                   <Tag
                     color="blue"
-                    bordered={false}
+                    variant="filled"
                     style={{
                       borderRadius: 6,
                       padding: "2px 10px",
                       fontSize: 13,
                       fontWeight: 500,
+                      border: "none",
                     }}
                   >
                     {type}
                   </Tag>
                   <Tag
                     color="green"
-                    bordered={false}
+                    variant="filled"
                     style={{
                       borderRadius: 6,
                       padding: "2px 10px",
                       fontSize: 13,
                       fontWeight: 500,
+                      border: "none",
                     }}
                   >
                     เปิดรับสมัคร
