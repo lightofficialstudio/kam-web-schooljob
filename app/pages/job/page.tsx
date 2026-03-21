@@ -29,6 +29,7 @@ import {
   Drawer,
   Input,
   Layout,
+  Pagination,
   Row,
   Select,
   Space,
@@ -323,6 +324,10 @@ function JobSearchPageContent() {
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // 📄 Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   const handleOpenJob = (job: (typeof MOCK_JOBS)[0]) => {
     setSelectedJob(job);
     setIsDrawerOpen(true);
@@ -383,6 +388,12 @@ function JobSearchPageContent() {
       return true;
     });
   }, [filters]);
+
+  // 📄 Paginated Jobs
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredJobs.slice(startIndex, startIndex + pageSize);
+  }, [filteredJobs, currentPage, pageSize]);
 
   return (
     <Layout
@@ -656,8 +667,8 @@ function JobSearchPageContent() {
                 </Row>
 
                 <Space direction="vertical" size={16} style={{ width: "100%" }}>
-                  {filteredJobs.length > 0 ? (
-                    filteredJobs.map((job) => (
+                  {paginatedJobs.length > 0 ? (
+                    paginatedJobs.map((job) => (
                       <Card
                         key={job.id}
                         hoverable
@@ -827,6 +838,32 @@ function JobSearchPageContent() {
                     </Card>
                   )}
                 </Space>
+
+                {/* 📄 Pagination Control */}
+                {filteredJobs.length > 0 && (
+                  <Card
+                    style={{
+                      marginTop: "24px",
+                      borderRadius: token.borderRadiusLG,
+                      textAlign: "center",
+                    }}
+                    styles={{ body: { padding: "16px 24px" } }}
+                  >
+                    <Pagination
+                      current={currentPage}
+                      pageSize={pageSize}
+                      total={filteredJobs.length}
+                      onChange={(page, size) => {
+                        setCurrentPage(page);
+                        setPageSize(size);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      showSizeChanger
+                      pageSizeOptions={["5", "10", "25", "50"]}
+                      locale={{ items_per_page: "/ หน้า" }}
+                    />
+                  </Card>
+                )}
               </Col>
 
               {/* RIGHT COLUMN: Sidebar Tools */}
