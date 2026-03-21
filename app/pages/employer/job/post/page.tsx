@@ -186,6 +186,8 @@ export default function PostJobPage() {
                         </Select>
                       </Form.Item>
                     </Col>
+                  </Row>
+                  <Row gutter={16}>
                     <Col span={8}>
                       <Form.Item
                         label="จำนวนที่รับ (คน)"
@@ -201,9 +203,7 @@ export default function PostJobPage() {
                         />
                       </Form.Item>
                     </Col>
-                  </Row>
-                  <Row gutter={16}>
-                    <Col span={12}>
+                    <Col span={16}>
                       <Form.Item
                         label="วิชาที่สอน"
                         name="subjects"
@@ -224,7 +224,7 @@ export default function PostJobPage() {
                         </Select>
                       </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={24}>
                       <Form.Item
                         label="ระดับชั้นที่สอน"
                         name="grades"
@@ -438,28 +438,46 @@ export default function PostJobPage() {
                   }}
                 >
                   <Alert
-                    title="ดึงข้อมูลอัตโนมัติจาก School Profile ของคุณ"
+                    title="ข้อมูลสถานที่ทำงาน"
+                    description="ระบบจะดึงข้อมูลเริ่มต้นจาก School Profile ของคุณ หากสถาบันมีหลายสาขา คุณสามารถแก้ไขที่อยู่สำหรับประกาศนี้ได้โดยเฉพาะ"
                     type="info"
                     showIcon
                     style={{ marginBottom: "24px" }}
                   />
                   <Row gutter={16}>
                     <Col span={12}>
-                      <Form.Item label="จังหวัด" name="province">
-                        <Input size="large" disabled value="กรุงเทพมหานคร" />
+                      <Form.Item
+                        label="จังหวัด"
+                        name="province"
+                        rules={[
+                          { required: true, message: "กรุณาระบุจังหวัด" },
+                        ]}
+                      >
+                        <Input size="large" placeholder="ระบุจังหวัด" />
                       </Form.Item>
                     </Col>
                     <Col span={12}>
-                      <Form.Item label="เขต/พื้นที่" name="area">
-                        <Input size="large" disabled value="จตุจักร" />
+                      <Form.Item
+                        label="เขต/พื้นที่"
+                        name="area"
+                        rules={[
+                          { required: true, message: "กรุณาระบุเขต/พื้นที่" },
+                        ]}
+                      >
+                        <Input size="large" placeholder="ระบุเขต/พื้นที่" />
                       </Form.Item>
                     </Col>
                     <Col span={24}>
-                      <Form.Item label="ที่อยู่โรงเรียน" name="address">
+                      <Form.Item
+                        label="ที่อยู่สถาบัน (ระบุสาขาถ้ามี)"
+                        name="address"
+                        rules={[
+                          { required: true, message: "กรุณาระบุที่อยู่" },
+                        ]}
+                      >
                         <Input.TextArea
-                          disabled
                           rows={2}
-                          value="เลขที่ 123 อาคารเรียนสีขาว ถ.พหลโยธิน แขวงลาดยาว"
+                          placeholder="เช่น เลขที่ 123 อาคารเรียนสีขาว ถ.พหลโยธิน แขวงลาดยาว (สาขาจตุจักร)"
                         />
                       </Form.Item>
                     </Col>
