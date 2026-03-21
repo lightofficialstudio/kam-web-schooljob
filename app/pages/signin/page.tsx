@@ -60,7 +60,7 @@ function SigninFormContent() {
           // หลังนำไปหน้าแรกแล้ว ให้เคลียร์สถานะ first login
           useAuthStore.getState().setFirstLogin(false);
         } else if (!redirectUrl) {
-          destinationUrl = "/pages/employer/job/read";
+          destinationUrl = "/pages/employer/profile";
         }
       }
 

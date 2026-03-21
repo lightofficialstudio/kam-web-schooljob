@@ -108,7 +108,7 @@ export default function EmployerProfilePage() {
         justify="center"
         style={{
           height: "280px",
-          background: "#001e45", // ทึบ มองง่าย
+          background: "#11b6f5", // เปลี่ยนเป็นสีฟ้าตามธีมหลัก
           position: "relative",
           overflow: "hidden",
         }}

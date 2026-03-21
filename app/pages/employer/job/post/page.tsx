@@ -165,6 +165,29 @@ export default function PostJobPage() {
                     </Col>
                     <Col span={8}>
                       <Form.Item
+                        label="รูปแบบงาน"
+                        name="employmentType"
+                        rules={[
+                          { required: true, message: "กรุณาเลือกรูปแบบงาน" },
+                        ]}
+                      >
+                        <Select size="large" placeholder="เลือกรูปแบบงาน">
+                          <Option value="FULL_TIME">
+                            งานเต็มเวลา (Full-time)
+                          </Option>
+                          <Option value="PART_TIME">
+                            งานพาร์ทไทม์ (Part-time)
+                          </Option>
+                          <Option value="CONTRACT">สัญญาจ้าง</Option>
+                          <Option value="INTERNSHIP">ฝึกงาน</Option>
+                          <Option value="STUDENT_TEACHER">
+                            นักศึกษาฝึกสอน
+                          </Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item
                         label="จำนวนที่รับ (คน)"
                         name="vacancyCount"
                         rules={[
@@ -178,6 +201,8 @@ export default function PostJobPage() {
                         />
                       </Form.Item>
                     </Col>
+                  </Row>
+                  <Row gutter={16}>
                     <Col span={12}>
                       <Form.Item
                         label="วิชาที่สอน"
