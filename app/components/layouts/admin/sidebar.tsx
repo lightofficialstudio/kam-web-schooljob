@@ -388,17 +388,17 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
         }
 
         .ant-layout-sider-light .ant-menu-light .ant-menu-item:hover {
-          background: rgba(96, 165, 250, 0.1) !important;
-          color: #1890ff !important;
+          background: rgba(17, 182, 245, 0.1) !important;
+          color: #11b6f5 !important;
           transform: translateX(4px);
-          box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.2);
+          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.2);
         }
 
         .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected {
-          background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%) !important;
-          color: #1890ff !important;
+          background: linear-gradient(135deg, rgba(17, 182, 245, 0.15) 0%, rgba(17, 182, 245, 0.1) 100%) !important;
+          color: #11b6f5 !important;
           font-weight: 600;
-          box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.3);
+          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.3);
         }
 
         .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected::before {
@@ -408,7 +408,7 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
           top: 0;
           bottom: 0;
           width: 3px;
-          background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%);
+          background: linear-gradient(180deg, #11b6f5 0%, #0099d6 100%);
           border-radius: 0 3px 3px 0;
         }
 
@@ -418,12 +418,12 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
         }
 
         .ant-layout-sider-light .ant-menu-light .ant-menu-item:hover .ant-menu-item-icon {
-          color: #1890ff !important;
+          color: #11b6f5 !important;
           transform: rotate(5deg) scale(1.1);
         }
 
         .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected .ant-menu-item-icon {
-          color: #1890ff !important;
+          color: #11b6f5 !important;
         }
 
         .ant-menu-item-divider {

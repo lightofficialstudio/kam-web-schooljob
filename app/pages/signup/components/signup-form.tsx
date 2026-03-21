@@ -161,7 +161,7 @@ export default function SignupForm() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "#1890ff",
+                    backgroundColor: "#11b6f5",
                   }}
                 >
                   <Title level={2} style={{ margin: 0, color: "#fff" }}>

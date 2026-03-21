@@ -47,7 +47,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       fontFamily:
         "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       fontSize: 16,
-      colorPrimary: "#1890ff",
+      colorPrimary: "#11b6f5",
       borderRadius: 12,
       // ✨ [Enhanced color tokens for high visibility & Modern look]
       colorBgBase: mode === "dark" ? "#0F172A" : "#ffffff",
@@ -78,9 +78,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         itemBg: "transparent",
         itemSelectedBg:
           mode === "dark"
-            ? "rgba(24, 144, 255, 0.2)"
-            : "rgba(24, 144, 255, 0.1)",
-        itemSelectedColor: mode === "dark" ? "#52B8FF" : "#1890ff",
+            ? "rgba(17, 182, 245, 0.2)"
+            : "rgba(17, 182, 245, 0.1)",
+        itemSelectedColor: mode === "dark" ? "#52B8FF" : "#11b6f5",
         itemHoverBg:
           mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
         itemHoverColor: mode === "dark" ? "#F8FAFC" : "#1E293B",

@@ -591,7 +591,7 @@ export default function LandingPage() {
                       >
                         {job.title}
                       </Title>
-                      <Text strong style={{ color: "#1890ff" }}>
+                      <Text strong style={{ color: "#11b6f5" }}>
                         {job.school}
                       </Text>
                     </div>

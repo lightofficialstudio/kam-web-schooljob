@@ -56,7 +56,7 @@ export function AdminBreadcrumb() {
       title: isLast ? (
         <span style={{ fontWeight: 600 }}>{item.title}</span>
       ) : (
-        <Link href={item.href || "#"} style={{ color: "#1890ff" }}>
+        <Link href={item.href || "#"} style={{ color: "#11b6f5" }}>
           {item.title}
         </Link>
       ),

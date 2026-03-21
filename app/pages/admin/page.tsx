@@ -136,9 +136,9 @@ export default function AdminPage() {
           <Statistic
             title="จำนวนผู้ใช้ทั้งหมด"
             value={2}
-            prefix={<UserOutlined style={{ color: "#1890ff" }} />}
+            prefix={<UserOutlined style={{ color: "#11b6f5" }} />}
             suffix="คน"
-            valueStyle={{ color: "#1890ff", fontSize: "28px", fontWeight: 600 }}
+            valueStyle={{ color: "#11b6f5", fontSize: "28px", fontWeight: 600 }}
           />
           <div style={{ marginTop: "12px", fontSize: "12px" }}>
             <span style={{ color: "#95de64" }}>
@@ -250,12 +250,12 @@ export default function AdminPage() {
           <Statistic
             title="API Response"
             value={145}
-            prefix={<ApiOutlined style={{ color: "#1890ff" }} />}
+            prefix={<ApiOutlined style={{ color: "#11b6f5" }} />}
             suffix="ms"
-            valueStyle={{ color: "#1890ff", fontSize: "28px", fontWeight: 600 }}
+            valueStyle={{ color: "#11b6f5", fontSize: "28px", fontWeight: 600 }}
           />
           <div style={{ marginTop: "12px", fontSize: "12px" }}>
-            <span style={{ color: "#1890ff" }}>
+            <span style={{ color: "#11b6f5" }}>
               <LineChartOutlined /> ปกติ
             </span>
           </div>
@@ -284,7 +284,7 @@ export default function AdminPage() {
                 <Col>
                   <Space>
                     <DatabaseOutlined
-                      style={{ color: "#1890ff", fontSize: "16px" }}
+                      style={{ color: "#11b6f5", fontSize: "16px" }}
                     />
                     <span style={{ fontWeight: 500 }}>
                       ฐานข้อมูล PostgreSQL
@@ -468,7 +468,7 @@ export default function AdminPage() {
                   Avg Response Time
                 </span>
               </Col>
-              <Col style={{ fontWeight: 600, color: "#1890ff" }}>145ms</Col>
+              <Col style={{ fontWeight: 600, color: "#11b6f5" }}>145ms</Col>
             </Row>
           </Space>
         </Card>

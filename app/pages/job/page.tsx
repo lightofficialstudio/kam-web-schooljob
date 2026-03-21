@@ -1005,7 +1005,7 @@ function JobSearchPageContent() {
                         {selectedJob.schoolName}
                       </Text>
                       <Badge status="success" />
-                      <Link href="#" style={{ color: "#1890ff" }}>
+                      <Link href="#" style={{ color: "#11b6f5" }}>
                         ดูงานทั้งหมดจากโรงเรียนนี้
                       </Link>
                     </Space>

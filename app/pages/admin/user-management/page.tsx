@@ -300,7 +300,7 @@ export default function UserManagementPage() {
                 valueStyle={{
                   fontSize: "28px",
                   fontWeight: 700,
-                  color: "#1890ff",
+                  color: "#11b6f5",
                 }}
               />
             </Card>

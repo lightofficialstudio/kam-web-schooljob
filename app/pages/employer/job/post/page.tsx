@@ -140,7 +140,7 @@ export default function PostJobPage() {
                 <Card
                   title={
                     <Space>
-                      <ThunderboltOutlined style={{ color: "#1890ff" }} />{" "}
+                      <ThunderboltOutlined style={{ color: "#11b6f5" }} />{" "}
                       ข้อมูลตำแหน่งงาน
                     </Space>
                   }
