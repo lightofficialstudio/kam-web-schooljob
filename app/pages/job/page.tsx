@@ -824,7 +824,18 @@ function JobSearchPageContent() {
                     bordered={false}
                     style={{ borderRadius: token.borderRadiusLG }}
                   >
-                    <Title level={5}>การค้นหาที่บันทึกไว้</Title>
+                    <Space align="center" style={{ marginBottom: 8 }}>
+                      <Title level={5} style={{ margin: 0 }}>
+                        การค้นหาที่บันทึกไว้
+                      </Title>
+                      <Badge
+                        count="พบกันเร็วๆนี้"
+                        style={{
+                          backgroundColor: token.colorInfo,
+                          fontSize: "10px",
+                        }}
+                      />
+                    </Space>
                     <Text
                       type="secondary"
                       style={{
@@ -842,7 +853,18 @@ function JobSearchPageContent() {
                     bordered={false}
                     style={{ borderRadius: token.borderRadiusLG }}
                   >
-                    <Title level={5}>งานที่บันทึกไว้</Title>
+                    <Space align="center" style={{ marginBottom: 8 }}>
+                      <Title level={5} style={{ margin: 0 }}>
+                        งานที่บันทึกไว้
+                      </Title>
+                      <Badge
+                        count="พบกันเร็วๆนี้"
+                        style={{
+                          backgroundColor: token.colorInfo,
+                          fontSize: "10px",
+                        }}
+                      />
+                    </Space>
                     <Text
                       type="secondary"
                       style={{
