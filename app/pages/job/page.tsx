@@ -922,11 +922,11 @@ function JobSearchPageContent() {
         </Row>
       </Layout.Content>
 
-      {/* 3. Job Details Drawer (70% Width) */}
+      {/* 3. Job Details Drawer (80% Width) */}
       <Drawer
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        width="70%"
+        width="80%"
         closable={false}
         styles={{ body: { padding: 0 } }}
       >
