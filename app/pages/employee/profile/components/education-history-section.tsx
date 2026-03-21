@@ -4,6 +4,7 @@ import { useNotificationModalStore } from "@/app/stores/notification-modal-store
 import {
   CheckCircleFilled,
   CloseCircleFilled,
+  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
@@ -11,16 +12,26 @@ import {
 import {
   Button,
   Card,
+  Col,
+  Divider,
+  Drawer,
   Empty,
+  Flex,
   Form,
   Input,
   InputNumber,
+  Layout,
   Modal,
+  Row,
   Select,
   Space,
+  Typography,
+  theme as antTheme,
 } from "antd";
 import React, { useState } from "react";
 import { EducationEntry, useProfileStore } from "../stores/profile-store";
+
+const { Title, Text } = Typography;
 
 const EDUCATION_LEVELS = [
   { value: "ประถมศึกษา", label: "ประถมศึกษา" },
@@ -33,11 +44,11 @@ const EDUCATION_LEVELS = [
 ];
 
 export const EducationHistorySection: React.FC = () => {
+  const { token } = antTheme.useToken();
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { profile, addEducation, updateEducation, removeEducation } =
-    useProfileStore();
+  const { profile, addEducation, removeEducation } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
@@ -127,134 +138,226 @@ export const EducationHistorySection: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Form for Adding/Editing */}
-      {isAddingNew && (
-        <Card className="border-2 border-blue-300 bg-blue-50">
-          <h3 className="text-lg font-semibold mb-4">
-            {editingIndex !== null
-              ? "แก้ไขข้อมูลการศึกษา"
-              : "เพิ่มข้อมูลการศึกษา"}
-          </h3>
-          <Form form={form} layout="vertical" requiredMark="optional">
-            <Form.Item
-              label="ระดับการศึกษา"
-              name="level"
-              rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
-            >
-              <Select
-                options={EDUCATION_LEVELS}
-                placeholder="เลือกระดับการศึกษา"
-              />
-            </Form.Item>
+    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+      {/* 1. Add/Edit Drawer (UX following job page pattern) */}
+      <Drawer
+        open={isAddingNew}
+        onClose={handleCancel}
+        width="60%"
+        closable={false}
+        placement="right"
+        styles={{ body: { padding: 0 } }}
+      >
+        <Layout
+          style={{
+            position: "relative",
+            minHeight: "100%",
+            backgroundColor: token.colorBgContainer,
+          }}
+        >
+          {/* Header Sticky Action Bar */}
+          <Layout.Header
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+              backgroundColor: token.colorBgContainer,
+              padding: "16px 24px",
+              borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "12px",
+              height: "auto",
+            }}
+          >
+            <Title level={4} style={{ margin: 0 }}>
+              {editingIndex !== null
+                ? "แก้ไขข้อมูลการศึกษา"
+                : "เพิ่มข้อมูลการศึกษา"}
+            </Title>
+            <Button
+              type="text"
+              icon={<CloseOutlined style={{ fontSize: "20px" }} />}
+              onClick={handleCancel}
+            />
+          </Layout.Header>
 
-            <Form.Item
-              label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
-              name="institution"
-              rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
-            >
-              <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" />
-            </Form.Item>
-
-            <Form.Item
-              label="สาขาวิชา/วิทยาลัย"
-              name="major"
-              rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
-            >
-              <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" />
-            </Form.Item>
-
-            <Form.Item
-              label="GPA"
-              name="gpa"
-              rules={[
-                {
-                  type: "number",
-                  min: 0,
-                  max: 4,
-                  message: "GPA ต้องเป็นตัวเลขระหว่าง 0-4",
-                },
-              ]}
-            >
-              <InputNumber placeholder="เช่น 3.5" step={0.01} min={0} max={4} />
-            </Form.Item>
-
-            <Form.Item>
-              <Space>
-                <Button type="primary" onClick={handleSave}>
-                  {editingIndex !== null ? "บันทึกการแก้ไข" : "เพิ่มรายการ"}
-                </Button>
-                <Button onClick={handleCancel}>ยกเลิก</Button>
-              </Space>
-            </Form.Item>
-          </Form>
-        </Card>
-      )}
-
-      {/* List of Educations */}
-      <div className="space-y-4">
-        {educations.length > 0 ? (
-          <>
-            <h3 className="text-lg font-semibold">
-              ประวัติการศึกษา ({educations.length})
-            </h3>
-            {educations.map((education, index) => (
-              <Card
-                key={index}
-                className="border border-gray-200 hover:shadow-md transition-shadow"
+          {/* Content Area */}
+          <Layout.Content
+            style={{
+              padding: "32px 40px 80px 40px",
+              backgroundColor: token.colorBgContainer,
+            }}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item
+                label="ระดับการศึกษา"
+                name="level"
+                required
+                rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h4 className="text-lg font-semibold text-gray-900">
-                        {education.level}
-                      </h4>
-                      {education.gpa && (
-                        <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          GPA {education.gpa}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">
+                <Select
+                  options={EDUCATION_LEVELS}
+                  placeholder="เลือกระดับการศึกษา"
+                  size="large"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
+                name="institution"
+                required
+                rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
+              >
+                <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
+              </Form.Item>
+
+              <Form.Item
+                label="สาขาวิชา/วิทยาลัย"
+                name="major"
+                required
+                rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
+              >
+                <Input
+                  placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ"
+                  size="large"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="GPA"
+                name="gpa"
+                rules={[
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 4,
+                    message: "GPA ต้องเป็นตัวเลขระหว่าง 0-4",
+                  },
+                ]}
+              >
+                <InputNumber
+                  placeholder="เช่น 3.5"
+                  step={0.01}
+                  min={0}
+                  max={4}
+                  size="large"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Divider style={{ margin: "32px 0 24px 0" }} />
+
+              <Flex justify="end" gap={12}>
+                <Button
+                  onClick={handleCancel}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
+                  ยกเลิก
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={handleSave}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
+                  บันทึก
+                </Button>
+              </Flex>
+            </Form>
+          </Layout.Content>
+        </Layout>
+      </Drawer>
+
+      {/* 2. List of Educations */}
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        {educations.length > 0 ? (
+          educations.map((education, index) => (
+            <Card
+              key={index}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                border: `1px solid ${token.colorBorderSecondary}`,
+              }}
+              styles={{ body: { padding: "20px" } }}
+              hoverable
+            >
+              <Row justify="space-between" align="top">
+                <Col flex="auto">
+                  <Space direction="vertical" size={2}>
+                    <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
+                      {education.level}
+                    </Title>
+                    <Text strong style={{ color: token.colorTextSecondary }}>
                       {education.institution}
-                    </p>
-                    <p className="text-sm text-gray-600">{education.major}</p>
-                  </div>
-                  <Space className="ml-4">
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: "14px" }}>
+                      {education.major}
+                    </Text>
+                    {education.gpa && (
+                      <Text
+                        style={{
+                          marginTop: "8px",
+                          display: "inline-block",
+                          padding: "2px 8px",
+                          backgroundColor: token.colorFillAlter,
+                          borderRadius: token.borderRadiusSM,
+                          fontSize: "13px",
+                        }}
+                      >
+                        GPA: {education.gpa}
+                      </Text>
+                    )}
+                  </Space>
+                </Col>
+                <Col>
+                  <Space>
                     <Button
                       type="text"
-                      icon={<EditOutlined />}
+                      shape="circle"
+                      icon={
+                        <EditOutlined style={{ color: token.colorPrimary }} />
+                      }
                       onClick={() => handleEdit(index)}
-                      className="text-blue-600 hover:text-blue-800"
                     />
                     <Button
                       type="text"
+                      shape="circle"
+                      danger
                       icon={<DeleteOutlined />}
                       onClick={() => handleDelete(index)}
-                      className="text-red-600 hover:text-red-800"
                     />
                   </Space>
-                </div>
-              </Card>
-            ))}
-          </>
+                </Col>
+              </Row>
+            </Card>
+          ))
         ) : (
-          !isAddingNew && <Empty description="ยังไม่มีข้อมูลการศึกษา" />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="ยังไม่มีข้อมูลการศึกษา"
+          />
         )}
-      </div>
+      </Space>
 
-      {/* Add Button */}
-      {!isAddingNew && (
-        <Button
-          type="dashed"
-          icon={<PlusOutlined />}
-          block
-          onClick={handleAddNew}
-          size="large"
-        >
-          เพิ่มข้อมูลการศึกษา
-        </Button>
-      )}
-    </div>
+      {/* 3. Global Add Button */}
+      <Button
+        type="dashed"
+        icon={<PlusOutlined />}
+        block
+        onClick={handleAddNew}
+        size="large"
+        style={{
+          height: "54px",
+          borderRadius: token.borderRadiusLG,
+          fontSize: "16px",
+          fontWeight: 600,
+        }}
+      >
+        เพิ่มข้อมูลการศึกษา
+      </Button>
+    </Space>
   );
 };
