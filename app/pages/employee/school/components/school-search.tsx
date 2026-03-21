@@ -1,8 +1,19 @@
 "use client";
 
 import { SearchOutlined } from "@ant-design/icons";
-import { Card, Col, Input, Row, Select, theme as antTheme } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Input,
+  Row,
+  Select,
+  Typography,
+  theme as antTheme,
+} from "antd";
 import { useSchoolStore } from "../stores/school-store";
+
+const { Text } = Typography;
 
 export const SchoolSearch = () => {
   const { token } = antTheme.useToken();
@@ -12,29 +23,53 @@ export const SchoolSearch = () => {
   return (
     <Card
       style={{
-        marginBottom: 32,
+        marginBottom: 40,
         borderRadius: token.borderRadiusLG,
-        boxShadow: token.boxShadowTertiary,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+        border: "none",
       }}
-      styles={{ body: { padding: "24px" } }}
+      styles={{ body: { padding: "32px" } }}
     >
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
+      <Row gutter={[20, 20]} align="bottom">
+        <Col xs={24} md={10}>
+          <div style={{ marginBottom: 8 }}>
+            <Text
+              strong
+              style={{ fontSize: 13, color: token.colorTextSecondary }}
+            >
+              ค้นหาด้วยชื่อโรงเรียน
+            </Text>
+          </div>
           <Input
             size="large"
-            placeholder="ค้นหาชื่อโรงเรียน..."
+            placeholder="เช่น นานาชาติเซนต์แอนดรูว์ส..."
+            style={{
+              borderRadius: token.borderRadius,
+              height: 48,
+              fontSize: 15,
+            }}
             prefix={
-              <SearchOutlined style={{ color: token.colorTextDescription }} />
+              <SearchOutlined
+                style={{ color: token.colorTextDescription, marginRight: 8 }}
+              />
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </Col>
-        <Col xs={12} md={6}>
+        <Col xs={12} md={5}>
+          <div style={{ marginBottom: 8 }}>
+            <Text
+              strong
+              style={{ fontSize: 13, color: token.colorTextSecondary }}
+            >
+              เลือกจังหวัด
+            </Text>
+          </div>
           <Select
             size="large"
-            placeholder="จังหวัด"
-            style={{ width: "100%" }}
+            placeholder="กรุงเทพมหานคร"
+            style={{ width: "100%", height: 48 }}
             allowClear
             onChange={setProvinceFilter}
             options={[
@@ -44,11 +79,19 @@ export const SchoolSearch = () => {
             ]}
           />
         </Col>
-        <Col xs={12} md={6}>
+        <Col xs={12} md={5}>
+          <div style={{ marginBottom: 8 }}>
+            <Text
+              strong
+              style={{ fontSize: 13, color: token.colorTextSecondary }}
+            >
+              ประเภทสถาบัน
+            </Text>
+          </div>
           <Select
             size="large"
-            placeholder="ประเภทสถาบัน"
-            style={{ width: "100%" }}
+            placeholder="ทุกประเภท"
+            style={{ width: "100%", height: 48 }}
             allowClear
             onChange={setTypeFilter}
             options={[
@@ -57,6 +100,21 @@ export const SchoolSearch = () => {
               { value: "นานาชาติ", label: "นานาชาติ" },
             ]}
           />
+        </Col>
+        <Col xs={24} md={4}>
+          <Button
+            type="primary"
+            size="large"
+            block
+            style={{
+              height: 48,
+              fontWeight: 600,
+              borderRadius: token.borderRadius,
+              boxShadow: `0 4px 12px ${token.colorPrimary}40`,
+            }}
+          >
+            ค้นหาเลย
+          </Button>
         </Col>
       </Row>
     </Card>

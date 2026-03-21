@@ -1,13 +1,11 @@
 "use client";
 
 import {
-  BankOutlined,
   ClockCircleOutlined,
   DollarOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
 import {
-  Badge,
   Col,
   Drawer,
   Empty,
@@ -35,104 +33,155 @@ export const SchoolJobsDrawer = () => {
     <Drawer
       open={isDrawerOpen}
       onClose={handleClose}
-      size="large"
+      width={640}
+      placement="right"
       title={
         selectedSchool && (
-          <Space direction="vertical" size={2} style={{ width: "100%" }}>
-            <Text style={{ fontSize: "18px", fontWeight: 700 }}>
-              {selectedSchool.name}
-            </Text>
-            <Space size={12}>
-              <Space size={4}>
-                <EnvironmentOutlined
-                  style={{ color: token.colorTextDescription }}
-                />
-                <Text type="secondary" style={{ fontSize: "13px" }}>
-                  {selectedSchool.province}
-                </Text>
-              </Space>
-              <Tag color="blue" bordered={false} style={{ borderRadius: 100 }}>
-                {selectedSchool.type}
-              </Tag>
-            </Space>
-          </Space>
+          <Row align="middle" gutter={20}>
+            <Col>
+              <Avatar
+                size={60}
+                shape="square"
+                src={selectedSchool.logo}
+                style={{
+                  borderRadius: 12,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  backgroundColor: "#fff",
+                }}
+              />
+            </Col>
+            <Col flex="auto">
+              <div>
+                <Title
+                  level={4}
+                  style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}
+                >
+                  {selectedSchool.name}
+                </Title>
+                <Space size={12} split={<Divider type="vertical" />}>
+                  <Space size={4}>
+                    <EnvironmentOutlined
+                      style={{ color: token.colorPrimary, fontSize: 13 }}
+                    />
+                    <Text type="secondary" style={{ fontSize: "14px" }}>
+                      {selectedSchool.province}
+                    </Text>
+                  </Space>
+                  <Tag
+                    color="blue"
+                    bordered={false}
+                    style={{ borderRadius: 6, margin: 0 }}
+                  >
+                    {selectedSchool.type}
+                  </Tag>
+                </Space>
+              </div>
+            </Col>
+          </Row>
         )
       }
       styles={{
-        header: { paddingBottom: 12 },
-        body: { padding: "16px 24px" },
+        header: {
+          padding: "24px",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+        },
+        body: {
+          padding: "32px 24px",
+          backgroundColor: token.colorBgLayout,
+        },
       }}
     >
       {selectedSchool && (
-        <Space direction="vertical" size={12} style={{ width: "100%" }}>
-          <Row justify="space-between" align="middle">
-            <Col>
-              <Text strong style={{ fontSize: "15px" }}>
-                ตำแหน่งที่กำลังเปิดรับ
-              </Text>
-            </Col>
-            <Col>
-              <Badge
-                count={selectedSchool.jobs.length}
-                style={{ backgroundColor: token.colorPrimary }}
-              />
-            </Col>
-          </Row>
+        <div style={{ width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 24,
+            }}
+          >
+            <Title
+              level={5}
+              style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}
+            >
+              ตำแหน่งงานที่เปิดรับสมัคร
+            </Title>
+            <Tag
+              color="cyan"
+              style={{ borderRadius: 100, padding: "2px 12px", border: "none" }}
+            >
+              {selectedSchool.jobs.length} ตำแหน่ง
+            </Tag>
+          </div>
 
-          {selectedSchool.jobs.length > 0 ? (
-            selectedSchool.jobs.map((job) => (
-              <div
-                key={job.id}
-                style={{
-                  padding: "16px",
-                  borderRadius: token.borderRadiusLG,
-                  border: `1px solid ${token.colorBorderSecondary}`,
-                  backgroundColor: token.colorBgContainer,
-                  boxShadow: token.boxShadowTertiary,
-                }}
-              >
-                <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                  <Space size={6} align="center">
-                    <BankOutlined style={{ color: token.colorPrimary }} />
-                    <Text strong style={{ fontSize: "15px" }}>
-                      {job.title}
-                    </Text>
-                  </Space>
-                  <Row gutter={16}>
-                    <Col>
-                      <Space size={4}>
-                        <DollarOutlined
-                          style={{ color: token.colorSuccess }}
-                        />
-                        <Text type="secondary" style={{ fontSize: "13px" }}>
-                          {job.salary} บาท/เดือน
-                        </Text>
-                      </Space>
-                    </Col>
-                    <Col>
-                      <Space size={4}>
-                        <ClockCircleOutlined
-                          style={{ color: token.colorTextDescription }}
-                        />
-                        <Tag
-                          color={
-                            job.type === "Full-time" ? "green" : "orange"
-                          }
-                          bordered={false}
-                          style={{ borderRadius: 100, margin: 0 }}
+          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+            {selectedSchool.jobs.length > 0 ? (
+              selectedSchool.jobs.map((job) => (
+                <Card
+                  key={job.id}
+                  hoverable
+                  style={{
+                    borderRadius: token.borderRadiusLG,
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                  }}
+                  styles={{ body: { padding: "20px 24px" } }}
+                >
+                  <Row justify="space-between" align="top">
+                    <Col flex="auto">
+                      <Space
+                        direction="vertical"
+                        size={12}
+                        style={{ width: "100%" }}
+                      >
+                        <Title
+                          level={5}
+                          style={{
+                            margin: 0,
+                            color: token.colorPrimary,
+                            fontSize: 17,
+                            fontWeight: 700,
+                          }}
                         >
-                          {job.type}
-                        </Tag>
+                          {job.title}
+                        </Title>
+
+                        <Row gutter={[16, 8]}>
+                          <Col span={12}>
+                            <Space size={8}>
+                              <DollarOutlined
+                                style={{
+                                  color: token.colorSuccess,
+                                  fontSize: 16,
+                                }}
+                              />
+                              <Text style={{ fontSize: 14 }}>{job.salary}</Text>
+                            </Space>
+                          </Col>
+                          <Col span={12}>
+                            <Space size={8}>
+                              <ClockCircleOutlined
+                                style={{ color: token.colorInfo, fontSize: 16 }}
+                              />
+                              <Text style={{ fontSize: 14 }}>{job.type}</Text>
+                            </Space>
+                          </Col>
+                        </Row>
                       </Space>
                     </Col>
                   </Row>
-                </Space>
-              </div>
-            ))
-          ) : (
-            <Empty description="ไม่มีตำแหน่งที่เปิดรับในขณะนี้" />
-          )}
-        </Space>
+                </Card>
+              ))
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="ยังไม่มีตำแหน่งงานที่เปิดรับสมัครในขณะนี้"
+                style={{ padding: "40px 0" }}
+              />
+            )}
+          </Space>
+        </div>
       )}
     </Drawer>
   );

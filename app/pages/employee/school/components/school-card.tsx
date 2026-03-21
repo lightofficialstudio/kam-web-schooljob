@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Col,
+  Divider,
   Row,
   Space,
   Tag,
@@ -49,57 +50,125 @@ export const SchoolCard = ({
       style={{
         borderRadius: token.borderRadiusLG,
         marginBottom: 16,
-        borderColor: token.colorBorderSecondary,
-        boxShadow: token.boxShadowTertiary,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        transition: "all 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
+        overflow: "hidden",
       }}
-      styles={{ body: { padding: "20px 24px" } }}
+      styles={{ body: { padding: 0 } }}
     >
-      <Row align="middle" gutter={24}>
-        <Col>
+      <Row align="stretch">
+        <Col
+          xs={24}
+          sm={4}
+          style={{
+            background: token.colorBgLayout,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            borderRight: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           <Avatar
-            size={64}
+            size={80}
             shape="square"
             src={logo}
             style={{
-              borderRadius: token.borderRadius,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              backgroundColor: token.colorBgLayout,
+              borderRadius: 12,
+              border: `2px solid #fff`,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              backgroundColor: "#fff",
             }}
           />
         </Col>
-        <Col flex="auto">
-          <Space direction="vertical" size={2}>
-            <Title level={5} style={{ margin: 0, fontSize: "18px" }}>
-              {name}
-            </Title>
-            <Space size={16}>
-              <Space size={4}>
-                <EnvironmentOutlined
-                  style={{ color: token.colorTextDescription }}
-                />
-                <Text type="secondary">{province}</Text>
+        <Col xs={24} sm={20} style={{ padding: "24px 32px" }}>
+          <Row justify="space-between" align="middle">
+            <Col flex="auto">
+              <Space direction="vertical" size={8}>
+                <Title
+                  level={4}
+                  style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}
+                >
+                  {name}
+                </Title>
+                <Space size={16} wrap>
+                  <Space size={6}>
+                    <EnvironmentOutlined
+                      style={{ color: token.colorPrimary, fontSize: 16 }}
+                    />
+                    <Text type="secondary" style={{ fontSize: 15 }}>
+                      {province}
+                    </Text>
+                  </Space>
+                  <Divider type="vertical" />
+                  <Tag
+                    color="blue"
+                    bordered={false}
+                    style={{
+                      borderRadius: 6,
+                      padding: "2px 10px",
+                      fontSize: 13,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {type}
+                  </Tag>
+                  <Tag
+                    color="green"
+                    bordered={false}
+                    style={{
+                      borderRadius: 6,
+                      padding: "2px 10px",
+                      fontSize: 13,
+                      fontWeight: 500,
+                    }}
+                  >
+                    เปิดรับสมัคร
+                  </Tag>
+                </Space>
               </Space>
-              <Tag color="blue" bordered={false} style={{ borderRadius: 100 }}>
-                {type}
-              </Tag>
-            </Space>
-          </Space>
-        </Col>
-        <Col>
-          <Space direction="vertical" align="end" size={4}>
-            <Text type="secondary" style={{ fontSize: "14px" }}>
-              กำลังเปิดรับ{" "}
-              <Text strong style={{ color: token.colorPrimary }}>
-                {jobCount}
-              </Text>{" "}
-              ตำแหน่ง
-            </Text>
-            <Button
-              type="text"
-              icon={<RightOutlined />}
-              style={{ color: token.colorTextDescription }}
-            />
-          </Space>
+            </Col>
+            <Col>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ marginBottom: 12 }}>
+                  <Text type="secondary" style={{ fontSize: 14 }}>
+                    กำลังเปิดรับ
+                  </Text>
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 800,
+                      color: token.colorPrimary,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {jobCount}{" "}
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 400,
+                        color: token.colorTextSecondary,
+                      }}
+                    >
+                      ตำแหน่ง
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  type="primary"
+                  ghost
+                  icon={<RightOutlined />}
+                  style={{
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    height: 40,
+                  }}
+                >
+                  ดูตำแหน่งงาน
+                </Button>
+              </div>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </Card>
