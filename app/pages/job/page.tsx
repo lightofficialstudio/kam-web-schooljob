@@ -1221,7 +1221,66 @@ function JobSearchPageContent() {
                 </div>
               </Card>
 
-              {/* How you match section - Show only if logged in */}
+              {/* Roles and Responsibilities (SECTION 3 in Post Page) */}
+              <div style={{ marginTop: "40px" }}>
+                <Title level={4}>หน้าที่และความรับผิดชอบ:</Title>
+                <ul
+                  style={{
+                    paddingLeft: "20px",
+                    lineHeight: "2",
+                    color: "#434343",
+                    fontSize: "15px",
+                  }}
+                >
+                  <li>
+                    <strong>จัดการเรียนการสอน:</strong>{" "}
+                    {selectedJob.description} ในระดับชั้น{" "}
+                    {selectedJob.grades.join(", ")}
+                  </li>
+                  <li>
+                    <strong>เตรียมแผนการจัดการเรียนรู้:</strong>{" "}
+                    ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ
+                  </li>
+                  <li>
+                    <strong>วัดและประเมินผล:</strong>{" "}
+                    ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน
+                  </li>
+                  <li>
+                    <strong>ให้คำปรึกษา:</strong>{" "}
+                    ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง
+                  </li>
+                  <li>
+                    เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ
+                  </li>
+                </ul>
+              </div>
+
+              {/* Qualifications (SECTION 4 in Post Page) */}
+              <div style={{ marginTop: "40px" }}>
+                <Title level={4}>คุณสมบัติผู้สมัคร:</Title>
+                <ul
+                  style={{
+                    paddingLeft: "20px",
+                    lineHeight: "2",
+                    color: "#434343",
+                    fontSize: "15px",
+                  }}
+                >
+                  <li>
+                    วุฒิการศึกษระดับ {selectedJob.educationLevel}{" "}
+                    ในสาขาที่เกี่ยวข้อง
+                  </li>
+                  <li>มีทักษะในการสื่อสารดีเยี่ยมและมีจิตวิทยาในการสอนเด็ก</li>
+                  <li>
+                    หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired}
+                    ) จะพิจารณาเป็นพิเศษ
+                  </li>
+                  <li>มีประสบการณ์การสอน {selectedJob.teachingExperience}</li>
+                  <li>สามารถทำงานร่วมกับผู้อื่นได้ดีและมีความรับผิดชอบสูง</li>
+                </ul>
+              </div>
+
+              {/* How you match section - Show only if logged in (Contextual analysis) */}
               {user && (
                 <Card
                   style={{
@@ -1263,66 +1322,7 @@ function JobSearchPageContent() {
                 </Card>
               )}
 
-              {/* Roles and Responsibilities */}
-              <div style={{ marginTop: "40px" }}>
-                <Title level={4}>หน้าที่และความรับผิดชอบ:</Title>
-                <ul
-                  style={{
-                    paddingLeft: "20px",
-                    lineHeight: "2",
-                    color: "#434343",
-                    fontSize: "15px",
-                  }}
-                >
-                  <li>
-                    <strong>จัดการเรียนการสอน:</strong>{" "}
-                    {selectedJob.description} ในระดับชั้น{" "}
-                    {selectedJob.grades.join(", ")}
-                  </li>
-                  <li>
-                    <strong>เตรียมแผนการจัดการเรียนรู้:</strong>{" "}
-                    ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ
-                  </li>
-                  <li>
-                    <strong>วัดและประเมินผล:</strong>{" "}
-                    ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน
-                  </li>
-                  <li>
-                    <strong>ให้คำปรึกษา:</strong>{" "}
-                    ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง
-                  </li>
-                  <li>
-                    เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ
-                  </li>
-                </ul>
-              </div>
-
-              {/* Qualifications */}
-              <div style={{ marginTop: "40px" }}>
-                <Title level={4}>คุณสมบัติผู้สมัคร:</Title>
-                <ul
-                  style={{
-                    paddingLeft: "20px",
-                    lineHeight: "2",
-                    color: "#434343",
-                    fontSize: "15px",
-                  }}
-                >
-                  <li>
-                    วุฒิการศึกษาระดับ {selectedJob.educationLevel}{" "}
-                    ในสาขาที่เกี่ยวข้อง
-                  </li>
-                  <li>มีทักษะในการสื่อสารดีเยี่ยมและมีจิตวิทยาในการสอนเด็ก</li>
-                  <li>
-                    หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired}
-                    ) จะพิจารณาเป็นพิเศษ
-                  </li>
-                  <li>มีประสบการณ์การสอน {selectedJob.teachingExperience}</li>
-                  <li>สามารถทำงานร่วมกับผู้อื่นได้ดีและมีความรับผิดชอบสูง</li>
-                </ul>
-              </div>
-
-              {/* Welfare */}
+              {/* Welfare (SECTION 5/6 in Post Page, explicitly placed last) */}
               <div style={{ marginTop: "40px" }}>
                 <Title level={4}>สวัสดิการและสถานที่ทำงาน:</Title>
                 <Space wrap size={[24, 12]}>
