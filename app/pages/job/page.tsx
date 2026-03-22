@@ -7,7 +7,6 @@ import {
   DollarCircleOutlined,
   EnvironmentOutlined,
   GlobalOutlined,
-  HeartOutlined,
   HistoryOutlined,
   InfoCircleOutlined,
   MoreOutlined,
@@ -871,11 +870,6 @@ function JobSearchPageContent() {
                           <Col>
                             <Space size={16}>
                               <Button
-                                size="large"
-                                icon={<HeartOutlined />}
-                                style={{ borderRadius: token.borderRadius }}
-                              />
-                              <Button
                                 type="primary"
                                 size="large"
                                 style={{
@@ -1210,7 +1204,7 @@ function JobSearchPageContent() {
                         สมัครงานทันที
                       </Button>
                     </Link>
-                      {/* <Button
+                    {/* <Button
                       size="large"
                       style={{
                         height: "48px",
