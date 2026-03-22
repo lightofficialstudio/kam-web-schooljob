@@ -821,7 +821,7 @@ export default function LandingPage() {
             }
             .feature-card:hover .icon-wrapper {
               transform: scale(1.1) rotate(5deg);
-              box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+              box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
               background: #11b6f5 !important;
               color: white !important;
             }
@@ -831,13 +831,13 @@ export default function LandingPage() {
             type="primary"
             size="large"
             shape="round"
-            style={{ 
-              marginTop: "48px", 
-              height: "56px", 
+            style={{
+              marginTop: "48px",
+              height: "56px",
               padding: "0 48px",
               fontSize: "18px",
               fontWeight: "600",
-              boxShadow: "0 10px 20px rgba(17, 182, 245, 0.3)"
+              boxShadow: "0 10px 20px rgba(17, 182, 245, 0.3)",
             }}
           >
             สร้างโปรไฟล์หางานตอนนี้

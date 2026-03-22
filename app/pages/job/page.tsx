@@ -1207,10 +1207,10 @@ function JobSearchPageContent() {
                           fontWeight: 600,
                         }}
                       >
-                        สมัครด่วน (Quick Apply)
+                        สมัครงานทันที
                       </Button>
                     </Link>
-                    <Button
+                      {/* <Button
                       size="large"
                       style={{
                         height: "48px",
@@ -1220,7 +1220,7 @@ function JobSearchPageContent() {
                       }}
                     >
                       บันทึกงาน
-                    </Button>
+                    </Button> */}
                   </Space>
                 </div>
               </Card>
