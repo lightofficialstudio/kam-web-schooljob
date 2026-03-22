@@ -19,11 +19,11 @@ dayjs.locale("th");
  * Design Constants for 2026 Aesthetics
  */
 const BRAND_COLORS = {
-  primary: "#0066FF", // Blue Primary as previously defined
+  primary: "#11b6f5", // Blue Primary as previously defined
   success: "#10B981", // Emerald
   warning: "#F59E0B", // Amber
   error: "#EF4444", // Rose
-  info: "#3B82F6", // Blue
+  info: "#11b6f5", // Blue
 };
 
 const FONTS = {
@@ -97,8 +97,8 @@ const getModernTheme = (isDark: boolean): ThemeConfig => {
         borderRadius: 12,
         defaultShadow: "none",
         primaryShadow: isDark
-          ? "0 4px 12px rgba(0, 102, 255, 0.4)"
-          : "0 4px 12px rgba(0, 102, 255, 0.25)",
+          ? "0 4px 12px rgba(17, 182, 245, 0.4)"
+          : "0 4px 12px rgba(17, 182, 245, 0.25)",
       },
       Card: {
         paddingLG: 24,

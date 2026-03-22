@@ -179,7 +179,7 @@ export default function UserManagementPage() {
           color = "red";
           label = "ผู้ดูแล";
         } else if (role === "EMPLOYER") {
-          color = "blue";
+          color = "#11b6f5";
           label = "โรงเรียน";
         } else if (role === "EMPLOYEE") {
           color = "green";
@@ -254,7 +254,7 @@ export default function UserManagementPage() {
       <Col xs={24}>
         <Card
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "linear-gradient(135deg, #11b6f5 0%, #0ea5e0 100%)",
             borderRadius: "8px",
           }}
         >
@@ -444,7 +444,7 @@ export default function UserManagementPage() {
                               color = "red";
                               label = "ผู้ดูแล";
                             } else if (record.role === "EMPLOYER") {
-                              color = "blue";
+                              color = "#11b6f5";
                               label = "โรงเรียน";
                             } else if (record.role === "EMPLOYEE") {
                               color = "green";

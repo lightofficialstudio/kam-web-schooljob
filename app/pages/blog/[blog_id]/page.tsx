@@ -150,7 +150,7 @@ export default function BlogDetailPage() {
               {/* Title & Metadata */}
               <div style={{ textAlign: "center" }}>
                 <Tag
-                  color="blue"
+                  color="#11b6f5"
                   style={{
                     marginBottom: "16px",
                     padding: "2px 12px",
@@ -306,7 +306,7 @@ export default function BlogDetailPage() {
                           <List.Item style={{ padding: "16px 0" }}>
                             <Link href={`/pages/blog/${item.id}`}>
                               <Tag
-                                color="blue"
+                                color="#11b6f5"
                                 style={{
                                   marginBottom: "8px",
                                   fontSize: "11px",

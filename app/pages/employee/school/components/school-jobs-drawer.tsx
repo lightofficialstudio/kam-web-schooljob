@@ -72,7 +72,7 @@ export const SchoolJobsDrawer = () => {
                     </Text>
                   </Space>
                   <Tag
-                    color="blue"
+                    color="#11b6f5"
                     variant="filled"
                     style={{ borderRadius: 6, margin: 0, border: "none" }}
                   >

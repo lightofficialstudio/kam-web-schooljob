@@ -247,7 +247,7 @@ export default function EmployerProfilePage() {
                     <Row justify="center">
                       <Space wrap>
                         <Tag
-                          color="blue"
+                          color="#11b6f5"
                           style={{
                             fontSize: "14px",
                             padding: "4px 12px",

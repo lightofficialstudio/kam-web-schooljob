@@ -83,7 +83,7 @@ export default function AdminPage() {
       key: "status",
       render: (status) => {
         const tagColor =
-          status === "success" ? "green" : status === "info" ? "blue" : "red";
+          status === "success" ? "green" : status === "info" ? "#11b6f5" : "red";
         return <Tag color={tagColor}>{status.toUpperCase()}</Tag>;
       },
     },
@@ -95,7 +95,7 @@ export default function AdminPage() {
       <Col xs={24}>
         <Card
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "linear-gradient(135deg, #11b6f5 0%, #0ea5e0 100%)",
             border: "none",
             color: "white",
             borderRadius: "8px",
@@ -381,7 +381,7 @@ export default function AdminPage() {
                 </Space>
               </Col>
               <Col>
-                <Tag color="blue">45%</Tag>
+                <Tag color="#11b6f5">45%</Tag>
               </Col>
             </Row>
             <Progress

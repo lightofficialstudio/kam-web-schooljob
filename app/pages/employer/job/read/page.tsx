@@ -115,7 +115,7 @@ export default function MyJobsPage() {
           </Text>
           <Space wrap>
             {record.subjects.map((s: string) => (
-              <Tag key={s} color="blue" variant="filled">
+              <Tag key={s} color="#11b6f5" variant="filled">
                 {s}
               </Tag>
             ))}

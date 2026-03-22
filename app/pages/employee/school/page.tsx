@@ -124,7 +124,7 @@ export default function SchoolDirectoryPage() {
                       สถานศึกษาทั้งหมด
                     </Text>
                     <Tag
-                      color="blue"
+                      color="#11b6f5"
                       style={{ borderRadius: 4, transform: "translateY(-1px)" }}
                     >
                       {filteredSchools.length}

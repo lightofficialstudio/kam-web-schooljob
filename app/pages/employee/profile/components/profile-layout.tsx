@@ -57,7 +57,7 @@ export const ProfileLayout: React.FC<ProfileLayoutProps> = ({
                     onClick={() => onSectionClick(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between ${
                       activeSection === section.id
-                        ? "bg-blue-50 border border-blue-300 text-blue-700 font-medium"
+                        ? "bg-[#11b6f5]/10 border-[#11b6f5]/30 text-[#11b6f5] font-medium"
                         : "bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
                     }`}
                   >
@@ -72,7 +72,7 @@ export const ProfileLayout: React.FC<ProfileLayoutProps> = ({
                     )}
                     {section.itemCount !== undefined &&
                       section.itemCount > 0 && (
-                        <Tag color="blue" className="text-xs">
+                        <Tag color="#11b6f5" className="text-xs">
                           {section.itemCount}
                         </Tag>
                       )}
@@ -93,7 +93,7 @@ export const ProfileLayout: React.FC<ProfileLayoutProps> = ({
                     {items.map((item, index) => (
                       <div
                         key={index}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                        className="border border-gray-200 rounded-lg p-4 hover:border-[#11b6f5]/50 transition-colors"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -112,7 +112,7 @@ export const ProfileLayout: React.FC<ProfileLayoutProps> = ({
                                 size="small"
                                 icon={<EditOutlined />}
                                 onClick={() => onEditItem(index)}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="text-[#11b6f5] hover:text-[#0ea5e0]"
                               />
                             )}
                             {onDeleteItem && (

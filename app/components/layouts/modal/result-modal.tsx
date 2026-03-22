@@ -59,7 +59,7 @@ export default function ResultModal({
     info: (
       <InfoCircleOutlined
         style={{
-          color: "#0066FF",
+          color: "#11b6f5",
           fontSize: "72px",
         }}
       />

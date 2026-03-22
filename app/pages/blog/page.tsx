@@ -424,7 +424,7 @@ export default function BlogListPage() {
                               }}
                             >
                               <Tag
-                                color="blue"
+                                color="#11b6f5"
                                 variant="filled"
                                 style={styles.categoryBadge}
                               >

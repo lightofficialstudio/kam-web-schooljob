@@ -121,7 +121,7 @@ function SigninFormContent() {
   return (
     <ConfigProvider
       theme={{
-        token: { colorPrimary: "#0066FF", borderRadius: 12 },
+        token: { colorPrimary: "#11b6f5", borderRadius: 12 },
         components: {
           Button: { controlHeightLG: 54, fontWeight: 600 },
           Input: { controlHeightLG: 54 },

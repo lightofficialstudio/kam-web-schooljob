@@ -38,7 +38,7 @@ export function NotificationModalProvider() {
       case "info":
       default:
         return (
-          <InfoCircleOutlined style={{ color: "#3b82f6", fontSize: "48px" }} />
+          <InfoCircleOutlined style={{ color: "#11b6f5", fontSize: "48px" }} />
         );
     }
   };

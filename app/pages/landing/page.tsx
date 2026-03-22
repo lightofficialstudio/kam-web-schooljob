@@ -134,7 +134,7 @@ export default function LandingPage() {
             height: "500px",
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(24,144,255,0.1) 0%, rgba(255,255,255,0) 70%)",
+              "radial-gradient(circle, rgba(17, 182, 245, 0.1) 0%, rgba(255,255,255,0) 70%)",
             filter: "blur(100px)",
           }}
         />
@@ -579,7 +579,7 @@ export default function LandingPage() {
                       {job.tags.map((tag) => (
                         <Tag
                           key={tag}
-                          color="blue"
+                          color="#11b6f5"
                           style={{ borderRadius: "4px" }}
                         >
                           {tag}

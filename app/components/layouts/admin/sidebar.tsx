@@ -134,8 +134,8 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
           height: 300,
           background:
             mode === "dark"
-              ? "radial-gradient(circle, rgba(30, 58, 138, 0.1) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(96, 165, 250, 0.05) 0%, transparent 70%)",
+              ? "radial-gradient(circle, rgba(17, 182, 245, 0.1) 0%, transparent 70%)"
+              : "radial-gradient(circle, rgba(17, 182, 245, 0.05) 0%, transparent 70%)",
           borderRadius: "50%",
           pointerEvents: "none",
           animation: "float 8s ease-in-out infinite reverse",
@@ -155,8 +155,8 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
               : "1px solid rgba(0, 0, 0, 0.08)",
           background:
             mode === "dark"
-              ? "linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(30, 58, 138, 0.2) 100%)"
-              : "linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%)",
+              ? "linear-gradient(135deg, rgba(17, 182, 245, 0.4) 0%, rgba(17, 182, 245, 0.2) 100%)"
+              : "linear-gradient(135deg, rgba(17, 182, 245, 0.1) 0%, rgba(17, 182, 245, 0.05) 100%)",
           backdropFilter: "blur(10px)",
           position: "relative",
           zIndex: 1,
@@ -167,7 +167,7 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
             style={{
               fontSize: "20px",
               fontWeight: 800,
-              background: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
+              background: "linear-gradient(135deg, #7dd3fc 0%, #11b6f5 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textAlign: "center",
@@ -183,7 +183,7 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
               style={{
                 fontSize: "24px",
                 fontWeight: 800,
-                background: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
+                background: "linear-gradient(135deg, #7dd3fc 0%, #11b6f5 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 marginBottom: "4px",
@@ -339,17 +339,17 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
         }
 
         .ant-layout-sider-dark .ant-menu-dark .ant-menu-item:hover {
-          background: rgba(96, 165, 250, 0.12) !important;
-          color: #60a5fa !important;
+          background: rgba(17, 182, 245, 0.12) !important;
+          color: #11b6f5 !important;
           transform: translateX(4px);
-          box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.2);
+          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.2);
         }
 
         .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected {
-          background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%) !important;
-          color: #93c5fd !important;
+          background: linear-gradient(135deg, rgba(17, 182, 245, 0.2) 0%, rgba(17, 182, 245, 0.15) 100%) !important;
+          color: #7dd3fc !important;
           font-weight: 600;
-          box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.3);
+          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.3);
         }
 
         .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected::before {
@@ -359,7 +359,7 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
           top: 0;
           bottom: 0;
           width: 3px;
-          background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+          background: linear-gradient(180deg, #7dd3fc 0%, #11b6f5 100%);
           border-radius: 0 3px 3px 0;
         }
 
@@ -369,12 +369,12 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
         }
 
         .ant-layout-sider-dark .ant-menu-dark .ant-menu-item:hover .ant-menu-item-icon {
-          color: #60a5fa !important;
+          color: #11b6f5 !important;
           transform: rotate(5deg) scale(1.1);
         }
 
         .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected .ant-menu-item-icon {
-          color: #93c5fd !important;
+          color: #7dd3fc !important;
         }
 
         /* Light Mode Menu Styles */

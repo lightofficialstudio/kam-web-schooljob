@@ -346,7 +346,7 @@ export default function EmployeeProfilePage() {
                             profile.specialization.map((s) => (
                               <Tag
                                 key={s}
-                                color="blue"
+                                color="#11b6f5"
                                 style={{
                                   padding: "4px 12px",
                                   borderRadius: 999,
