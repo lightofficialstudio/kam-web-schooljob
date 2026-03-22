@@ -3,16 +3,21 @@
 import {
   DownOutlined,
   FileTextOutlined,
+  FolderOpenOutlined,
   ProfileOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {
   theme as antTheme,
+  Button,
   Card,
+  Input,
   Layout,
   Radio,
   Select,
   Space,
   Typography,
+  Upload,
 } from "antd";
 import { useApplyStore } from "../stores/apply-store";
 
@@ -35,6 +40,44 @@ export default function DocumentSection() {
       size={24}
       style={{ width: "100%", marginBottom: 40 }}
     >
+      {/* Introduction Section */}
+      <Card
+        title={
+          <Space size={12}>
+            <ProfileOutlined
+              style={{ color: token.colorPrimary, fontSize: "20px" }}
+            />
+            <Text strong style={{ fontSize: "18px" }}>
+              ข้อความแนะนำตัว
+            </Text>
+          </Space>
+        }
+        variant="outlined"
+        style={{
+          borderRadius: token.borderRadiusLG,
+          borderColor: token.colorBorderSecondary,
+          backgroundColor: token.colorBgContainer,
+          boxShadow: token.boxShadowTertiary,
+        }}
+        styles={{
+          header: {
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            padding: "16px 24px",
+          },
+          body: { padding: "24px" },
+        }}
+      >
+        <Input.TextArea
+          rows={5}
+          placeholder="แนะนำตัว หรือบอกเหตุผลที่สนใจตำแหน่งนี้ เพื่อให้โรงเรียนรู้จักคุณมากขึ้น (ไม่บังคับ)"
+          style={{
+            borderRadius: "12px",
+            padding: "16px",
+            fontSize: "15px",
+          }}
+        />
+      </Card>
+
       {/* Resume Section */}
       <Card
         title={
@@ -43,7 +86,7 @@ export default function DocumentSection() {
               style={{ color: token.colorPrimary, fontSize: "20px" }}
             />
             <Text strong style={{ fontSize: "18px" }}>
-              เรซูเม่ (Resumé)
+              เรซูเม่ (Resume)
             </Text>
           </Space>
         }
@@ -68,18 +111,6 @@ export default function DocumentSection() {
           style={{ width: "100%" }}
         >
           <Space direction="vertical" style={{ width: "100%" }} size={20}>
-            <Radio value="upload">
-              <Text
-                style={{
-                  color: token.colorText,
-                  fontSize: "16px",
-                  marginLeft: "8px",
-                }}
-              >
-                อัปโหลดเรซูเม่ใหม่ (.pdf, .doc)
-              </Text>
-            </Radio>
-
             <Radio value="select" style={{ width: "100%" }}>
               <Layout
                 style={{
@@ -113,6 +144,25 @@ export default function DocumentSection() {
               </Layout>
             </Radio>
 
+            <Radio value="upload">
+              <Text
+                style={{
+                  color: token.colorText,
+                  fontSize: "16px",
+                  marginLeft: "8px",
+                }}
+              >
+                อัปโหลดเรซูเม่ใหม่ (.pdf, .doc)
+              </Text>
+              {resumeOption === "upload" && (
+                <div style={{ marginTop: 12, paddingLeft: 32 }}>
+                  <Upload maxCount={1}>
+                    <Button icon={<UploadOutlined />}>คลิกเพื่ออัปโหลด</Button>
+                  </Upload>
+                </div>
+              )}
+            </Radio>
+
             <Radio value="none">
               <Text
                 style={{
@@ -121,22 +171,22 @@ export default function DocumentSection() {
                   marginLeft: "8px",
                 }}
               >
-                ไม่รวมเรซูเม่ (ฉันจะส่งภายหลัง)
+                ไม่แนบเรซูเม่
               </Text>
             </Radio>
           </Space>
         </Radio.Group>
       </Card>
 
-      {/* Cover Letter Section */}
+      {/* Other Documents Section */}
       <Card
         title={
           <Space size={12}>
-            <ProfileOutlined
+            <FolderOpenOutlined
               style={{ color: token.colorPrimary, fontSize: "20px" }}
             />
             <Text strong style={{ fontSize: "18px" }}>
-              จดหมายนำหน้า (Cover letter)
+              เอกสารอื่น ๆ (เช่น Portfolio, ประกาศนียบัตร)
             </Text>
           </Space>
         }
@@ -155,47 +205,33 @@ export default function DocumentSection() {
           body: { padding: "24px" },
         }}
       >
-        <Radio.Group
-          value={coverLetterOption}
-          onChange={(e) => setCoverLetterOption(e.target.value)}
-          style={{ width: "100%" }}
-        >
-          <Space direction="vertical" style={{ width: "100%" }} size={20}>
-            <Radio value="upload">
-              <Text
-                style={{
-                  color: token.colorText,
-                  fontSize: "16px",
-                  marginLeft: "8px",
-                }}
-              >
-                อัปโหลดจดหมายนำหน้า
-              </Text>
-            </Radio>
-            <Radio value="write">
-              <Text
-                style={{
-                  color: token.colorText,
-                  fontSize: "16px",
-                  marginLeft: "8px",
-                }}
-              >
-                เขียนจดหมายแนะนำตัวหน้าเว็บ
-              </Text>
-            </Radio>
-            <Radio value="none">
-              <Text
-                style={{
-                  color: token.colorTextSecondary,
-                  fontSize: "16px",
-                  marginLeft: "8px",
-                }}
-              >
-                ไม่รวมจดหมายนำหน้า
-              </Text>
-            </Radio>
-          </Space>
-        </Radio.Group>
+        <Space direction="vertical" style={{ width: "100%" }} size={16}>
+          <Text type="secondary">
+            คุณสามารถอัปโหลดไฟล์เพิ่มเติมได้ (เช่น แฟ้มสะสมผลงาน หรือเอกสารอื่น
+            ๆ ที่เป็นประโยชน์)
+          </Text>
+          <Upload
+            action="/api/upload"
+            listType="text"
+            maxCount={3}
+            multiple
+            style={{ width: "100%" }}
+          >
+            <Button
+              icon={<UploadOutlined />}
+              size="large"
+              style={{ width: "100%", height: "50px", borderRadius: "8px" }}
+            >
+              คลิกเพื่ออัปโหลดเอกสาร (ไม่เกิน 3 ไฟล์)
+            </Button>
+          </Upload>
+          <Text
+            type="secondary"
+            style={{ fontSize: "12px", display: "block", marginTop: "8px" }}
+          >
+            รองรับไฟล์ .pdf, .jpg, .png, .doc (ขนาดไม่เกิน 10MB ต่อไฟล์)
+          </Text>
+        </Space>
       </Card>
     </Space>
   );

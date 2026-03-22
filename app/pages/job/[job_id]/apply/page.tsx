@@ -5,14 +5,15 @@ import {
   Button,
   Col,
   Layout,
+  Modal,
   Row,
   Space,
-  Steps,
   Typography,
   theme as antTheme,
 } from "antd";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import DocumentSection from "./components/document-section";
 import JobSummary from "./components/job-summary";
 import UserProfileCard from "./components/user-profile-card";
@@ -25,6 +26,7 @@ export default function JobApplyPage() {
   const params = useParams();
   const router = useRouter();
   const { currentStep, setCurrentStep } = useApplyStore();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const jobInfo = {
     title: "ครูสอนภาษาอังกฤษ (English Teacher)",
@@ -32,12 +34,15 @@ export default function JobApplyPage() {
     logo: `https://api.dicebear.com/7.x/initials/svg?seed=ST&backgroundColor=${token.colorPrimary.replace("#", "")}`,
   };
 
-  const steps = [
-    { title: "เลือกเอกสาร" },
-    { title: "คำถามจากนายจ้าง" },
-    { title: "อัปเดตโปรไฟล์" },
-    { title: "ตรวจสอบและส่ง" },
-  ];
+  const handleApply = () => {
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmSubmit = () => {
+    // TODO: Process API
+    setIsConfirmModalOpen(false);
+    // router.push("/pages/job/apply-success");
+  };
 
   return (
     <Layout
@@ -82,22 +87,10 @@ export default function JobApplyPage() {
             {/* 1. Job Summary */}
             <JobSummary job={jobInfo} />
 
-            {/* 2. Steps Indicator */}
-            <Layout
-              style={{ marginBottom: "60px", backgroundColor: "transparent" }}
-            >
-              <Steps
-                current={currentStep}
-                size="small"
-                items={steps}
-                labelPlacement="vertical"
-              />
-            </Layout>
-
-            {/* 3. User Profile Card */}
+            {/* 2. User Profile Card */}
             <UserProfileCard />
 
-            {/* 4. Document Selection Section */}
+            {/* 3. Document Selection Section */}
             <DocumentSection />
 
             <Layout
@@ -118,7 +111,7 @@ export default function JobApplyPage() {
               </Text>
             </Layout>
 
-            {/* 6. Footer Action Button */}
+            {/* 4. Footer Action Button */}
             <Space
               direction="horizontal"
               style={{
@@ -139,14 +132,41 @@ export default function JobApplyPage() {
                   fontSize: "16px",
                   boxShadow: token.boxShadowSecondary,
                 }}
-                onClick={() => setCurrentStep(Math.min(currentStep + 1, 3))}
+                onClick={handleApply}
               >
-                ดำเนินการต่อ (Continue)
+                ส่งใบสมัคร
               </Button>
             </Space>
           </Col>
         </Row>
       </Layout.Content>
+
+      <Modal
+        title="ยืนยันการสมัครงาน"
+        open={isConfirmModalOpen}
+        onOk={handleConfirmSubmit}
+        onCancel={() => setIsConfirmModalOpen(false)}
+        okText="ส่งใบสมัคร"
+        cancelText="ยกเลิก"
+        okButtonProps={{
+          style: {
+            backgroundColor: token.colorPrimary,
+            borderRadius: "6px",
+          },
+        }}
+        cancelButtonProps={{
+          style: {
+            borderRadius: "6px",
+          },
+        }}
+      >
+        <div style={{ padding: "10px 0" }}>
+          <Text style={{ fontSize: "16px" }}>
+            คุณต้องการส่งใบสมัครสำหรับตำแหน่งนี้ใช่หรือไม่ <br />
+            โรงเรียนจะได้รับโปรไฟล์ของคุณ
+          </Text>
+        </div>
+      </Modal>
     </Layout>
   );
 }
