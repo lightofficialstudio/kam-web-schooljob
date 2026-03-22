@@ -474,7 +474,7 @@ export default function LandingPage() {
             <div>
               <Badge status="processing" text="อัปเดตล่าสุด" />
               <Title level={2} style={{ marginTop: "12px", marginBottom: 0 }}>
-                ตำแหน่งงานใหม่ที่น่าสนใจ
+                ประกาศงานใหม่ล่าสุด
               </Title>
             </div>
             <Button type="link" size="large">
