@@ -626,11 +626,11 @@ export default function LandingPage() {
             <Col xs={24} md={12}>
               <Badge
                 status="processing"
-                text={<Text strong>สำหรับสถานศึกษา</Text>}
+                text={<Text strong>สำหรับโรงเรียน</Text>}
               />
               <Title style={{ fontSize: "40px", marginTop: "16px" }}>
-                พบกับบุคลากรที่ตรงใจ <br />
-                <span>ได้เร็วกว่าที่เคย</span>
+                พบบุคลากรที่ใช่ <br />
+                <span>ได้เร็วกว่าเดิม</span>
               </Title>
               <Paragraph
                 style={{
@@ -638,8 +638,9 @@ export default function LandingPage() {
                   marginBottom: "32px",
                 }}
               >
-                เราช่วยแก้ปัญหา "หาครูยาก" ด้วยระบบจัดการประกาศงานที่ทันสมัย
-                คัดกรองบุคลากรตามวิชาเอกที่ต้องการ และระบบนัดสัมภาษณ์อัตโนมัติ
+                เราช่วยให้โรงเรียน หาครูและบุคลากรทางการศึกษาได้ง่ายขึ้น
+                ด้วยระบบประกาศงานที่ใช้งานง่าย
+                พร้อมเครื่องมือคัดกรองผู้สมัครและติดตามสถานะการสมัครในที่เดียว
               </Paragraph>
               <Space
                 direction="vertical"
@@ -647,10 +648,10 @@ export default function LandingPage() {
                 style={{ marginBottom: "40px" }}
               >
                 {[
-                  "ประกาศงานไม่จำกัดตำแหน่ง",
-                  "เข้าถึงฐานข้อมูลประวัติครู (Active candidates)",
-                  "ระบบ Dashboard ติดตามสถานะผู้สมัคร",
-                  "ส่งแจ้งเตือนผ่าน Line OA ถึงกลุ่มเป้าหมาย",
+                  "ประกาศรับสมัครงานได้ไม่จำกัดตำแหน่ง",
+                  "Dashboard ติดตามสถานะผู้สมัครได้ในที่เดียว",
+                  "สร้างโปรไฟล์โรงเรียนเพื่อเพิ่มความน่าเชื่อถือ",
+                  "เข้าถึงผู้สมัครที่ตรงคุณสมบัติได้ง่ายขึ้น",
                 ].map((feature, i) => (
                   <Space key={i}>
                     <RocketOutlined />
@@ -667,7 +668,7 @@ export default function LandingPage() {
                   borderRadius: "16px",
                 }}
               >
-                ลงทะเบียนสถานศึกษาเริ่มต้น 8,000 บ./ปี
+                เริ่มต้นใช้งานฟรี ประกาศงานได้ทันที!
               </Button>
             </Col>
             <Col xs={24} md={12}>
