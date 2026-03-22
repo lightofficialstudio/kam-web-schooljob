@@ -1,0 +1,52 @@
+[
+  {
+    "title": "ครูสอนภาษาอังกฤษ (EP)",
+    "school": "โรงเรียนนานาชาติแสงดาว",
+    "schoolLogo": "https://api.dicebear.com/7.x/miniavs/svg?seed=1",
+    "location": "กรุงเทพมหานคร",
+    "salary": "35,000 - 50,000",
+    "postedAt": "2 ชม. ที่แล้ว",
+    "isNew": true,
+    "tags": ["Full-time", "English"]
+  },
+  {
+    "title": "ครูอาสาสมัครสอนคณิตศาสตร์",
+    "school": "โรงเรียนบ้านนาพัฒนา",
+    "schoolLogo": "https://api.dicebear.com/7.x/miniavs/svg?seed=2",
+    "location": "เชียงใหม่",
+    "salary": "18,000 - 25,000",
+    "postedAt": "5 ชม. ที่แล้ว",
+    "isNew": true,
+    "tags": ["Contract", "Math"]
+  },
+  {
+    "title": "เจ้าหน้าที่ธุรการประสานงานวิจัย",
+    "school": "มหาวิทยาลัยนวัตกรรม",
+    "schoolLogo": "https://api.dicebear.com/7.x/miniavs/svg?seed=3",
+    "location": "นนทบุรี",
+    "salary": "22,000 - 30,000",
+    "postedAt": "1 วันที่ผ่านมา",
+    "isNew": false,
+    "tags": ["Full-time", "Admin"]
+  },
+  {
+    "title": "ครูสอนศิลปะ (Part-time)",
+    "school": "สถาบันอาร์ตดีล",
+    "schoolLogo": "https://api.dicebear.com/7.x/miniavs/svg?seed=4",
+    "location": "กรุงเทพมหานคร",
+    "salary": "500 - 800 / ชม.",
+    "postedAt": "3 วันที่ผ่านมา",
+    "isNew": false,
+    "tags": ["Part-time", "Art"]
+  },
+  {
+    "title": "หัวหน้าฝ่ายวิชาการ",
+    "school": "โรงเรียนปัญญาวิมล",
+    "schoolLogo": "https://api.dicebear.com/7.x/miniavs/svg?seed=5",
+    "location": "ชลบุรี",
+    "salary": "45,000 - 60,000",
+    "postedAt": "4 วันที่ผ่านมา",
+    "isNew": false,
+    "tags": ["Full-time", "Management"]
+  }
+]

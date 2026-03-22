@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import {
   theme as antTheme,
+  Avatar,
   Badge,
   Button,
   Card,
@@ -23,6 +24,7 @@ import {
 } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import mockJobs from "./mock-up-data.json";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -494,43 +496,7 @@ export default function LandingPage() {
             }}
             className="job-scroll-container"
           >
-            {[
-              {
-                title: "ครูสอนภาษาอังกฤษ (EP)",
-                school: "โรงเรียนนานาชาติแสงดาว",
-                location: "กรุงเทพมหานคร",
-                salary: "35,000 - 50,000",
-                tags: ["Full-time", "English"],
-              },
-              {
-                title: "ครูอาสาสมัครสอนคณิตศาสตร์",
-                school: "โรงเรียนบ้านนาพัฒนา",
-                location: "เชียงใหม่",
-                salary: "18,000 - 25,000",
-                tags: ["Contract", "Math"],
-              },
-              {
-                title: "เจ้าหน้าที่ธุรการประสานงานวิจัย",
-                school: "มหาวิทยาลัยนวัตกรรม",
-                location: "นนทบุรี",
-                salary: "22,000 - 30,000",
-                tags: ["Full-time", "Admin"],
-              },
-              {
-                title: "ครูสอนศิลปะ (Part-time)",
-                school: "สถาบันอาร์ตดีล",
-                location: "กรุงเทพมหานคร",
-                salary: "500 - 800 / ชม.",
-                tags: ["Part-time", "Art"],
-              },
-              {
-                title: "หัวหน้าฝ่ายวิชาการ",
-                school: "โรงเรียนปัญญาวิมล",
-                location: "ชลบุรี",
-                salary: "45,000 - 60,000",
-                tags: ["Full-time", "Management"],
-              },
-            ].map((job, idx) => (
+            {mockJobs.map((job, idx) => (
               <div
                 key={idx}
                 style={{
@@ -555,37 +521,67 @@ export default function LandingPage() {
                         alignItems: "flex-start",
                       }}
                     >
-                      <Badge count="New" color="#52c41a" />
+                      {job.isNew ? (
+                        <Badge count="New" color="#ef4444" />
+                      ) : (
+                        <div />
+                      )}
                       <Text type="secondary" style={{ fontSize: "12px" }}>
-                        2 ชม. ที่แล้ว
+                        {job.postedAt}
                       </Text>
                     </div>
-                    <div>
-                      <Title
-                        level={4}
-                        style={{
-                          marginBottom: "4px",
-                          height: "56px",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {job.title}
-                      </Title>
-                      <Text strong style={{ color: "#11b6f5" }}>
-                        {job.school}
-                      </Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar
+                        src={job.schoolLogo}
+                        size={48}
+                        shape="square"
+                        style={{ borderRadius: "8px", flexShrink: 0 }}
+                      />
+                      <div style={{ overflow: "hidden" }}>
+                        <Title
+                          level={4}
+                          style={{
+                            marginBottom: "0px",
+                            fontSize: "16px",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {job.title}
+                        </Title>
+                        <Text style={{ color: "#5B5B5B", fontSize: "13px" }}>
+                          {job.school}
+                        </Text>
+                      </div>
                     </div>
                     <Space direction="vertical" size={4}>
-                      <Text type="secondary">
+                      <Text type="secondary" style={{ fontSize: "13px" }}>
                         <GlobalOutlined /> {job.location}
                       </Text>
-                      <Text strong style={{ color: "#52c41a" }}>
+                      <Text
+                        style={{
+                          color: "#2b3244",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                        }}
+                      >
                         ฿ {job.salary}
                       </Text>
                     </Space>
                     <Space size={[4, 4]} wrap>
                       {job.tags.map((tag) => (
-                        <Tag key={tag} color="blue">
+                        <Tag
+                          key={tag}
+                          color="blue"
+                          style={{ borderRadius: "4px" }}
+                        >
                           {tag}
                         </Tag>
                       ))}
@@ -593,7 +589,12 @@ export default function LandingPage() {
                     <Button
                       type="primary"
                       block
-                      style={{ borderRadius: "10px" }}
+                      style={{
+                        borderRadius: "10px",
+                        height: "40px",
+                        backgroundColor: "#11b6f5",
+                        borderColor: "#11b6f5",
+                      }}
                     >
                       ดูรายละเอียด
                     </Button>
