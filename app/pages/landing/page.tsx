@@ -196,7 +196,7 @@ export default function LandingPage() {
             <Row gutter={[0, 0]} align="middle">
               {/* 💻 Search Input */}
               <Col xs={24} lg={8}>
-                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                <div style={{ padding: "0 12px", textAlign: "left" }}>
                   <Text
                     strong
                     style={{
@@ -234,7 +234,7 @@ export default function LandingPage() {
 
               {/* 📂 Job Categories (Cascader) */}
               <Col xs={24} lg={9}>
-                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                <div style={{ padding: "0 12px", textAlign: "left" }}>
                   <Text
                     strong
                     style={{
@@ -277,7 +277,7 @@ export default function LandingPage() {
 
               {/* 📍 Location Select */}
               <Col xs={24} lg={7}>
-                <div style={{ padding: "0 24px", textAlign: "left" }}>
+                <div style={{ padding: "0 12px", textAlign: "left" }}>
                   <Text
                     strong
                     style={{
@@ -314,7 +314,7 @@ export default function LandingPage() {
             {/* � Advanced Filters Row */}
             <div
               style={{
-                marginTop: "24px",
+                marginTop: "12px",
                 padding: "0 24px",
                 paddingTop: "16px",
                 borderTop: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
@@ -721,7 +721,6 @@ export default function LandingPage() {
         style={{
           padding: "80px 24px",
           background: isDark ? "#101622" : "#fafafa",
-          borderTop: `1px solid ${token.colorBorder}`,
         }}
       >
         <div
