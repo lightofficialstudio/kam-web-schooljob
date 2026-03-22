@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import {
   CheckCircleFilled,
   ClockCircleOutlined,
@@ -294,6 +295,7 @@ export default function JobSearchPage() {
 function JobSearchPageContent() {
   const searchParams = useSearchParams();
   const { token } = antTheme.useToken();
+  const { user } = useAuthStore();
 
   const [filters, setFilters] = useState({
     keyword: searchParams.get("keyword") || "",
@@ -1219,45 +1221,47 @@ function JobSearchPageContent() {
                 </div>
               </Card>
 
-              {/* How you match section */}
-              <Card
-                style={{
-                  marginTop: "24px",
-                  borderRadius: "12px",
-                  backgroundColor: "#fff",
-                  border: "1px solid #f0f0f0",
-                }}
-                styles={{ body: { padding: "24px" } }}
-              >
-                <Space size={8} style={{ marginBottom: "16px" }}>
-                  <Title level={5} style={{ margin: 0 }}>
-                    ความเหมาะสมของคุณต่อตำแหน่งนี้
-                  </Title>
-                  <InfoCircleOutlined style={{ color: "#8c8c8c" }} />
-                </Space>
-                <Text
-                  type="secondary"
-                  style={{ display: "block", marginBottom: "16px" }}
+              {/* How you match section - Show only if logged in */}
+              {user && (
+                <Card
+                  style={{
+                    marginTop: "24px",
+                    borderRadius: "12px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #f0f0f0",
+                  }}
+                  styles={{ body: { padding: "24px" } }}
                 >
-                  2 ทักษะและคุณสมบัติของคุณตรงกับความต้องการของโรงเรียน
-                </Text>
-                <Space size={[8, 12]} wrap>
-                  <Tag
-                    icon={<CheckCircleFilled />}
-                    color="success"
-                    style={{ padding: "4px 12px", borderRadius: "16px" }}
+                  <Space size={8} style={{ marginBottom: "16px" }}>
+                    <Title level={5} style={{ margin: 0 }}>
+                      ความเหมาะสมของคุณต่อตำแหน่งนี้
+                    </Title>
+                    <InfoCircleOutlined style={{ color: "#8c8c8c" }} />
+                  </Space>
+                  <Text
+                    type="secondary"
+                    style={{ display: "block", marginBottom: "16px" }}
                   >
-                    ประสบการณ์การสอน {selectedJob.teachingExperience}
-                  </Tag>
-                  <Tag
-                    icon={<CheckCircleFilled />}
-                    color="success"
-                    style={{ padding: "4px 12px", borderRadius: "16px" }}
-                  >
-                    วุฒิ {selectedJob.educationLevel}
-                  </Tag>
-                </Space>
-              </Card>
+                    2 ทักษะและคุณสมบัติของคุณตรงกับความต้องการของโรงเรียน
+                  </Text>
+                  <Space size={[8, 12]} wrap>
+                    <Tag
+                      icon={<CheckCircleFilled />}
+                      color="success"
+                      style={{ padding: "4px 12px", borderRadius: "16px" }}
+                    >
+                      ประสบการณ์การสอน {selectedJob.teachingExperience}
+                    </Tag>
+                    <Tag
+                      icon={<CheckCircleFilled />}
+                      color="success"
+                      style={{ padding: "4px 12px", borderRadius: "16px" }}
+                    >
+                      วุฒิ {selectedJob.educationLevel}
+                    </Tag>
+                  </Space>
+                </Card>
+              )}
 
               {/* Roles and Responsibilities */}
               <div style={{ marginTop: "40px" }}>
