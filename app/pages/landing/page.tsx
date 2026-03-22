@@ -736,23 +736,27 @@ export default function LandingPage() {
             {[
               {
                 title: "ฝากประวัติฟรี",
-                desc: "สร้าง Resume ออนไลน์ระดับมืออาชีพ",
-                localIcon: "/images/flat/undraw_resume_jrgi.svg",
+                desc: "สร้างโปรไฟล์เพื่อให้โรงเรียนค้นพบคุณ",
+                icon: <SolutionOutlined />,
+                color: "#11b6f5",
               },
               {
-                title: "แจ้งเตือนงานตรงใจ",
-                desc: "รับค่างานใหม่ตามวิชาเอกที่คุณระบุ",
-                localIcon: "/images/flat/undraw_job-offers_55y0.svg",
+                title: "สมัครง่ายในไม่กี่ขั้นตอน",
+                desc: "ลงทะเบียนและเริ่มสมัครงานได้ทันที",
+                icon: <RocketOutlined />,
+                color: "#52c41a",
               },
               {
-                title: "ติดตามสถานะ",
-                desc: "ดูประวัติการสมัครและนัดสัมภาษณ์งาน",
-                localIcon: "/images/flat/undraw_interview_yz52.svg",
+                title: "ค้นพบตำแหน่งงานมากมาย",
+                desc: "รวมงานจากโรงเรียนทั่วประเทศ",
+                icon: <SearchOutlined />,
+                color: "#fadb14",
               },
               {
-                title: "ประกาศเกียรติคุณ",
-                desc: "ระบบยืนยันวิทยฐานะและการเข้าอบรม",
-                localIcon: "/images/flat/undraw_project-completed_ug9i.svg",
+                title: "เพิ่มโอกาสได้งานที่ใช่",
+                desc: "โรงเรียนค้นพบโปรไฟล์ของคุณได้ง่ายขึ้น",
+                icon: <GlobalOutlined />,
+                color: "#ff4d4f",
               },
             ].map((item, i) => (
               <Col xs={24} sm={12} md={6} key={i}>
@@ -760,9 +764,11 @@ export default function LandingPage() {
                   hoverable
                   style={{
                     height: "100%",
-                    borderRadius: "20px",
+                    borderRadius: "24px",
                     border: "none",
+                    transition: "all 0.3s ease",
                   }}
+                  className="feature-card"
                 >
                   <Space
                     direction="vertical"
@@ -771,32 +777,24 @@ export default function LandingPage() {
                     size={24}
                   >
                     <div
+                      className="icon-wrapper"
                       style={{
-                        width: "64px",
-                        height: "64px",
-                        borderRadius: "16px",
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "20px",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: "28px",
-                        marginBottom: "16px",
+                        fontSize: "40px",
                         background: isDark
-                          ? "rgba(24, 144, 255, 0.15)"
-                          : "#f0f7ff",
-                        border: isDark
-                          ? "1px solid rgba(24, 144, 255, 0.3)"
-                          : "none",
+                          ? "rgba(255, 255, 255, 0.05)"
+                          : "#fff",
+                        boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
+                        color: item.color,
+                        transition: "all 0.3s ease",
                       }}
                     >
-                      <img
-                        src={item.localIcon}
-                        alt={item.title}
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          objectFit: "contain",
-                        }}
-                      />
+                      {item.icon}
                     </div>
                     <Space
                       direction="vertical"
@@ -804,22 +802,45 @@ export default function LandingPage() {
                       style={{ width: "100%" }}
                       size={8}
                     >
-                      <Title level={4} style={{ margin: 0 }}>
+                      <Title level={4} style={{ margin: 0, fontSize: "18px" }}>
                         {item.title}
                       </Title>
-                      <Text type="secondary">{item.desc}</Text>
+                      <Text type="secondary" style={{ fontSize: "14px" }}>
+                        {item.desc}
+                      </Text>
                     </Space>
                   </Space>
                 </Card>
               </Col>
             ))}
           </Row>
+
+          <style jsx global>{`
+            .feature-card:hover {
+              transform: translateY(-10px);
+            }
+            .feature-card:hover .icon-wrapper {
+              transform: scale(1.1) rotate(5deg);
+              box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+              background: #11b6f5 !important;
+              color: white !important;
+            }
+          `}</style>
+
           <Button
+            type="primary"
             size="large"
             shape="round"
-            style={{ marginTop: "48px", height: "54px", padding: "0 40px" }}
+            style={{ 
+              marginTop: "48px", 
+              height: "56px", 
+              padding: "0 48px",
+              fontSize: "18px",
+              fontWeight: "600",
+              boxShadow: "0 10px 20px rgba(17, 182, 245, 0.3)"
+            }}
           >
-            สร้างโปรไฟล์หางานฟรีเลยตอนนี้
+            สร้างโปรไฟล์หางานตอนนี้
           </Button>
         </div>
       </div>
