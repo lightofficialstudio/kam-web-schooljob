@@ -83,7 +83,11 @@ export default function AdminPage() {
       key: "status",
       render: (status) => {
         const tagColor =
-          status === "success" ? "green" : status === "info" ? "#11b6f5" : "red";
+          status === "success"
+            ? "green"
+            : status === "info"
+              ? "#11b6f5"
+              : "red";
         return <Tag color={tagColor}>{status.toUpperCase()}</Tag>;
       },
     },
