@@ -62,7 +62,7 @@ export const SchoolJobsDrawer = () => {
                 >
                   {selectedSchool.name}
                 </Title>
-                <Space size={12} split={<Divider orientation="vertical" />}>
+                <Space size={12} separator={<Divider orientation="vertical" />}>
                   <Space size={4}>
                     <EnvironmentOutlined
                       style={{ color: token.colorPrimary, fontSize: 13 }}

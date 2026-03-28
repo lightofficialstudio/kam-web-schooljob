@@ -343,7 +343,7 @@ export default function BlogListPage() {
                         </div>
 
                         <Space
-                          split={
+                          separator={
                             <Divider
                               type="vertical"
                               style={{ borderColor: token.colorBorder }}

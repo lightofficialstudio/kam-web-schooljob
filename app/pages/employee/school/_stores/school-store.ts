@@ -83,7 +83,7 @@ export const useSchoolStore = create<SchoolState>((set) => ({
       name: "สถาบันกวดวิชาออนดีมานด์",
       logo: "https://api.dicebear.com/7.x/initials/svg?seed=OD",
       province: "นนทบุรี",
-      type: "กวดวิชา",
+      type: "สถาบันกวดวิชา",
       jobCount: 3,
       jobs: [
         {
@@ -111,7 +111,7 @@ export const useSchoolStore = create<SchoolState>((set) => ({
       name: "โรงเรียนสาธิตมหาวิทยาลัยเชียงใหม่",
       logo: "https://api.dicebear.com/7.x/initials/svg?seed=CMU",
       province: "เชียงใหม่",
-      type: "โรงเรียน",
+      type: "โรงเรียนรัฐบาล",
       jobCount: 2,
       jobs: [
         {
@@ -133,7 +133,7 @@ export const useSchoolStore = create<SchoolState>((set) => ({
       name: "โรงเรียนกรุงเทพคริสเตียนวิทยาลัย",
       logo: "https://api.dicebear.com/7.x/initials/svg?seed=BCC",
       province: "กรุงเทพมหานคร",
-      type: "โรงเรียน",
+      type: "โรงเรียนเอกชน",
       jobCount: 4,
       jobs: [
         {

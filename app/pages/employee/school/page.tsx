@@ -12,7 +12,6 @@ import {
   theme as antTheme,
 } from "antd";
 import { SchoolCard } from "./_components/school-card";
-import { SchoolJobsDrawer } from "./_components/school-jobs-drawer";
 import { SchoolSearch } from "./_components/school-search";
 import { useSchoolStore } from "./_stores/school-store";
 
@@ -105,7 +104,7 @@ export default function SchoolDirectoryPage() {
               margin: "0 auto 32px",
             }}
           >
-            สำรวจสถานศึกษาในระบบที่กำลังเปิดรับสมัครงานครูทั่วมุมโลก
+            สำรวจโรงเรียนในระบบที่กำลังเปิดรับสมัครงานครูทั่วประเทศ
             พร้อมดูข้อมูลเบื้องต้นและตำแหน่งงานที่รอคุณอยู่
           </Text>
         </Flex>
@@ -121,7 +120,7 @@ export default function SchoolDirectoryPage() {
                 <Col>
                   <Space size={8}>
                     <Text strong style={{ fontSize: "18px" }}>
-                      สถานศึกษาทั้งหมด
+                      โรงเรียนทั้งหมด
                     </Text>
                     <Tag
                       color="#11b6f5"
@@ -157,7 +156,7 @@ export default function SchoolDirectoryPage() {
                   >
                     <Flex vertical align="center">
                       <Text style={{ fontSize: 48, marginBottom: 16 }}>🏫</Text>
-                      <Title level={4}>ไม่พบสถานศึกษา</Title>
+                      <Title level={4}>ไม่พบโรงเรียน</Title>
                       <Text type="secondary">
                         ลองเปลี่ยนคำค้นหาหรือตัวกรองเพื่อให้เราพบโรงเรียนที่คุณต้องการ
                       </Text>
@@ -169,7 +168,6 @@ export default function SchoolDirectoryPage() {
           </Col>
         </Row>
       </Content>
-      <SchoolJobsDrawer />
     </Layout>
   );
 }

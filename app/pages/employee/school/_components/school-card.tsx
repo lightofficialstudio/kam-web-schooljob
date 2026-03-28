@@ -14,7 +14,7 @@ import {
   Typography,
   theme as antTheme,
 } from "antd";
-import { useSchoolStore } from "../_stores/school-store";
+import { useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
@@ -36,12 +36,11 @@ export const SchoolCard = ({
   jobCount,
 }: SchoolCardProps) => {
   const { token } = antTheme.useToken();
-  const { schools, setSelectedSchool, setIsDrawerOpen } = useSchoolStore();
+  const router = useRouter();
 
+  // นำทางไปยังหน้าโปรไฟล์โรงเรียน
   const handleClick = () => {
-    const school = schools.find((s) => s.id === id) ?? null;
-    setSelectedSchool(school);
-    setIsDrawerOpen(true);
+    router.push(`/pages/employee/school/${id}`);
   };
 
   return (

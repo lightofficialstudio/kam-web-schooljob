@@ -86,7 +86,7 @@ export const SchoolSearch = () => {
               strong
               style={{ fontSize: 13, color: token.colorTextSecondary }}
             >
-              ประเภทสถาบัน
+              ประเภทโรงเรียน
             </Text>
           </Flex>
           <Select
@@ -96,9 +96,12 @@ export const SchoolSearch = () => {
             allowClear
             onChange={setTypeFilter}
             options={[
-              { value: "โรงเรียน", label: "โรงเรียน" },
-              { value: "กวดวิชา", label: "กวดวิชา" },
-              { value: "นานาชาติ", label: "นานาชาติ" },
+              { value: "โรงเรียนรัฐบาล", label: "โรงเรียนรัฐบาล" },
+              { value: "โรงเรียนเอกชน", label: "โรงเรียนเอกชน" },
+              { value: "โรงเรียนนานาชาติ", label: "โรงเรียนนานาชาติ" },
+              { value: "มหาวิทยาลัย / วิทยาลัย", label: "มหาวิทยาลัย / วิทยาลัย" },
+              { value: "สถาบันกวดวิชา", label: "สถาบันกวดวิชา" },
+              { value: "ศูนย์การเรียน / สถาบันการศึกษาอื่น ๆ", label: "ศูนย์การเรียน / สถาบันการศึกษาอื่น ๆ" },
             ]}
           />
         </Col>
