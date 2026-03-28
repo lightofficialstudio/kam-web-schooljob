@@ -8,21 +8,19 @@ import {
   EyeOutlined,
   StopOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Badge,
   Button,
   Card,
-  Col,
   Empty,
-  Row,
+  Flex,
   Space,
-  Statistic,
   Table,
   Tag,
   Tooltip,
   Typography,
-  theme,
 } from "antd";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -30,12 +28,12 @@ import { useJobReadStore, type JobRecord } from "../_state/job-read-store";
 
 const { Text } = Typography;
 
-// ตาราง Job Listings พร้อมสถิติ, สถานะ และปุ่มจัดการ
+const PRIMARY = "#11b6f5";
+
+// ตารางประกาศรับสมัครครู — ข้อมูลครบถ้วนสำหรับฝ่ายบุคลากร
 export const JobsTable = () => {
-  const { token } = theme.useToken();
   const { jobs, searchKeyword, activeTab } = useJobReadStore();
 
-  // กรองตาม keyword และ tab สถานะ
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       !searchKeyword ||
@@ -47,27 +45,36 @@ export const JobsTable = () => {
     return matchesSearch && matchesTab;
   });
 
+  const STATUS_CONFIG: Record<string, { color: string; text: string; icon: ReactNode }> = {
+    ACTIVE:  { color: "green",   text: "กำลังเปิดรับ", icon: <CheckCircleOutlined /> },
+    CLOSED:  { color: "default", text: "ปิดรับแล้ว",   icon: <StopOutlined /> },
+    DRAFT:   { color: "orange",  text: "ฉบับร่าง",     icon: <ClockCircleOutlined /> },
+  };
+
   const columns = [
     {
-      title: "รายละเอียดงาน",
+      title: "ตำแหน่ง / วิชาที่สอน",
       dataIndex: "title",
       key: "title",
       render: (text: string, record: JobRecord) => (
-        <Space orientation="vertical" size={4}>
-          <Text strong style={{ fontSize: 16, color: token.colorPrimary }}>
+        <Flex vertical gap={6}>
+          <Text strong style={{ fontSize: 15, color: PRIMARY }}>
             {text}
           </Text>
-          <Space wrap>
+          <Flex wrap="wrap" gap={4}>
             {record.subjects.map((s) => (
-              <Tag key={s} color="#11b6f5" variant="filled">
+              <Tag key={s} color="blue" style={{ margin: 0 }}>
                 {s}
               </Tag>
             ))}
-          </Space>
+          </Flex>
           <Text type="secondary" style={{ fontSize: 12 }}>
             ระดับชั้น: {record.grades.join(", ")}
           </Text>
-        </Space>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            เงินเดือน: <Text strong style={{ color: "#0F172A", fontSize: 12 }}>{record.salary}</Text>
+          </Text>
+        </Flex>
       ),
     },
     {
@@ -76,91 +83,96 @@ export const JobsTable = () => {
       key: "status",
       width: 140,
       render: (status: string) => {
-        const config: Record<
-          string,
-          { color: string; text: string; icon: ReactNode }
-        > = {
-          ACTIVE: {
-            color: "green",
-            text: "กำลังเปิดรับ",
-            icon: <CheckCircleOutlined />,
-          },
-          CLOSED: {
-            color: "default",
-            text: "ปิดรับแล้ว",
-            icon: <StopOutlined />,
-          },
-          DRAFT: {
-            color: "orange",
-            text: "ฉบับร่าง",
-            icon: <ClockCircleOutlined />,
-          },
-        };
-        const current = config[status];
+        const cfg = STATUS_CONFIG[status];
         return (
-          <Tag color={current.color} icon={current.icon}>
-            {current.text}
+          <Tag color={cfg.color} icon={cfg.icon} style={{ fontSize: 12 }}>
+            {cfg.text}
           </Tag>
         );
       },
     },
     {
-      title: "สถิติการเข้าชม",
-      key: "stats",
-      width: 250,
+      title: "ผู้สมัคร",
+      key: "applicants",
+      width: 160,
       render: (_: unknown, record: JobRecord) => (
-        <Row gutter={16}>
-          <Col span={12}>
-            <Statistic
-              title="ยอดเข้าชม"
-              value={record.views}
-              prefix={<EyeOutlined />}
-              styles={{ content: { fontSize: 16 } }}
+        <Flex vertical gap={8}>
+          <Flex align="center" gap={8}>
+            <UserOutlined style={{ color: "#94A3B8", fontSize: 13 }} />
+            <Text style={{ fontSize: 14 }}>ทั้งหมด</Text>
+            <Text strong style={{ fontSize: 16, color: "#0F172A" }}>{record.applicants}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>คน</Text>
+          </Flex>
+          {record.newApplicants > 0 && (
+            <Badge
+              count={`+${record.newApplicants} ใหม่`}
+              style={{
+                backgroundColor: "#EFF9FF",
+                color: PRIMARY,
+                border: `1px solid #BAE6FD`,
+                fontSize: 11,
+                fontWeight: 600,
+                boxShadow: "none",
+              }}
             />
-          </Col>
-          <Col span={12}>
-            <Badge count={record.newApplicants} offset={[10, 0]}>
-              <Statistic
-                title="ผู้สมัคร"
-                value={record.applicants}
-                prefix={<UserAddOutlined />}
-                styles={{ content: { fontSize: 16 } }}
-              />
-            </Badge>
-          </Col>
-        </Row>
+          )}
+          <Flex align="center" gap={6}>
+            <EyeOutlined style={{ color: "#CBD5E1", fontSize: 12 }} />
+            <Text type="secondary" style={{ fontSize: 12 }}>{record.views.toLocaleString()} ครั้ง</Text>
+          </Flex>
+        </Flex>
       ),
     },
     {
-      title: "วันที่ลงประกาศ",
-      dataIndex: "publishedAt",
-      key: "publishedAt",
+      title: "วันที่ประกาศ / หมดอายุ",
+      key: "dates",
       width: 160,
-      render: (date: string, record: JobRecord) => (
-        <Space orientation="vertical" size={0}>
-          <Text style={{ fontSize: 14 }}>{date}</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            หมดอายุ: {record.expiresAt}
-          </Text>
-        </Space>
-      ),
+      render: (_: unknown, record: JobRecord) => {
+        const expires = new Date(record.expiresAt);
+        const today = new Date();
+        const daysLeft = Math.ceil((expires.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        const isExpiringSoon = record.status === "ACTIVE" && daysLeft <= 7 && daysLeft >= 0;
+        const isExpired = daysLeft < 0;
+
+        return (
+          <Flex vertical gap={4}>
+            <Text style={{ fontSize: 13 }}>{record.publishedAt}</Text>
+            <Flex align="center" gap={4}>
+              <Text type={isExpiringSoon ? "warning" : isExpired ? "danger" : "secondary"} style={{ fontSize: 12 }}>
+                หมดอายุ: {record.expiresAt}
+              </Text>
+            </Flex>
+            {isExpiringSoon && (
+              <Tag color="orange" style={{ fontSize: 10, margin: 0 }}>
+                เหลือ {daysLeft} วัน
+              </Tag>
+            )}
+            {isExpired && record.status === "ACTIVE" && (
+              <Tag color="red" style={{ fontSize: 10, margin: 0 }}>หมดอายุแล้ว</Tag>
+            )}
+          </Flex>
+        );
+      },
     },
     {
       title: "จัดการ",
       key: "action",
-      width: 180,
+      width: 160,
       render: (_: unknown, record: JobRecord) => (
-        <Space size="middle">
+        <Space size={6}>
+          <Tooltip title="ดูผู้สมัครทั้งหมด">
+            <Button icon={<UserAddOutlined />} type="primary" ghost size="small" />
+          </Tooltip>
           <Tooltip title="แก้ไขประกาศ">
             <Link href={`/pages/employer/job/post/${record.key}`}>
-              <Button icon={<EditOutlined />} />
+              <Button icon={<EditOutlined />} size="small" />
             </Link>
           </Tooltip>
-          <Tooltip title="ดูสถิติเชิงลึก">
-            <Button icon={<BarChartOutlined />} />
+          <Tooltip title="ดูสถิติ">
+            <Button icon={<BarChartOutlined />} size="small" />
           </Tooltip>
           <Tooltip title="ปิดรับสมัคร">
-            <Button danger icon={<StopOutlined />} />
+            <Button danger icon={<StopOutlined />} size="small" />
           </Tooltip>
         </Space>
       ),
@@ -168,12 +180,34 @@ export const JobsTable = () => {
   ];
 
   return (
-    <Card variant="borderless" style={{ borderRadius: 12, overflow: "hidden" }}>
+    <Card
+      variant="borderless"
+      style={{ borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+      styles={{ body: { padding: 0 } }}
+    >
       <Table
         columns={columns}
         dataSource={filteredJobs}
-        pagination={{ pageSize: 10 }}
-        locale={{ emptyText: <Empty description="ไม่พบข้อมูลงานที่ประกาศ" /> }}
+        rowKey="key"
+        pagination={{
+          pageSize: 10,
+          showTotal: (total) => `ทั้งหมด ${total} ประกาศ`,
+          showSizeChanger: false,
+        }}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <Text type="secondary">
+                  {searchKeyword ? `ไม่พบประกาศที่ตรงกับ "${searchKeyword}"` : "ยังไม่มีประกาศรับสมัครงาน"}
+                </Text>
+              }
+            />
+          ),
+        }}
+        rowHoverBg="#F8FAFC"
+        style={{ borderRadius: 14 }}
       />
     </Card>
   );
