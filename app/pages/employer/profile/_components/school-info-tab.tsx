@@ -16,18 +16,63 @@ import {
 import {
   Card,
   Col,
-  Descriptions,
   Empty,
   Flex,
   List,
   Row,
   Tag,
+  theme,
   Typography,
 } from "antd";
 
 import type { SchoolProfile } from "../_state/school-profile.state";
 
 const { Title, Paragraph, Text } = Typography;
+
+// InfoItem — แสดง label + value แบบ 2-column ต่อ 1 row อ่านง่าย
+const InfoItem: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}> = ({ icon, label, value }) => {
+  const { token } = theme.useToken();
+  return (
+    <Flex
+      align="flex-start"
+      gap={12}
+      style={{
+        padding: "14px 16px",
+        borderRadius: 10,
+        background: token.colorFillQuaternary,
+        border: `1px solid ${token.colorBorderSecondary}`,
+      }}
+    >
+      <Flex
+        align="center"
+        justify="center"
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 8,
+          background: token.colorFillTertiary,
+          color: token.colorTextSecondary,
+          flexShrink: 0,
+          fontSize: 16,
+        }}
+      >
+        {icon}
+      </Flex>
+      <Flex vertical gap={2}>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {label}
+        </Text>
+        <Text strong style={{ fontSize: 14 }}>
+          {value}
+        </Text>
+      </Flex>
+    </Flex>
+  );
+};
 
 // Section header component ใช้ซ้ำได้ภายใน tab นี้
 const SectionTitle: React.FC<{
@@ -151,82 +196,68 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
         </Card>
       )}
 
-      {/* ─── ข้อมูลเพิ่มเติม (Descriptions) ─── */}
+      {/* ─── ข้อมูลเพิ่มเติม ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
         <SectionTitle
           icon={<InfoCircleOutlined />}
           color="#fa8c16"
           text="ข้อมูลเพิ่มเติม"
         />
-        <Descriptions
-          bordered
-          column={{ xs: 1, sm: 2 }}
-          size="middle"
-          labelStyle={{ fontWeight: 600, width: 160 }}
-        >
+        <Row gutter={[16, 16]}>
           {profile.type && (
-            <Descriptions.Item
-              label={
-                <Flex align="center" gap={6}>
-                  <BankOutlined /> ประเภทโรงเรียน
-                </Flex>
-              }
-            >
-              {profile.type}
-            </Descriptions.Item>
+            <Col xs={24} sm={12}>
+              <InfoItem
+                icon={<BankOutlined />}
+                label="ประเภทโรงเรียน"
+                value={profile.type}
+              />
+            </Col>
           )}
           {profile.size && (
-            <Descriptions.Item
-              label={
-                <Flex align="center" gap={6}>
-                  <TeamOutlined /> จำนวนบุคลากร
-                </Flex>
-              }
-            >
-              {profile.size}
-            </Descriptions.Item>
+            <Col xs={24} sm={12}>
+              <InfoItem
+                icon={<TeamOutlined />}
+                label="จำนวนบุคลากร"
+                value={profile.size}
+              />
+            </Col>
           )}
           {profile.curriculum && (
-            <Descriptions.Item
-              label={
-                <Flex align="center" gap={6}>
-                  <BookOutlined /> หลักสูตร
-                </Flex>
-              }
-            >
-              {profile.curriculum}
-            </Descriptions.Item>
+            <Col xs={24} sm={12}>
+              <InfoItem
+                icon={<BookOutlined />}
+                label="หลักสูตร"
+                value={profile.curriculum}
+              />
+            </Col>
           )}
           {profile.established && (
-            <Descriptions.Item
-              label={
-                <Flex align="center" gap={6}>
-                  <CalendarOutlined /> ก่อตั้งปี พ.ศ.
-                </Flex>
-              }
-            >
-              {profile.established}
-            </Descriptions.Item>
+            <Col xs={24} sm={12}>
+              <InfoItem
+                icon={<CalendarOutlined />}
+                label="ก่อตั้งปี พ.ศ."
+                value={profile.established}
+              />
+            </Col>
           )}
           {profile.levels && profile.levels.length > 0 && (
-            <Descriptions.Item
-              label={
-                <Flex align="center" gap={6}>
-                  <BookOutlined /> ระดับชั้นที่เปิดสอน
-                </Flex>
-              }
-              span={2}
-            >
-              <Flex gap={6} wrap="wrap">
-                {profile.levels.map((level) => (
-                  <Tag key={level} color="blue">
-                    {level}
-                  </Tag>
-                ))}
-              </Flex>
-            </Descriptions.Item>
+            <Col span={24}>
+              <InfoItem
+                icon={<BookOutlined />}
+                label="ระดับชั้นที่เปิดสอน"
+                value={
+                  <Flex gap={6} wrap="wrap">
+                    {profile.levels.map((level) => (
+                      <Tag key={level} color="blue">
+                        {level}
+                      </Tag>
+                    ))}
+                  </Flex>
+                }
+              />
+            </Col>
           )}
-        </Descriptions>
+        </Row>
       </Card>
 
       {/* ─── ที่ตั้งโรงเรียน ─── */}
