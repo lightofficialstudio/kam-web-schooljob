@@ -12,7 +12,16 @@ export interface ApplicantRecord {
   education: string;
   appliedAt: string;
   status: ApplicantStatus;
+  jobTitle?: string; // แสดงเฉพาะใน mode ผู้สมัครใหม่ทั้งหมด
+  jobId?: string;
 }
+
+// Map ชื่อตำแหน่งตาม jobId — ใช้ในการ aggregate "ผู้สมัครใหม่ทั้งหมด"
+export const JOB_TITLE_MAP: Record<string, string> = {
+  "1": "ครูสอนภาษาอังกฤษ (Full-time)",
+  "2": "ครูสอนคณิตศาสตร์ (Part-time)",
+  "3": "ครูประจำชั้นอนุบาล 3",
+};
 
 // ข้อมูล Mock ผู้สมัครจำแนกตาม jobId
 const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
@@ -70,7 +79,29 @@ const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
       experience: "3 ปี",
       education: "ครุศาสตรบัณฑิต ม.เชียงใหม่",
       appliedAt: "2026-03-24",
-      status: "REJECTED",
+      status: "PENDING",
+    },
+    {
+      key: "a1-6",
+      name: "นายธนพล อังกฤษเยี่ยม",
+      email: "thanapol@email.com",
+      phone: "064-222-3333",
+      subjects: ["ภาษาอังกฤษ", "Conversation"],
+      experience: "4 ปี",
+      education: "ครุศาสตรบัณฑิต ม.ศิลปากร",
+      appliedAt: "2026-03-26",
+      status: "PENDING",
+    },
+    {
+      key: "a1-7",
+      name: "นางสาวชลิดา นิ่มนวล",
+      email: "chalida@email.com",
+      phone: "085-444-5555",
+      subjects: ["ภาษาอังกฤษ"],
+      experience: "6 ปี",
+      education: "ศิลปศาสตรบัณฑิต ม.เกษตรศาสตร์",
+      appliedAt: "2026-03-27",
+      status: "PENDING",
     },
   ],
   "2": [
@@ -107,6 +138,17 @@ const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
       appliedAt: "2026-03-10",
       status: "ACCEPTED",
     },
+    {
+      key: "a2-4",
+      name: "นางสาวสุภาพร เลขดี",
+      email: "supaporn@email.com",
+      phone: "096-888-7777",
+      subjects: ["คณิตศาสตร์"],
+      experience: "2 ปี",
+      education: "วิทยาศาสตรบัณฑิต ม.มหิดล",
+      appliedAt: "2026-03-26",
+      status: "PENDING",
+    },
   ],
   "3": [
     {
@@ -134,6 +176,9 @@ const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
   ],
 };
 
+// "__NEW__" คือ mode พิเศษ — แสดงผู้สมัครใหม่ (PENDING) จากทุกตำแหน่ง
+export const NEW_APPLICANTS_MODE = "__NEW__";
+
 // State สำหรับ Drawer แสดงรายชื่อผู้สมัครของแต่ละตำแหน่ง
 interface ApplicantDrawerState {
   isOpen: boolean;
@@ -141,9 +186,11 @@ interface ApplicantDrawerState {
   selectedJobTitle: string;
   filterStatus: ApplicantStatus | "ALL";
   openDrawer: (jobId: string, jobTitle: string) => void;
+  openNewApplicantsDrawer: () => void; // เปิดในโหมดผู้สมัครใหม่ทั้งหมด
   closeDrawer: () => void;
   setFilterStatus: (status: ApplicantStatus | "ALL") => void;
-  getApplicants: () => ApplicantRecord[];
+  getAllApplicants: () => ApplicantRecord[]; // ดึงทั้งหมดโดยไม่ filter status
+  getApplicants: () => ApplicantRecord[];   // ดึงตาม filterStatus ปัจจุบัน
   updateApplicantStatus: (applicantKey: string, status: ApplicantStatus) => void;
 }
 
@@ -157,6 +204,15 @@ export const useApplicantDrawerStore = create<ApplicantDrawerState>((set, get) =
   openDrawer: (jobId, jobTitle) =>
     set({ isOpen: true, selectedJobId: jobId, selectedJobTitle: jobTitle, filterStatus: "ALL" }),
 
+  // เปิด Drawer ในโหมดรวมผู้สมัครใหม่ทุกตำแหน่ง
+  openNewApplicantsDrawer: () =>
+    set({
+      isOpen: true,
+      selectedJobId: NEW_APPLICANTS_MODE,
+      selectedJobTitle: "ผู้สมัครใหม่ทั้งหมด",
+      filterStatus: "ALL",
+    }),
+
   // ปิด Drawer และ reset state
   closeDrawer: () =>
     set({ isOpen: false, selectedJobId: null, selectedJobTitle: "", filterStatus: "ALL" }),
@@ -164,21 +220,60 @@ export const useApplicantDrawerStore = create<ApplicantDrawerState>((set, get) =
   // กรองสถานะผู้สมัครใน Drawer
   setFilterStatus: (filterStatus) => set({ filterStatus }),
 
-  // ดึงรายชื่อผู้สมัครตาม jobId และ filterStatus ปัจจุบัน
+  // ดึงรายชื่อผู้สมัครทั้งหมดตาม mode โดยไม่ filter status — ใช้คำนวณ count
+  getAllApplicants: () => {
+    const { selectedJobId } = get();
+    if (!selectedJobId) return [];
+    if (selectedJobId === NEW_APPLICANTS_MODE) {
+      return Object.entries(MOCK_APPLICANTS).flatMap(([jobId, applicants]) =>
+        applicants
+          .filter((a) => a.status === "PENDING")
+          .map((a) => ({ ...a, jobTitle: JOB_TITLE_MAP[jobId] ?? jobId, jobId })),
+      );
+    }
+    return MOCK_APPLICANTS[selectedJobId] ?? [];
+  },
+
+  // ดึงรายชื่อผู้สมัครตาม mode ปัจจุบัน
   getApplicants: () => {
     const { selectedJobId, filterStatus } = get();
     if (!selectedJobId) return [];
-    const all = MOCK_APPLICANTS[selectedJobId] ?? [];
-    return filterStatus === "ALL" ? all : all.filter((a) => a.status === filterStatus);
+
+    let allRecords: ApplicantRecord[] = [];
+
+    if (selectedJobId === NEW_APPLICANTS_MODE) {
+      // รวมผู้สมัครใหม่ (PENDING) จากทุกตำแหน่ง พร้อม inject jobTitle + jobId
+      allRecords = Object.entries(MOCK_APPLICANTS).flatMap(([jobId, applicants]) =>
+        applicants
+          .filter((a) => a.status === "PENDING")
+          .map((a) => ({ ...a, jobTitle: JOB_TITLE_MAP[jobId] ?? jobId, jobId })),
+      );
+    } else {
+      allRecords = MOCK_APPLICANTS[selectedJobId] ?? [];
+    }
+
+    return filterStatus === "ALL" ? allRecords : allRecords.filter((a) => a.status === filterStatus);
   },
 
-  // อัปเดตสถานะผู้สมัคร (จำลองการเปลี่ยนสถานะ)
+  // อัปเดตสถานะผู้สมัคร — รองรับทั้ง mode ปกติและ NEW mode
   updateApplicantStatus: (applicantKey, status) => {
     const { selectedJobId } = get();
-    if (!selectedJobId || !MOCK_APPLICANTS[selectedJobId]) return;
-    MOCK_APPLICANTS[selectedJobId] = MOCK_APPLICANTS[selectedJobId].map((a) =>
-      a.key === applicantKey ? { ...a, status } : a,
-    );
+
+    if (selectedJobId === NEW_APPLICANTS_MODE) {
+      // ค้นหาใน jobId ทั้งหมดแล้ว update
+      for (const jobId of Object.keys(MOCK_APPLICANTS)) {
+        const idx = MOCK_APPLICANTS[jobId].findIndex((a) => a.key === applicantKey);
+        if (idx !== -1) {
+          MOCK_APPLICANTS[jobId][idx] = { ...MOCK_APPLICANTS[jobId][idx], status };
+          break;
+        }
+      }
+    } else if (selectedJobId && MOCK_APPLICANTS[selectedJobId]) {
+      MOCK_APPLICANTS[selectedJobId] = MOCK_APPLICANTS[selectedJobId].map((a) =>
+        a.key === applicantKey ? { ...a, status } : a,
+      );
+    }
+
     set({}); // trigger re-render
   },
 }));

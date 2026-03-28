@@ -8,6 +8,7 @@ import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
 import { JobsTable } from "./_components/jobs-table";
 import { StatsSection } from "./_components/stats-section";
+import { useApplicantDrawerStore } from "./_state/applicant-drawer-store";
 import { useJobReadStore } from "./_state/job-read-store";
 
 const { Title, Text } = Typography;
@@ -19,6 +20,7 @@ const PRIMARY_DARK = "#0878a8";
 // หน้าจัดการประกาศรับสมัครครู — สำหรับฝ่ายบุคลากรของโรงเรียน
 export default function MyJobsPage() {
   const { jobs } = useJobReadStore();
+  const { openNewApplicantsDrawer } = useApplicantDrawerStore();
   const totalNewApplicants = jobs.reduce((sum, j) => sum + j.newApplicants, 0);
 
   return (
@@ -85,6 +87,7 @@ export default function MyJobsPage() {
                 <Badge count={totalNewApplicants} size="default" offset={[-4, 4]}>
                   <Button
                     size="large"
+                    onClick={openNewApplicantsDrawer}
                     style={{
                       borderRadius: 10,
                       background: "rgba(255,255,255,0.15)",

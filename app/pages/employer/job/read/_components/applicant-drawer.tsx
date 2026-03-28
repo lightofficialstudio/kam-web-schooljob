@@ -22,6 +22,7 @@ import {
   Typography,
 } from "antd";
 import {
+  NEW_APPLICANTS_MODE,
   type ApplicantStatus,
   useApplicantDrawerStore,
 } from "../_state/applicant-drawer-store";
@@ -53,24 +54,24 @@ const FILTER_TABS: { key: ApplicantStatus | "ALL"; label: string }[] = [
 export const ApplicantDrawer = () => {
   const {
     isOpen,
+    selectedJobId,
     selectedJobTitle,
     filterStatus,
     closeDrawer,
     setFilterStatus,
     getApplicants,
+    getAllApplicants,
     updateApplicantStatus,
   } = useApplicantDrawerStore();
 
+  const isNewMode = selectedJobId === NEW_APPLICANTS_MODE;
   const applicants = getApplicants();
+  const allUnfiltered = getAllApplicants();
 
-  // นับจำนวนผู้สมัครแต่ละสถานะเพื่อแสดง Badge บน Tab
-  const { isOpen: _, selectedJobId, getApplicants: getAllFn, ...rest } = useApplicantDrawerStore.getState();
-  const allApplicants = useApplicantDrawerStore((s) => s.getApplicants)();
-
-  // นับตามสถานะทั้งหมด (ไม่ filter) — เรียก store โดยตรง
+  // นับผู้สมัครแต่ละสถานะจาก raw list (ไม่ผ่าน filterStatus)
   const countByStatus = (status: ApplicantStatus | "ALL") => {
-    if (status === "ALL") return allApplicants.length;
-    return allApplicants.filter((a) => a.status === status).length;
+    if (status === "ALL") return allUnfiltered.length;
+    return allUnfiltered.filter((a) => a.status === status).length;
   };
 
   return (
@@ -179,6 +180,12 @@ export const ApplicantDrawer = () => {
                             {s}
                           </Tag>
                         ))}
+                        {/* แสดงชื่อตำแหน่งเมื่ออยู่ใน mode ผู้สมัครใหม่ทั้งหมด */}
+                        {isNewMode && applicant.jobTitle && (
+                          <Tag color="purple" style={{ margin: 0, fontSize: 11 }}>
+                            {applicant.jobTitle}
+                          </Tag>
+                        )}
                       </Flex>
                     </Flex>
                   </Flex>
