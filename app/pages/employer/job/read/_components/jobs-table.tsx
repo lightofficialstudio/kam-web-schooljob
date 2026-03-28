@@ -53,7 +53,7 @@ export const JobsTable = () => {
       dataIndex: "title",
       key: "title",
       render: (text: string, record: JobRecord) => (
-        <Space direction="vertical" size={4}>
+        <Space orientation="vertical" size={4}>
           <Text strong style={{ fontSize: 16, color: token.colorPrimary }}>
             {text}
           </Text>
@@ -122,7 +122,7 @@ export const JobsTable = () => {
       key: "publishedAt",
       width: 160,
       render: (date: string, record: JobRecord) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Text style={{ fontSize: 14 }}>{date}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
             หมดอายุ: {record.expiresAt}

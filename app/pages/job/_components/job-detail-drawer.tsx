@@ -48,7 +48,7 @@ export const JobDetailDrawer = () => {
     <Drawer
       open={isDrawerOpen}
       onClose={() => setIsDrawerOpen(false)}
-      width="80%"
+      size="80%"
       closable={false}
       styles={{ body: { padding: 0 } }}
     >
@@ -71,7 +71,7 @@ export const JobDetailDrawer = () => {
             <Flex justify="flex-end" align="center" gap={12}>
               <Button type="text" icon={<ShareAltOutlined />} style={{ fontSize: 20 }} />
               <Button type="text" icon={<MoreOutlined />} style={{ fontSize: 20 }} />
-              <Divider type="vertical" />
+              <Divider orientation="vertical" />
               <Button
                 type="text"
                 icon={<CloseOutlined />}

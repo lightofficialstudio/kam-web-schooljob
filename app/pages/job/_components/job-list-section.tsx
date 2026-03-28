@@ -64,7 +64,7 @@ export const JobListSection = () => {
       </Row>
 
       {/* Job Cards */}
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
         {paginatedJobs.length > 0 ? (
           paginatedJobs.map((job) => <JobCard key={job.id} job={job} />)
         ) : (

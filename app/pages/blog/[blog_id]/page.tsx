@@ -171,7 +171,7 @@ export default function BlogDetailPage() {
                   {blog.title}
                 </Title>
                 <Space
-                  separator={<Divider type="vertical" />}
+                  separator={<Divider orientation="vertical" />}
                   style={{ color: token.colorTextDescription }}
                 >
                   <Space>

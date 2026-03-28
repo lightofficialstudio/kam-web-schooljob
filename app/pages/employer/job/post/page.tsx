@@ -133,7 +133,7 @@ export default function PostJobPage() {
           >
             <Row gutter={40}>
               <Col xs={24} lg={16}>
-                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={24} style={{ width: "100%" }}>
                   <BasicInfoSection />
                   <SalarySection />
                   <JobDetailSection />
