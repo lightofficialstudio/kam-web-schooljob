@@ -38,8 +38,18 @@ const MAX_WORK_EXPERIENCES = 5;
 
 // ชื่อเดือนภาษาไทยแบบย่อ
 const THAI_MONTHS = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+  "ม.ค.",
+  "ก.พ.",
+  "มี.ค.",
+  "เม.ย.",
+  "พ.ค.",
+  "มิ.ย.",
+  "ก.ค.",
+  "ส.ค.",
+  "ก.ย.",
+  "ต.ค.",
+  "พ.ย.",
+  "ธ.ค.",
 ];
 
 // [Fix #5] แปลงวันที่ string เป็น "เดือน พ.ศ." สำหรับแสดงผล
@@ -249,7 +259,9 @@ export const WorkExperienceSection: React.FC = () => {
               <Form.Item
                 label="ชื่อโรงเรียน / บริษัท"
                 name="companyName"
-                rules={[{ required: true, message: "กรุณากรอกชื่อโรงเรียน/บริษัท" }]}
+                rules={[
+                  { required: true, message: "กรุณากรอกชื่อโรงเรียน/บริษัท" },
+                ]}
               >
                 <Input placeholder="เช่น โรงเรียนสาธิตจุฬาฯ" size="large" />
               </Form.Item>
@@ -260,7 +272,12 @@ export const WorkExperienceSection: React.FC = () => {
                   <Form.Item
                     label="เริ่มงาน (เดือน/ปี พ.ศ.)"
                     name="startDate"
-                    rules={[{ required: true, message: "กรุณาเลือกเดือนและปีที่เริ่มงาน" }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณาเลือกเดือนและปีที่เริ่มงาน",
+                      },
+                    ]}
                   >
                     <DatePicker
                       picker="month"
@@ -286,7 +303,7 @@ export const WorkExperienceSection: React.FC = () => {
                             return Promise.resolve();
                           }
                           return Promise.reject(
-                            new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด")
+                            new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด"),
                           );
                         },
                       }),
@@ -334,7 +351,11 @@ export const WorkExperienceSection: React.FC = () => {
               <Divider style={{ margin: "32px 0 24px 0" }} />
 
               <Flex justify="end" gap={12}>
-                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
+                <Button
+                  onClick={handleCancel}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
                   ยกเลิก
                 </Button>
                 <Button
@@ -385,18 +406,29 @@ export const WorkExperienceSection: React.FC = () => {
                       <Col>
                         {/* [Fix #5] แสดงวันที่เป็น พ.ศ. */}
                         <Flex vertical align="end">
-                          <Text strong style={{ color: token.colorPrimary, fontSize: "14px" }}>
+                          <Text
+                            strong
+                            style={{
+                              color: token.colorPrimary,
+                              fontSize: "14px",
+                            }}
+                          >
                             {formatMonthYearThai(experience.startDate)} -{" "}
                             {experience.inPresent
                               ? "ปัจจุบัน"
                               : formatMonthYearThai(experience.endDate)}
                           </Text>
-                          <Text type="secondary" style={{ fontSize: "12px", fontWeight: 500 }}>
-                            ({calculateDuration(
+                          <Text
+                            type="secondary"
+                            style={{ fontSize: "12px", fontWeight: 500 }}
+                          >
+                            (
+                            {calculateDuration(
                               experience.startDate,
                               experience.endDate,
                               experience.inPresent,
-                            )})
+                            )}
+                            )
                           </Text>
                         </Flex>
                       </Col>
@@ -488,7 +520,8 @@ export const WorkExperienceSection: React.FC = () => {
           fontWeight: 600,
         }}
       >
-        เพิ่มประสบการณ์การทำงาน ({workExperiences.length}/{MAX_WORK_EXPERIENCES})
+        เพิ่มประสบการณ์การทำงาน ({workExperiences.length}/{MAX_WORK_EXPERIENCES}
+        )
       </Button>
     </Space>
   );

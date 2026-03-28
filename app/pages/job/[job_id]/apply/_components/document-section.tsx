@@ -19,7 +19,7 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { useApplyStore } from "../stores/apply-store";
+import { useApplyStore } from "../_stores/apply-store";
 
 const { Text } = Typography;
 

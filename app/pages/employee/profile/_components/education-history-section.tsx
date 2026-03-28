@@ -58,7 +58,8 @@ export const EducationHistorySection: React.FC = () => {
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { profile, addEducation, updateEducation, removeEducation } = useProfileStore();
+  const { profile, addEducation, updateEducation, removeEducation } =
+    useProfileStore();
   const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
@@ -197,7 +198,9 @@ export const EducationHistorySection: React.FC = () => {
             }}
           >
             <Title level={4} style={{ margin: 0 }}>
-              {editingIndex !== null ? "แก้ไขข้อมูลการศึกษา" : "เพิ่มข้อมูลการศึกษา"}
+              {editingIndex !== null
+                ? "แก้ไขข้อมูลการศึกษา"
+                : "เพิ่มข้อมูลการศึกษา"}
             </Title>
             <Button
               type="text"
@@ -240,7 +243,10 @@ export const EducationHistorySection: React.FC = () => {
                 name="major"
                 rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
               >
-                <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" size="large" />
+                <Input
+                  placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ"
+                  size="large"
+                />
               </Form.Item>
 
               {/* [Fix #2] เพิ่ม field ปีที่สำเร็จการศึกษา (พ.ศ.) */}
@@ -291,10 +297,19 @@ export const EducationHistorySection: React.FC = () => {
               <Divider style={{ margin: "32px 0 24px 0" }} />
 
               <Flex justify="end" gap={12}>
-                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
+                <Button
+                  onClick={handleCancel}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
                   ยกเลิก
                 </Button>
-                <Button type="primary" onClick={handleSave} size="large" style={{ minWidth: 100 }}>
+                <Button
+                  type="primary"
+                  onClick={handleSave}
+                  size="large"
+                  style={{ minWidth: 100 }}
+                >
                   บันทึก
                 </Button>
               </Flex>
@@ -363,7 +378,9 @@ export const EducationHistorySection: React.FC = () => {
                     <Button
                       type="text"
                       shape="circle"
-                      icon={<EditOutlined style={{ color: token.colorPrimary }} />}
+                      icon={
+                        <EditOutlined style={{ color: token.colorPrimary }} />
+                      }
                       onClick={() => handleEdit(index)}
                     />
                     <Button

@@ -14,10 +14,10 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import DocumentSection from "./components/document-section";
-import JobSummary from "./components/job-summary";
-import UserProfileCard from "./components/user-profile-card";
-import { useApplyStore } from "./stores/apply-store";
+import DocumentSection from "./_components/document-section";
+import JobSummary from "./_components/job-summary";
+import UserProfileCard from "./_components/user-profile-card";
+import { useApplyStore } from "./_stores/apply-store";
 
 const { Text } = Typography;
 
