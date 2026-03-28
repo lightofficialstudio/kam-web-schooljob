@@ -1,36 +1,44 @@
 "use client";
 
-import { Card, Flex, Row, theme as antTheme } from "antd";
+import { Card, ConfigProvider, Flex, Row } from "antd";
 import { BrandingPanel } from "./_components/branding-panel";
 import { SignupForm } from "./_components/signup-form";
 
-// Orchestrator — ประกอบ Layout และ Component ทั้งหมดของหน้า Signup
-export default function SignupPage() {
-  const { token } = antTheme.useToken();
+const PRIMARY_COLOR = "#11b6f5";
 
+// Orchestrator — ครอบ ConfigProvider เพื่อ inject primary color #11b6f5
+export default function SignupPage() {
   return (
-    <Flex
-      align="center"
-      justify="center"
-      style={{ width: "100%", minHeight: "100vh", padding: "40px 0" }}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: PRIMARY_COLOR,
+          borderRadius: 10,
+        },
+      }}
     >
-      <Card
-        style={{
-          maxWidth: 1400,
-          width: "95%",
-          borderRadius: 24,
-          boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-          overflow: "hidden",
-          margin: "40px auto",
-          border: `2px solid ${token.colorBorderSecondary}`,
-        }}
-        styles={{ body: { padding: 0 } }}
+      <Flex
+        align="center"
+        justify="center"
+        style={{ width: "100%", minHeight: "100vh", padding: "32px 16px" }}
       >
-        <Row align="stretch">
-          <BrandingPanel />
-          <SignupForm />
-        </Row>
-      </Card>
-    </Flex>
+        <Card
+          style={{
+            width: "100%",
+            maxWidth: 960,
+            borderRadius: 20,
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            border: "none",
+          }}
+          styles={{ body: { padding: 0 } }}
+        >
+          <Row align="stretch">
+            <BrandingPanel />
+            <SignupForm />
+          </Row>
+        </Card>
+      </Flex>
+    </ConfigProvider>
   );
 }

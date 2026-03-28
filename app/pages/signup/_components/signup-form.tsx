@@ -41,9 +41,7 @@ export const SignupForm = () => {
   const { isLoading, modal, setLoading, showModal, hideModal } = useSignupStore();
 
   const handleModalConfirm = () => {
-    if (modal.type === "success") {
-      router.push("/pages/signin");
-    }
+    if (modal.type === "success") router.push("/pages/signin");
   };
 
   const onFinish = async (values: any) => {
@@ -60,20 +58,17 @@ export const SignupForm = () => {
 
       showModal(
         "success",
-        "ตรวจสอบอีเมลของคุณ เพื่อยืนยันการสมัครสมาชิก",
-        <Flex vertical align="center" style={{ marginTop: 12 }}>
-          <Text style={{ marginBottom: 16, fontSize: 15, textAlign: "center" }}>
-            School Board ได้ส่งอีเมลเพื่อยืนยันการสมัครสมาชิกไปที่ <br />
+        "ตรวจสอบอีเมลของคุณ",
+        <Flex vertical align="center" style={{ marginTop: 8 }}>
+          <Text style={{ fontSize: 15, textAlign: "center", marginBottom: 12 }}>
+            School Board ได้ส่งลิงก์ยืนยันไปที่{" "}
             <Text strong style={{ color: token.colorPrimary }}>
               {values.email}
             </Text>
           </Text>
-          <Text type="secondary" style={{ fontSize: 14, lineHeight: "1.6", textAlign: "center" }}>
-            หากไม่พบอีเมลจาก School Board ในกล่องจดหมาย <br />
-            ให้ตรวจสอบที่ "อีเมลขยะ" หรือ "โปรโมชัน"
-          </Text>
-          <Text strong style={{ display: "block", marginTop: 16 }}>
-            (และยืนยันการสมัครภายใน 72 ชม.)
+          <Text type="secondary" style={{ fontSize: 13, textAlign: "center", lineHeight: "1.7" }}>
+            ไม่พบอีเมล? ตรวจสอบโฟลเดอร์ "สแปม" หรือ "โปรโมชัน" <br />
+            ลิงก์มีอายุ 72 ชั่วโมง
           </Text>
         </Flex>
       );
@@ -99,31 +94,27 @@ export const SignupForm = () => {
         onCancel={hideModal}
         confirmText="ตกลง"
         centered
-        width={650}
+        width={560}
       />
 
-      <Col xs={24} lg={16} style={{ padding: "60px 100px" }}>
-        <Flex vertical gap={40}>
-          <Flex vertical gap={8}>
-            <Title level={2}>ลงทะเบียนผู้ใช้งาน</Title>
-            <Text type="secondary" style={{ fontSize: 18 }}>
+      <Col xs={24} md={15} style={{ padding: "40px 48px" }}>
+        <Flex vertical gap={28}>
+          {/* Header */}
+          <Flex vertical gap={4}>
+            <Title level={3} style={{ margin: 0 }}>
+              สร้างบัญชีใหม่
+            </Title>
+            <Text type="secondary" style={{ fontSize: 14 }}>
               มีบัญชีอยู่แล้ว?{" "}
-              <Link
-                href="/pages/signin"
-                style={{ fontWeight: 600, color: token.colorPrimary }}
-              >
+              <Link href="/pages/signin" style={{ fontWeight: 600, color: token.colorPrimary }}>
                 เข้าสู่ระบบ
               </Link>
             </Text>
           </Flex>
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            size="large"
-          >
-            <Row gutter={24}>
+          <Form form={form} layout="vertical" onFinish={onFinish} size="large">
+            {/* ชื่อ - นามสกุล */}
+            <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="firstName"
@@ -132,8 +123,7 @@ export const SignupForm = () => {
                 >
                   <Input
                     prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="กรอกชื่อของคุณ"
-                    style={{ borderRadius: 12 }}
+                    placeholder="ชื่อของคุณ"
                   />
                 </Form.Item>
               </Col>
@@ -145,66 +135,62 @@ export const SignupForm = () => {
                 >
                   <Input
                     prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="กรอกนามสกุลของคุณ"
-                    style={{ borderRadius: 12 }}
+                    placeholder="นามสกุลของคุณ"
                   />
                 </Form.Item>
               </Col>
             </Row>
 
+            {/* Role Selection */}
             <Form.Item
               name="role"
-              label="คุณสมัครใช้งานในฐานะ?"
+              label="สมัครในฐานะ"
               initialValue="teacher"
               rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}
             >
               <Radio.Group style={{ width: "100%" }}>
-                <Row gutter={16}>
+                <Row gutter={12}>
                   <Col span={12}>
                     <Radio.Button
                       value="teacher"
-                      className="role-selection-button"
                       style={{
                         width: "100%",
                         height: "auto",
-                        padding: "32px 0",
+                        padding: "16px 0",
                         textAlign: "center",
-                        borderRadius: 20,
+                        borderRadius: 12,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
                         borderWidth: 2,
-                        transition: "none",
                       }}
                     >
-                      <Space direction="vertical" size={12}>
-                        <UserOutlined style={{ fontSize: 44, color: token.colorPrimary }} />
-                        <Text strong style={{ fontSize: 18 }}>ครูผู้สอน</Text>
+                      <Space direction="vertical" size={6}>
+                        <UserOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
+                        <Text strong style={{ fontSize: 14 }}>ครูผู้สอน</Text>
                       </Space>
                     </Radio.Button>
                   </Col>
                   <Col span={12}>
                     <Radio.Button
                       value="school"
-                      className="role-selection-button"
                       style={{
                         width: "100%",
                         height: "auto",
-                        padding: "32px 0",
+                        padding: "16px 0",
                         textAlign: "center",
-                        borderRadius: 20,
+                        borderRadius: 12,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
                         borderWidth: 2,
-                        transition: "none",
                       }}
                     >
-                      <Space direction="vertical" size={12}>
-                        <BankOutlined style={{ fontSize: 44, color: token.colorPrimary }} />
-                        <Text strong style={{ fontSize: 18 }}>สถานศึกษา</Text>
+                      <Space direction="vertical" size={6}>
+                        <BankOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
+                        <Text strong style={{ fontSize: 14 }}>สถานศึกษา</Text>
                       </Space>
                     </Radio.Button>
                   </Col>
@@ -212,13 +198,16 @@ export const SignupForm = () => {
               </Radio.Group>
             </Form.Item>
 
-            <Divider style={{ margin: "40px 0" }}>
-              <Text type="secondary">ข้อมูลการติดต่อและรหัสผ่าน</Text>
+            <Divider style={{ margin: "20px 0" }}>
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                อีเมลและรหัสผ่าน
+              </Text>
             </Divider>
 
+            {/* Email */}
             <Form.Item
               name="email"
-              label="อีเมล (ใช้เป็น Username)"
+              label="อีเมล"
               rules={[
                 { required: true, message: "กรุณาระบุอีเมล" },
                 { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง" },
@@ -227,31 +216,30 @@ export const SignupForm = () => {
               <Input
                 prefix={<MailOutlined style={{ color: token.colorPrimary }} />}
                 placeholder="example@email.com"
-                style={{ borderRadius: 12 }}
               />
             </Form.Item>
 
-            <Row gutter={24}>
+            {/* Password */}
+            <Row gutter={16}>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="password"
                   label="รหัสผ่าน"
                   rules={[
                     { required: true, message: "กรุณาระบุรหัสผ่าน" },
-                    { min: 8, message: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร" },
+                    { min: 8, message: "อย่างน้อย 8 ตัวอักษร" },
                   ]}
                 >
                   <Input.Password
                     prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
                     placeholder="อย่างน้อย 8 ตัวอักษร"
-                    style={{ borderRadius: 12 }}
                   />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="confirm"
-                  label="ยืนยันรหัสผ่านอีกครั้ง"
+                  label="ยืนยันรหัสผ่าน"
                   dependencies={["password"]}
                   rules={[
                     { required: true, message: "กรุณายืนยันรหัสผ่าน" },
@@ -259,7 +247,7 @@ export const SignupForm = () => {
                       validator(_, value) {
                         if (!value || getFieldValue("password") === value)
                           return Promise.resolve();
-                        return Promise.reject(new Error("รหัสผ่านที่ป้อนไม่ตรงกัน"));
+                        return Promise.reject(new Error("รหัสผ่านไม่ตรงกัน"));
                       },
                     }),
                   ]}
@@ -267,12 +255,12 @@ export const SignupForm = () => {
                   <Input.Password
                     prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
                     placeholder="กรอกรหัสผ่านอีกครั้ง"
-                    style={{ borderRadius: 12 }}
                   />
                 </Form.Item>
               </Col>
             </Row>
 
+            {/* Agreement */}
             <Form.Item
               name="agreement"
               valuePropName="checked"
@@ -284,20 +272,21 @@ export const SignupForm = () => {
                       : Promise.reject(new Error("กรุณายอมรับข้อกำหนดและนโยบาย")),
                 },
               ]}
-              style={{ marginBottom: 32 }}
+              style={{ marginBottom: 20 }}
             >
-              <Checkbox>
+              <Checkbox style={{ fontSize: 13 }}>
                 ฉันยอมรับ{" "}
-                <Link href="/terms" style={{ fontWeight: 700, color: token.colorPrimary }}>
+                <Link href="/terms" style={{ color: token.colorPrimary, fontWeight: 600 }}>
                   ข้อกำหนดการใช้บริการ
                 </Link>{" "}
                 และ{" "}
-                <Link href="/privacy" style={{ fontWeight: 700, color: token.colorPrimary }}>
+                <Link href="/privacy" style={{ color: token.colorPrimary, fontWeight: 600 }}>
                   นโยบายความเป็นส่วนตัว
                 </Link>
               </Checkbox>
             </Form.Item>
 
+            {/* Submit */}
             <Form.Item style={{ marginBottom: 0 }}>
               <Button
                 type="primary"
@@ -306,14 +295,14 @@ export const SignupForm = () => {
                 loading={isLoading}
                 size="large"
                 style={{
-                  height: 60,
-                  borderRadius: 16,
-                  boxShadow: `0 10px 20px ${token.colorPrimary}33`,
+                  height: 52,
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  fontSize: 16,
+                  boxShadow: `0 6px 20px ${token.colorPrimary}40`,
                 }}
               >
-                <Title level={4} style={{ margin: 0, color: "#fff" }}>
-                  สมัครสมาชิก
-                </Title>
+                สร้างบัญชี
               </Button>
             </Form.Item>
           </Form>
