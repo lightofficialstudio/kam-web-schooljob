@@ -20,34 +20,35 @@ import {
   Tag,
   Tooltip,
   Typography,
+  theme,
 } from "antd";
 import {
   NEW_APPLICANTS_MODE,
-  type ApplicantStatus,
   useApplicantDrawerStore,
+  type ApplicantStatus,
 } from "../_state/applicant-drawer-store";
 
 const { Text, Title } = Typography;
 
 const PRIMARY = "#11b6f5";
 
-// Config สถานะผู้สมัคร: สี, ข้อความ, icon
+// config สถานะผู้สมัคร: ใช้ preset color ของ AntD ที่รองรับ dark mode
 const STATUS_CONFIG: Record<
   ApplicantStatus,
-  { color: string; text: string; bg: string; border: string }
+  { tagColor: string; text: string }
 > = {
-  PENDING:  { color: "#F59E0B", text: "รอพิจารณา",      bg: "#FFFBEB", border: "#FDE68A" },
-  INTERVIEW:{ color: PRIMARY,   text: "นัดสัมภาษณ์",    bg: "#EFF9FF", border: "#BAE6FD" },
-  ACCEPTED: { color: "#10B981", text: "รับเข้าทำงาน",   bg: "#F0FDF4", border: "#BBF7D0" },
-  REJECTED: { color: "#EF4444", text: "ไม่ผ่านการคัดเลือก", bg: "#FEF2F2", border: "#FECACA" },
+  PENDING: { tagColor: "warning", text: "รอพิจารณา" },
+  INTERVIEW: { tagColor: "processing", text: "นัดสัมภาษณ์" },
+  ACCEPTED: { tagColor: "success", text: "รับเข้าทำงาน" },
+  REJECTED: { tagColor: "error", text: "ไม่ผ่านการคัดเลือก" },
 };
 
 const FILTER_TABS: { key: ApplicantStatus | "ALL"; label: string }[] = [
-  { key: "ALL",       label: "ทั้งหมด" },
-  { key: "PENDING",   label: "รอพิจารณา" },
+  { key: "ALL", label: "ทั้งหมด" },
+  { key: "PENDING", label: "รอพิจารณา" },
   { key: "INTERVIEW", label: "นัดสัมภาษณ์" },
-  { key: "ACCEPTED",  label: "รับเข้าทำงาน" },
-  { key: "REJECTED",  label: "ไม่ผ่าน" },
+  { key: "ACCEPTED", label: "รับเข้าทำงาน" },
+  { key: "REJECTED", label: "ไม่ผ่าน" },
 ];
 
 // Drawer แสดงรายชื่อผู้สมัครของตำแหน่งที่เลือก พร้อมจัดการสถานะ
@@ -67,6 +68,7 @@ export const ApplicantDrawer = () => {
   const isNewMode = selectedJobId === NEW_APPLICANTS_MODE;
   const applicants = getApplicants();
   const allUnfiltered = getAllApplicants();
+  const { token } = theme.useToken();
 
   // นับผู้สมัครแต่ละสถานะจาก raw list (ไม่ผ่าน filterStatus)
   const countByStatus = (status: ApplicantStatus | "ALL") => {
@@ -97,7 +99,7 @@ export const ApplicantDrawer = () => {
         gap={8}
         style={{
           padding: "16px 24px",
-          borderBottom: "1px solid #F1F5F9",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
           overflowX: "auto",
           flexShrink: 0,
         }}
@@ -113,8 +115,8 @@ export const ApplicantDrawer = () => {
               style={{
                 borderRadius: 20,
                 fontWeight: isActive ? 700 : 400,
-                background: isActive ? PRIMARY : "#F1F5F9",
-                color: isActive ? "#fff" : "#64748B",
+                background: isActive ? PRIMARY : token.colorFillSecondary,
+                color: isActive ? "#fff" : token.colorTextSecondary,
                 border: "none",
                 whiteSpace: "nowrap",
               }}
@@ -126,7 +128,9 @@ export const ApplicantDrawer = () => {
                   size="small"
                   style={{
                     marginLeft: 4,
-                    backgroundColor: isActive ? "rgba(255,255,255,0.3)" : "#E2E8F0",
+                    backgroundColor: isActive
+                      ? "rgba(255,255,255,0.3)"
+                      : "#E2E8F0",
                     color: isActive ? "#fff" : "#64748B",
                     boxShadow: "none",
                     fontSize: 10,
@@ -139,7 +143,10 @@ export const ApplicantDrawer = () => {
       </Flex>
 
       {/* Applicant List */}
-      <Flex vertical style={{ padding: "16px 24px", gap: 12, overflowY: "auto" }}>
+      <Flex
+        vertical
+        style={{ padding: "16px 24px", gap: 12, overflowY: "auto" }}
+      >
         {applicants.length === 0 ? (
           <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
             <Empty
@@ -160,8 +167,8 @@ export const ApplicantDrawer = () => {
                 style={{
                   padding: "16px",
                   borderRadius: 12,
-                  border: "1px solid #E2E8F0",
-                  backgroundColor: "#FAFAFA",
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  backgroundColor: token.colorFillQuaternary,
                 }}
               >
                 {/* Row 1: Avatar + Name + Status */}
@@ -169,20 +176,33 @@ export const ApplicantDrawer = () => {
                   <Flex gap={12} align="center">
                     <Avatar
                       size={44}
-                      style={{ backgroundColor: PRIMARY, fontSize: 18, flexShrink: 0 }}
+                      style={{
+                        backgroundColor: PRIMARY,
+                        fontSize: 18,
+                        flexShrink: 0,
+                      }}
                       icon={<UserOutlined />}
                     />
                     <Flex vertical gap={3}>
-                      <Text strong style={{ fontSize: 15 }}>{applicant.name}</Text>
+                      <Text strong style={{ fontSize: 15 }}>
+                        {applicant.name}
+                      </Text>
                       <Flex gap={4} wrap="wrap">
                         {applicant.subjects.map((s) => (
-                          <Tag key={s} color="blue" style={{ margin: 0, fontSize: 11 }}>
+                          <Tag
+                            key={s}
+                            color="blue"
+                            style={{ margin: 0, fontSize: 11 }}
+                          >
                             {s}
                           </Tag>
                         ))}
                         {/* แสดงชื่อตำแหน่งเมื่ออยู่ใน mode ผู้สมัครใหม่ทั้งหมด */}
                         {isNewMode && applicant.jobTitle && (
-                          <Tag color="purple" style={{ margin: 0, fontSize: 11 }}>
+                          <Tag
+                            color="purple"
+                            style={{ margin: 0, fontSize: 11 }}
+                          >
                             {applicant.jobTitle}
                           </Tag>
                         )}
@@ -190,10 +210,8 @@ export const ApplicantDrawer = () => {
                     </Flex>
                   </Flex>
                   <Tag
+                    color={cfg.tagColor}
                     style={{
-                      color: cfg.color,
-                      backgroundColor: cfg.bg,
-                      border: `1px solid ${cfg.border}`,
                       borderRadius: 20,
                       fontWeight: 600,
                       fontSize: 11,
@@ -207,32 +225,55 @@ export const ApplicantDrawer = () => {
                 {/* Row 2: Info */}
                 <Flex gap={20} wrap="wrap">
                   <Flex align="center" gap={5}>
-                    <SolutionOutlined style={{ color: "#94A3B8", fontSize: 13 }} />
+                    <SolutionOutlined
+                      style={{ color: token.colorTextTertiary, fontSize: 13 }}
+                    />
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      ประสบการณ์ <Text strong style={{ color: "#0F172A", fontSize: 12 }}>{applicant.experience}</Text>
+                      ประสบการณ์{" "}
+                      <Text strong style={{ fontSize: 12 }}>
+                        {applicant.experience}
+                      </Text>
                     </Text>
                   </Flex>
                   <Flex align="center" gap={5}>
-                    <CalendarOutlined style={{ color: "#94A3B8", fontSize: 13 }} />
+                    <CalendarOutlined
+                      style={{ color: token.colorTextTertiary, fontSize: 13 }}
+                    />
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      สมัครเมื่อ <Text strong style={{ color: "#0F172A", fontSize: 12 }}>{applicant.appliedAt}</Text>
+                      สมัครเมื่อ{" "}
+                      <Text strong style={{ fontSize: 12 }}>
+                        {applicant.appliedAt}
+                      </Text>
                     </Text>
                   </Flex>
                 </Flex>
 
                 <Flex align="center" gap={5}>
-                  <SolutionOutlined style={{ color: "#94A3B8", fontSize: 13 }} />
-                  <Text type="secondary" style={{ fontSize: 12 }}>{applicant.education}</Text>
+                  <SolutionOutlined
+                    style={{ color: token.colorTextTertiary, fontSize: 13 }}
+                  />
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {applicant.education}
+                  </Text>
                 </Flex>
 
                 {/* Row 3: Contact + Actions */}
-                <Flex justify="space-between" align="center" wrap="wrap" gap={8}>
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  wrap="wrap"
+                  gap={8}
+                >
                   <Flex gap={12}>
                     <Tooltip title={applicant.email}>
                       <Button
                         type="text"
                         size="small"
-                        icon={<MailOutlined style={{ color: "#94A3B8" }} />}
+                        icon={
+                          <MailOutlined
+                            style={{ color: token.colorTextTertiary }}
+                          />
+                        }
                         style={{ padding: "0 4px", height: "auto" }}
                       />
                     </Tooltip>
@@ -240,7 +281,11 @@ export const ApplicantDrawer = () => {
                       <Button
                         type="text"
                         size="small"
-                        icon={<PhoneOutlined style={{ color: "#94A3B8" }} />}
+                        icon={
+                          <PhoneOutlined
+                            style={{ color: token.colorTextTertiary }}
+                          />
+                        }
                         style={{ padding: "0 4px", height: "auto" }}
                       />
                     </Tooltip>
@@ -258,7 +303,9 @@ export const ApplicantDrawer = () => {
                             borderColor: PRIMARY,
                             color: PRIMARY,
                           }}
-                          onClick={() => updateApplicantStatus(applicant.key, "INTERVIEW")}
+                          onClick={() =>
+                            updateApplicantStatus(applicant.key, "INTERVIEW")
+                          }
                         >
                           นัดสัมภาษณ์
                         </Button>
@@ -268,9 +315,15 @@ export const ApplicantDrawer = () => {
                           okText="ยืนยัน"
                           cancelText="ยกเลิก"
                           okButtonProps={{ danger: true }}
-                          onConfirm={() => updateApplicantStatus(applicant.key, "REJECTED")}
+                          onConfirm={() =>
+                            updateApplicantStatus(applicant.key, "REJECTED")
+                          }
                         >
-                          <Button size="small" danger style={{ borderRadius: 8 }}>
+                          <Button
+                            size="small"
+                            danger
+                            style={{ borderRadius: 8 }}
+                          >
                             ปฏิเสธ
                           </Button>
                         </Popconfirm>
@@ -283,7 +336,9 @@ export const ApplicantDrawer = () => {
                           type="primary"
                           icon={<CheckCircleOutlined />}
                           style={{ borderRadius: 8 }}
-                          onClick={() => updateApplicantStatus(applicant.key, "ACCEPTED")}
+                          onClick={() =>
+                            updateApplicantStatus(applicant.key, "ACCEPTED")
+                          }
                         >
                           รับเข้าทำงาน
                         </Button>
@@ -293,9 +348,15 @@ export const ApplicantDrawer = () => {
                           okText="ยืนยัน"
                           cancelText="ยกเลิก"
                           okButtonProps={{ danger: true }}
-                          onConfirm={() => updateApplicantStatus(applicant.key, "REJECTED")}
+                          onConfirm={() =>
+                            updateApplicantStatus(applicant.key, "REJECTED")
+                          }
                         >
-                          <Button size="small" danger style={{ borderRadius: 8 }}>
+                          <Button
+                            size="small"
+                            danger
+                            style={{ borderRadius: 8 }}
+                          >
                             ไม่ผ่าน
                           </Button>
                         </Popconfirm>

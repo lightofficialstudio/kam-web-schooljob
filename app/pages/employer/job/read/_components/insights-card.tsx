@@ -18,6 +18,7 @@ import {
   Statistic,
   Tag,
   Typography,
+  theme,
 } from "antd";
 import { useJobReadStore } from "../_state/job-read-store";
 
@@ -55,18 +56,17 @@ const URGENT_ITEMS = [
 // การ์ดภาพรวมกระบวนการรับสมัคร + รายการด่วน
 export const InsightsCard = () => {
   const { jobs } = useJobReadStore();
+  const { token } = theme.useToken();
 
   // คำนวณ Pipeline จาก Mock Data
   const totalApplicants = jobs.reduce((sum, j) => sum + j.applicants, 0);
   const interviewed = Math.floor(totalApplicants * 0.27); // ~27% เข้าสัมภาษณ์
-  const hired = Math.floor(interviewed * 0.33);           // ~33% ได้รับการตอบรับ
-  const hiringRate = totalApplicants > 0
-    ? Math.round((hired / totalApplicants) * 100)
-    : 0;
+  const hired = Math.floor(interviewed * 0.33); // ~33% ได้รับการตอบรับ
+  const hiringRate =
+    totalApplicants > 0 ? Math.round((hired / totalApplicants) * 100) : 0;
 
   return (
     <Row gutter={[16, 16]}>
-
       {/* Hiring Pipeline Card */}
       <Col xs={24} lg={15}>
         <Card
@@ -84,7 +84,9 @@ export const InsightsCard = () => {
             <Flex justify="space-between" align="flex-start">
               <Flex vertical gap={4}>
                 <Flex align="center" gap={8}>
-                  <TrophyOutlined style={{ color: "rgba(255,255,255,0.9)", fontSize: 18 }} />
+                  <TrophyOutlined
+                    style={{ color: "rgba(255,255,255,0.9)", fontSize: 18 }}
+                  />
                   <Title level={4} style={{ margin: 0, color: "#fff" }}>
                     Pipeline การรับสมัคร <ThunderboltOutlined />
                   </Title>
@@ -101,8 +103,18 @@ export const InsightsCard = () => {
                 railColor="rgba(255,255,255,0.2)"
                 format={(percent) => (
                   <Flex vertical align="center">
-                    <Text style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>{percent}%</Text>
-                    <Text style={{ fontSize: 9, color: "rgba(255,255,255,0.8)", lineHeight: 1.2 }}>
+                    <Text
+                      style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}
+                    >
+                      {percent}%
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        color: "rgba(255,255,255,0.8)",
+                        lineHeight: 1.2,
+                      }}
+                    >
                       อัตราสำเร็จ
                     </Text>
                   </Flex>
@@ -114,11 +126,26 @@ export const InsightsCard = () => {
             <Row gutter={24}>
               <Col span={8}>
                 <Flex vertical gap={4}>
-                  <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>ผู้สมัครทั้งหมด</Text>
+                  <Text
+                    style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}
+                  >
+                    ผู้สมัครทั้งหมด
+                  </Text>
                   <Statistic
                     value={totalApplicants}
-                    suffix={<span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>คน</span>}
-                    styles={{ content: { color: "#fff", fontSize: 24, fontWeight: 700 } }}
+                    suffix={
+                      <span
+                        style={{
+                          fontSize: 13,
+                          color: "rgba(255,255,255,0.65)",
+                        }}
+                      >
+                        คน
+                      </span>
+                    }
+                    styles={{
+                      content: { color: "#fff", fontSize: 24, fontWeight: 700 },
+                    }}
                   />
                   <Progress
                     percent={100}
@@ -131,14 +158,33 @@ export const InsightsCard = () => {
               </Col>
               <Col span={8}>
                 <Flex vertical gap={4}>
-                  <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>เข้าสัมภาษณ์</Text>
+                  <Text
+                    style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}
+                  >
+                    เข้าสัมภาษณ์
+                  </Text>
                   <Statistic
                     value={interviewed}
-                    suffix={<span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>คน</span>}
-                    styles={{ content: { color: "#fff", fontSize: 24, fontWeight: 700 } }}
+                    suffix={
+                      <span
+                        style={{
+                          fontSize: 13,
+                          color: "rgba(255,255,255,0.65)",
+                        }}
+                      >
+                        คน
+                      </span>
+                    }
+                    styles={{
+                      content: { color: "#fff", fontSize: 24, fontWeight: 700 },
+                    }}
                   />
                   <Progress
-                    percent={totalApplicants > 0 ? Math.round((interviewed / totalApplicants) * 100) : 0}
+                    percent={
+                      totalApplicants > 0
+                        ? Math.round((interviewed / totalApplicants) * 100)
+                        : 0
+                    }
                     showInfo={false}
                     strokeColor="rgba(255,255,255,0.7)"
                     trailColor="rgba(255,255,255,0.15)"
@@ -148,14 +194,33 @@ export const InsightsCard = () => {
               </Col>
               <Col span={8}>
                 <Flex vertical gap={4}>
-                  <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>ตอบรับเข้าทำงาน</Text>
+                  <Text
+                    style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}
+                  >
+                    ตอบรับเข้าทำงาน
+                  </Text>
                   <Statistic
                     value={hired}
-                    suffix={<span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>คน</span>}
-                    styles={{ content: { color: "#fff", fontSize: 24, fontWeight: 700 } }}
+                    suffix={
+                      <span
+                        style={{
+                          fontSize: 13,
+                          color: "rgba(255,255,255,0.65)",
+                        }}
+                      >
+                        คน
+                      </span>
+                    }
+                    styles={{
+                      content: { color: "#fff", fontSize: 24, fontWeight: 700 },
+                    }}
                   />
                   <Progress
-                    percent={totalApplicants > 0 ? Math.round((hired / totalApplicants) * 100) : 0}
+                    percent={
+                      totalApplicants > 0
+                        ? Math.round((hired / totalApplicants) * 100)
+                        : 0
+                    }
                     showInfo={false}
                     strokeColor="#fff"
                     trailColor="rgba(255,255,255,0.15)"
@@ -174,7 +239,9 @@ export const InsightsCard = () => {
           title={
             <Flex align="center" gap={8}>
               <BellOutlined style={{ color: "#F59E0B" }} />
-              <Text strong style={{ fontSize: 14 }}>รายการรอดำเนินการ</Text>
+              <Text strong style={{ fontSize: 14 }}>
+                รายการรอดำเนินการ
+              </Text>
             </Flex>
           }
           variant="borderless"
@@ -191,7 +258,7 @@ export const InsightsCard = () => {
                   padding: "14px 0",
                   borderBottom:
                     index < URGENT_ITEMS.length - 1
-                      ? "1px solid #F1F5F9"
+                      ? `1px solid ${token.colorBorderSecondary}`
                       : "none",
                 }}
               >
@@ -203,7 +270,7 @@ export const InsightsCard = () => {
                       width: 32,
                       height: 32,
                       borderRadius: 8,
-                      backgroundColor: "#F8FAFC",
+                      backgroundColor: token.colorFillTertiary,
                       flexShrink: 0,
                       marginTop: 2,
                     }}
@@ -211,22 +278,35 @@ export const InsightsCard = () => {
                     {item.icon}
                   </Flex>
                   <Flex vertical gap={3}>
-                    <Text strong style={{ fontSize: 13, lineHeight: 1.4 }}>{item.title}</Text>
+                    <Text strong style={{ fontSize: 13, lineHeight: 1.4 }}>
+                      {item.title}
+                    </Text>
                     <Flex align="center" gap={6}>
                       <Text type="secondary" style={{ fontSize: 11 }}>
                         {item.desc}
                       </Text>
                       <Tag
                         color={item.tag.color}
-                        style={{ fontSize: 10, lineHeight: "16px", margin: 0, padding: "0 6px" }}
+                        style={{
+                          fontSize: 10,
+                          lineHeight: "16px",
+                          margin: 0,
+                          padding: "0 6px",
+                        }}
                       >
                         {item.tag.label}
                       </Tag>
                     </Flex>
-                    <Text type="secondary" style={{ fontSize: 11 }}>{item.time}</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                      {item.time}
+                    </Text>
                   </Flex>
                 </Flex>
-                <Button type="text" size="small" icon={<ArrowRightOutlined />} />
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<ArrowRightOutlined />}
+                />
               </Flex>
             ))}
           </Flex>

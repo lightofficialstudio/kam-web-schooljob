@@ -18,12 +18,15 @@ import {
   Modal,
   Progress,
   Row,
-  Statistic,
   Tag,
   Tooltip,
   Typography,
+  theme,
 } from "antd";
-import { useJobStatsModalStore, type DailyTrend } from "../_state/job-stats-modal-store";
+import {
+  useJobStatsModalStore,
+  type DailyTrend,
+} from "../_state/job-stats-modal-store";
 
 const { Title, Text } = Typography;
 
@@ -63,7 +66,13 @@ const MiniBarChart = ({
                   transition: "opacity 0.2s",
                 }}
               />
-              <Text style={{ fontSize: 9, color: "#94A3B8", whiteSpace: "nowrap" }}>
+              <Text
+                style={{
+                  fontSize: 9,
+                  color: token.colorTextTertiary,
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {d.date.split(" ")[0]}
               </Text>
             </Flex>
@@ -85,36 +94,49 @@ const BreakdownBar = ({
   count: number;
   percent: number;
   color: string;
-}) => (
-  <Flex vertical gap={4}>
-    <Flex justify="space-between" align="center">
-      <Text style={{ fontSize: 13 }}>{label}</Text>
-      <Flex gap={6} align="center">
-        <Text strong style={{ fontSize: 13 }}>{count} คน</Text>
-        <Text type="secondary" style={{ fontSize: 12 }}>({percent}%)</Text>
+}) => {
+  const { token } = theme.useToken();
+  return (
+    <Flex vertical gap={4}>
+      <Flex justify="space-between" align="center">
+        <Text style={{ fontSize: 13 }}>{label}</Text>
+        <Flex gap={6} align="center">
+          <Text strong style={{ fontSize: 13 }}>
+            {count} คน
+          </Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            ({percent}%)
+          </Text>
+        </Flex>
       </Flex>
+      <Progress
+        percent={percent}
+        showInfo={false}
+        strokeColor={color}
+        trailColor={token.colorFillSecondary}
+        size="small"
+        style={{ margin: 0 }}
+      />
     </Flex>
-    <Progress
-      percent={percent}
-      showInfo={false}
-      strokeColor={color}
-      trailColor="#F1F5F9"
-      size="small"
-      style={{ margin: 0 }}
-    />
-  </Flex>
-);
+  );
+};
 
 // ─── Modal หลัก ──────────────────────────────────────────────────────────────
 // Modal แสดงสถิติเชิงลึกของตำแหน่งงาน สำหรับฝ่ายบุคลากรของโรงเรียน
 export const JobStatsModal = () => {
   const { isOpen, stats, closeModal } = useJobStatsModalStore();
+  const { token } = theme.useToken();
 
   if (!stats) return null;
 
-  const hiringRate = stats.pipeline.length > 0
-    ? Math.round((stats.pipeline[stats.pipeline.length - 1].count / stats.pipeline[0].count) * 100)
-    : 0;
+  const hiringRate =
+    stats.pipeline.length > 0
+      ? Math.round(
+          (stats.pipeline[stats.pipeline.length - 1].count /
+            stats.pipeline[0].count) *
+            100,
+        )
+      : 0;
 
   return (
     <Modal
@@ -138,14 +160,18 @@ export const JobStatsModal = () => {
             <BarChartOutlined style={{ color: "#fff", fontSize: 18 }} />
           </Flex>
           <Flex vertical gap={1}>
-            <Text strong style={{ fontSize: 16 }}>สถิติการประกาศ</Text>
+            <Text strong style={{ fontSize: 16 }}>
+              สถิติการประกาศ
+            </Text>
             <Text type="secondary" style={{ fontSize: 13, fontWeight: 400 }}>
               {stats.jobTitle}
             </Text>
           </Flex>
         </Flex>
       }
-      styles={{ body: { padding: "0 24px 24px", maxHeight: "80vh", overflowY: "auto" } }}
+      styles={{
+        body: { padding: "0 24px 24px", maxHeight: "80vh", overflowY: "auto" },
+      }}
     >
       {/* ─── Row 1: Key Metrics ─── */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20, marginTop: 8 }}>
@@ -155,28 +181,28 @@ export const JobStatsModal = () => {
             label: "ยอดเข้าชมรวม",
             value: stats.totalViews.toLocaleString(),
             suffix: "ครั้ง",
-            bg: "#EFF9FF",
+            bg: token.colorPrimaryBg,
           },
           {
-            icon: <UserAddOutlined style={{ color: "#6366F1" }} />,
+            icon: <UserAddOutlined style={{ color: token.colorInfo }} />,
             label: "ผู้สมัครทั้งหมด",
             value: stats.totalApplicants,
             suffix: "คน",
-            bg: "#EEF2FF",
+            bg: token.colorInfoBg,
           },
           {
-            icon: <RiseOutlined style={{ color: "#10B981" }} />,
+            icon: <RiseOutlined style={{ color: token.colorSuccess }} />,
             label: "อัตราการสมัคร",
             value: stats.conversionRate,
             suffix: "",
-            bg: "#F0FDF4",
+            bg: token.colorSuccessBg,
           },
           {
-            icon: <ClockCircleOutlined style={{ color: "#F59E0B" }} />,
+            icon: <ClockCircleOutlined style={{ color: token.colorWarning }} />,
             label: "เวลาเฉลี่ยก่อนสมัคร",
             value: stats.avgTimeToApply,
             suffix: "",
-            bg: "#FFFBEB",
+            bg: token.colorWarningBg,
           },
         ].map((item) => (
           <Col xs={12} md={6} key={item.label}>
@@ -188,12 +214,28 @@ export const JobStatsModal = () => {
               <Flex vertical gap={8}>
                 <Flex align="center" gap={6}>
                   {item.icon}
-                  <Text style={{ fontSize: 12, color: "#64748B" }}>{item.label}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {item.label}
+                  </Text>
                 </Flex>
-                <Text strong style={{ fontSize: 22, color: "#0F172A", lineHeight: 1 }}>
+                <Text
+                  strong
+                  style={{
+                    fontSize: 22,
+                    color: token.colorText,
+                    lineHeight: 1,
+                  }}
+                >
                   {item.value}
                   {item.suffix && (
-                    <Text style={{ fontSize: 13, color: "#94A3B8", fontWeight: 400, marginLeft: 4 }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: token.colorTextTertiary,
+                        fontWeight: 400,
+                        marginLeft: 4,
+                      }}
+                    >
                       {item.suffix}
                     </Text>
                   )}
@@ -206,7 +248,6 @@ export const JobStatsModal = () => {
 
       {/* ─── Row 2: Pipeline + Trend ─── */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-
         {/* Hiring Pipeline */}
         <Col xs={24} md={12}>
           <Card
@@ -215,7 +256,9 @@ export const JobStatsModal = () => {
             title={
               <Flex align="center" gap={6}>
                 <TeamOutlined style={{ color: PRIMARY }} />
-                <Text strong style={{ fontSize: 14 }}>Pipeline การรับสมัคร</Text>
+                <Text strong style={{ fontSize: 14 }}>
+                  Pipeline การรับสมัคร
+                </Text>
               </Flex>
             }
           >
@@ -243,15 +286,21 @@ export const JobStatsModal = () => {
                       <Text style={{ fontSize: 13 }}>{step.label}</Text>
                     </Flex>
                     <Flex align="center" gap={6}>
-                      <Text strong style={{ fontSize: 15 }}>{step.count}</Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>คน</Text>
+                      <Text strong style={{ fontSize: 15 }}>
+                        {step.count}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        คน
+                      </Text>
                     </Flex>
                   </Flex>
                   <Progress
-                    percent={Math.round((step.count / stats.pipeline[0].count) * 100)}
+                    percent={Math.round(
+                      (step.count / stats.pipeline[0].count) * 100,
+                    )}
                     showInfo={false}
                     strokeColor={step.color}
-                    trailColor="#F1F5F9"
+                    trailColor={token.colorFillSecondary}
                     size="small"
                     style={{ margin: 0 }}
                   />
@@ -260,9 +309,17 @@ export const JobStatsModal = () => {
 
               <Divider style={{ margin: "8px 0" }} />
               <Flex justify="space-between" align="center">
-                <Text type="secondary" style={{ fontSize: 13 }}>อัตราความสำเร็จ (Offer Rate)</Text>
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  อัตราความสำเร็จ (Offer Rate)
+                </Text>
                 <Tag
-                  color={hiringRate >= 10 ? "green" : hiringRate >= 5 ? "orange" : "red"}
+                  color={
+                    hiringRate >= 10
+                      ? "green"
+                      : hiringRate >= 5
+                        ? "orange"
+                        : "red"
+                  }
                   style={{ fontWeight: 700, fontSize: 13 }}
                 >
                   {hiringRate}%
@@ -280,7 +337,9 @@ export const JobStatsModal = () => {
             title={
               <Flex align="center" gap={6}>
                 <ThunderboltOutlined style={{ color: "#F59E0B" }} />
-                <Text strong style={{ fontSize: 14 }}>แนวโน้ม 7 วันล่าสุด</Text>
+                <Text strong style={{ fontSize: 14 }}>
+                  แนวโน้ม 7 วันล่าสุด
+                </Text>
               </Flex>
             }
           >
@@ -288,21 +347,47 @@ export const JobStatsModal = () => {
               <Flex vertical gap={6}>
                 <Flex align="center" gap={6}>
                   <Flex
-                    style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: PRIMARY }}
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 2,
+                      backgroundColor: PRIMARY,
+                    }}
                   />
-                  <Text style={{ fontSize: 12, color: "#64748B" }}>ยอดเข้าชม (ครั้ง)</Text>
+                  <Text
+                    style={{ fontSize: 12, color: token.colorTextSecondary }}
+                  >
+                    ยอดเข้าชม (ครั้ง)
+                  </Text>
                 </Flex>
-                <MiniBarChart data={stats.dailyTrend} valueKey="views" color={PRIMARY} />
+                <MiniBarChart
+                  data={stats.dailyTrend}
+                  valueKey="views"
+                  color={PRIMARY}
+                />
               </Flex>
 
               <Flex vertical gap={6}>
                 <Flex align="center" gap={6}>
                   <Flex
-                    style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: "#10B981" }}
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 2,
+                      backgroundColor: "#10B981",
+                    }}
                   />
-                  <Text style={{ fontSize: 12, color: "#64748B" }}>ผู้สมัครใหม่ (คน)</Text>
+                  <Text
+                    style={{ fontSize: 12, color: token.colorTextSecondary }}
+                  >
+                    ผู้สมัครใหม่ (คน)
+                  </Text>
                 </Flex>
-                <MiniBarChart data={stats.dailyTrend} valueKey="applicants" color="#10B981" />
+                <MiniBarChart
+                  data={stats.dailyTrend}
+                  valueKey="applicants"
+                  color="#10B981"
+                />
               </Flex>
             </Flex>
           </Card>
@@ -318,7 +403,9 @@ export const JobStatsModal = () => {
             title={
               <Flex align="center" gap={6}>
                 <CalendarOutlined style={{ color: "#6366F1" }} />
-                <Text strong style={{ fontSize: 14 }}>แหล่งที่มาของผู้สมัคร</Text>
+                <Text strong style={{ fontSize: 14 }}>
+                  แหล่งที่มาของผู้สมัคร
+                </Text>
               </Flex>
             }
           >
@@ -343,7 +430,9 @@ export const JobStatsModal = () => {
             title={
               <Flex align="center" gap={6}>
                 <UserAddOutlined style={{ color: "#10B981" }} />
-                <Text strong style={{ fontSize: 14 }}>ประสบการณ์ผู้สมัคร</Text>
+                <Text strong style={{ fontSize: 14 }}>
+                  ประสบการณ์ผู้สมัคร
+                </Text>
               </Flex>
             }
           >

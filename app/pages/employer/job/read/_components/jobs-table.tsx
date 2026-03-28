@@ -21,12 +21,13 @@ import {
   Tag,
   Tooltip,
   Typography,
+  theme,
 } from "antd";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useApplicantDrawerStore } from "../_state/applicant-drawer-store";
-import { useJobStatsModalStore } from "../_state/job-stats-modal-store";
 import { useJobReadStore, type JobRecord } from "../_state/job-read-store";
+import { useJobStatsModalStore } from "../_state/job-stats-modal-store";
 
 const { Text } = Typography;
 
@@ -37,6 +38,7 @@ export const JobsTable = () => {
   const { jobs, searchKeyword, activeTab } = useJobReadStore();
   const { openDrawer } = useApplicantDrawerStore();
   const { openModal: openStatsModal } = useJobStatsModalStore();
+  const { token } = theme.useToken();
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -49,10 +51,17 @@ export const JobsTable = () => {
     return matchesSearch && matchesTab;
   });
 
-  const STATUS_CONFIG: Record<string, { color: string; text: string; icon: ReactNode }> = {
-    ACTIVE:  { color: "green",   text: "กำลังเปิดรับ", icon: <CheckCircleOutlined /> },
-    CLOSED:  { color: "default", text: "ปิดรับแล้ว",   icon: <StopOutlined /> },
-    DRAFT:   { color: "orange",  text: "ฉบับร่าง",     icon: <ClockCircleOutlined /> },
+  const STATUS_CONFIG: Record<
+    string,
+    { color: string; text: string; icon: ReactNode }
+  > = {
+    ACTIVE: {
+      color: "green",
+      text: "กำลังเปิดรับ",
+      icon: <CheckCircleOutlined />,
+    },
+    CLOSED: { color: "default", text: "ปิดรับแล้ว", icon: <StopOutlined /> },
+    DRAFT: { color: "orange", text: "ฉบับร่าง", icon: <ClockCircleOutlined /> },
   };
 
   const columns = [
@@ -76,7 +85,10 @@ export const JobsTable = () => {
             ระดับชั้น: {record.grades.join(", ")}
           </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            เงินเดือน: <Text strong style={{ color: "#0F172A", fontSize: 12 }}>{record.salary}</Text>
+            เงินเดือน:{" "}
+            <Text strong style={{ color: token.colorText, fontSize: 12 }}>
+              {record.salary}
+            </Text>
           </Text>
         </Flex>
       ),
@@ -102,18 +114,24 @@ export const JobsTable = () => {
       render: (_: unknown, record: JobRecord) => (
         <Flex vertical gap={8}>
           <Flex align="center" gap={8}>
-            <UserOutlined style={{ color: "#94A3B8", fontSize: 13 }} />
+            <UserOutlined
+              style={{ color: token.colorTextTertiary, fontSize: 13 }}
+            />
             <Text style={{ fontSize: 14 }}>ทั้งหมด</Text>
-            <Text strong style={{ fontSize: 16, color: "#0F172A" }}>{record.applicants}</Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>คน</Text>
+            <Text strong style={{ fontSize: 16, color: token.colorText }}>
+              {record.applicants}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              คน
+            </Text>
           </Flex>
           {record.newApplicants > 0 && (
             <Badge
               count={`+${record.newApplicants} ใหม่`}
               style={{
-                backgroundColor: "#EFF9FF",
+                backgroundColor: token.colorPrimaryBg,
                 color: PRIMARY,
-                border: `1px solid #BAE6FD`,
+                border: `1px solid ${token.colorPrimaryBorder}`,
                 fontSize: 11,
                 fontWeight: 600,
                 boxShadow: "none",
@@ -121,8 +139,12 @@ export const JobsTable = () => {
             />
           )}
           <Flex align="center" gap={6}>
-            <EyeOutlined style={{ color: "#CBD5E1", fontSize: 12 }} />
-            <Text type="secondary" style={{ fontSize: 12 }}>{record.views.toLocaleString()} ครั้ง</Text>
+            <EyeOutlined
+              style={{ color: token.colorTextQuaternary, fontSize: 12 }}
+            />
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {record.views.toLocaleString()} ครั้ง
+            </Text>
           </Flex>
         </Flex>
       ),
@@ -134,15 +156,27 @@ export const JobsTable = () => {
       render: (_: unknown, record: JobRecord) => {
         const expires = new Date(record.expiresAt);
         const today = new Date();
-        const daysLeft = Math.ceil((expires.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        const isExpiringSoon = record.status === "ACTIVE" && daysLeft <= 7 && daysLeft >= 0;
+        const daysLeft = Math.ceil(
+          (expires.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const isExpiringSoon =
+          record.status === "ACTIVE" && daysLeft <= 7 && daysLeft >= 0;
         const isExpired = daysLeft < 0;
 
         return (
           <Flex vertical gap={4}>
             <Text style={{ fontSize: 13 }}>{record.publishedAt}</Text>
             <Flex align="center" gap={4}>
-              <Text type={isExpiringSoon ? "warning" : isExpired ? "danger" : "secondary"} style={{ fontSize: 12 }}>
+              <Text
+                type={
+                  isExpiringSoon
+                    ? "warning"
+                    : isExpired
+                      ? "danger"
+                      : "secondary"
+                }
+                style={{ fontSize: 12 }}
+              >
                 หมดอายุ: {record.expiresAt}
               </Text>
             </Flex>
@@ -152,7 +186,9 @@ export const JobsTable = () => {
               </Tag>
             )}
             {isExpired && record.status === "ACTIVE" && (
-              <Tag color="red" style={{ fontSize: 10, margin: 0 }}>หมดอายุแล้ว</Tag>
+              <Tag color="red" style={{ fontSize: 10, margin: 0 }}>
+                หมดอายุแล้ว
+              </Tag>
             )}
           </Flex>
         );
@@ -196,7 +232,11 @@ export const JobsTable = () => {
   return (
     <Card
       variant="borderless"
-      style={{ borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+      style={{
+        borderRadius: 14,
+        overflow: "hidden",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      }}
       styles={{ body: { padding: 0 } }}
     >
       <Table
@@ -214,13 +254,14 @@ export const JobsTable = () => {
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
                 <Text type="secondary">
-                  {searchKeyword ? `ไม่พบประกาศที่ตรงกับ "${searchKeyword}"` : "ยังไม่มีประกาศรับสมัครงาน"}
+                  {searchKeyword
+                    ? `ไม่พบประกาศที่ตรงกับ "${searchKeyword}"`
+                    : "ยังไม่มีประกาศรับสมัครงาน"}
                 </Text>
               }
             />
           ),
         }}
-        rowHoverBg="#F8FAFC"
         style={{ borderRadius: 14 }}
       />
     </Card>

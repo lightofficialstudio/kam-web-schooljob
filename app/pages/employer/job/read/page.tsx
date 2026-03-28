@@ -1,7 +1,15 @@
 "use client";
 
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
-import { Badge, Breadcrumb, Button, Flex, Layout, Typography } from "antd";
+import {
+  Badge,
+  Breadcrumb,
+  Button,
+  Flex,
+  Layout,
+  Typography,
+  theme,
+} from "antd";
 import Link from "next/link";
 import { ApplicantDrawer } from "./_components/applicant-drawer";
 import { FilterSection } from "./_components/filter-section";
@@ -22,11 +30,17 @@ const PRIMARY_DARK = "#0878a8";
 export default function MyJobsPage() {
   const { jobs } = useJobReadStore();
   const { openNewApplicantsDrawer } = useApplicantDrawerStore();
+  const { token } = theme.useToken();
   const totalNewApplicants = jobs.reduce((sum, j) => sum + j.newApplicants, 0);
 
   return (
-    <Layout style={{ minHeight: "100vh", backgroundColor: "#F1F5F9", paddingBottom: 80 }}>
-
+    <Layout
+      style={{
+        minHeight: "100vh",
+        backgroundColor: token.colorBgLayout,
+        paddingBottom: 80,
+      }}
+    >
       {/* Gradient Hero Header */}
       <Flex
         vertical
@@ -38,19 +52,31 @@ export default function MyJobsPage() {
         <Flex
           vertical
           gap={20}
-          style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", width: "100%" }}
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 24px",
+            width: "100%",
+          }}
         >
           <Breadcrumb
             items={[
               {
                 title: (
-                  <Link href="/pages/employer" style={{ color: "rgba(255,255,255,0.65)" }}>
+                  <Link
+                    href="/pages/employer"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
                     แดชบอร์ด
                   </Link>
                 ),
               },
               {
-                title: <span style={{ color: "rgba(255,255,255,0.9)" }}>ประกาศรับสมัครครู</span>,
+                title: (
+                  <span style={{ color: "rgba(255,255,255,0.9)" }}>
+                    ประกาศรับสมัครครู
+                  </span>
+                ),
               },
             ]}
           />
@@ -73,7 +99,10 @@ export default function MyJobsPage() {
                 <TeamOutlined style={{ fontSize: 26, color: "#fff" }} />
               </Flex>
               <Flex vertical gap={3}>
-                <Title level={2} style={{ margin: 0, color: "#fff", lineHeight: 1.2 }}>
+                <Title
+                  level={2}
+                  style={{ margin: 0, color: "#fff", lineHeight: 1.2 }}
+                >
                   ประกาศรับสมัครครู
                 </Title>
                 <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>
@@ -85,7 +114,11 @@ export default function MyJobsPage() {
             {/* Action Buttons */}
             <Flex gap={12} align="center">
               {totalNewApplicants > 0 && (
-                <Badge count={totalNewApplicants} size="default" offset={[-4, 4]}>
+                <Badge
+                  count={totalNewApplicants}
+                  size="default"
+                  offset={[-4, 4]}
+                >
                   <Button
                     size="large"
                     onClick={openNewApplicantsDrawer}

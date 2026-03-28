@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchOutlined } from "@ant-design/icons";
-import { Card, Flex, Input, Tabs, Typography } from "antd";
+import { Card, Flex, Input, Tabs, Typography, theme } from "antd";
 import { useJobReadStore } from "../_state/job-read-store";
 
 const { Text } = Typography;
@@ -10,6 +10,7 @@ const { Text } = Typography;
 export const FilterSection = () => {
   const { jobs, searchKeyword, activeTab, setSearchKeyword, setActiveTab } =
     useJobReadStore();
+  const { token } = theme.useToken();
 
   const activeCount = jobs.filter((j) => j.status === "ACTIVE").length;
   const closedCount = jobs.filter((j) => j.status === "CLOSED").length;
@@ -24,10 +25,17 @@ export const FilterSection = () => {
     >
       <Flex vertical gap={0}>
         {/* Search Row */}
-        <Flex justify="space-between" align="center" gap={16} style={{ paddingBottom: 16 }}>
+        <Flex
+          justify="space-between"
+          align="center"
+          gap={16}
+          style={{ paddingBottom: 16 }}
+        >
           <Input
             placeholder="ค้นหาตามชื่อตำแหน่ง หรือวิชาที่สอน..."
-            prefix={<SearchOutlined style={{ color: "#94A3B8" }} />}
+            prefix={
+              <SearchOutlined style={{ color: token.colorTextTertiary }} />
+            }
             size="large"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
@@ -61,8 +69,14 @@ export const FilterSection = () => {
                       fontWeight: 700,
                       padding: "1px 8px",
                       borderRadius: 20,
-                      background: activeTab === "ACTIVE" ? "#11b6f5" : "#E2E8F0",
-                      color: activeTab === "ACTIVE" ? "#fff" : "#64748B",
+                      background:
+                        activeTab === "ACTIVE"
+                          ? "#11b6f5"
+                          : token.colorFillSecondary,
+                      color:
+                        activeTab === "ACTIVE"
+                          ? "#fff"
+                          : token.colorTextSecondary,
                     }}
                   >
                     {activeCount}
@@ -81,8 +95,14 @@ export const FilterSection = () => {
                       fontWeight: 700,
                       padding: "1px 8px",
                       borderRadius: 20,
-                      background: activeTab === "CLOSED" ? "#64748B" : "#E2E8F0",
-                      color: activeTab === "CLOSED" ? "#fff" : "#64748B",
+                      background:
+                        activeTab === "CLOSED"
+                          ? token.colorTextQuaternary
+                          : token.colorFillSecondary,
+                      color:
+                        activeTab === "CLOSED"
+                          ? "#fff"
+                          : token.colorTextSecondary,
                     }}
                   >
                     {closedCount}
@@ -101,8 +121,14 @@ export const FilterSection = () => {
                       fontWeight: 700,
                       padding: "1px 8px",
                       borderRadius: 20,
-                      background: activeTab === "DRAFT" ? "#F59E0B" : "#E2E8F0",
-                      color: activeTab === "DRAFT" ? "#fff" : "#64748B",
+                      background:
+                        activeTab === "DRAFT"
+                          ? token.colorWarning
+                          : token.colorFillSecondary,
+                      color:
+                        activeTab === "DRAFT"
+                          ? "#fff"
+                          : token.colorTextSecondary,
                     }}
                   >
                     {draftCount}

@@ -7,7 +7,7 @@ import {
   UserAddOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Flex, Row, Statistic, Typography } from "antd";
+import { Card, Col, Flex, Row, Statistic, Typography, theme } from "antd";
 import { useJobReadStore } from "../_state/job-read-store";
 
 const { Text } = Typography;
@@ -17,6 +17,7 @@ const PRIMARY = "#11b6f5";
 // สถิติภาพรวมสำหรับฝ่ายบุคลากร: งานที่เปิดรับ, ผู้สมัครใหม่, ยอดเข้าชม, ใกล้หมดอายุ
 export const StatsSection = () => {
   const { jobs } = useJobReadStore();
+  const { token } = theme.useToken();
 
   const activeCount = jobs.filter((j) => j.status === "ACTIVE").length;
   const totalNewApplicants = jobs.reduce((sum, j) => sum + j.newApplicants, 0);
@@ -28,7 +29,9 @@ export const StatsSection = () => {
   const expiringSoonCount = jobs.filter((j) => {
     if (j.status !== "ACTIVE") return false;
     const expires = new Date(j.expiresAt);
-    const daysLeft = Math.ceil((expires.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.ceil(
+      (expires.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
     return daysLeft <= 7 && daysLeft >= 0;
   }).length;
 
@@ -36,10 +39,14 @@ export const StatsSection = () => {
     {
       title: "ตำแหน่งที่เปิดรับ",
       value: activeCount,
-      icon: <CheckCircleOutlined style={{ fontSize: 20, color: "#10B981" }} />,
-      color: "#10B981",
-      bg: "#F0FDF4",
-      border: "#BBF7D0",
+      icon: (
+        <CheckCircleOutlined
+          style={{ fontSize: 20, color: token.colorSuccess }}
+        />
+      ),
+      color: token.colorSuccess,
+      bg: token.colorSuccessBg,
+      border: token.colorSuccessBorder,
       suffix: "ตำแหน่ง",
     },
     {
@@ -47,26 +54,28 @@ export const StatsSection = () => {
       value: totalNewApplicants,
       icon: <UserAddOutlined style={{ fontSize: 20, color: PRIMARY }} />,
       color: PRIMARY,
-      bg: "#EFF9FF",
-      border: "#BAE6FD",
+      bg: token.colorPrimaryBg,
+      border: token.colorPrimaryBorder,
       suffix: "คน",
     },
     {
       title: "ยอดผู้สมัครทั้งหมด",
       value: totalApplicants,
-      icon: <FileTextOutlined style={{ fontSize: 20, color: "#6366F1" }} />,
-      color: "#6366F1",
-      bg: "#EEF2FF",
-      border: "#C7D2FE",
+      icon: (
+        <FileTextOutlined style={{ fontSize: 20, color: token.colorInfo }} />
+      ),
+      color: token.colorInfo,
+      bg: token.colorInfoBg,
+      border: token.colorInfoBorder,
       suffix: "คน",
     },
     {
       title: "ยอดเข้าชมประกาศ",
       value: totalViews,
-      icon: <EyeOutlined style={{ fontSize: 20, color: "#F59E0B" }} />,
-      color: "#F59E0B",
-      bg: "#FFFBEB",
-      border: "#FDE68A",
+      icon: <EyeOutlined style={{ fontSize: 20, color: token.colorWarning }} />,
+      color: token.colorWarning,
+      bg: token.colorWarningBg,
+      border: token.colorWarningBorder,
       suffix: "ครั้ง",
     },
   ];
@@ -87,7 +96,9 @@ export const StatsSection = () => {
           >
             <Flex vertical gap={12}>
               <Flex justify="space-between" align="center">
-                <Text style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>
+                <Text
+                  style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}
+                >
                   {stat.title}
                 </Text>
                 <Flex
@@ -97,7 +108,7 @@ export const StatsSection = () => {
                     width: 36,
                     height: 36,
                     borderRadius: 10,
-                    backgroundColor: "rgba(255,255,255,0.8)",
+                    backgroundColor: token.colorBgContainer,
                     border: `1px solid ${stat.border}`,
                   }}
                 >
@@ -106,9 +117,20 @@ export const StatsSection = () => {
               </Flex>
               <Statistic
                 value={stat.value}
-                suffix={<span style={{ fontSize: 13, color: "#94A3B8" }}>{stat.suffix}</span>}
+                suffix={
+                  <span
+                    style={{ fontSize: 13, color: token.colorTextTertiary }}
+                  >
+                    {stat.suffix}
+                  </span>
+                }
                 styles={{
-                  content: { fontSize: 28, fontWeight: 700, color: stat.color, lineHeight: 1 },
+                  content: {
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: stat.color,
+                    lineHeight: 1,
+                  },
                   root: { marginBottom: 0 },
                 }}
               />
@@ -124,15 +146,18 @@ export const StatsSection = () => {
             variant="borderless"
             style={{
               borderRadius: 12,
-              backgroundColor: "#FFFBEB",
-              border: "1px solid #FDE68A",
+              backgroundColor: token.colorWarningBg,
+              border: `1px solid ${token.colorWarningBorder}`,
             }}
             styles={{ body: { padding: "12px 20px" } }}
           >
             <Flex align="center" gap={10}>
-              <WarningOutlined style={{ color: "#F59E0B", fontSize: 16 }} />
-              <Text style={{ fontSize: 14, color: "#92400E" }}>
-                มี <b>{expiringSoonCount} ประกาศ</b> ที่จะหมดอายุภายใน 7 วัน — ตรวจสอบและต่ออายุเพื่อไม่ให้พลาดผู้สมัคร
+              <WarningOutlined
+                style={{ color: token.colorWarning, fontSize: 16 }}
+              />
+              <Text style={{ fontSize: 14, color: token.colorWarningText }}>
+                มี <b>{expiringSoonCount} ประกาศ</b> ที่จะหมดอายุภายใน 7 วัน —
+                ตรวจสอบและต่ออายุเพื่อไม่ให้พลาดผู้สมัคร
               </Text>
             </Flex>
           </Card>
