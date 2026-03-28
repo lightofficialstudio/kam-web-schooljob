@@ -145,7 +145,7 @@ export const ApplicationTrackerDrawer = () => {
           )}
         </Flex>
       }
-      width={520}
+      size="large"
     >
       {applications.length === 0 ? (
         <Empty description="ยังไม่มีใบสมัครงาน" style={{ marginTop: 80 }} />

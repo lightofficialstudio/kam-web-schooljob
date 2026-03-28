@@ -24,6 +24,7 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useEffect, useState } from "react";
 import type { Job } from "../_state/job-search-store";
 import { useJobSearchStore } from "../_state/job-search-store";
 import { useSavedJobsStore } from "../_state/saved-jobs-store";
@@ -43,7 +44,10 @@ export const JobCard = ({ job }: JobCardProps) => {
   const { openJobDrawer } = useJobSearchStore();
   const { isSaved, toggleSavedJob } = useSavedJobsStore();
 
-  const saved = isSaved(job.id);
+  // ป้องกัน Hydration mismatch — localStorage ไม่มีบน server
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => setHasMounted(true), []);
+  const saved = hasMounted && isSaved(job.id);
 
   return (
     <Card
