@@ -55,7 +55,7 @@ export default function LatestJobsSection() {
           className="job-scroll-container"
           style={{
             overflowX: "auto",
-            paddingBottom: "20px",
+            padding: "20px 0", // เพิ่ม padding บน-ล่างเพื่อให้เห็น border ตอน hover
             display: "flex",
             gap: "24px",
             msOverflowStyle: "none",
