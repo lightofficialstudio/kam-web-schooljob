@@ -206,8 +206,8 @@ export default function BlogListPage() {
           style={{ position: "relative", zIndex: 1, padding: "0 20px" }}
         >
           <Col xs={24} md={18} lg={12}>
-            <Space direction="vertical" size={24} style={{ width: "100%" }}>
-              <Space direction="vertical" size={12}>
+            <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={12}>
                 <Title
                   level={1}
                   style={{
@@ -266,7 +266,7 @@ export default function BlogListPage() {
         }}
       >
         <Col span={24} style={{ maxWidth: "1240px" }}>
-          <Space direction="vertical" size={64} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={64} style={{ width: "100%" }}>
             {/* 2. Featured Post */}
             {!searchText && featuredBlog && (
               <Link href={`/pages/blog/${featuredBlog.id}`}>
@@ -374,7 +374,7 @@ export default function BlogListPage() {
             )}
 
             {/* 3. Category Tabs & Blog Grid */}
-            <Space direction="vertical" size={48} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={48} style={{ width: "100%" }}>
               <Tabs
                 activeKey={activeTab}
                 onChange={setActiveTab}

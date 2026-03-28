@@ -384,7 +384,7 @@ export default function UserManagementPage() {
                 expandedRowRender: (record) => (
                   <Row gutter={[24, 16]}>
                     <Col xs={24} sm={12} md={8}>
-                      <Space direction="vertical" style={{ width: "100%" }}>
+                      <Space orientation="vertical" style={{ width: "100%" }}>
                         <div>
                           <Text type="secondary" strong>
                             User ID:
@@ -402,7 +402,7 @@ export default function UserManagementPage() {
                       </Space>
                     </Col>
                     <Col xs={24} sm={12} md={8}>
-                      <Space direction="vertical" style={{ width: "100%" }}>
+                      <Space orientation="vertical" style={{ width: "100%" }}>
                         <div>
                           <Text type="secondary" strong>
                             สร้างเมื่อ:
@@ -420,7 +420,7 @@ export default function UserManagementPage() {
                       </Space>
                     </Col>
                     <Col xs={24} sm={12} md={8}>
-                      <Space direction="vertical" style={{ width: "100%" }}>
+                      <Space orientation="vertical" style={{ width: "100%" }}>
                         <div>
                           <Text type="secondary" strong>
                             ชื่อเต็ม:
@@ -473,7 +473,7 @@ export default function UserManagementPage() {
               borderRadius: "8px",
             }}
           >
-            <Space direction="vertical" style={{ width: "100%" }} size="middle">
+            <Space orientation="vertical" style={{ width: "100%" }} size="middle">
               <Row justify="space-between" align="middle">
                 <Col>
                   <Text>
@@ -534,7 +534,7 @@ export default function UserManagementPage() {
         <Card>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6}>
-              <Space direction="vertical">
+              <Space orientation="vertical">
                 <Text type="secondary" strong>
                   ข้อมูลล่าสุด
                 </Text>
@@ -550,7 +550,7 @@ export default function UserManagementPage() {
               </Space>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space direction="vertical">
+              <Space orientation="vertical">
                 <Text type="secondary" strong>
                   สถิติบทบาท
                 </Text>
@@ -566,7 +566,7 @@ export default function UserManagementPage() {
               </Space>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space direction="vertical">
+              <Space orientation="vertical">
                 <Text type="secondary" strong>
                   สถิติข้อมูล
                 </Text>
@@ -579,7 +579,7 @@ export default function UserManagementPage() {
               </Space>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space direction="vertical">
+              <Space orientation="vertical">
                 <Text type="secondary" strong>
                   การจัดการ
                 </Text>

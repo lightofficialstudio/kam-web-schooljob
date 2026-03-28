@@ -86,7 +86,7 @@ export const SchoolCard = ({
         <Col xs={24} sm={20} style={{ padding: "24px 32px" }}>
           <Row justify="space-between" align="middle">
             <Col flex="auto">
-              <Space direction="vertical" size={8}>
+              <Space orientation="vertical" size={8}>
                 <Title
                   level={4}
                   style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}

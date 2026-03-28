@@ -138,7 +138,7 @@ export const EducationHistorySection: React.FC = () => {
   };
 
   return (
-    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
       {/* 1. Add/Edit Drawer (UX following job page pattern) */}
       <Drawer
         open={isAddingNew}
@@ -272,7 +272,7 @@ export const EducationHistorySection: React.FC = () => {
       </Drawer>
 
       {/* 2. List of Educations */}
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
         {educations.length > 0 ? (
           educations.map((education, index) => (
             <Card
@@ -286,7 +286,7 @@ export const EducationHistorySection: React.FC = () => {
             >
               <Row justify="space-between" align="top">
                 <Col flex="auto">
-                  <Space direction="vertical" size={2}>
+                  <Space orientation="vertical" size={2}>
                     <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
                       {education.level}
                     </Title>

@@ -116,7 +116,7 @@ export const SchoolJobsDrawer = () => {
             </Tag>
           </Flex>
 
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {selectedSchool.jobs.length > 0 ? (
               selectedSchool.jobs.map((job) => (
                 <Card

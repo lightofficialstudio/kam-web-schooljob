@@ -109,7 +109,7 @@ export default function MyJobsPage() {
       dataIndex: "title",
       key: "title",
       render: (text: string, record: JobRecord) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Text strong style={{ fontSize: "16px", color: token.colorPrimary }}>
             {text}
           </Text>
@@ -190,7 +190,7 @@ export default function MyJobsPage() {
       key: "publishedAt",
       width: 150,
       render: (date: string) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Text style={{ fontSize: "14px" }}>{date}</Text>
           <Text type="secondary" style={{ fontSize: "12px" }}>
             หมดอายุ: {MOCK_JOBS.find((j) => j.publishedAt === date)?.expiresAt}
@@ -520,7 +520,7 @@ export default function MyJobsPage() {
               }}
               styles={{ body: { padding: "12px 20px" } }}
             >
-              <Space direction="vertical" size={2}>
+              <Space orientation="vertical" size={2}>
                 <Text type="warning" strong style={{ fontSize: "12px" }}>
                   <ThunderboltOutlined /> แนะนำด่วน
                 </Text>

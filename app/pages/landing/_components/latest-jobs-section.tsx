@@ -34,7 +34,11 @@ export default function LatestJobsSection() {
     >
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         {/* Section Header */}
-        <Flex justify="space-between" align="flex-end" style={{ marginBottom: "40px" }}>
+        <Flex
+          justify="space-between"
+          align="flex-end"
+          style={{ marginBottom: "40px" }}
+        >
           <div>
             <Badge status="processing" text="อัปเดตล่าสุด" />
             <Title level={2} style={{ marginTop: "12px", marginBottom: 0 }}>
@@ -66,7 +70,11 @@ export default function LatestJobsSection() {
                 style={{ borderRadius: "20px", height: "100%" }}
                 styles={{ body: { padding: "24px" } }}
               >
-                <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                <Space
+                  orientation="vertical"
+                  size={16}
+                  style={{ width: "100%" }}
+                >
                   {/* Badge + Posted Date */}
                   <Flex justify="space-between" align="flex-start">
                     {job.isNew ? (
@@ -107,11 +115,17 @@ export default function LatestJobsSection() {
                   </Flex>
 
                   {/* Location + Salary */}
-                  <Space direction="vertical" size={4}>
+                  <Space orientation="vertical" size={4}>
                     <Text type="secondary" style={{ fontSize: "13px" }}>
                       <GlobalOutlined /> {job.location}
                     </Text>
-                    <Text style={{ color: "#2b3244", fontSize: "15px", fontWeight: 500 }}>
+                    <Text
+                      style={{
+                        color: "#2b3244",
+                        fontSize: "15px",
+                        fontWeight: 500,
+                      }}
+                    >
                       ฿ {job.salary}
                     </Text>
                   </Space>
@@ -119,7 +133,11 @@ export default function LatestJobsSection() {
                   {/* Tags */}
                   <Space size={[4, 4]} wrap>
                     {job.tags.map((tag) => (
-                      <Tag key={tag} color="#11b6f5" style={{ borderRadius: "4px" }}>
+                      <Tag
+                        key={tag}
+                        color="#11b6f5"
+                        style={{ borderRadius: "4px" }}
+                      >
                         {tag}
                       </Tag>
                     ))}

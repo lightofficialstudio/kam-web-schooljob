@@ -74,7 +74,7 @@ export default function UserProfileCard() {
         >
           THANAT PROMPIRIYA
         </Title>
-        <Space direction="vertical" size={12} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size={12} style={{ marginTop: 16 }}>
           <Space align="center" size={12}>
             <EnvironmentOutlined
               style={{ color: token.colorTextLightSolid, opacity: 0.8 }}

@@ -135,7 +135,7 @@ export default function PostJobPage() {
               }}
               scrollToFirstError
             >
-              <Space direction="vertical" size={24} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={24} style={{ width: "100%" }}>
                 {/* SECTION 1: ข้อมูลตำแหน่งงาน */}
                 <Card
                   title={
@@ -596,7 +596,7 @@ export default function PostJobPage() {
               </Card>
 
               <Card variant="borderless" style={{ borderRadius: "24px" }}>
-                <Space direction="vertical" size={16}>
+                <Space orientation="vertical" size={16}>
                   <Text strong>ทำไมต้องลงประกาศกับเรา?</Text>
                   <Space align="start">
                     <Badge status="success" />

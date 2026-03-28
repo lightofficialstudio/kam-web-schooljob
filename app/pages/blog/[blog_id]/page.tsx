@@ -146,7 +146,7 @@ export default function BlogDetailPage() {
         {/* Main Content Area */}
         <Row justify="center" style={{ marginTop: "40px" }}>
           <Col xs={24} lg={20} xl={18} style={{ padding: "0 24px" }}>
-            <Space direction="vertical" size={40} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={40} style={{ width: "100%" }}>
               {/* Title & Metadata */}
               <div style={{ textAlign: "center" }}>
                 <Tag
@@ -337,7 +337,7 @@ export default function BlogDetailPage() {
                         border: `1px solid ${token.colorBorder}`,
                       }}
                     >
-                      <Space direction="vertical" size={16}>
+                      <Space orientation="vertical" size={16}>
                         <BookOutlined
                           style={{
                             fontSize: "24px",

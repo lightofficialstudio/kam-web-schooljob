@@ -115,7 +115,7 @@ export default function JobSeekerSection() {
                   >
                     {item.icon}
                   </div>
-                  <Space direction="vertical" align="center" size={8} style={{ width: "100%" }}>
+                  <Space orientation="vertical" align="center" size={8} style={{ width: "100%" }}>
                     <Title level={4} style={{ margin: 0, fontSize: "18px" }}>
                       {item.title}
                     </Title>

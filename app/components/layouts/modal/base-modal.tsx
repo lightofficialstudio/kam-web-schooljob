@@ -40,7 +40,7 @@ export default function BaseModal({
       }}
       {...props}
     >
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
         {/* Icon */}
         {icon && <div style={{ fontSize: "48px", lineHeight: 1 }}>{icon}</div>}
 

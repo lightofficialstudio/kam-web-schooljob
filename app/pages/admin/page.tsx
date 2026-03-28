@@ -277,7 +277,7 @@ export default function AdminPage() {
           }
           style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}
         >
-          <Space direction="vertical" style={{ width: "100%" }} size="large">
+          <Space orientation="vertical" style={{ width: "100%" }} size="large">
             {/* Database */}
             <div>
               <Row
@@ -408,7 +408,7 @@ export default function AdminPage() {
           }
           style={{ boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}
         >
-          <Space direction="vertical" style={{ width: "100%" }} size="middle">
+          <Space orientation="vertical" style={{ width: "100%" }} size="middle">
             <Row justify="space-between">
               <Col>
                 <span style={{ color: "rgba(0, 0, 0, 0.65)" }}>

@@ -12,9 +12,9 @@ const EmployeeAccountSettingPage = () => {
     <Content style={{ padding: "40px 24px", minHeight: "100vh" }}>
       <Row justify="center">
         <Col xs={24} sm={22} md={18} lg={14} xl={12}>
-          <Space direction="vertical" size={32} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={32} style={{ width: "100%" }}>
             {/* Header Section */}
-            <Space direction="vertical" size={16} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={16} style={{ width: "100%" }}>
               <Breadcrumb
                 items={[
                   {

@@ -304,7 +304,7 @@ export const WorkExperienceSection: React.FC = () => {
       </Drawer>
 
       {/* 2. List of Work Experiences */}
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
         {workExperiences.length > 0 ? (
           workExperiences.map((experience, index) => (
             <Card

@@ -49,7 +49,7 @@ const AccountSettingForm = () => {
   };
 
   return (
-    <Space direction="vertical" size="large" style={{ width: "100%" }}>
+    <Space orientation="vertical" size="large" style={{ width: "100%" }}>
       {/* ส่วนเปลี่ยนอีเมล */}
       <Card
         title={

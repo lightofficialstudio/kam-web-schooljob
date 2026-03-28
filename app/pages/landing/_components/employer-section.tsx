@@ -52,7 +52,7 @@ export default function EmployerSection() {
               พร้อมเครื่องมือคัดกรองผู้สมัครและติดตามสถานะการสมัครในที่เดียว
             </Paragraph>
 
-            <Space direction="vertical" size={16} style={{ marginBottom: "40px" }}>
+            <Space orientation="vertical" size={16} style={{ marginBottom: "40px" }}>
               {EMPLOYER_FEATURES.map((feature, i) => (
                 <Flex key={i} gap={8} align="center">
                   <RocketOutlined />

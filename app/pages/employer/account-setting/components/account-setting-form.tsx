@@ -36,7 +36,7 @@ export default function AccountSettingForm() {
   };
 
   return (
-    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
       <Card
         variant="borderless"
         style={{
@@ -44,7 +44,7 @@ export default function AccountSettingForm() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Space>
             <MailOutlined style={{ fontSize: "20px" }} />
             <Title level={4} style={{ margin: 0 }}>
@@ -105,7 +105,7 @@ export default function AccountSettingForm() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         }}
       >
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Space>
             <LockOutlined style={{ fontSize: "20px" }} />
             <Title level={4} style={{ margin: 0 }}>

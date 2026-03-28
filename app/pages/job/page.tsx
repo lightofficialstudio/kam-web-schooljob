@@ -667,7 +667,7 @@ function JobSearchPageContent() {
                   </Col>
                 </Row>
 
-                <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={16} style={{ width: "100%" }}>
                   {paginatedJobs.length > 0 ? (
                     paginatedJobs.map((job) => (
                       <Card
@@ -751,7 +751,7 @@ function JobSearchPageContent() {
                                   backgroundColor: "transparent",
                                 }}
                               >
-                                <Space direction="vertical" size={10}>
+                                <Space orientation="vertical" size={10}>
                                   <Space size={12} align="center">
                                     <ClockCircleOutlined
                                       style={{
@@ -939,7 +939,7 @@ function JobSearchPageContent() {
 
               {/* RIGHT COLUMN: Sidebar Tools */}
               <Col span={8}>
-                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={24} style={{ width: "100%" }}>
                   {/* 1. Saved Searches */}
                   <Card
                     bordered={false}
@@ -1008,7 +1008,7 @@ function JobSearchPageContent() {
                     }}
                     styles={{ body: { padding: "24px" } }}
                   >
-                    <Space direction="vertical" size={16}>
+                    <Space orientation="vertical" size={16}>
                       <SafetyCertificateOutlined
                         style={{ fontSize: "32px", color: token.colorSuccess }}
                       />

@@ -53,7 +53,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
           />
         </Col>
         <Col xs={24}>
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" style={{ width: "100%" }}>
             <p style={{ margin: 0, color: "rgba(0,0,0,0.65)" }}>
               กรุณาเข้าสู่ระบบด้วยบัญชีผู้ดูแลระบบเพื่อดำเนินการต่อ
             </p>

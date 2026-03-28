@@ -166,7 +166,7 @@ export default function SignupForm() {
               size={48}
               style={{ height: "100%", justifyContent: "center" }}
             >
-              <Space direction="vertical" size={24}>
+              <Space orientation="vertical" size={24}>
                 <Card
                   size="small"
                   variant="borderless"
@@ -199,7 +199,7 @@ export default function SignupForm() {
                 </Paragraph>
               </Space>
 
-              <Space direction="vertical" size={24}>
+              <Space orientation="vertical" size={24}>
                 {[
                   {
                     icon: <CheckCircleFilled />,
@@ -225,8 +225,8 @@ export default function SignupForm() {
 
           {/* 📝 Form Side */}
           <Col xs={24} lg={16} style={{ padding: "60px 100px" }}>
-            <Space direction="vertical" size={40} style={{ width: "100%" }}>
-              <Space direction="vertical" size={8}>
+            <Space orientation="vertical" size={40} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={8}>
                 <Title level={2}>ลงทะเบียนผู้ใช้งาน</Title>
                 <Text type="secondary" style={{ fontSize: 18 }}>
                   มีบัญชีอยู่แล้ว?{" "}
@@ -305,7 +305,7 @@ export default function SignupForm() {
                             transition: "none",
                           }}
                         >
-                          <Space direction="vertical" size={12}>
+                          <Space orientation="vertical" size={12}>
                             <UserOutlined
                               style={{
                                 fontSize: 44,
@@ -336,7 +336,7 @@ export default function SignupForm() {
                             transition: "none",
                           }}
                         >
-                          <Space direction="vertical" size={12}>
+                          <Space orientation="vertical" size={12}>
                             <BankOutlined
                               style={{
                                 fontSize: 44,

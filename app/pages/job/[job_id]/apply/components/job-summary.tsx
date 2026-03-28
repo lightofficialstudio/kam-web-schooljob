@@ -27,7 +27,7 @@ export default function JobSummary({ job }: JobSummaryProps) {
           backgroundColor: token.colorBgContainer,
         }}
       />
-      <Space direction="vertical" size={2}>
+      <Space orientation="vertical" size={2}>
         <Text type="secondary" style={{ fontSize: 14 }}>
           กำลังสมัครตำแหน่ง
         </Text>

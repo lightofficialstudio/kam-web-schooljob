@@ -110,7 +110,7 @@ export default function DocumentSection() {
           onChange={(e) => setResumeOption(e.target.value)}
           style={{ width: "100%" }}
         >
-          <Space direction="vertical" style={{ width: "100%" }} size={20}>
+          <Space orientation="vertical" style={{ width: "100%" }} size={20}>
             <Radio value="select" style={{ width: "100%" }}>
               <Layout
                 style={{
@@ -205,7 +205,7 @@ export default function DocumentSection() {
           body: { padding: "24px" },
         }}
       >
-        <Space direction="vertical" style={{ width: "100%" }} size={16}>
+        <Space orientation="vertical" style={{ width: "100%" }} size={16}>
           <Text type="secondary">
             คุณสามารถอัปโหลดไฟล์เพิ่มเติมได้ (เช่น แฟ้มสะสมผลงาน หรือเอกสารอื่น
             ๆ ที่เป็นประโยชน์)
