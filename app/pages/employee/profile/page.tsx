@@ -6,7 +6,9 @@ import {
   CloseCircleFilled,
   EditOutlined,
   EnvironmentOutlined,
+  EyeOutlined,
   LinkOutlined,
+  LockOutlined,
   MailOutlined,
   PlayCircleOutlined,
   UserOutlined,
@@ -17,11 +19,11 @@ import {
   Button,
   Card,
   Col,
-  Divider,
   Flex,
   Form,
   Layout,
   Progress,
+  Radio,
   Row,
   Space,
   Tag,
@@ -411,64 +413,48 @@ export default function EmployeeProfilePage() {
               {/* RIGHT COLUMN: Sidebar */}
               <Col span={8} style={{ paddingTop: 40 }}>
                 <Flex vertical gap={32} style={{ position: "sticky", top: 24 }}>
-                  {/* Profile Visibility */}
-                  <Flex vertical gap={8} style={{ cursor: "pointer" }}>
-                    <Row justify="space-between" align="middle">
-                      <Text strong style={{ fontSize: 16 }}>
+                  {/* การมองเห็นโปรไฟล์ */}
+                  <Card
+                    styles={{ body: { padding: 20 } }}
+                    style={{ borderColor: token.colorBorderSecondary }}
+                  >
+                    <Flex vertical gap={12}>
+                      <Text strong style={{ fontSize: 15 }}>
                         การมองเห็นโปรไฟล์
                       </Text>
-                      <LinkOutlined
-                        style={{ color: token.colorTextDescription }}
-                      />
-                    </Row>
-                    <Text type="secondary">ระดับเริ่มต้น</Text>
-                    <Divider style={{ margin: "24px 0 0 0" }} />
-                  </Flex>
-
-                  {/* Profile Activity */}
-                  <Flex vertical gap={8} style={{ cursor: "pointer" }}>
-                    <Row justify="space-between" align="middle">
-                      <Text strong style={{ fontSize: 16 }}>
-                        ความเคลื่อนไหวโปรไฟล์
-                      </Text>
-                      <LinkOutlined
-                        style={{ color: token.colorTextDescription }}
-                      />
-                    </Row>
-                    <Text type="secondary">
-                      คุณปรากฏในการค้นหา <Text strong>109 ครั้ง</Text>{" "}
-                      สัปดาห์นี้
-                    </Text>
-                    <Divider style={{ margin: "24px 0 0 0" }} />
-                  </Flex>
-
-                  {/* Verifications */}
-                  <Flex vertical gap={16} style={{ cursor: "pointer" }}>
-                    <Row justify="space-between" align="middle">
-                      <Text strong style={{ fontSize: 16 }}>
-                        การยืนยันตัวตน
-                      </Text>
-                      <LinkOutlined
-                        style={{ color: token.colorTextDescription }}
-                      />
-                    </Row>
-                    <Text type="secondary" style={{ fontSize: 14 }}>
-                      โปรไฟล์ที่มีการยืนยันตัวตน
-                      มีโอกาสถูกเลือกโดยโรงเรียนมากกว่า
-                    </Text>
-                    <Button
-                      block
-                      style={{
-                        height: 40,
-                        borderColor: token.colorText,
-                        color: token.colorText,
-                        fontWeight: 600,
-                      }}
-                    >
-                      ยืนยันตัวตนเลย
-                    </Button>
-                    <Divider style={{ margin: "8px 0 0 0" }} />
-                  </Flex>
+                      <Radio.Group
+                        value={profile.profileVisibility ?? "public"}
+                        onChange={(e) =>
+                          setProfile({ ...profile, profileVisibility: e.target.value })
+                        }
+                      >
+                        <Flex vertical gap={12}>
+                          <Radio value="public">
+                            <Flex gap={6} align="center">
+                              <EyeOutlined style={{ color: token.colorSuccess }} />
+                              <Flex vertical gap={0}>
+                                <Text strong style={{ fontSize: 13 }}>เปิดสาธารณะ</Text>
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  โรงเรียนสามารถค้นหาและดูโปรไฟล์ของคุณได้
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Radio>
+                          <Radio value="apply_only">
+                            <Flex gap={6} align="center">
+                              <LockOutlined style={{ color: token.colorWarning }} />
+                              <Flex vertical gap={0}>
+                                <Text strong style={{ fontSize: 13 }}>เฉพาะเมื่อสมัครงาน</Text>
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  โรงเรียนจะเห็นโปรไฟล์เมื่อคุณสมัครตำแหน่งงาน
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Radio>
+                        </Flex>
+                      </Radio.Group>
+                    </Flex>
+                  </Card>
 
                   {/* Profile Strength */}
                   <Card>
@@ -502,38 +488,6 @@ export default function EmployeeProfilePage() {
                     </Button>
                   </Card>
 
-                  {/* Search promotion card */}
-                  <Card
-                    variant="borderless"
-                    style={{
-                      borderRadius: token.borderRadiusLG,
-                      borderColor: token.colorBorderSecondary,
-                    }}
-                    styles={{ body: { padding: 24, textAlign: "center" } }}
-                  >
-                    <Flex vertical gap={16} align="center">
-                      <Avatar.Group>
-                        <Avatar
-                          icon={<UserOutlined />}
-                          style={{ backgroundColor: token.colorError }}
-                        />
-                        <Avatar
-                          icon={<UserOutlined />}
-                          style={{ backgroundColor: token.colorInfo }}
-                        />
-                        <Avatar
-                          icon={<UserOutlined />}
-                          style={{ backgroundColor: token.colorWarning }}
-                        />
-                      </Avatar.Group>
-                      <Text strong style={{ fontSize: 16 }}>
-                        ค้นหาคุณครูท่านอื่น
-                      </Text>
-                      <Text type="secondary" style={{ fontSize: 13 }}>
-                        ค้นหาคุณครูที่เปิดโปรไฟล์เป็นสาธารณะเพื่อแลกเปลี่ยนเทคนิค
-                      </Text>
-                    </Flex>
-                  </Card>
                 </Flex>
               </Col>
             </Row>

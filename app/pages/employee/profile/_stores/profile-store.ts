@@ -91,6 +91,9 @@ interface EmployeeProfile {
   preferredProvinces: string[];
   canRelocate: boolean;
 
+  // การมองเห็นโปรไฟล์
+  profileVisibility: "public" | "apply_only";
+
   // Other
   resumeFile?: File;
   resumeUrl?: string;
@@ -163,6 +166,7 @@ const initialProfile: Partial<EmployeeProfile> = {
   specialActivities: "",
   preferredProvinces: [],
   canRelocate: false,
+  profileVisibility: "public",
   resumeUrl: "",
   workExperiences: [],
   educations: [],
