@@ -24,6 +24,7 @@ import {
 } from "antd";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useApplicantDrawerStore } from "../_state/applicant-drawer-store";
 import { useJobReadStore, type JobRecord } from "../_state/job-read-store";
 
 const { Text } = Typography;
@@ -33,6 +34,7 @@ const PRIMARY = "#11b6f5";
 // ตารางประกาศรับสมัครครู — ข้อมูลครบถ้วนสำหรับฝ่ายบุคลากร
 export const JobsTable = () => {
   const { jobs, searchKeyword, activeTab } = useJobReadStore();
+  const { openDrawer } = useApplicantDrawerStore();
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -161,7 +163,13 @@ export const JobsTable = () => {
       render: (_: unknown, record: JobRecord) => (
         <Space size={6}>
           <Tooltip title="ดูผู้สมัครทั้งหมด">
-            <Button icon={<UserAddOutlined />} type="primary" ghost size="small" />
+            <Button
+              icon={<UserAddOutlined />}
+              type="primary"
+              ghost
+              size="small"
+              onClick={() => openDrawer(record.key, record.title)}
+            />
           </Tooltip>
           <Tooltip title="แก้ไขประกาศ">
             <Link href={`/pages/employer/job/post/${record.key}`}>

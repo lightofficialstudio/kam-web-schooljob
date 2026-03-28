@@ -3,6 +3,7 @@
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { Badge, Breadcrumb, Button, Flex, Layout, Typography } from "antd";
 import Link from "next/link";
+import { ApplicantDrawer } from "./_components/applicant-drawer";
 import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
 import { JobsTable } from "./_components/jobs-table";
@@ -134,6 +135,9 @@ export default function MyJobsPage() {
           <JobsTable />
         </Flex>
       </Content>
+
+      {/* Drawer แสดงรายชื่อผู้สมัครของตำแหน่งที่เลือก */}
+      <ApplicantDrawer />
     </Layout>
   );
 }
