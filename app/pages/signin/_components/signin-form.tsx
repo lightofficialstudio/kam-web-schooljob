@@ -12,8 +12,10 @@ import {
   Input,
   Space,
   Typography,
-  theme as antTheme,
 } from "antd";
+
+// ใช้ค่าคงที่แทน PRIMARY เพื่อป้องกัน SSR/Client hydration mismatch
+const PRIMARY = "#11b6f5";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { requestSignin } from "../_api/signin-api";
@@ -26,7 +28,6 @@ export const SigninForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
-  const { token } = antTheme.useToken();
   const { setUser } = useAuthStore();
   const { isLoading, modal, setLoading, showModal, hideModal } = useSigninStore();
 
@@ -111,7 +112,7 @@ export const SigninForm = () => {
               rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}
             >
               <Input
-                prefix={<MailOutlined style={{ color: token.colorPrimary }} />}
+                prefix={<MailOutlined style={{ color: PRIMARY }} />}
                 placeholder="example@email.com"
               />
             </Form.Item>
@@ -122,7 +123,7 @@ export const SigninForm = () => {
               rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}
             >
               <Input.Password
-                prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                prefix={<LockOutlined style={{ color: PRIMARY }} />}
                 placeholder="รหัสผ่านของคุณ"
               />
             </Form.Item>
@@ -130,7 +131,7 @@ export const SigninForm = () => {
             <Flex justify="flex-end" style={{ marginTop: -16, marginBottom: 12 }}>
               <Link
                 href="/pages/forgot-password"
-                style={{ fontSize: 13, color: token.colorPrimary, fontWeight: 500 }}
+                style={{ fontSize: 13, color: PRIMARY, fontWeight: 500 }}
               >
                 ลืมรหัสผ่าน?
               </Link>
@@ -148,7 +149,7 @@ export const SigninForm = () => {
                   borderRadius: 10,
                   fontWeight: 700,
                   fontSize: 15,
-                  boxShadow: `0 6px 20px ${token.colorPrimary}40`,
+                  boxShadow: `0 6px 20px ${PRIMARY}40`,
                 }}
               >
                 เข้าสู่ระบบ
@@ -166,7 +167,7 @@ export const SigninForm = () => {
                 <Text type="secondary" style={{ fontSize: 14 }}>ยังไม่มีบัญชี?</Text>
                 <Link
                   href="/pages/signup"
-                  style={{ fontWeight: 700, color: token.colorPrimary, fontSize: 14 }}
+                  style={{ fontWeight: 700, color: PRIMARY, fontSize: 14 }}
                 >
                   สมัครสมาชิกฟรี
                 </Link>
