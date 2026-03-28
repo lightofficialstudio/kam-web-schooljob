@@ -29,7 +29,7 @@ import {
   theme as antTheme,
 } from "antd";
 import React, { useState } from "react";
-import { EducationEntry, useProfileStore } from "../stores/profile-store";
+import { EducationEntry, useProfileStore } from "../_stores/profile-store";
 
 const { Title, Text } = Typography;
 

@@ -30,7 +30,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import React, { useState } from "react";
-import { WorkExperienceEntry, useProfileStore } from "../stores/profile-store";
+import { WorkExperienceEntry, useProfileStore } from "../_stores/profile-store";
 
 const { Title, Text, Paragraph } = Typography;
 

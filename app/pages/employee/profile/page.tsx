@@ -39,8 +39,8 @@ import {
   SkillsLocationSection,
   TeachingInfoSection,
   WorkExperienceSection,
-} from "./components";
-import { useProfileStore } from "./stores/profile-store";
+} from "./_components";
+import { useProfileStore } from "./_stores/profile-store";
 
 const { Title, Text, Link } = Typography;
 const { Content } = Layout;
