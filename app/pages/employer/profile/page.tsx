@@ -37,12 +37,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { ProfileEditDrawer } from "./components/profile-edit-drawer";
-import { StatisticItem } from "./components/statistic-item";
+import { ProfileEditDrawer } from "./_components/profile-edit-drawer";
+import { StatisticItem } from "./_components/statistic-item";
 import {
   SchoolProfile,
   useSchoolProfileStore,
-} from "./stores/school-profile-store";
+} from "./_stores/school-profile-store";
 
 const { Title, Text, Paragraph } = Typography;
 

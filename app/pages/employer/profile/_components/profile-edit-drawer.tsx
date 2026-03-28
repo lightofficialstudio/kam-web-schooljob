@@ -17,7 +17,7 @@ import React from "react";
 import {
   SchoolProfile,
   useSchoolProfileStore,
-} from "../stores/school-profile-store";
+} from "../_stores/school-profile-store";
 
 const { Title } = Typography;
 
