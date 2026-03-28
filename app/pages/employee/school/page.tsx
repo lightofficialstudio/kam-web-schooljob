@@ -11,10 +11,10 @@ import {
   Typography,
   theme as antTheme,
 } from "antd";
-import { SchoolCard } from "./components/school-card";
-import { SchoolJobsDrawer } from "./components/school-jobs-drawer";
-import { SchoolSearch } from "./components/school-search";
-import { useSchoolStore } from "./stores/school-store";
+import { SchoolCard } from "./_components/school-card";
+import { SchoolJobsDrawer } from "./_components/school-jobs-drawer";
+import { SchoolSearch } from "./_components/school-search";
+import { useSchoolStore } from "./_stores/school-store";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;

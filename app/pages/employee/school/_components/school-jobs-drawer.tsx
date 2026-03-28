@@ -19,7 +19,7 @@ import {
   Typography,
   theme as antTheme,
 } from "antd";
-import { useSchoolStore } from "../stores/school-store";
+import { useSchoolStore } from "../_stores/school-store";
 
 const { Title, Text } = Typography;
 
