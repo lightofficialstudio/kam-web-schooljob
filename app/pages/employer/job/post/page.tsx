@@ -1,40 +1,37 @@
 "use client";
 
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import {
-  ArrowLeftOutlined,
-  DollarOutlined,
-  EnvironmentOutlined,
-  FileTextOutlined,
-  ThunderboltOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import {
-  Alert,
-  Badge,
   Breadcrumb,
   Button,
-  Card,
   Col,
+  Flex,
   Form,
-  Input,
-  InputNumber,
+  Layout,
   Row,
-  Select,
   Space,
-  Switch,
   Typography,
+  theme as antTheme,
 } from "antd";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { BasicInfoSection } from "./_components/basic-info-section";
+import { JobDetailSection } from "./_components/job-detail-section";
+import { JobTipsSidebar } from "./_components/job-tips-sidebar";
+import { LocationSection } from "./_components/location-section";
+import { PostSettingsSection } from "./_components/post-settings-section";
+import { SalarySection } from "./_components/salary-section";
+import { useJobPostStore } from "./_state/job-post-store";
 
-const { Title, Text, Paragraph } = Typography;
-const { Option } = Select;
+const { Title } = Typography;
+const { Content } = Layout;
 
-// Mock Data สำหรับงานที่ต้องการแก้ไข
-const MOCK_JOB_DATA = {
+// ข้อมูล Mock สำหรับทดสอบโหมดแก้ไข (จะแทนที่ด้วย API จริง)
+const MOCK_JOB_DATA: Record<string, Record<string, unknown>> = {
   "1": {
     title: "ครูสอนภาษาอังกฤษ (Full-time)",
+    employmentType: "FULL_TIME",
     vacancyCount: 2,
     subjects: ["ภาษาอังกฤษ", "Conversation"],
     grades: ["มัธยมต้น", "มัธยมปลาย"],
@@ -43,10 +40,13 @@ const MOCK_JOB_DATA = {
     salaryTo: 35000,
     description: "รับผิดชอบการสอนภาษาอังกฤษพื้นฐานและเพื่อการสื่อสาร...",
     educationLevel: "ปริญญาตรีขึ้นไป",
-    experience: "1-3 ปี",
-    license: "ต้องมี",
+    experience: "1 - 3 ปี",
+    license: "จำเป็นต้องมี",
     gender: "ไม่จำกัด",
     qualifications: "มีอัธยาศัยดี สอนสนุก รักเด็ก",
+    province: "กรุงเทพมหานคร",
+    area: "เขตบางนา",
+    address: "เลขที่ 123 ถ.บางนา กรุงเทพฯ",
     duration: 30,
     status: true,
   },
@@ -56,566 +56,112 @@ export default function PostJobPage() {
   const [form] = Form.useForm();
   const router = useRouter();
   const params = useParams();
-  const jobId = params?.id as string;
+  const { token } = antTheme.useToken();
+  const jobId = params?.id as string | undefined;
   const isEdit = !!jobId;
+  const { setSalaryType, setSubmitting, isSubmitting } = useJobPostStore();
 
-  const [salaryType, setSalaryType] = useState("SPECIFY");
-
+  // โหลดข้อมูลงานที่ต้องการแก้ไข
   useEffect(() => {
-    if (isEdit && MOCK_JOB_DATA[jobId as keyof typeof MOCK_JOB_DATA]) {
-      const data = MOCK_JOB_DATA[jobId as keyof typeof MOCK_JOB_DATA];
+    if (isEdit && MOCK_JOB_DATA[jobId]) {
+      const data = MOCK_JOB_DATA[jobId];
       form.setFieldsValue(data);
-      setSalaryType(data.salary_type);
+      setSalaryType(data.salary_type as string);
     }
-  }, [isEdit, jobId, form]);
+  }, [isEdit, jobId, form, setSalaryType]);
 
-  const onFinish = (values: any) => {
-    console.log(isEdit ? "Updating Job:" : "Creating Job:", values);
-    // TODO: Connect with API (POST if !isEdit, PATCH if isEdit)
+  // บันทึกข้อมูลเมื่อกด Submit
+  const onFinish = async (values: Record<string, unknown>) => {
+    setSubmitting(true);
+    try {
+      console.log(isEdit ? "✨ Updating Job:" : "✨ Creating Job:", values);
+      // TODO: เชื่อมต่อ API → requestUpdateJob(jobId, values) | requestCreateJob(values)
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div
+    <Layout
       style={{
         minHeight: "100vh",
-
-        paddingBottom: "100px",
+        backgroundColor: token.colorBgLayout,
+        paddingBottom: 100,
       }}
     >
-      {/* 1. Header & Navigation */}
-      <div
+      {/* Header Navigation */}
+      <Flex
+        vertical
         style={{
-          padding: "16px 0",
-
-          marginBottom: "40px",
+          backgroundColor: token.colorBgContainer,
+          padding: "16px 0 24px",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          marginBottom: 40,
         }}
       >
-        <div
-          style={{ maxWidth: "1152px", margin: "0 auto", padding: "0 24px" }}
+        <Flex
+          vertical
+          gap={16}
+          style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px", width: "100%" }}
         >
           <Breadcrumb
             items={[
-              { title: <Link href="/pages/admin">แดชบอร์ด</Link> },
-              { title: "งานของฉัน" },
+              { title: <Link href="/pages/employer">แดชบอร์ด</Link> },
+              { title: <Link href="/pages/employer/job/read">งานของฉัน</Link> },
               { title: isEdit ? "แก้ไขประกาศงาน" : "ลงประกาศงานใหม่" },
             ]}
           />
-          <div
-            style={{
-              marginTop: "16px",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
-            <Button
-              type="text"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => router.back()}
-            />
+          <Flex align="center" gap={12}>
+            <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} />
             <Title level={2} style={{ margin: 0 }}>
               {isEdit ? "แก้ไขประกาศงาน" : "ลงประกาศงานใหม่"} (School Board)
             </Title>
-          </div>
-        </div>
-      </div>
+          </Flex>
+        </Flex>
+      </Flex>
 
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 24px" }}>
-        <Row gutter={40}>
-          <Col xs={24} lg={16}>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              initialValues={{
-                vacancyCount: 1,
-                salary_type: "SPECIFY",
-                duration: 30,
-                status: true,
-              }}
-              scrollToFirstError
-            >
-              <Space orientation="vertical" size={24} style={{ width: "100%" }}>
-                {/* SECTION 1: ข้อมูลตำแหน่งงาน */}
-                <Card
-                  title={
-                    <Space>
-                      <ThunderboltOutlined style={{ color: "#11b6f5" }} />{" "}
-                      ข้อมูลตำแหน่งงาน
-                    </Space>
-                  }
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Row gutter={16}>
-                    <Col span={16}>
-                      <Form.Item
-                        label="ตำแหน่งงาน"
-                        name="title"
-                        rules={[
-                          { required: true, message: "กรุณาระบุตำแหน่งงาน" },
-                        ]}
-                        tooltip="เช่น ครูภาษาอังกฤษ, ครูสอนศิลปะ"
-                      >
-                        <Input size="large" placeholder="ระบุตำแหน่งงาน" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      <Form.Item
-                        label="รูปแบบงาน"
-                        name="employmentType"
-                        rules={[
-                          { required: true, message: "กรุณาเลือกรูปแบบงาน" },
-                        ]}
-                      >
-                        <Select size="large" placeholder="เลือกรูปแบบงาน">
-                          <Option value="FULL_TIME">
-                            งานเต็มเวลา (Full-time)
-                          </Option>
-                          <Option value="PART_TIME">
-                            งานพาร์ทไทม์ (Part-time)
-                          </Option>
-                          <Option value="CONTRACT">สัญญาจ้าง</Option>
-                          <Option value="INTERNSHIP">ฝึกงาน</Option>
-                          <Option value="STUDENT_TEACHER">
-                            นักศึกษาฝึกสอน
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row gutter={16}>
-                    <Col span={8}>
-                      <Form.Item
-                        label="จำนวนที่รับ (คน)"
-                        name="vacancyCount"
-                        rules={[
-                          { required: true, message: "กรุณาระบุจำนวนที่รับ" },
-                        ]}
-                      >
-                        <InputNumber
-                          size="large"
-                          min={1}
-                          style={{ width: "100%" }}
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={16}>
-                      <Form.Item
-                        label="วิชาที่สอน"
-                        name="subjects"
-                        rules={[
-                          { required: true, message: "กรุณาเลือกวิชาที่สอน" },
-                        ]}
-                      >
-                        <Select
-                          mode="tags"
-                          size="large"
-                          placeholder="เลือกหรือพิมพ์วิชาที่สอน"
-                          style={{ width: "100%" }}
-                        >
-                          <Option value="ภาษาอังกฤษ">ภาษาอังกฤษ</Option>
-                          <Option value="คณิตศาสตร์">คณิตศาสตร์</Option>
-                          <Option value="วิทยาศาสตร์">วิทยาศาสตร์</Option>
-                          <Option value="ไทย">ภาษาไทย</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                      <Form.Item
-                        label="ระดับชั้นที่สอน"
-                        name="grades"
-                        rules={[
-                          { required: true, message: "กรุณาเลือกระดับชั้น" },
-                        ]}
-                      >
-                        <Select
-                          mode="multiple"
-                          size="large"
-                          placeholder="เลือกระดับชั้น"
-                          style={{ width: "100%" }}
-                        >
-                          <Option value="อนุบาล">อนุบาล</Option>
-                          <Option value="ประถมศึกษา">ประถมศึกษา</Option>
-                          <Option value="มัธยมต้น">มัธยมต้น</Option>
-                          <Option value="มัธยมปลาย">มัธยมปลาย</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Card>
-
-                {/* SECTION 2: เงินเดือน */}
-                <Card
-                  title={
-                    <Space>
-                      <DollarOutlined style={{ color: "#52c41a" }} />{" "}
-                      ข้อมูลเงินเดือน
-                    </Space>
-                  }
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Row gutter={16}>
-                    <Col span={24}>
-                      <Form.Item
-                        label="รูปแบบเงินเดือน"
-                        name="salary_type"
-                        rules={[{ required: true }]}
-                      >
-                        <Select
-                          size="large"
-                          onChange={(val) => setSalaryType(val)}
-                        >
-                          <Option value="NOT_SPECIFIED">ไม่ระบุ</Option>
-                          <Option value="NEGOTIABLE">ตามประสบการณ์</Option>
-                          <Option value="SPECIFY">ระบุเงินเดือน</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    {salaryType === "SPECIFY" && (
-                      <>
-                        <Col span={12}>
-                          <Form.Item
-                            label="เงินเดือนเริ่มต้น (บาท)"
-                            name="salaryFrom"
-                            rules={[
-                              {
-                                required: salaryType === "SPECIFY",
-                                message: "กรุณาระบุเงินเดือนเริ่มต้น",
-                              },
-                            ]}
-                          >
-                            <InputNumber
-                              size="large"
-                              formatter={(value) =>
-                                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                              }
-                              style={{ width: "100%" }}
-                              placeholder="เช่น 15,000"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                          <Form.Item
-                            label="เงินเดือนสูงสุด (บาท)"
-                            name="salaryTo"
-                          >
-                            <InputNumber
-                              size="large"
-                              formatter={(value) =>
-                                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                              }
-                              style={{ width: "100%" }}
-                              placeholder="เช่น 25,000"
-                            />
-                          </Form.Item>
-                        </Col>
-                      </>
-                    )}
-                  </Row>
-                </Card>
-
-                {/* SECTION 3: รายละเอียดงาน */}
-                <Card
-                  title={
-                    <Space>
-                      <FileTextOutlined style={{ color: "#faad14" }} />{" "}
-                      รายละเอียดงาน
-                    </Space>
-                  }
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Form.Item
-                    label="รายละเอียดความรับผิดชอบ"
-                    name="description"
-                    rules={[
-                      { required: true, message: "กรุณาระบุรายละเอียดงาน" },
-                    ]}
-                  >
-                    <Input.TextArea
-                      rows={6}
-                      placeholder="รายละเอียดหน้าที่ความรับผิดชอบ และเนื้องานเบื้องต้น..."
-                    />
-                  </Form.Item>
-                </Card>
-
-                {/* SECTION 4: เงื่อนไขผู้สมัคร */}
-                <Card
-                  title={
-                    <Space>
-                      <UserOutlined style={{ color: "#eb2f96" }} />{" "}
-                      เงื่อนไขผู้สมัคร
-                    </Space>
-                  }
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item label="ระดับการศึกษา" name="educationLevel">
-                        <Select size="large" placeholder="เลือกวุฒิการศึกษา">
-                          <Option value="ไม่กำหนด">ไม่กำหนด</Option>
-                          <Option value="ปริญญาตรีขึ้นไป">
-                            ปริญญาตรีขึ้นไป
-                          </Option>
-                          <Option value="ปริญญาโทขึ้นไป">ปริญญาโทขึ้นไป</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="ประสบการณ์สอน" name="experience">
-                        <Select size="large" placeholder="เลือกประสบการณ์">
-                          <Option value="ไม่จำกัด">ไม่จำกัด</Option>
-                          <Option value="ฝึกสอน">ฝึกสอน</Option>
-                          <Option value="น้อยกว่า 1 ปี">น้อยกว่า 1 ปี</Option>
-                          <Option value="1-3 ปี">1-3 ปี</Option>
-                          <Option value="3-5 ปี">3-5 ปี</Option>
-                          <Option value="5-10 ปี">5-10 ปี</Option>
-                          <Option value="มากกว่า 10 ปี">มากกว่า 10 ปี</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        label="ใบอนุญาตประกอบวิชาชีพครู"
-                        name="license"
-                      >
-                        <Select size="large" placeholder="เลือกเงื่อนไข">
-                          <Option value="ไม่จำเป็น">ไม่จำเป็น</Option>
-                          <Option value="ต้องมี">ต้องมี</Option>
-                          <Option value="ยินดีรับผู้ที่กำลังดำเนินการ">
-                            ยินดีรับผู้ที่กำลังดำเนินการ
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="เพศ" name="gender">
-                        <Select size="large">
-                          <Option value="ไม่จำกัด">ไม่จำกัด</Option>
-                          <Option value="ชาย">ชาย</Option>
-                          <Option value="หญิง">หญิง</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                      <Form.Item
-                        label="คุณสมบัติเพิ่มเติม"
-                        name="qualifications"
-                      >
-                        <Input.TextArea placeholder="ระบุรายละเอียดเพิ่มเติม เช่น มีอัธยาศัยดี สอนสนุก รักเด็ก" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Card>
-
-                {/* SECTION 5: สถานที่ทำงาน */}
-                <Card
-                  title={
-                    <Space>
-                      <EnvironmentOutlined style={{ color: "#ff4d4f" }} />{" "}
-                      สถานที่ทำงาน
-                    </Space>
-                  }
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Alert
-                    title="ข้อมูลสถานที่ทำงาน"
-                    description="ระบบจะดึงข้อมูลเริ่มต้นจาก School Profile ของคุณ หากสถาบันมีหลายสาขา คุณสามารถแก้ไขที่อยู่สำหรับประกาศนี้ได้โดยเฉพาะ"
-                    type="info"
-                    showIcon
-                    style={{ marginBottom: "24px" }}
-                  />
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        label="จังหวัด"
-                        name="province"
-                        rules={[
-                          { required: true, message: "กรุณาระบุจังหวัด" },
-                        ]}
-                      >
-                        <Input size="large" placeholder="ระบุจังหวัด" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        label="เขต/พื้นที่"
-                        name="area"
-                        rules={[
-                          { required: true, message: "กรุณาระบุเขต/พื้นที่" },
-                        ]}
-                      >
-                        <Input size="large" placeholder="ระบุเขต/พื้นที่" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                      <Form.Item
-                        label="ที่อยู่สถาบัน (ระบุสาขาถ้ามี)"
-                        name="address"
-                        rules={[
-                          { required: true, message: "กรุณาระบุที่อยู่" },
-                        ]}
-                      >
-                        <Input.TextArea
-                          rows={2}
-                          placeholder="เช่น เลขที่ 123 อาคารเรียนสีขาว ถ.พหลโยธิน แขวงลาดยาว (สาขาจตุจักร)"
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Card>
-
-                {/* SECTION 6: เงื่อนไขประกาศ */}
-                <Card
-                  variant="borderless"
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Row gutter={16} align="middle">
-                    <Col span={12}>
-                      <Form.Item
-                        label="ระยะเวลาประกาศ"
-                        name="duration"
-                        rules={[{ required: true }]}
-                      >
-                        <Select size="large">
-                          <Option value={30}>30 วัน</Option>
-                          <Option value={60}>60 วัน</Option>
-                          <Option value={90}>90 วัน</Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item
-                        label="สถานะประกาศ"
-                        name="status"
-                        valuePropName="checked"
-                      >
-                        <Space size={12}>
-                          <Switch defaultChecked />
-                          <Text type="secondary">เปิด / ปิด การรับสมัคร</Text>
-                        </Space>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Card>
-
-                {/* Action Buttons */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "16px",
-                    marginTop: "24px",
-                  }}
-                >
-                  <Button
-                    size="large"
-                    style={{ minWidth: "120px", borderRadius: "8px" }}
-                  >
-                    ยกเลิก
-                  </Button>
-                  <Button
-                    type="primary"
-                    size="large"
-                    htmlType="submit"
-                    style={{
-                      minWidth: "200px",
-                      borderRadius: "8px",
-                      backgroundColor: "#e60278",
-                      borderColor: "#e60278",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {isEdit ? "บันทึกการแก้ไข" : "ยืนยันการลงประกาศงาน"}
-                  </Button>
-                </div>
-              </Space>
-            </Form>
-          </Col>
-
-          {/* ✨ Sidebar for UI Decoration & Tips */}
-          <Col xs={0} lg={8}>
-            <div style={{ position: "sticky", top: "120px" }}>
-              <Card
-                variant="borderless"
-                style={{
-                  borderRadius: "24px",
-                  background:
-                    "linear-gradient(135deg, #001e45 0%, #003370 100%)",
-                  color: "white",
-                  overflow: "hidden",
-                  marginBottom: "24px",
-                }}
-              >
-                <div style={{ padding: "10px" }}>
-                  <Title
-                    level={4}
-                    style={{ color: "white", marginBottom: "8px" }}
-                  >
-                    มาสร้างประกาศงานที่น่าสนใจกันเถอะ! 🚀
-                  </Title>
-                  <Paragraph
-                    style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}
-                  >
-                    การระบุรายละเอียดวิชาและระดับชั้นที่ชัดเจน
-                    จะช่วยให้คุณพบครูที่ตรงใจได้เร็วขึ้นถึง 2 เท่า
-                  </Paragraph>
-                  <img
-                    src="https://illustrations.popsy.co/amber/launching-soon.svg"
-                    alt="Success Illustration"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      marginTop: "20px",
-                      display: "block",
-                    }}
-                  />
-                </div>
-              </Card>
-
-              <Card variant="borderless" style={{ borderRadius: "24px" }}>
-                <Space orientation="vertical" size={16}>
-                  <Text strong>ทำไมต้องลงประกาศกับเรา?</Text>
-                  <Space align="start">
-                    <Badge status="success" />
-                    <Text type="secondary" style={{ fontSize: "14px" }}>
-                      เข้าถึงเครือข่ายครูคุณภาพทั่วประเทศ
-                    </Text>
-                  </Space>
-                  <Space align="start">
-                    <Badge status="success" />
-                    <Text type="secondary" style={{ fontSize: "14px" }}>
-                      ระบบคัดกรองผู้สมัครอัตโนมัติ
-                    </Text>
-                  </Space>
+      {/* Main Content */}
+      <Content>
+        <Flex style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            initialValues={{ vacancyCount: 1, salary_type: "SPECIFY", duration: 30, status: true }}
+            scrollToFirstError
+            style={{ width: "100%" }}
+          >
+            <Row gutter={40}>
+              <Col xs={24} lg={16}>
+                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                  <BasicInfoSection />
+                  <SalarySection />
+                  <JobDetailSection />
+                  <LocationSection />
+                  <PostSettingsSection />
+                  <Flex justify="flex-end" gap={16} style={{ marginTop: 8 }}>
+                    <Button size="large" style={{ minWidth: 120 }} onClick={() => router.back()}>
+                      ยกเลิก
+                    </Button>
+                    <Button
+                      type="primary"
+                      size="large"
+                      htmlType="submit"
+                      loading={isSubmitting}
+                      style={{ minWidth: 200, fontWeight: 600 }}
+                    >
+                      {isEdit ? "บันทึกการแก้ไข" : "ยืนยันการลงประกาศงาน"}
+                    </Button>
+                  </Flex>
                 </Space>
-              </Card>
-            </div>
-          </Col>
-        </Row>
-      </div>
-    </div>
+              </Col>
+              <Col xs={0} lg={8}>
+                <JobTipsSidebar isEdit={isEdit} />
+              </Col>
+            </Row>
+          </Form>
+        </Flex>
+      </Content>
+    </Layout>
   );
 }

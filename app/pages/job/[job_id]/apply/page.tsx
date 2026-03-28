@@ -12,21 +12,16 @@ import {
   theme as antTheme,
 } from "antd";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 import DocumentSection from "./_components/document-section";
 import JobSummary from "./_components/job-summary";
 import UserProfileCard from "./_components/user-profile-card";
-import { useApplyStore } from "./_stores/apply-store";
+import { useApplyStore } from "./_state/apply-store";
 
 const { Text } = Typography;
 
 export default function JobApplyPage() {
   const { token } = antTheme.useToken();
-  const params = useParams();
-  const router = useRouter();
-  const { currentStep, setCurrentStep } = useApplyStore();
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const { isConfirmModalOpen, setIsConfirmModalOpen } = useApplyStore();
 
   const jobInfo = {
     title: "ครูสอนภาษาอังกฤษ (English Teacher)",
@@ -41,7 +36,6 @@ export default function JobApplyPage() {
   const handleConfirmSubmit = () => {
     // TODO: Process API
     setIsConfirmModalOpen(false);
-    // router.push("/pages/job/apply-success");
   };
 
   return (

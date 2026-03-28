@@ -1,0 +1,210 @@
+"use client";
+
+import {
+  GlobalOutlined,
+  SearchOutlined,
+  SolutionOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Cascader,
+  Col,
+  Divider,
+  Flex,
+  Input,
+  Layout,
+  Row,
+  Select,
+  Typography,
+  theme as antTheme,
+} from "antd";
+import { useJobSearchStore } from "../_state/job-search-store";
+
+const { Text } = Typography;
+const { Option } = Select;
+
+const JOB_CATEGORIES = [
+  {
+    value: "academic",
+    label: "การสอน / วิชาการ",
+    children: [
+      { value: "math", label: "ครูคณิตศาสตร์" },
+      { value: "english", label: "ครูภาษาอังกฤษ" },
+      { value: "thai", label: "ครูภาษาไทย" },
+      { value: "science", label: "ครูวิทยาศาสตร์" },
+      { value: "early-childhood", label: "ครูปฐมวัย" },
+    ],
+  },
+  {
+    value: "support",
+    label: "ธุรการ / สนับสนุน",
+    children: [
+      { value: "admin", label: "ธุรการโรงเรียน" },
+      { value: "hr", label: "ฝ่ายบุคคล (HR)" },
+      { value: "finance", label: "การเงิน / บัญชี" },
+      { value: "it-support", label: "IT Support" },
+    ],
+  },
+  {
+    value: "construction",
+    label: "งานก่อสร้างสถาปัตยกรรม",
+    children: [
+      { value: "const-tech", label: "งานช่างก่อสร้าง/อาคาร" },
+      { value: "proj-mgmt", label: "งานบริหารโครงการ" },
+      { value: "arch", label: "งานสถาปนิก" },
+    ],
+  },
+];
+
+// ส่วนค้นหางานหลัก: keyword, ประเภทงาน, จังหวัด และ filters ขั้นสูง
+export const SearchFilterSection = () => {
+  const { token } = antTheme.useToken();
+  const { filters, setFilters, resetFilters } = useJobSearchStore();
+
+  return (
+    <Layout.Header
+      style={{
+        backgroundColor: token.colorPrimary,
+        height: "auto",
+        padding: "40px 0",
+      }}
+    >
+      <Row justify="center">
+        <Col span={24} style={{ maxWidth: 1200, padding: "0 24px" }}>
+          <Card
+            styles={{ body: { padding: 32 } }}
+            style={{
+              borderRadius: token.borderRadiusLG * 2,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              backgroundColor: token.colorBgContainer,
+              boxShadow: token.boxShadowSecondary,
+            }}
+          >
+            <Row gutter={[20, 20]} align="middle">
+              {/* Keyword Search */}
+              <Col xs={24} lg={8}>
+                <Flex vertical gap={8}>
+                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                    ค้นหางานที่คุณสนใจ
+                  </Text>
+                  <Input
+                    prefix={<SearchOutlined style={{ color: token.colorPrimary }} />}
+                    placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
+                    value={filters.keyword}
+                    onChange={(e) => setFilters({ keyword: e.target.value })}
+                    size="large"
+                    style={{ height: 52, fontSize: 15 }}
+                  />
+                </Flex>
+              </Col>
+
+              {/* Job Categories */}
+              <Col xs={24} lg={9}>
+                <Flex vertical gap={8}>
+                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                    ประเภทงาน
+                  </Text>
+                  <Cascader
+                    options={JOB_CATEGORIES}
+                    multiple
+                    maxTagCount={1}
+                    value={filters.category}
+                    onChange={(value) => setFilters({ category: value as string[][] })}
+                    placeholder="เลือกตำแหน่งที่สนใจ"
+                    style={{ width: "100%" }}
+                    size="large"
+                    showCheckedStrategy={Cascader.SHOW_CHILD}
+                    suffixIcon={<SolutionOutlined style={{ color: token.colorPrimary }} />}
+                  />
+                </Flex>
+              </Col>
+
+              {/* Location */}
+              <Col xs={24} lg={7}>
+                <Flex vertical gap={8}>
+                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                    สถานที่
+                  </Text>
+                  <Select
+                    placeholder="ทุกจังหวัด"
+                    style={{ width: "100%" }}
+                    size="large"
+                    value={filters.location}
+                    onChange={(value) => setFilters({ location: value })}
+                    suffixIcon={<GlobalOutlined style={{ color: token.colorPrimary }} />}
+                    allowClear
+                  >
+                    <Option value="bkk">กรุงเทพมหานคร</Option>
+                    <Option value="center">ภาคกลาง</Option>
+                    <Option value="north">ภาคเหนือ</Option>
+                    <Option value="east">ภาคตะวันออก</Option>
+                  </Select>
+                </Flex>
+              </Col>
+
+              {/* Advanced Filters */}
+              <Col span={24}>
+                <Divider style={{ margin: "8px 0 16px" }} />
+                <Row gutter={[16, 16]} align="middle">
+                  <Col xs={12} md={6}>
+                    <Select
+                      placeholder="รูปแบบการจ้างงาน"
+                      style={{ width: "100%" }}
+                      size="large"
+                      allowClear
+                      value={filters.employmentType}
+                      onChange={(value) => setFilters({ employmentType: value })}
+                    >
+                      <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
+                      <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
+                      <Option value="contract">สัญญาจ้าง / อัตราจ้าง</Option>
+                    </Select>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Select
+                      placeholder="ใบประกอบวิชาชีพ"
+                      style={{ width: "100%" }}
+                      size="large"
+                      allowClear
+                      value={filters.license}
+                      onChange={(value) => setFilters({ license: value })}
+                    >
+                      <Option value="required">ต้องมีใบประกอบฯ</Option>
+                      <Option value="not-required">ไม่ต้องมีใบประกอบฯ</Option>
+                      <Option value="pending">อยู่ระหว่างขอรับใบประกอบฯ</Option>
+                    </Select>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Select
+                      placeholder="ช่วงเงินเดือน"
+                      style={{ width: "100%" }}
+                      size="large"
+                      allowClear
+                      value={filters.salaryRange}
+                      onChange={(value) => setFilters({ salaryRange: value })}
+                    >
+                      <Option value="0-15000">ต่ำกว่า 15,000</Option>
+                      <Option value="15000-25000">15,000 - 25,000</Option>
+                      <Option value="25000-40000">25,000 - 40,000</Option>
+                      <Option value="40000+">40,000 ขึ้นไป</Option>
+                    </Select>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Button
+                      type="link"
+                      onClick={resetFilters}
+                      style={{ color: token.colorTextDescription, fontSize: 14 }}
+                    >
+                      รีเซ็ตเงื่อนไขทั้งหมด
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+    </Layout.Header>
+  );
+};
