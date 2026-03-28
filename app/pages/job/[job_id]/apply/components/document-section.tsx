@@ -36,7 +36,7 @@ export default function DocumentSection() {
 
   return (
     <Space
-      direction="vertical"
+      orientation="vertical"
       size={24}
       style={{ width: "100%", marginBottom: 40 }}
     >

@@ -90,7 +90,7 @@ export default function JobSeekerSection() {
                 styles={{ body: { padding: "24px" } }}
               >
                 <Space
-                  direction="vertical"
+                  orientation="vertical"
                   align="center"
                   style={{ width: "100%" }}
                   size={24}

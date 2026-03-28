@@ -6,7 +6,7 @@ import SignupForm from "./components/signup-form";
 export default function SignupPage() {
   return (
     <Space
-      direction="vertical"
+      orientation="vertical"
       align="center"
       style={{ width: "100%", minHeight: "100vh", padding: "40px 0" }}
     >

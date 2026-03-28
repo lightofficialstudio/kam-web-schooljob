@@ -60,7 +60,7 @@ export default function UserProfileCard() {
       />
 
       <Space
-        direction="vertical"
+        orientation="vertical"
         style={{ position: "relative", zIndex: 1, width: "100%" }}
       >
         <Title

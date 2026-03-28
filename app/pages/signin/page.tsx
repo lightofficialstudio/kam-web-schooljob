@@ -158,7 +158,7 @@ function SigninFormContent() {
           styles={{ body: { padding: 40 } }}
         >
           <Space
-            direction="vertical"
+            orientation="vertical"
             align="center"
             style={{ width: "100%", marginBottom: 32 }}
             size={16}

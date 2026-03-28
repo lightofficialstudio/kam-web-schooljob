@@ -211,7 +211,7 @@ export default function BlogDetailPage() {
                 <Col xs={0} lg={2}>
                   <Affix offsetTop={100}>
                     <Space
-                      direction="vertical"
+                      orientation="vertical"
                       size={16}
                       style={{ textAlign: "center", width: "100%" }}
                     >
@@ -291,7 +291,7 @@ export default function BlogDetailPage() {
                 {/* Sidebar (Right) */}
                 <Col xs={24} lg={7}>
                   <Space
-                    direction="vertical"
+                    orientation="vertical"
                     size={40}
                     style={{ width: "100%" }}
                   >

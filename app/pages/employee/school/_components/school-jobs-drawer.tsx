@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ClockCircleOutlined,
   DollarOutlined,
   EnvironmentOutlined,
   SendOutlined,
@@ -113,7 +112,10 @@ export const SchoolJobsDrawer = () => {
             align="center"
             style={{ marginBottom: 24 }}
           >
-            <Title level={5} style={{ margin: 0, fontSize: "18px", fontWeight: 600 }}>
+            <Title
+              level={5}
+              style={{ margin: 0, fontSize: "18px", fontWeight: 600 }}
+            >
               ตำแหน่งงานที่เปิดรับสมัคร
             </Title>
             <Tag

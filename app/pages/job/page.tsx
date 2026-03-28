@@ -687,7 +687,7 @@ function JobSearchPageContent() {
                         <Row gutter={24}>
                           <Col flex="auto">
                             <Space
-                              direction="vertical"
+                              orientation="vertical"
                               size={8}
                               style={{ width: "100%" }}
                             >

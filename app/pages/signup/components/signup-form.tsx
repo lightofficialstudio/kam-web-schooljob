@@ -162,7 +162,7 @@ export default function SignupForm() {
             }}
           >
             <Space
-              direction="vertical"
+              orientation="vertical"
               size={48}
               style={{ height: "100%", justifyContent: "center" }}
             >

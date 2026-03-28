@@ -186,7 +186,7 @@ export const WorkExperienceSection: React.FC = () => {
   };
 
   return (
-    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
       {/* 1. Add/Edit Drawer */}
       <Drawer
         open={isAddingNew}
@@ -352,7 +352,7 @@ export const WorkExperienceSection: React.FC = () => {
       </Drawer>
 
       {/* 2. รายการประวัติการทำงาน */}
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
         {workExperiences.length > 0 ? (
           workExperiences.map((experience, index) => (
             <Card

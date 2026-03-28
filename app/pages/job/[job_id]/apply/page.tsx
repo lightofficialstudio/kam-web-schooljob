@@ -113,7 +113,7 @@ export default function JobApplyPage() {
 
             {/* 4. Footer Action Button */}
             <Space
-              direction="horizontal"
+              orientation="horizontal"
               style={{
                 width: "100%",
                 justifyContent: "center",

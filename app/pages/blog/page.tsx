@@ -292,7 +292,7 @@ export default function BlogListPage() {
                     </Col>
                     <Col xs={24} md={12} style={{ padding: "48px" }}>
                       <Space
-                        direction="vertical"
+                        orientation="vertical"
                         size={32}
                         style={{
                           width: "100%",
@@ -434,7 +434,7 @@ export default function BlogListPage() {
                           }
                         >
                           <Space
-                            direction="vertical"
+                            orientation="vertical"
                             size={16}
                             style={{ flex: 1, width: "100%" }}
                           >
@@ -557,7 +557,7 @@ export default function BlogListPage() {
               <Row justify="center">
                 <Col xs={24} md={18} lg={14} style={{ textAlign: "center" }}>
                   <Space
-                    direction="vertical"
+                    orientation="vertical"
                     size={32}
                     style={{ width: "100%" }}
                   >
