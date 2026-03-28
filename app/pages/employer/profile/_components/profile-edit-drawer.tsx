@@ -16,8 +16,8 @@ import {
 import React from "react";
 import {
   SchoolProfile,
-  useSchoolProfileStore,
-} from "../_stores/school-profile-store";
+  useSchoolProfileState as useSchoolProfileStore,
+} from "../_state/school-profile.state";
 
 const { Title } = Typography;
 
