@@ -426,7 +426,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <Space direction="vertical" size={8} style={{ marginTop: "24px" }}>
+          <Space orientation="vertical" size={8} style={{ marginTop: "24px" }}>
             <Text type="secondary">ตำแหน่งยอดนิยม: </Text>
             <Space size={[8, 8]} wrap>
               {[
