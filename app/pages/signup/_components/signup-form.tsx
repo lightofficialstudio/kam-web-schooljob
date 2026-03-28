@@ -166,7 +166,7 @@ export const SignupForm = () => {
                         borderWidth: 2,
                       }}
                     >
-                      <Space direction="vertical" size={6}>
+                      <Space orientation="vertical" size={6}>
                         <UserOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
                         <Text strong style={{ fontSize: 14 }}>ครูผู้สอน</Text>
                       </Space>
@@ -188,7 +188,7 @@ export const SignupForm = () => {
                         borderWidth: 2,
                       }}
                     >
-                      <Space direction="vertical" size={6}>
+                      <Space orientation="vertical" size={6}>
                         <BankOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
                         <Text strong style={{ fontSize: 14 }}>สถานศึกษา</Text>
                       </Space>
