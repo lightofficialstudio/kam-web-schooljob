@@ -44,7 +44,9 @@ export const JobListSection = () => {
       <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
         <Col>
           <AntTitle level={4} style={{ margin: 0 }}>
-            {filters.keyword ? `ผลการค้นหาสำหรับ "${filters.keyword}"` : "งานที่แนะนำสำหรับคุณ"}
+            {filters.keyword
+              ? `ผลการค้นหาสำหรับ "${filters.keyword}"`
+              : "งานที่แนะนำสำหรับคุณ"}
           </AntTitle>
         </Col>
         <Col>
@@ -69,12 +71,22 @@ export const JobListSection = () => {
           paginatedJobs.map((job) => <JobCard key={job.id} job={job} />)
         ) : (
           <Card
-            style={{ textAlign: "center", padding: 40, borderRadius: token.borderRadiusLG }}
+            style={{
+              textAlign: "center",
+              padding: 40,
+              borderRadius: token.borderRadiusLG,
+            }}
           >
             <Flex vertical align="center" gap={12}>
-              <TeamOutlined style={{ fontSize: 48, color: token.colorTextQuaternary }} />
-              <AntTitle level={4} style={{ margin: 0 }}>ไม่พบงานที่ตรงตามเงื่อนไข</AntTitle>
-              <Text type="secondary">ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองใหม่อีกครั้ง</Text>
+              <TeamOutlined
+                style={{ fontSize: 48, color: token.colorTextQuaternary }}
+              />
+              <AntTitle level={4} style={{ margin: 0 }}>
+                ไม่พบงานที่ตรงตามเงื่อนไข
+              </AntTitle>
+              <Text type="secondary">
+                ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองใหม่อีกครั้ง
+              </Text>
             </Flex>
           </Card>
         )}

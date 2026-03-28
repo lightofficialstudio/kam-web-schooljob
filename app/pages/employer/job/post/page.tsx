@@ -102,7 +102,12 @@ export default function PostJobPage() {
         <Flex
           vertical
           gap={16}
-          style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px", width: "100%" }}
+          style={{
+            maxWidth: 1152,
+            margin: "0 auto",
+            padding: "0 24px",
+            width: "100%",
+          }}
         >
           <Breadcrumb
             items={[
@@ -112,7 +117,11 @@ export default function PostJobPage() {
             ]}
           />
           <Flex align="center" gap={12}>
-            <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => router.back()} />
+            <Button
+              type="text"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => router.back()}
+            />
             <Title level={2} style={{ margin: 0 }}>
               {isEdit ? "แก้ไขประกาศงาน" : "ลงประกาศงานใหม่"} (School Board)
             </Title>
@@ -127,20 +136,33 @@ export default function PostJobPage() {
             form={form}
             layout="vertical"
             onFinish={onFinish}
-            initialValues={{ vacancyCount: 1, salary_type: "SPECIFY", duration: 30, status: true }}
+            initialValues={{
+              vacancyCount: 1,
+              salary_type: "SPECIFY",
+              duration: 30,
+              status: true,
+            }}
             scrollToFirstError
             style={{ width: "100%" }}
           >
             <Row gutter={40}>
               <Col xs={24} lg={16}>
-                <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+                <Space
+                  orientation="vertical"
+                  size={24}
+                  style={{ width: "100%" }}
+                >
                   <BasicInfoSection />
                   <SalarySection />
                   <JobDetailSection />
                   <LocationSection />
                   <PostSettingsSection />
                   <Flex justify="flex-end" gap={16} style={{ marginTop: 8 }}>
-                    <Button size="large" style={{ minWidth: 120 }} onClick={() => router.back()}>
+                    <Button
+                      size="large"
+                      style={{ minWidth: 120 }}
+                      onClick={() => router.back()}
+                    >
                       ยกเลิก
                     </Button>
                     <Button

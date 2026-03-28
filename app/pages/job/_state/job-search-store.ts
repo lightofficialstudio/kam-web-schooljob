@@ -15,6 +15,7 @@ export interface Job {
   licenseRequired: string;
   gender: string;
   schoolName: string;
+  schoolType: string;
   province: string;
   address: string;
   postedAt: string;
@@ -27,8 +28,10 @@ export interface JobFilters {
   location: string | null;
   employmentType: string | null;
   license: string | null;
-  salaryRange: string | null;
+  salaryRange: [number, number];
   postedAt: string | null;
+  schoolType: string | null;
+  gradeLevel: string | null;
 }
 
 // Mock Data 10 รายการ — จะแทนที่ด้วย API จริง
@@ -48,6 +51,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "มีรับผู้ที่กำลังดำเนินการ",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนนานาชาติแสงทอง",
+    schoolType: "นานาชาติ",
     province: "กรุงเทพมหานคร",
     address: "เขตบางนา กรุงเทพฯ",
     postedAt: "2026-03-09T10:00:00Z",
@@ -66,6 +70,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "จำเป็นต้องมี",
     gender: "หญิง",
     schoolName: "โรงเรียนประถมวิทยา",
+    schoolType: "รัฐบาล",
     province: "นนทบุรี",
     address: "อ.เมือง นนทบุรี",
     postedAt: "2026-03-08T15:30:00Z",
@@ -86,6 +91,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "จำเป็นต้องมี",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนสาธิตเกษตร",
+    schoolType: "สาธิต",
     province: "กรุงเทพมหานคร",
     address: "เขตจตุจักร กรุงเทพฯ",
     postedAt: "2026-03-07T09:00:00Z",
@@ -106,6 +112,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ไม่จำเป็นต้องมี",
     gender: "หญิง",
     schoolName: "โรงเรียนอนุบาลรักลูก",
+    schoolType: "เอกชน",
     province: "ปทุมธานี",
     address: "คลองหลวง ปทุมธานี",
     postedAt: "2026-03-09T08:00:00Z",
@@ -126,6 +133,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนเทคโนวิทยา",
+    schoolType: "เอกชน",
     province: "สมุทรปราการ",
     address: "อ.เมือง สมุทรปราการ",
     postedAt: "2026-03-05T11:00:00Z",
@@ -144,6 +152,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนภาษาโลก",
+    schoolType: "เอกชน",
     province: "กรุงเทพมหานคร",
     address: "เขตสัมพันธวงศ์ กรุงเทพฯ",
     postedAt: "2026-03-09T14:00:00Z",
@@ -164,6 +173,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ไม่จำเป็นต้องมี",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนสร้างสรรค์วิทย์",
+    schoolType: "เอกชน",
     province: "เชียงใหม่",
     address: "อ.เมือง เชียงใหม่",
     postedAt: "2026-03-08T10:00:00Z",
@@ -184,6 +194,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "จำเป็นต้องมี",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนเก่งวิทยา",
+    schoolType: "รัฐบาล",
     province: "นครปฐม",
     address: "อ.พุทธมณฑล นครปฐม",
     postedAt: "2026-03-04T12:00:00Z",
@@ -204,6 +215,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
     gender: "ชาย",
     schoolName: "โรงเรียนกีฬาแห่งชาติ",
+    schoolType: "รัฐบาล",
     province: "ชลบุรี",
     address: "อ.เมือง ชลบุรี",
     postedAt: "2026-03-09T16:00:00Z",
@@ -222,6 +234,7 @@ const MOCK_JOBS: Job[] = [
     licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
     gender: "ไม่จำกัด",
     schoolName: "โรงเรียนศิลป์ดนตรี",
+    schoolType: "เอกชน",
     province: "กรุงเทพมหานคร",
     address: "เขตดุสิต กรุงเทพฯ",
     postedAt: "2026-03-06T13:00:00Z",
@@ -260,8 +273,10 @@ const DEFAULT_FILTERS: JobFilters = {
   location: null,
   employmentType: null,
   license: null,
-  salaryRange: null,
+  salaryRange: [0, 100000],
   postedAt: null,
+  schoolType: null,
+  gradeLevel: null,
 };
 
 export const useJobSearchStore = create<JobSearchState>((set, get) => ({
@@ -292,6 +307,7 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
   getFilteredJobs: () => {
     const { jobs, filters } = get();
     return jobs.filter((job) => {
+      // กรองด้วยคำค้นหา
       if (
         filters.keyword &&
         !job.title.toLowerCase().includes(filters.keyword.toLowerCase()) &&
@@ -299,24 +315,33 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
       ) {
         return false;
       }
+
+      // กรองด้วยพื้นที่
       if (filters.location) {
         const provinces = LOCATION_MAP[filters.location] || [filters.location];
         if (!provinces.includes(job.province)) return false;
       }
+
+      // กรองด้วยใบอนุญาตประกอบวิชาชีพ
       if (filters.license) {
         if (filters.license === "required" && job.licenseRequired !== "จำเป็นต้องมี") return false;
         if (filters.license === "not-required" && job.licenseRequired !== "ไม่จำเป็นต้องมี") return false;
       }
-      if (filters.salaryRange && job.salaryType === "ระบุเงินเดือน") {
-        const [min, max] = filters.salaryRange.split("-").map(Number);
+
+      // กรองด้วยช่วงเงินเดือน (Slider)
+      const [filterMin, filterMax] = filters.salaryRange;
+      if ((filterMin > 0 || filterMax < 100000) && job.salaryType === "ระบุเงินเดือน") {
         const sMin = job.salaryMin ?? 0;
-        const sMax = job.salaryMax ?? 0;
-        if (filters.salaryRange === "40000+") {
-          if (sMax < 40000) return false;
-        } else if (max && (sMin > max || sMax < min)) {
-          return false;
-        }
+        const sMax = job.salaryMax ?? Infinity;
+        if (sMax < filterMin || sMin > filterMax) return false;
       }
+
+      // กรองด้วยประเภทโรงเรียน
+      if (filters.schoolType && job.schoolType !== filters.schoolType) return false;
+
+      // กรองด้วยระดับชั้นที่สอน
+      if (filters.gradeLevel && !job.grades.includes(filters.gradeLevel)) return false;
+
       return true;
     });
   },

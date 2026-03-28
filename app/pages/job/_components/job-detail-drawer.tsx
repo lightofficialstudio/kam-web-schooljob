@@ -54,7 +54,11 @@ export const JobDetailDrawer = () => {
     >
       {selectedJob && (
         <Layout
-          style={{ position: "relative", minHeight: "100%", backgroundColor: token.colorBgContainer }}
+          style={{
+            position: "relative",
+            minHeight: "100%",
+            backgroundColor: token.colorBgContainer,
+          }}
         >
           {/* Sticky Action Bar */}
           <Layout.Header
@@ -69,8 +73,16 @@ export const JobDetailDrawer = () => {
             }}
           >
             <Flex justify="flex-end" align="center" gap={12}>
-              <Button type="text" icon={<ShareAltOutlined />} style={{ fontSize: 20 }} />
-              <Button type="text" icon={<MoreOutlined />} style={{ fontSize: 20 }} />
+              <Button
+                type="text"
+                icon={<ShareAltOutlined />}
+                style={{ fontSize: 20 }}
+              />
+              <Button
+                type="text"
+                icon={<MoreOutlined />}
+                style={{ fontSize: 20 }}
+              />
               <Divider orientation="vertical" />
               <Button
                 type="text"
@@ -93,8 +105,13 @@ export const JobDetailDrawer = () => {
             }}
           >
             <Flex vertical>
-              <Title level={2} style={{ color: token.colorWhite, margin: 0 }}>KEEP LEARNING</Title>
-              <Title level={4} style={{ color: token.colorWhite, opacity: 0.8, marginTop: 8 }}>
+              <Title level={2} style={{ color: token.colorWhite, margin: 0 }}>
+                KEEP LEARNING
+              </Title>
+              <Title
+                level={4}
+                style={{ color: token.colorWhite, opacity: 0.8, marginTop: 8 }}
+              >
                 AND CURIOUS ON
               </Title>
             </Flex>
@@ -121,18 +138,26 @@ export const JobDetailDrawer = () => {
                   />
                 </Col>
                 <Col flex="auto">
-                  <Title level={3} style={{ margin: 0 }}>{selectedJob.title}</Title>
+                  <Title level={3} style={{ margin: 0 }}>
+                    {selectedJob.title}
+                  </Title>
                   <Space size={8}>
-                    <Text strong style={{ fontSize: 16 }}>{selectedJob.schoolName}</Text>
+                    <Text strong style={{ fontSize: 16 }}>
+                      {selectedJob.schoolName}
+                    </Text>
                     <Badge status="success" />
-                    <Link href="#" style={{ color: "#11b6f5" }}>ดูงานทั้งหมดจากโรงเรียนนี้</Link>
+                    <Link href="#" style={{ color: "#11b6f5" }}>
+                      ดูงานทั้งหมดจากโรงเรียนนี้
+                    </Link>
                   </Space>
                 </Col>
               </Row>
 
               <Flex vertical gap={8} style={{ marginTop: 24 }}>
                 <Space size={12}>
-                  <EnvironmentOutlined style={{ color: token.colorTextSecondary }} />
+                  <EnvironmentOutlined
+                    style={{ color: token.colorTextSecondary }}
+                  />
                   <Text>{selectedJob.address}</Text>
                 </Space>
                 <Space size={12}>
@@ -140,11 +165,14 @@ export const JobDetailDrawer = () => {
                   <Text>ฝ่ายวิชาการ / {selectedJob.subjects.join(", ")}</Text>
                 </Space>
                 <Space size={12}>
-                  <ClockCircleOutlined style={{ color: token.colorTextSecondary }} />
+                  <ClockCircleOutlined
+                    style={{ color: token.colorTextSecondary }}
+                  />
                   <Text>งานเต็มเวลา</Text>
                 </Space>
                 <Text type="secondary" style={{ marginTop: 8 }}>
-                  โพสต์เมื่อ {dayjs(selectedJob.postedAt).fromNow()} • มีผู้สนใจสมัครจำนวนมาก
+                  โพสต์เมื่อ {dayjs(selectedJob.postedAt).fromNow()} •
+                  มีผู้สนใจสมัครจำนวนมาก
                 </Text>
               </Flex>
 
@@ -170,22 +198,56 @@ export const JobDetailDrawer = () => {
             {/* Roles & Responsibilities */}
             <Flex vertical style={{ marginTop: 40 }}>
               <Title level={4}>หน้าที่และความรับผิดชอบ:</Title>
-              <ul style={{ paddingLeft: 20, lineHeight: 2, color: token.colorText, fontSize: 15 }}>
-                <li><strong>จัดการเรียนการสอน:</strong> {selectedJob.description} ในระดับชั้น {selectedJob.grades.join(", ")}</li>
-                <li><strong>เตรียมแผนการจัดการเรียนรู้:</strong> ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ</li>
-                <li><strong>วัดและประเมินผล:</strong> ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน</li>
-                <li><strong>ให้คำปรึกษา:</strong> ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง</li>
-                <li>เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ</li>
+              <ul
+                style={{
+                  paddingLeft: 20,
+                  lineHeight: 2,
+                  color: token.colorText,
+                  fontSize: 15,
+                }}
+              >
+                <li>
+                  <strong>จัดการเรียนการสอน:</strong> {selectedJob.description}{" "}
+                  ในระดับชั้น {selectedJob.grades.join(", ")}
+                </li>
+                <li>
+                  <strong>เตรียมแผนการจัดการเรียนรู้:</strong>{" "}
+                  ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ
+                </li>
+                <li>
+                  <strong>วัดและประเมินผล:</strong>{" "}
+                  ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน
+                </li>
+                <li>
+                  <strong>ให้คำปรึกษา:</strong>{" "}
+                  ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง
+                </li>
+                <li>
+                  เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ
+                </li>
               </ul>
             </Flex>
 
             {/* Qualifications */}
             <Flex vertical style={{ marginTop: 40 }}>
               <Title level={4}>คุณสมบัติผู้สมัคร:</Title>
-              <ul style={{ paddingLeft: 20, lineHeight: 2, color: token.colorText, fontSize: 15 }}>
-                <li>วุฒิการศึกษระดับ {selectedJob.educationLevel} ในสาขาที่เกี่ยวข้อง</li>
+              <ul
+                style={{
+                  paddingLeft: 20,
+                  lineHeight: 2,
+                  color: token.colorText,
+                  fontSize: 15,
+                }}
+              >
+                <li>
+                  วุฒิการศึกษระดับ {selectedJob.educationLevel}{" "}
+                  ในสาขาที่เกี่ยวข้อง
+                </li>
                 <li>มีทักษะในการสื่อสารดีเยี่ยมและมีจิตวิทยาในการสอนเด็ก</li>
-                <li>หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired}) จะพิจารณาเป็นพิเศษ</li>
+                <li>
+                  หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired})
+                  จะพิจารณาเป็นพิเศษ
+                </li>
                 <li>มีประสบการณ์การสอน {selectedJob.teachingExperience}</li>
                 <li>สามารถทำงานร่วมกับผู้อื่นได้ดีและมีความรับผิดชอบสูง</li>
               </ul>
@@ -194,21 +256,40 @@ export const JobDetailDrawer = () => {
             {/* How You Match — แสดงเมื่อ Login แล้ว */}
             {user && (
               <Card
-                style={{ marginTop: 24, borderRadius: 12, border: `1px solid ${token.colorBorderSecondary}` }}
+                style={{
+                  marginTop: 24,
+                  borderRadius: 12,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                }}
                 styles={{ body: { padding: 24 } }}
               >
                 <Space size={8} style={{ marginBottom: 16 }}>
-                  <Title level={5} style={{ margin: 0 }}>ความเหมาะสมของคุณต่อตำแหน่งนี้</Title>
-                  <InfoCircleOutlined style={{ color: token.colorTextSecondary }} />
+                  <Title level={5} style={{ margin: 0 }}>
+                    ความเหมาะสมของคุณต่อตำแหน่งนี้
+                  </Title>
+                  <InfoCircleOutlined
+                    style={{ color: token.colorTextSecondary }}
+                  />
                 </Space>
-                <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+                <Text
+                  type="secondary"
+                  style={{ display: "block", marginBottom: 16 }}
+                >
                   2 ทักษะและคุณสมบัติของคุณตรงกับความต้องการของโรงเรียน
                 </Text>
                 <Space size={[8, 12]} wrap>
-                  <Tag icon={<CheckCircleFilled />} color="success" style={{ padding: "4px 12px", borderRadius: 16 }}>
+                  <Tag
+                    icon={<CheckCircleFilled />}
+                    color="success"
+                    style={{ padding: "4px 12px", borderRadius: 16 }}
+                  >
                     ประสบการณ์การสอน {selectedJob.teachingExperience}
                   </Tag>
-                  <Tag icon={<CheckCircleFilled />} color="success" style={{ padding: "4px 12px", borderRadius: 16 }}>
+                  <Tag
+                    icon={<CheckCircleFilled />}
+                    color="success"
+                    style={{ padding: "4px 12px", borderRadius: 16 }}
+                  >
                     วุฒิ {selectedJob.educationLevel}
                   </Tag>
                 </Space>
@@ -219,15 +300,26 @@ export const JobDetailDrawer = () => {
             <Flex vertical style={{ marginTop: 40 }}>
               <Title level={4}>สวัสดิการและสถานที่ทำงาน:</Title>
               <Space wrap size={[24, 12]}>
-                {["ประกันสังคม", "ประกันสุขภาพกลุ่ม", "โบนัสประจำปี", "ชุดยูนิฟอร์ม", "อาหารกลางวันฟรี"].map((w) => (
-                  <Tag key={w} color="default" style={{ padding: "4px 12px" }}>{w}</Tag>
+                {[
+                  "ประกันสังคม",
+                  "ประกันสุขภาพกลุ่ม",
+                  "โบนัสประจำปี",
+                  "ชุดยูนิฟอร์ม",
+                  "อาหารกลางวันฟรี",
+                ].map((w) => (
+                  <Tag key={w} color="default" style={{ padding: "4px 12px" }}>
+                    {w}
+                  </Tag>
                 ))}
               </Space>
             </Flex>
 
             <Divider style={{ margin: "40px 0" }} />
             <Flex justify="center">
-              <Title level={4} style={{ color: token.colorTextQuaternary, letterSpacing: 2 }}>
+              <Title
+                level={4}
+                style={{ color: token.colorTextQuaternary, letterSpacing: 2 }}
+              >
                 SCHOOL JOB BOARD
               </Title>
             </Flex>

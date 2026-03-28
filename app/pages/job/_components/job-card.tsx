@@ -4,6 +4,8 @@ import {
   ClockCircleOutlined,
   DollarCircleOutlined,
   EnvironmentOutlined,
+  HeartFilled,
+  HeartOutlined,
   HistoryOutlined,
 } from "@ant-design/icons";
 import {
@@ -24,6 +26,7 @@ import "dayjs/locale/th";
 import relativeTime from "dayjs/plugin/relativeTime";
 import type { Job } from "../_state/job-search-store";
 import { useJobSearchStore } from "../_state/job-search-store";
+import { useSavedJobsStore } from "../_state/saved-jobs-store";
 
 dayjs.extend(relativeTime);
 dayjs.locale("th");
@@ -38,6 +41,9 @@ interface JobCardProps {
 export const JobCard = ({ job }: JobCardProps) => {
   const { token } = antTheme.useToken();
   const { openJobDrawer } = useJobSearchStore();
+  const { isSaved, toggleSavedJob } = useSavedJobsStore();
+
+  const saved = isSaved(job.id);
 
   return (
     <Card
@@ -76,6 +82,12 @@ export const JobCard = ({ job }: JobCardProps) => {
                   เน้นวุฒิสูง
                 </Tag>
               )}
+              <Tag
+                color="default"
+                style={{ borderRadius: token.borderRadiusSM, margin: 0, padding: "4px 12px", fontSize: 13, border: "none" }}
+              >
+                {job.schoolType}
+              </Tag>
             </Space>
 
             <Flex vertical gap={8}>
@@ -130,9 +142,28 @@ export const JobCard = ({ job }: JobCardProps) => {
           </Text>
         </Col>
         <Col>
-          <Button type="primary" size="large" style={{ fontWeight: 600, padding: "0 32px" }}>
-            รายละเอียดงาน
-          </Button>
+          <Space size={12}>
+            {/* ปุ่มบันทึกงาน — stopPropagation เพื่อไม่ให้ card click trigger */}
+            <Button
+              type="text"
+              size="large"
+              icon={
+                saved ? (
+                  <HeartFilled style={{ color: token.colorError, fontSize: 20 }} />
+                ) : (
+                  <HeartOutlined style={{ fontSize: 20 }} />
+                )
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSavedJob(job.id);
+              }}
+              title={saved ? "ยกเลิกการบันทึก" : "บันทึกงานนี้"}
+            />
+            <Button type="primary" size="large" style={{ fontWeight: 600, padding: "0 32px" }}>
+              รายละเอียดงาน
+            </Button>
+          </Space>
         </Col>
       </Row>
     </Card>

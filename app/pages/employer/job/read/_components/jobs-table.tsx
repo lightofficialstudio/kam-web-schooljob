@@ -76,10 +76,25 @@ export const JobsTable = () => {
       key: "status",
       width: 140,
       render: (status: string) => {
-        const config: Record<string, { color: string; text: string; icon: ReactNode }> = {
-          ACTIVE: { color: "green", text: "กำลังเปิดรับ", icon: <CheckCircleOutlined /> },
-          CLOSED: { color: "default", text: "ปิดรับแล้ว", icon: <StopOutlined /> },
-          DRAFT: { color: "orange", text: "ฉบับร่าง", icon: <ClockCircleOutlined /> },
+        const config: Record<
+          string,
+          { color: string; text: string; icon: ReactNode }
+        > = {
+          ACTIVE: {
+            color: "green",
+            text: "กำลังเปิดรับ",
+            icon: <CheckCircleOutlined />,
+          },
+          CLOSED: {
+            color: "default",
+            text: "ปิดรับแล้ว",
+            icon: <StopOutlined />,
+          },
+          DRAFT: {
+            color: "orange",
+            text: "ฉบับร่าง",
+            icon: <ClockCircleOutlined />,
+          },
         };
         const current = config[status];
         return (
@@ -153,10 +168,7 @@ export const JobsTable = () => {
   ];
 
   return (
-    <Card
-      variant="borderless"
-      style={{ borderRadius: 12, overflow: "hidden" }}
-    >
+    <Card variant="borderless" style={{ borderRadius: 12, overflow: "hidden" }}>
       <Table
         columns={columns}
         dataSource={filteredJobs}

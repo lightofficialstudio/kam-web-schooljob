@@ -16,6 +16,7 @@ import {
   Layout,
   Row,
   Select,
+  Slider,
   Typography,
   theme as antTheme,
 } from "antd";
@@ -61,6 +62,9 @@ const JOB_CATEGORIES = [
 export const SearchFilterSection = () => {
   const { token } = antTheme.useToken();
   const { filters, setFilters, resetFilters } = useJobSearchStore();
+
+  const [salaryMin, salaryMax] = filters.salaryRange;
+  const isSalaryActive = salaryMin > 0 || salaryMax < 100000;
 
   return (
     <Layout.Header
@@ -143,7 +147,7 @@ export const SearchFilterSection = () => {
                 </Flex>
               </Col>
 
-              {/* Advanced Filters */}
+              {/* Advanced Filters — แถวที่ 1 */}
               <Col span={24}>
                 <Divider style={{ margin: "8px 0 16px" }} />
                 <Row gutter={[16, 16]} align="middle">
@@ -163,6 +167,36 @@ export const SearchFilterSection = () => {
                   </Col>
                   <Col xs={12} md={6}>
                     <Select
+                      placeholder="ประเภทโรงเรียน"
+                      style={{ width: "100%" }}
+                      size="large"
+                      allowClear
+                      value={filters.schoolType}
+                      onChange={(value) => setFilters({ schoolType: value })}
+                    >
+                      <Option value="รัฐบาล">โรงเรียนรัฐบาล</Option>
+                      <Option value="เอกชน">โรงเรียนเอกชน</Option>
+                      <Option value="นานาชาติ">โรงเรียนนานาชาติ</Option>
+                      <Option value="สาธิต">โรงเรียนสาธิต</Option>
+                    </Select>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Select
+                      placeholder="ระดับชั้นที่สอน"
+                      style={{ width: "100%" }}
+                      size="large"
+                      allowClear
+                      value={filters.gradeLevel}
+                      onChange={(value) => setFilters({ gradeLevel: value })}
+                    >
+                      <Option value="อนุบาล">อนุบาล</Option>
+                      <Option value="ประถมศึกษา">ประถมศึกษา</Option>
+                      <Option value="มัธยมต้น">มัธยมต้น</Option>
+                      <Option value="มัธยมปลาย">มัธยมปลาย</Option>
+                    </Select>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Select
                       placeholder="ใบประกอบวิชาชีพ"
                       style={{ width: "100%" }}
                       size="large"
@@ -175,22 +209,45 @@ export const SearchFilterSection = () => {
                       <Option value="pending">อยู่ระหว่างขอรับใบประกอบฯ</Option>
                     </Select>
                   </Col>
-                  <Col xs={12} md={6}>
-                    <Select
-                      placeholder="ช่วงเงินเดือน"
-                      style={{ width: "100%" }}
-                      size="large"
-                      allowClear
-                      value={filters.salaryRange}
-                      onChange={(value) => setFilters({ salaryRange: value })}
-                    >
-                      <Option value="0-15000">ต่ำกว่า 15,000</Option>
-                      <Option value="15000-25000">15,000 - 25,000</Option>
-                      <Option value="25000-40000">25,000 - 40,000</Option>
-                      <Option value="40000+">40,000 ขึ้นไป</Option>
-                    </Select>
+                </Row>
+              </Col>
+
+              {/* Advanced Filters — แถวที่ 2: Salary Slider + Reset */}
+              <Col span={24}>
+                <Row gutter={[16, 8]} align="middle">
+                  <Col xs={24} md={18}>
+                    <Flex vertical gap={4}>
+                      <Text style={{ fontSize: 13, color: token.colorTextDescription }}>
+                        ช่วงเงินเดือน (บาท)
+                        {isSalaryActive && (
+                          <Text strong style={{ marginLeft: 8, color: token.colorPrimary }}>
+                            ฿{salaryMin.toLocaleString()} — ฿{salaryMax.toLocaleString()}
+                          </Text>
+                        )}
+                      </Text>
+                      <Slider
+                        range
+                        min={0}
+                        max={100000}
+                        step={5000}
+                        value={filters.salaryRange}
+                        onChange={(value) =>
+                          setFilters({ salaryRange: value as [number, number] })
+                        }
+                        tooltip={{
+                          formatter: (v) => `฿${v?.toLocaleString()}`,
+                        }}
+                        marks={{
+                          0: "0",
+                          25000: "25K",
+                          50000: "50K",
+                          75000: "75K",
+                          100000: "100K+",
+                        }}
+                      />
+                    </Flex>
                   </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={24} md={6} style={{ textAlign: "right" }}>
                     <Button
                       type="link"
                       onClick={resetFilters}

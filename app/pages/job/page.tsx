@@ -1,19 +1,28 @@
 "use client";
 
-import { Col, Layout, Row } from "antd";
+import { FileSearchOutlined } from "@ant-design/icons";
+import { Badge, Button, Col, Layout, Row, Tooltip } from "antd";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { ApplicationTrackerDrawer } from "./_components/application-tracker-drawer";
 import { JobDetailDrawer } from "./_components/job-detail-drawer";
 import { JobListSection } from "./_components/job-list-section";
 import { SearchFilterSection } from "./_components/search-filter-section";
 import { SidebarSection } from "./_components/sidebar-section";
+import { useApplicationTrackerStore } from "./_state/application-tracker-store";
 import { useJobSearchStore } from "./_state/job-search-store";
 
 // Inner component ที่ใช้ useSearchParams (ต้องอยู่ใน Suspense)
 function JobSearchPageContent() {
   const searchParams = useSearchParams();
   const { setFilters } = useJobSearchStore();
+  const { applications, setIsTrackerOpen } = useApplicationTrackerStore();
+
+  // จำนวนใบสมัครที่ยังอยู่ระหว่างดำเนินการ
+  const activeApplicationCount = applications.filter(
+    (a) => a.status !== "accepted" && a.status !== "rejected"
+  ).length;
 
   // Sync URL params → store เมื่อ mount
   useEffect(() => {
@@ -50,8 +59,31 @@ function JobSearchPageContent() {
         </Row>
       </Layout.Content>
 
-      {/* Drawer แสดงรายละเอียดงาน */}
+      {/* ปุ่มลอย — เปิด Application Tracker */}
+      <Tooltip title="ติดตามใบสมัครของฉัน" placement="left">
+        <Badge count={activeApplicationCount} offset={[-4, 4]}>
+          <Button
+            type="primary"
+            shape="circle"
+            size="large"
+            icon={<FileSearchOutlined style={{ fontSize: 22 }} />}
+            onClick={() => setIsTrackerOpen(true)}
+            style={{
+              position: "fixed",
+              bottom: 32,
+              right: 32,
+              width: 56,
+              height: 56,
+              zIndex: 999,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            }}
+          />
+        </Badge>
+      </Tooltip>
+
+      {/* Drawers */}
       <JobDetailDrawer />
+      <ApplicationTrackerDrawer />
     </Layout>
   );
 }
