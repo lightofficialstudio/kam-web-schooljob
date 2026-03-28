@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useApplicantDrawerStore } from "../_state/applicant-drawer-store";
+import { useJobStatsModalStore } from "../_state/job-stats-modal-store";
 import { useJobReadStore, type JobRecord } from "../_state/job-read-store";
 
 const { Text } = Typography;
@@ -35,6 +36,7 @@ const PRIMARY = "#11b6f5";
 export const JobsTable = () => {
   const { jobs, searchKeyword, activeTab } = useJobReadStore();
   const { openDrawer } = useApplicantDrawerStore();
+  const { openModal: openStatsModal } = useJobStatsModalStore();
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -177,7 +179,11 @@ export const JobsTable = () => {
             </Link>
           </Tooltip>
           <Tooltip title="ดูสถิติ">
-            <Button icon={<BarChartOutlined />} size="small" />
+            <Button
+              icon={<BarChartOutlined />}
+              size="small"
+              onClick={() => openStatsModal(record.key)}
+            />
           </Tooltip>
           <Tooltip title="ปิดรับสมัคร">
             <Button danger icon={<StopOutlined />} size="small" />

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ApplicantDrawer } from "./_components/applicant-drawer";
 import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
+import { JobStatsModal } from "./_components/job-stats-modal";
 import { JobsTable } from "./_components/jobs-table";
 import { StatsSection } from "./_components/stats-section";
 import { useApplicantDrawerStore } from "./_state/applicant-drawer-store";
@@ -141,6 +142,9 @@ export default function MyJobsPage() {
 
       {/* Drawer แสดงรายชื่อผู้สมัครของตำแหน่งที่เลือก */}
       <ApplicantDrawer />
+
+      {/* Modal แสดงสถิติเชิงลึกของตำแหน่งที่เลือก */}
+      <JobStatsModal />
     </Layout>
   );
 }
