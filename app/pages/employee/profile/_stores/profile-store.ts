@@ -19,6 +19,7 @@ export interface EducationEntry {
   level: string;
   institution: string;
   major: string;
+  graduationYear?: number; // ปีที่สำเร็จการศึกษา (พ.ศ.)
   gpa?: number;
   startDate?: string;
   endDate?: string;
@@ -386,25 +387,22 @@ export const useProfileStore = create<ProfileStore>((set) => ({
             level: "ปริญญาโท",
             institution: "มหาวิทยาลัยธรรมศาสตร์",
             major: "ศิลปศาสตร์มหาบัณฑิต (การสอนภาษาอังกฤษ)",
+            graduationYear: 2565,
             gpa: 3.85,
           },
           {
             level: "ปริญญาตรี",
             institution: "จุฬาลงกรณ์มหาวิทยาลัย",
             major: "ครุศาสตร์บัณฑิต (สาขาวิชาภาษาอังกฤษ-ภาษาไทย)",
+            graduationYear: 2562,
             gpa: 3.75,
           },
           {
-            level: "มัธยมศึกษา",
+            level: "มัธยมศึกษาตอนปลาย",
             institution: "โรงเรียนเตรียมอุดมศึกษา",
             major: "ศิลป์-ภาษา (อังกฤษ-เยอรมัน)",
+            graduationYear: 2558,
             gpa: 3.9,
-          },
-          {
-            level: "อื่นๆ",
-            institution: "British Council Thailand",
-            major: "CELTA (Certificate in English Language Teaching)",
-            gpa: 4.0,
           },
         ],
         specialization: [

@@ -33,44 +33,67 @@ import { EducationEntry, useProfileStore } from "../_stores/profile-store";
 
 const { Title, Text } = Typography;
 
+// [Fix #1] ปรับ Dropdown ให้ตรงตาม Requirement ครบทุก Option
 const EDUCATION_LEVELS = [
-  { value: "ประถมศึกษา", label: "ประถมศึกษา" },
-  { value: "มัธยมศึกษา", label: "มัธยมศึกษา" },
-  { value: "ปวช/ปวส", label: "ปวช/ปวส" },
+  { value: "ต่ำกว่ามัธยมศึกษา", label: "ต่ำกว่ามัธยมศึกษา" },
+  { value: "มัธยมศึกษาตอนต้น", label: "มัธยมศึกษาตอนต้น" },
+  { value: "มัธยมศึกษาตอนปลาย", label: "มัธยมศึกษาตอนปลาย" },
+  { value: "ปวช.", label: "ปวช." },
+  { value: "ปวท.", label: "ปวท." },
+  { value: "ปวส.", label: "ปวส." },
+  { value: "อนุปริญญา", label: "อนุปริญญา" },
   { value: "ปริญญาตรี", label: "ปริญญาตรี" },
   { value: "ปริญญาโท", label: "ปริญญาโท" },
   { value: "ปริญญาเอก", label: "ปริญญาเอก" },
-  { value: "อื่นๆ", label: "อื่นๆ" },
 ];
+
+const MAX_EDUCATIONS = 3;
+
+// ปีพุทธศักราชต่ำสุดและสูงสุดที่ยอมรับ
+const YEAR_MIN = 2500;
+const YEAR_MAX = new Date().getFullYear() + 543; // ปัจจุบัน พ.ศ.
 
 export const EducationHistorySection: React.FC = () => {
   const { token } = antTheme.useToken();
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { profile, addEducation, removeEducation } = useProfileStore();
+  const { profile, addEducation, updateEducation, removeEducation } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
 
+  // [Fix #3] ตรวจสอบจำนวนก่อนเปิด Drawer เพิ่มใหม่
   const handleAddNew = () => {
+    if (educations.length >= MAX_EDUCATIONS) {
+      openNotification({
+        type: "error",
+        mainTitle: "ไม่สามารถเพิ่มได้",
+        description: `สามารถเพิ่มประวัติการศึกษาได้สูงสุด ${MAX_EDUCATIONS} รายการ`,
+        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
+      });
+      return;
+    }
     form.resetFields();
     setEditingIndex(null);
     setIsAddingNew(true);
   };
 
+  // เปิด Drawer สำหรับแก้ไข พร้อม set ค่าเดิมลงฟอร์ม
   const handleEdit = (index: number) => {
     const education = educations[index];
     form.setFieldsValue({
       level: education.level,
       institution: education.institution,
       major: education.major,
+      graduationYear: education.graduationYear,
       gpa: education.gpa,
     });
     setEditingIndex(index);
     setIsAddingNew(true);
   };
 
+  // [Fix #4] handleSave เรียก updateEducation จริงๆ เมื่อเป็น Edit mode
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
@@ -79,15 +102,17 @@ export const EducationHistorySection: React.FC = () => {
         level: values.level,
         institution: values.institution,
         major: values.major,
+        graduationYear: values.graduationYear,
         gpa: values.gpa,
       };
 
       if (editingIndex !== null) {
+        updateEducation(editingIndex, entry);
         openNotification({
           type: "success",
           mainTitle: "อัปเดตข้อมูลสำเร็จ",
           description: "ข้อมูลการศึกษาของคุณถูกบันทึกเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       } else {
         addEducation(entry);
@@ -95,7 +120,7 @@ export const EducationHistorySection: React.FC = () => {
           type: "success",
           mainTitle: "เพิ่มข้อมูลสำเร็จ",
           description: "ข้อมูลการศึกษาใหม่ถูกเพิ่มเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       }
 
@@ -107,7 +132,7 @@ export const EducationHistorySection: React.FC = () => {
         type: "error",
         mainTitle: "เกิดข้อผิดพลาด",
         description: "กรุณาตรวจสอบข้อมูลให้ถูกต้อง",
-        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />,
+        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
       });
     }
   };
@@ -131,15 +156,15 @@ export const EducationHistorySection: React.FC = () => {
           type: "success",
           mainTitle: "ลบข้อมูลสำเร็จ",
           description: "ข้อมูลการศึกษาถูกลบเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       },
     });
   };
 
   return (
-    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
-      {/* 1. Add/Edit Drawer (UX following job page pattern) */}
+    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+      {/* 1. Add/Edit Drawer */}
       <Drawer
         open={isAddingNew}
         onClose={handleCancel}
@@ -172,9 +197,7 @@ export const EducationHistorySection: React.FC = () => {
             }}
           >
             <Title level={4} style={{ margin: 0 }}>
-              {editingIndex !== null
-                ? "แก้ไขข้อมูลการศึกษา"
-                : "เพิ่มข้อมูลการศึกษา"}
+              {editingIndex !== null ? "แก้ไขข้อมูลการศึกษา" : "เพิ่มข้อมูลการศึกษา"}
             </Title>
             <Button
               type="text"
@@ -183,7 +206,7 @@ export const EducationHistorySection: React.FC = () => {
             />
           </Layout.Header>
 
-          {/* Content Area */}
+          {/* Form Content */}
           <Layout.Content
             style={{
               padding: "32px 40px 80px 40px",
@@ -191,10 +214,10 @@ export const EducationHistorySection: React.FC = () => {
             }}
           >
             <Form form={form} layout="vertical">
+              {/* [Fix #1] Dropdown ครบตาม Requirement */}
               <Form.Item
                 label="ระดับการศึกษา"
                 name="level"
-                required
                 rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
               >
                 <Select
@@ -207,38 +230,56 @@ export const EducationHistorySection: React.FC = () => {
               <Form.Item
                 label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
                 name="institution"
-                required
                 rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
               >
                 <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
               </Form.Item>
 
               <Form.Item
-                label="สาขาวิชา/วิทยาลัย"
+                label="สาขาวิชา"
                 name="major"
-                required
                 rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
               >
-                <Input
-                  placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ"
+                <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" size="large" />
+              </Form.Item>
+
+              {/* [Fix #2] เพิ่ม field ปีที่สำเร็จการศึกษา (พ.ศ.) */}
+              <Form.Item
+                label="ปีที่สำเร็จการศึกษา (พ.ศ.)"
+                name="graduationYear"
+                rules={[
+                  { required: true, message: "กรุณากรอกปีที่สำเร็จการศึกษา" },
+                  {
+                    type: "number",
+                    min: YEAR_MIN,
+                    max: YEAR_MAX,
+                    message: `กรุณากรอกปี พ.ศ. ระหว่าง ${YEAR_MIN} - ${YEAR_MAX}`,
+                  },
+                ]}
+              >
+                <InputNumber
+                  placeholder={`เช่น ${YEAR_MAX}`}
+                  min={YEAR_MIN}
+                  max={YEAR_MAX}
                   size="large"
+                  style={{ width: "100%" }}
                 />
               </Form.Item>
 
               <Form.Item
-                label="GPA"
+                label="เกรดเฉลี่ย (GPA)"
                 name="gpa"
                 rules={[
                   {
                     type: "number",
                     min: 0,
                     max: 4,
-                    message: "GPA ต้องเป็นตัวเลขระหว่าง 0-4",
+                    message: "GPA ต้องเป็นตัวเลขระหว่าง 0.00 - 4.00",
                   },
                 ]}
               >
                 <InputNumber
-                  placeholder="เช่น 3.5"
+                  placeholder="เช่น 3.50"
                   step={0.01}
                   min={0}
                   max={4}
@@ -250,19 +291,10 @@ export const EducationHistorySection: React.FC = () => {
               <Divider style={{ margin: "32px 0 24px 0" }} />
 
               <Flex justify="end" gap={12}>
-                <Button
-                  onClick={handleCancel}
-                  size="large"
-                  style={{ minWidth: 100 }}
-                >
+                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
                   ยกเลิก
                 </Button>
-                <Button
-                  type="primary"
-                  onClick={handleSave}
-                  size="large"
-                  style={{ minWidth: 100 }}
-                >
+                <Button type="primary" onClick={handleSave} size="large" style={{ minWidth: 100 }}>
                   บันทึก
                 </Button>
               </Flex>
@@ -271,22 +303,22 @@ export const EducationHistorySection: React.FC = () => {
         </Layout>
       </Drawer>
 
-      {/* 2. List of Educations */}
-      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+      {/* 2. รายการประวัติการศึกษา */}
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
         {educations.length > 0 ? (
           educations.map((education, index) => (
             <Card
               key={index}
+              hoverable
               style={{
                 borderRadius: token.borderRadiusLG,
                 border: `1px solid ${token.colorBorderSecondary}`,
               }}
               styles={{ body: { padding: "20px" } }}
-              hoverable
             >
               <Row justify="space-between" align="top">
                 <Col flex="auto">
-                  <Space orientation="vertical" size={2}>
+                  <Space direction="vertical" size={2}>
                     <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
                       {education.level}
                     </Title>
@@ -296,20 +328,34 @@ export const EducationHistorySection: React.FC = () => {
                     <Text type="secondary" style={{ fontSize: "14px" }}>
                       {education.major}
                     </Text>
-                    {education.gpa && (
-                      <Text
-                        style={{
-                          marginTop: "8px",
-                          display: "inline-block",
-                          padding: "2px 8px",
-                          backgroundColor: token.colorFillAlter,
-                          borderRadius: token.borderRadiusSM,
-                          fontSize: "13px",
-                        }}
-                      >
-                        GPA: {education.gpa}
-                      </Text>
-                    )}
+                    <Flex gap={8} style={{ marginTop: "8px" }} wrap="wrap">
+                      {education.graduationYear && (
+                        <Text
+                          style={{
+                            display: "inline-block",
+                            padding: "2px 8px",
+                            backgroundColor: token.colorFillAlter,
+                            borderRadius: token.borderRadiusSM,
+                            fontSize: "13px",
+                          }}
+                        >
+                          สำเร็จการศึกษา พ.ศ. {education.graduationYear}
+                        </Text>
+                      )}
+                      {education.gpa && (
+                        <Text
+                          style={{
+                            display: "inline-block",
+                            padding: "2px 8px",
+                            backgroundColor: token.colorFillAlter,
+                            borderRadius: token.borderRadiusSM,
+                            fontSize: "13px",
+                          }}
+                        >
+                          GPA: {education.gpa}
+                        </Text>
+                      )}
+                    </Flex>
                   </Space>
                 </Col>
                 <Col>
@@ -317,9 +363,7 @@ export const EducationHistorySection: React.FC = () => {
                     <Button
                       type="text"
                       shape="circle"
-                      icon={
-                        <EditOutlined style={{ color: token.colorPrimary }} />
-                      }
+                      icon={<EditOutlined style={{ color: token.colorPrimary }} />}
                       onClick={() => handleEdit(index)}
                     />
                     <Button
@@ -342,13 +386,14 @@ export const EducationHistorySection: React.FC = () => {
         )}
       </Space>
 
-      {/* 3. Global Add Button */}
+      {/* 3. ปุ่มเพิ่ม — แสดงจำนวน/จำกัดเพื่อให้ User รู้ */}
       <Button
         type="dashed"
         icon={<PlusOutlined />}
         block
         onClick={handleAddNew}
         size="large"
+        disabled={educations.length >= MAX_EDUCATIONS}
         style={{
           height: "54px",
           borderRadius: token.borderRadiusLG,
@@ -356,7 +401,7 @@ export const EducationHistorySection: React.FC = () => {
           fontWeight: 600,
         }}
       >
-        เพิ่มข้อมูลการศึกษา
+        เพิ่มข้อมูลการศึกษา ({educations.length}/{MAX_EDUCATIONS})
       </Button>
     </Space>
   );
