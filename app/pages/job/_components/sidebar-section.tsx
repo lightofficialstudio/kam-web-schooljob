@@ -5,9 +5,9 @@ import {
   Badge,
   Button,
   Card,
+  Divider,
   Empty,
   Flex,
-  List,
   Space,
   Typography,
   theme as antTheme,
@@ -67,42 +67,36 @@ export const SidebarSection = () => {
             }
           />
         ) : (
-          <List
-            dataSource={savedJobs}
-            renderItem={(job) => (
-              <List.Item
-                style={{ padding: "8px 0", cursor: "pointer" }}
-                actions={[
+          <Flex vertical>
+            {savedJobs.map((job, index) => (
+              <div key={job.id}>
+                <Flex justify="space-between" align="center" style={{ padding: "8px 0" }}>
+                  <Flex vertical style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+                    <Text
+                      strong
+                      style={{ fontSize: 13, cursor: "pointer" }}
+                      onClick={() => openJobDrawer(job)}
+                      ellipsis
+                    >
+                      {job.title}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 12 }} ellipsis>
+                      {job.schoolName}
+                    </Text>
+                  </Flex>
                   <Button
-                    key="delete"
                     type="text"
                     size="small"
                     danger
                     icon={<DeleteOutlined />}
                     onClick={() => toggleSavedJob(job.id)}
                     title="ลบออกจากรายการบันทึก"
-                  />,
-                ]}
-              >
-                <List.Item.Meta
-                  title={
-                    <Text
-                      style={{ fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-                      onClick={() => openJobDrawer(job)}
-                      ellipsis
-                    >
-                      {job.title}
-                    </Text>
-                  }
-                  description={
-                    <Text type="secondary" style={{ fontSize: 12 }} ellipsis>
-                      {job.schoolName}
-                    </Text>
-                  }
-                />
-              </List.Item>
-            )}
-          />
+                  />
+                </Flex>
+                {index < savedJobs.length - 1 && <Divider style={{ margin: 0 }} />}
+              </div>
+            ))}
+          </Flex>
         )}
       </Card>
 
