@@ -18,8 +18,14 @@ const { Text } = Typography;
 
 export const SchoolSearch = () => {
   const { token } = antTheme.useToken();
-  const { searchQuery, setSearchQuery, setProvinceFilter, setTypeFilter } =
-    useSchoolStore();
+  const {
+    searchQuery,
+    setSearchQuery,
+    setProvinceFilter,
+    setTypeFilter,
+    setGradeFilter,
+    setContractFilter,
+  } = useSchoolStore();
 
   return (
     <Card
@@ -31,8 +37,8 @@ export const SchoolSearch = () => {
       }}
       styles={{ body: { padding: "32px" } }}
     >
-      <Row gutter={[20, 20]} align="bottom">
-        <Col xs={24} md={10}>
+      <Row gutter={[16, 16]} align="bottom">
+        <Col xs={24} md={8}>
           <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
@@ -58,7 +64,7 @@ export const SchoolSearch = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </Col>
-        <Col xs={12} md={5}>
+        <Col xs={12} md={4}>
           <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
@@ -80,7 +86,7 @@ export const SchoolSearch = () => {
             ]}
           />
         </Col>
-        <Col xs={12} md={5}>
+        <Col xs={12} md={4}>
           <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
@@ -102,6 +108,49 @@ export const SchoolSearch = () => {
               { value: "มหาวิทยาลัย / วิทยาลัย", label: "มหาวิทยาลัย / วิทยาลัย" },
               { value: "สถาบันกวดวิชา", label: "สถาบันกวดวิชา" },
               { value: "ศูนย์การเรียน / สถาบันการศึกษาอื่น ๆ", label: "ศูนย์การเรียน / สถาบันการศึกษาอื่น ๆ" },
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={4}>
+          <Flex vertical style={{ marginBottom: 8 }}>
+            <Text
+              strong
+              style={{ fontSize: 13, color: token.colorTextSecondary }}
+            >
+              ระดับชั้นที่สอน
+            </Text>
+          </Flex>
+          <Select
+            size="large"
+            placeholder="ทุกระดับ"
+            style={{ width: "100%", height: 48 }}
+            allowClear
+            onChange={setGradeFilter}
+            options={[
+              { value: "ประถมศึกษา", label: "ประถมศึกษา" },
+              { value: "มัธยมศึกษาตอนต้น", label: "มัธยมศึกษาตอนต้น" },
+              { value: "มัธยมศึกษาตอนปลาย", label: "มัธยมศึกษาตอนปลาย" },
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={4}>
+          <Flex vertical style={{ marginBottom: 8 }}>
+            <Text
+              strong
+              style={{ fontSize: 13, color: token.colorTextSecondary }}
+            >
+              ประเภทสัญญา
+            </Text>
+          </Flex>
+          <Select
+            size="large"
+            placeholder="ทุกประเภท"
+            style={{ width: "100%", height: 48 }}
+            allowClear
+            onChange={setContractFilter}
+            options={[
+              { value: "Full-time", label: "Full-time" },
+              { value: "Part-time", label: "Part-time" },
             ]}
           />
         </Col>

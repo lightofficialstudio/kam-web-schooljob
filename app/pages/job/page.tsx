@@ -667,7 +667,11 @@ function JobSearchPageContent() {
                   </Col>
                 </Row>
 
-                <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+                <Space
+                  orientation="vertical"
+                  size={16}
+                  style={{ width: "100%" }}
+                >
                   {paginatedJobs.length > 0 ? (
                     paginatedJobs.map((job) => (
                       <Card
@@ -939,10 +943,14 @@ function JobSearchPageContent() {
 
               {/* RIGHT COLUMN: Sidebar Tools */}
               <Col span={8}>
-                <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+                <Space
+                  orientation="vertical"
+                  size={24}
+                  style={{ width: "100%" }}
+                >
                   {/* 1. Saved Searches */}
                   <Card
-                    bordered={false}
+                    variant="borderless"
                     style={{ borderRadius: token.borderRadiusLG }}
                   >
                     <Space align="center" style={{ marginBottom: 8 }}>
@@ -971,7 +979,7 @@ function JobSearchPageContent() {
 
                   {/* 2. Saved Jobs */}
                   <Card
-                    bordered={false}
+                    variant="borderless"
                     style={{ borderRadius: token.borderRadiusLG }}
                   >
                     <Space align="center" style={{ marginBottom: 8 }}>
@@ -1000,7 +1008,7 @@ function JobSearchPageContent() {
 
                   {/* 3. Safety Tip */}
                   <Card
-                    bordered={false}
+                    variant="borderless"
                     style={{
                       backgroundColor: token.colorBgLayout,
                       borderRadius: token.borderRadiusLG,
@@ -1123,7 +1131,7 @@ function JobSearchPageContent() {
               }}
             >
               <Card
-                bordered={false}
+                variant="borderless"
                 style={{
                   borderRadius: token.borderRadiusLG,
                   boxShadow: token.boxShadowTertiary,

@@ -6,12 +6,14 @@ import {
   Flex,
   Layout,
   Row,
+  Select,
   Space,
   Tag,
   Typography,
   theme as antTheme,
 } from "antd";
 import { SchoolCard } from "./_components/school-card";
+import { SchoolJobsDrawer } from "./_components/school-jobs-drawer";
 import { SchoolSearch } from "./_components/school-search";
 import { useSchoolStore } from "./_stores/school-store";
 
@@ -20,17 +22,45 @@ const { Content } = Layout;
 
 export default function SchoolDirectoryPage() {
   const { token } = antTheme.useToken();
-  const { schools, searchQuery, provinceFilter, typeFilter } = useSchoolStore();
+  const {
+    schools,
+    searchQuery,
+    provinceFilter,
+    typeFilter,
+    gradeFilter,
+    contractFilter,
+    sortBy,
+    setTypeFilter,
+    setProvinceFilter,
+    setSortBy,
+  } = useSchoolStore();
 
-  const filteredSchools = schools.filter((school) => {
-    const matchesSearch = school.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesProvince =
-      !provinceFilter || school.province === provinceFilter;
-    const matchesType = !typeFilter || school.type.includes(typeFilter);
-    return matchesSearch && matchesProvince && matchesType;
-  });
+  // Quick Filter Tags — toggle เมื่อกดซ้ำจะ clear
+  const handleQuickType = (value: string) =>
+    setTypeFilter(typeFilter === value ? null : value);
+  const handleQuickProvince = (value: string) =>
+    setProvinceFilter(provinceFilter === value ? null : value);
+
+  const filteredSchools = schools
+    .filter((school) => {
+      const matchesSearch = school.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesProvince =
+        !provinceFilter || school.province === provinceFilter;
+      const matchesType = !typeFilter || school.type.includes(typeFilter);
+      const matchesGrade =
+        !gradeFilter ||
+        school.jobs.some((job) => job.gradeLevels.includes(gradeFilter));
+      const matchesContract =
+        !contractFilter ||
+        school.jobs.some((job) => job.type === contractFilter);
+      return matchesSearch && matchesProvince && matchesType && matchesGrade && matchesContract;
+    })
+    .sort((a, b) => {
+      if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
+      return parseInt(a.id) - parseInt(b.id); // "latest" — ใช้ id เป็น proxy
+    });
 
   return (
     <Layout
@@ -115,6 +145,46 @@ export default function SchoolDirectoryPage() {
           <Col span={24} style={{ maxWidth: 1100 }}>
             <SchoolSearch />
 
+            {/* [ข้อ 2] Quick Filter Tags */}
+            <Flex gap={8} wrap="wrap" style={{ marginBottom: 24 }}>
+              <Text type="secondary" style={{ lineHeight: "28px", fontSize: 13 }}>
+                กรองด่วน:
+              </Text>
+              {[
+                { label: "โรงเรียนนานาชาติ", kind: "type" },
+                { label: "โรงเรียนรัฐบาล", kind: "type" },
+                { label: "โรงเรียนเอกชน", kind: "type" },
+                { label: "สถาบันกวดวิชา", kind: "type" },
+                { label: "กรุงเทพมหานคร", kind: "province" },
+                { label: "เชียงใหม่", kind: "province" },
+              ].map(({ label, kind }) => {
+                const isActive =
+                  kind === "type" ? typeFilter === label : provinceFilter === label;
+                return (
+                  <Tag
+                    key={label}
+                    color={isActive ? "#11b6f5" : undefined}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: 100,
+                      padding: "2px 14px",
+                      fontSize: 13,
+                      fontWeight: isActive ? 600 : 400,
+                      border: isActive ? "none" : `1px solid ${token.colorBorder}`,
+                      backgroundColor: isActive ? undefined : token.colorBgContainer,
+                    }}
+                    onClick={() =>
+                      kind === "type"
+                        ? handleQuickType(label)
+                        : handleQuickProvince(label)
+                    }
+                  >
+                    {label}
+                  </Tag>
+                );
+              })}
+            </Flex>
+
             <Flex vertical style={{ marginBottom: 24 }}>
               <Row justify="space-between" align="middle">
                 <Col>
@@ -131,7 +201,15 @@ export default function SchoolDirectoryPage() {
                   </Space>
                 </Col>
                 <Col>
-                  <Text type="secondary">เรียงตาม: ล่าสุด</Text>
+                  <Select
+                    value={sortBy}
+                    onChange={setSortBy}
+                    style={{ width: 180 }}
+                    options={[
+                      { value: "latest", label: "เรียงตาม: ล่าสุด" },
+                      { value: "most_jobs", label: "เรียงตาม: ตำแหน่งมากสุด" },
+                    ]}
+                  />
                 </Col>
               </Row>
             </Flex>
@@ -150,16 +228,47 @@ export default function SchoolDirectoryPage() {
                     style={{
                       borderRadius: token.borderRadiusLG,
                       textAlign: "center",
-                      padding: "60px 0",
+                      padding: "60px 32px",
                       background: token.colorBgContainer,
                     }}
                   >
-                    <Flex vertical align="center">
-                      <Text style={{ fontSize: 48, marginBottom: 16 }}>🏫</Text>
-                      <Title level={4}>ไม่พบโรงเรียน</Title>
-                      <Text type="secondary">
-                        ลองเปลี่ยนคำค้นหาหรือตัวกรองเพื่อให้เราพบโรงเรียนที่คุณต้องการ
-                      </Text>
+                    <Flex vertical align="center" gap={20}>
+                      <Text style={{ fontSize: 48 }}>🏫</Text>
+                      <Flex vertical align="center" gap={8}>
+                        <Title level={4} style={{ margin: 0 }}>ไม่พบโรงเรียนที่ตรงกับเงื่อนไข</Title>
+                        <Text type="secondary">
+                          ลองเลือก Quick Filter ด้านล่างหรือเปลี่ยนตัวกรองใหม่
+                        </Text>
+                      </Flex>
+                      <Flex gap={8} wrap="wrap" justify="center">
+                        {[
+                          { label: "โรงเรียนนานาชาติ", kind: "type" },
+                          { label: "โรงเรียนรัฐบาล", kind: "type" },
+                          { label: "โรงเรียนเอกชน", kind: "type" },
+                          { label: "สถาบันกวดวิชา", kind: "type" },
+                          { label: "กรุงเทพมหานคร", kind: "province" },
+                          { label: "เชียงใหม่", kind: "province" },
+                        ].map(({ label, kind }) => (
+                          <Tag
+                            key={label}
+                            style={{
+                              cursor: "pointer",
+                              borderRadius: 100,
+                              padding: "4px 16px",
+                              fontSize: 13,
+                              border: `1px solid ${token.colorBorder}`,
+                              backgroundColor: token.colorBgLayout,
+                            }}
+                            onClick={() =>
+                              kind === "type"
+                                ? handleQuickType(label)
+                                : handleQuickProvince(label)
+                            }
+                          >
+                            {label}
+                          </Tag>
+                        ))}
+                      </Flex>
                     </Flex>
                   </Card>
                 </Col>
@@ -168,6 +277,7 @@ export default function SchoolDirectoryPage() {
           </Col>
         </Row>
       </Content>
+      <SchoolJobsDrawer />
     </Layout>
   );
 }

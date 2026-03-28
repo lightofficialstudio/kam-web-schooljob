@@ -4,9 +4,11 @@ import {
   ClockCircleOutlined,
   DollarOutlined,
   EnvironmentOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
+  Button,
   Card,
   Col,
   Divider,
@@ -19,18 +21,26 @@ import {
   Typography,
   theme as antTheme,
 } from "antd";
+import { useRouter } from "next/navigation";
 import { useSchoolStore } from "../_stores/school-store";
 
 const { Title, Text } = Typography;
 
 export const SchoolJobsDrawer = () => {
   const { token } = antTheme.useToken();
+  const router = useRouter();
   const { selectedSchool, isDrawerOpen, setIsDrawerOpen, setSelectedSchool } =
     useSchoolStore();
 
   const handleClose = () => {
     setIsDrawerOpen(false);
     setSelectedSchool(null);
+  };
+
+  // นำทางไปหน้าสมัครงานของตำแหน่งนั้น พร้อมปิด Drawer
+  const handleApply = (jobId: string) => {
+    handleClose();
+    router.push(`/pages/job/${jobId}/apply`);
   };
 
   return (
@@ -58,7 +68,7 @@ export const SchoolJobsDrawer = () => {
               <Flex vertical>
                 <Title
                   level={4}
-                  style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}
+                  style={{ margin: 0, fontSize: "20px", fontWeight: 600 }}
                 >
                   {selectedSchool.name}
                 </Title>
@@ -97,15 +107,13 @@ export const SchoolJobsDrawer = () => {
     >
       {selectedSchool && (
         <Flex vertical style={{ width: "100%" }}>
+          {/* Section Header */}
           <Flex
             justify="space-between"
             align="center"
             style={{ marginBottom: 24 }}
           >
-            <Title
-              level={5}
-              style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}
-            >
+            <Title level={5} style={{ margin: 0, fontSize: "18px", fontWeight: 600 }}>
               ตำแหน่งงานที่เปิดรับสมัคร
             </Title>
             <Tag
@@ -116,12 +124,12 @@ export const SchoolJobsDrawer = () => {
             </Tag>
           </Flex>
 
+          {/* Job List */}
           <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {selectedSchool.jobs.length > 0 ? (
               selectedSchool.jobs.map((job) => (
                 <Card
                   key={job.id}
-                  hoverable
                   style={{
                     borderRadius: token.borderRadiusLG,
                     border: `1px solid ${token.colorBorder}`,
@@ -129,45 +137,61 @@ export const SchoolJobsDrawer = () => {
                   }}
                   styles={{ body: { padding: "20px 24px" } }}
                 >
-                  <Row justify="space-between" align="top">
-                    <Col flex="auto">
-                      <Flex vertical gap={12} style={{ width: "100%" }}>
-                        <Title
-                          level={5}
-                          style={{
-                            margin: 0,
-                            color: token.colorPrimary,
-                            fontSize: 17,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {job.title}
-                        </Title>
+                  <Flex vertical gap={16}>
+                    {/* Job Title + Tags */}
+                    <Flex justify="space-between" align="flex-start" gap={12}>
+                      <Title
+                        level={5}
+                        style={{
+                          margin: 0,
+                          color: token.colorPrimary,
+                          fontSize: 16,
+                          fontWeight: 600,
+                          flex: 1,
+                        }}
+                      >
+                        {job.title}
+                      </Title>
+                      <Tag
+                        color={job.type === "Full-time" ? "blue" : "orange"}
+                        style={{ borderRadius: 6, flexShrink: 0 }}
+                      >
+                        {job.type}
+                      </Tag>
+                    </Flex>
 
-                        <Row gutter={[16, 8]}>
-                          <Col span={12}>
-                            <Space size={8}>
-                              <DollarOutlined
-                                style={{
-                                  color: token.colorSuccess,
-                                  fontSize: 16,
-                                }}
-                              />
-                              <Text style={{ fontSize: 14 }}>{job.salary}</Text>
-                            </Space>
-                          </Col>
-                          <Col span={12}>
-                            <Space size={8}>
-                              <ClockCircleOutlined
-                                style={{ color: token.colorInfo, fontSize: 16 }}
-                              />
-                              <Text style={{ fontSize: 14 }}>{job.type}</Text>
-                            </Space>
-                          </Col>
-                        </Row>
-                      </Flex>
-                    </Col>
-                  </Row>
+                    {/* Salary */}
+                    <Space size={8}>
+                      <DollarOutlined
+                        style={{ color: token.colorSuccess, fontSize: 15 }}
+                      />
+                      <Text style={{ fontSize: 14, fontWeight: 500 }}>
+                        ฿ {job.salary}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 13 }}>
+                        / เดือน
+                      </Text>
+                    </Space>
+
+                    <Divider style={{ margin: "4px 0" }} />
+
+                    {/* [ข้อ 1] ปุ่มสมัครงาน */}
+                    <Flex justify="flex-end">
+                      <Button
+                        type="primary"
+                        icon={<SendOutlined />}
+                        onClick={() => handleApply(job.id)}
+                        style={{
+                          borderRadius: token.borderRadius,
+                          fontWeight: 600,
+                          height: 40,
+                          paddingInline: 24,
+                        }}
+                      >
+                        สมัครงานตำแหน่งนี้
+                      </Button>
+                    </Flex>
+                  </Flex>
                 </Card>
               ))
             ) : (

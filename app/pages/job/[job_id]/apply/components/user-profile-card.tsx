@@ -22,7 +22,7 @@ export default function UserProfileCard() {
 
   return (
     <Card
-      bordered={false}
+      variant="borderless"
       style={{
         background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorInfoActive} 100%)`,
         borderRadius: token.borderRadiusLG * 2,

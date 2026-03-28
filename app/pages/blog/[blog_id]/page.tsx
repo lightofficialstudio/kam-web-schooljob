@@ -254,7 +254,7 @@ export default function BlogDetailPage() {
 
                   {/* Author Profile */}
                   <Card
-                    bordered={false}
+                    variant="borderless"
                     style={{
                       backgroundColor: token.colorFillAlter,
                       borderRadius: token.borderRadiusLG,
