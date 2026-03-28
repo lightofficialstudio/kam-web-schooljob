@@ -34,6 +34,22 @@ import { WorkExperienceEntry, useProfileStore } from "../_stores/profile-store";
 
 const { Title, Text, Paragraph } = Typography;
 
+const MAX_WORK_EXPERIENCES = 5;
+
+// ชื่อเดือนภาษาไทยแบบย่อ
+const THAI_MONTHS = [
+  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+];
+
+// [Fix #5] แปลงวันที่ string เป็น "เดือน พ.ศ." สำหรับแสดงผล
+const formatMonthYearThai = (dateStr: string): string => {
+  if (!dateStr) return "";
+  const d = dayjs(dateStr);
+  return `${THAI_MONTHS[d.month()]} ${d.year() + 543}`;
+};
+
+// คำนวณระยะเวลาการทำงาน
 const calculateDuration = (
   startDate: string,
   endDate: string | null,
@@ -41,16 +57,13 @@ const calculateDuration = (
 ) => {
   const start = dayjs(startDate);
   const end = inPresent ? dayjs() : dayjs(endDate);
-
   const years = end.diff(start, "year");
   const months = end.diff(start.add(years, "year"), "month");
   const days = end.diff(start.add(years, "year").add(months, "month"), "day");
-
   const parts = [];
   if (years > 0) parts.push(`${years} ปี`);
   if (months > 0) parts.push(`${months} เดือน`);
   if (days > 0) parts.push(`${days} วัน`);
-
   return parts.length > 0 ? parts.join(" ") : "0 วัน";
 };
 
@@ -69,7 +82,17 @@ export const WorkExperienceSection: React.FC = () => {
 
   const workExperiences = profile.workExperiences || [];
 
+  // [Fix #3] ตรวจสอบจำนวนก่อนเปิด Drawer
   const handleAddNew = () => {
+    if (workExperiences.length >= MAX_WORK_EXPERIENCES) {
+      openNotification({
+        type: "error",
+        mainTitle: "ไม่สามารถเพิ่มได้",
+        description: `สามารถเพิ่มประวัติการทำงานได้สูงสุด ${MAX_WORK_EXPERIENCES} รายการ`,
+        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
+      });
+      return;
+    }
     form.resetFields();
     form.setFieldsValue({ inPresent: false });
     setEditingIndex(null);
@@ -90,6 +113,7 @@ export const WorkExperienceSection: React.FC = () => {
     setIsAddingNew(true);
   };
 
+  // [Fix #4] handleSave เรียก updateWorkExperience จริงๆ เมื่อเป็น Edit mode
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
@@ -106,11 +130,12 @@ export const WorkExperienceSection: React.FC = () => {
       };
 
       if (editingIndex !== null) {
+        updateWorkExperience(editingIndex, entry);
         openNotification({
           type: "success",
           mainTitle: "อัปเดตข้อมูลสำเร็จ",
           description: "ข้อมูลประสบการณ์ทำงานถูกบันทึกเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       } else {
         addWorkExperience(entry);
@@ -118,7 +143,7 @@ export const WorkExperienceSection: React.FC = () => {
           type: "success",
           mainTitle: "เพิ่มข้อมูลสำเร็จ",
           description: "ข้อมูลประสบการณ์ทำงานใหม่ถูกเพิ่มเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       }
 
@@ -130,7 +155,7 @@ export const WorkExperienceSection: React.FC = () => {
         type: "error",
         mainTitle: "เกิดข้อผิดพลาด",
         description: "กรุณาตรวจสอบข้อมูลให้ถูกต้อง",
-        icon: <CloseCircleFilled style={{ color: "#ff4d4f" }} />,
+        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
       });
     }
   };
@@ -154,15 +179,15 @@ export const WorkExperienceSection: React.FC = () => {
           type: "success",
           mainTitle: "ลบข้อมูลสำเร็จ",
           description: "ข้อมูลประสบการณ์ทำงานถูกลบเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: "#52c41a" }} />,
+          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       },
     });
   };
 
   return (
-    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
-      {/* 1. Add/Edit Drawer (UX following job page pattern) */}
+    <Space direction="vertical" size={24} style={{ width: "100%" }}>
+      {/* 1. Add/Edit Drawer */}
       <Drawer
         open={isAddingNew}
         onClose={handleCancel}
@@ -206,7 +231,6 @@ export const WorkExperienceSection: React.FC = () => {
             />
           </Layout.Header>
 
-          {/* Content Area */}
           <Layout.Content
             style={{
               padding: "32px 40px 80px 40px",
@@ -217,40 +241,66 @@ export const WorkExperienceSection: React.FC = () => {
               <Form.Item
                 label="ตำแหน่งงาน"
                 name="jobTitle"
-                required
                 rules={[{ required: true, message: "กรุณากรอกตำแหน่งงาน" }]}
               >
                 <Input placeholder="เช่น ครูสอนภาษาอังกฤษ" size="large" />
               </Form.Item>
 
               <Form.Item
-                label="ชื่อบริษัท / สถาบัน"
+                label="ชื่อโรงเรียน / บริษัท"
                 name="companyName"
-                required
-                rules={[{ required: true, message: "กรุณากรอกชื่อบริษัท" }]}
+                rules={[{ required: true, message: "กรุณากรอกชื่อโรงเรียน/บริษัท" }]}
               >
-                <Input placeholder="เช่น โรงเรียน ABC" size="large" />
+                <Input placeholder="เช่น โรงเรียนสาธิตจุฬาฯ" size="large" />
               </Form.Item>
 
               <Row gutter={16}>
+                {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. */}
                 <Col span={12}>
                   <Form.Item
-                    label="วันที่เริ่มงาน"
+                    label="เริ่มงาน (เดือน/ปี พ.ศ.)"
                     name="startDate"
-                    required
-                    rules={[
-                      { required: true, message: "กรุณาเลือกวันที่เริ่มงาน" },
-                    ]}
+                    rules={[{ required: true, message: "กรุณาเลือกเดือนและปีที่เริ่มงาน" }]}
                   >
-                    <DatePicker style={{ width: "100%" }} size="large" />
+                    <DatePicker
+                      picker="month"
+                      style={{ width: "100%" }}
+                      size="large"
+                      format={(value) =>
+                        `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
+                      }
+                      placeholder="เลือกเดือน/ปี"
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label="วันที่สิ้นสุด" name="endDate">
+                  {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. + [Fix #2b] Required เมื่อ inPresent = false */}
+                  <Form.Item
+                    label="จนถึง (เดือน/ปี พ.ศ.)"
+                    name="endDate"
+                    dependencies={["inPresent"]}
+                    rules={[
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (getFieldValue("inPresent") || value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด")
+                          );
+                        },
+                      }),
+                    ]}
+                  >
                     <DatePicker
+                      picker="month"
                       style={{ width: "100%" }}
                       size="large"
-                      disabled={form.getFieldValue("inPresent")}
+                      format={(value) =>
+                        `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
+                      }
+                      placeholder="เลือกเดือน/ปี"
+                      disabled={Form.useWatch("inPresent", form)}
                     />
                   </Form.Item>
                 </Col>
@@ -266,27 +316,25 @@ export const WorkExperienceSection: React.FC = () => {
                     if (e.target.checked) {
                       form.setFieldValue("endDate", null);
                     }
+                    // re-validate endDate เมื่อ checkbox เปลี่ยน
+                    form.validateFields(["endDate"]);
                   }}
                 >
-                  ยังคงทำงานที่นี่
+                  ยังคงทำงานที่นี่อยู่
                 </Checkbox>
               </Form.Item>
 
-              <Form.Item label="คำอธิบายหน้าที่การทำงาน" name="description">
+              <Form.Item label="รายละเอียดงาน" name="description">
                 <Input.TextArea
                   rows={6}
-                  placeholder="อธิบายความรับผิดชอบและสำเร็จการงาน..."
+                  placeholder="อธิบายความรับผิดชอบและผลงานที่ผ่านมา..."
                 />
               </Form.Item>
 
               <Divider style={{ margin: "32px 0 24px 0" }} />
 
               <Flex justify="end" gap={12}>
-                <Button
-                  onClick={handleCancel}
-                  size="large"
-                  style={{ minWidth: 100 }}
-                >
+                <Button onClick={handleCancel} size="large" style={{ minWidth: 100 }}>
                   ยกเลิก
                 </Button>
                 <Button
@@ -303,23 +351,23 @@ export const WorkExperienceSection: React.FC = () => {
         </Layout>
       </Drawer>
 
-      {/* 2. List of Work Experiences */}
-      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+      {/* 2. รายการประวัติการทำงาน */}
+      <Space direction="vertical" size={16} style={{ width: "100%" }}>
         {workExperiences.length > 0 ? (
           workExperiences.map((experience, index) => (
             <Card
               key={index}
+              hoverable
               style={{
                 borderRadius: token.borderRadiusLG,
                 border: `1px solid ${token.colorBorderSecondary}`,
               }}
               styles={{ body: { padding: "20px" } }}
-              hoverable
             >
               <Row justify="space-between" align="top">
                 <Col flex="auto">
                   <Flex vertical gap={12}>
-                    {/* Header Row: Job Title (Left) and Date Range + Duration (Right) */}
+                    {/* Header: ตำแหน่ง + ช่วงเวลา */}
                     <Row justify="space-between" align="middle" gutter={16}>
                       <Col flex="1">
                         <Title
@@ -327,7 +375,7 @@ export const WorkExperienceSection: React.FC = () => {
                           style={{
                             margin: 0,
                             fontSize: "18px",
-                            fontWeight: 700,
+                            fontWeight: 600,
                             color: token.colorTextHeading,
                           }}
                         >
@@ -335,38 +383,26 @@ export const WorkExperienceSection: React.FC = () => {
                         </Title>
                       </Col>
                       <Col>
+                        {/* [Fix #5] แสดงวันที่เป็น พ.ศ. */}
                         <Flex vertical align="end">
-                          <Text
-                            strong
-                            style={{
-                              color: token.colorPrimary,
-                              fontSize: "14px",
-                            }}
-                          >
-                            {dayjs(experience.startDate).format("MMM YYYY")} -{" "}
+                          <Text strong style={{ color: token.colorPrimary, fontSize: "14px" }}>
+                            {formatMonthYearThai(experience.startDate)} -{" "}
                             {experience.inPresent
                               ? "ปัจจุบัน"
-                              : experience.endDate
-                                ? dayjs(experience.endDate).format("MMM YYYY")
-                                : ""}
+                              : formatMonthYearThai(experience.endDate)}
                           </Text>
-                          <Text
-                            type="secondary"
-                            style={{ fontSize: "12px", fontWeight: 500 }}
-                          >
-                            (
-                            {calculateDuration(
+                          <Text type="secondary" style={{ fontSize: "12px", fontWeight: 500 }}>
+                            ({calculateDuration(
                               experience.startDate,
                               experience.endDate,
                               experience.inPresent,
-                            )}
-                            )
+                            )})
                           </Text>
                         </Flex>
                       </Col>
                     </Row>
 
-                    {/* Company Name */}
+                    {/* ชื่อโรงเรียน/บริษัท */}
                     <Text
                       strong
                       style={{
@@ -378,7 +414,7 @@ export const WorkExperienceSection: React.FC = () => {
                       {experience.companyName}
                     </Text>
 
-                    {/* Description */}
+                    {/* รายละเอียดงาน */}
                     {experience.description && (
                       <Paragraph
                         ellipsis={{
@@ -412,10 +448,7 @@ export const WorkExperienceSection: React.FC = () => {
                     type="text"
                     icon={<EditOutlined />}
                     onClick={() => handleEdit(index)}
-                    style={{
-                      color: token.colorPrimary,
-                      fontWeight: 600,
-                    }}
+                    style={{ color: token.colorPrimary, fontWeight: 600 }}
                   >
                     แก้ไขข้อมูล
                   </Button>
@@ -440,13 +473,14 @@ export const WorkExperienceSection: React.FC = () => {
         )}
       </Space>
 
-      {/* 3. Global Add Button */}
+      {/* 3. ปุ่มเพิ่ม — แสดงจำนวน/จำกัด */}
       <Button
         type="dashed"
         icon={<PlusOutlined />}
         block
         onClick={handleAddNew}
         size="large"
+        disabled={workExperiences.length >= MAX_WORK_EXPERIENCES}
         style={{
           height: "54px",
           borderRadius: token.borderRadiusLG,
@@ -454,7 +488,7 @@ export const WorkExperienceSection: React.FC = () => {
           fontWeight: 600,
         }}
       >
-        เพิ่มประสบการณ์การทำงาน
+        เพิ่มประสบการณ์การทำงาน ({workExperiences.length}/{MAX_WORK_EXPERIENCES})
       </Button>
     </Space>
   );
