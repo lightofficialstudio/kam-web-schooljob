@@ -1,12 +1,14 @@
 // prisma.config.ts
 import { defineConfig } from "@prisma/config";
+import * as dotenv from "dotenv";
+import path from "path";
+
+// ✨ [โหลด .env ก่อน เพื่อให้ process.env พร้อมใช้งาน]
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 export default defineConfig({
   datasource: {
-    // ใช้ DATABASE_URL หรือ DATABASE_PRISMA_URL ที่ Vercel มีให้
-    url:
-      process.env.DATABASE_PRISMA_URL ||
-      process.env.DATABASE_URL ||
-      process.env.DIRECT_URL,
+    // ใช้ DIRECT_URL (session pooler) สำหรับ db push
+    url: process.env.DIRECT_URL!,
   },
 });

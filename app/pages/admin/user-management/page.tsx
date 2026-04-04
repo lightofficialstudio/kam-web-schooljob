@@ -275,7 +275,7 @@ export default function UserManagementPage() {
               <Statistic
                 title="จำนวนผู้ใช้ทั้งหมด"
                 value={users.length}
-                valueStyle={{ fontSize: "28px", fontWeight: 700 }}
+                styles={{ content: { fontSize: "28px", fontWeight: 700 } }}
               />
             </Card>
           </Col>
@@ -284,11 +284,7 @@ export default function UserManagementPage() {
               <Statistic
                 title="ครู"
                 value={users.filter((u) => u.role === "EMPLOYEE").length}
-                valueStyle={{
-                  fontSize: "28px",
-                  fontWeight: 700,
-                  color: "#52C41A",
-                }}
+                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#52C41A" } }}
               />
             </Card>
           </Col>
@@ -297,11 +293,7 @@ export default function UserManagementPage() {
               <Statistic
                 title="โรงเรียน"
                 value={users.filter((u) => u.role === "EMPLOYER").length}
-                valueStyle={{
-                  fontSize: "28px",
-                  fontWeight: 700,
-                  color: "#11b6f5",
-                }}
+                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#11b6f5" } }}
               />
             </Card>
           </Col>
@@ -310,11 +302,7 @@ export default function UserManagementPage() {
               <Statistic
                 title="ผู้ดูแล"
                 value={users.filter((u) => u.role === "ADMIN").length}
-                valueStyle={{
-                  fontSize: "28px",
-                  fontWeight: 700,
-                  color: "#f5222d",
-                }}
+                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#f5222d" } }}
               />
             </Card>
           </Col>
