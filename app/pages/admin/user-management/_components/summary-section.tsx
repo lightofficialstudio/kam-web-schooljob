@@ -1,6 +1,15 @@
 "use client";
 
-import { Button, Card, Col, Flex, Row, Typography, theme } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Flex,
+  Row,
+  Skeleton,
+  Typography,
+  theme,
+} from "antd";
 import { useUserManagementStore } from "../_state/user-management-store";
 
 const { Text } = Typography;
@@ -20,6 +29,7 @@ const formatDateThai = (dateString: string): string => {
 export function SummarySection() {
   const { token } = theme.useToken();
   const users = useUserManagementStore((s) => s.users);
+  const isLoading = useUserManagementStore((s) => s.isLoading);
   const countByRole = useUserManagementStore((s) => s.countByRole);
 
   const lastUser = users.length > 0 ? users[users.length - 1] : null;
@@ -44,55 +54,69 @@ export function SummarySection() {
         borderRadius: token.borderRadiusLG,
       }}
     >
-      <Row gutter={[24, 16]}>
-        <Col xs={24} sm={12} md={6}>
-          <Flex vertical gap={6}>
-            <Text type="secondary" strong>
-              ข้อมูลล่าสุด
-            </Text>
-            {lastUser && (
-              <>
-                <Text>ผู้ใช้ล่าสุด: {formatDateThai(lastUser.createdAt)}</Text>
-                <Text>อีเมล: {lastUser.email}</Text>
-              </>
-            )}
-          </Flex>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Flex vertical gap={6}>
-            <Text type="secondary" strong>
-              สถิติบทบาท
-            </Text>
-            <Text>ผู้ดูแล: {countByRole("ADMIN")}</Text>
-            <Text>โรงเรียน: {countByRole("EMPLOYER")}</Text>
-            <Text>ครู: {countByRole("EMPLOYEE")}</Text>
-          </Flex>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Flex vertical gap={6}>
-            <Text type="secondary" strong>
-              สถิติข้อมูล
-            </Text>
-            <Text>มีชื่อเต็ม: {users.filter((u) => u.fullName).length}</Text>
-            <Text>ยังไม่มีชื่อ: {users.filter((u) => !u.fullName).length}</Text>
-          </Flex>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Flex vertical gap={6}>
-            <Text type="secondary" strong>
-              การจัดการ
-            </Text>
-            <Button
-              type="text"
-              size="small"
-              style={{ padding: 0, textAlign: "left" }}
-              onClick={handleDownloadJson}
-            >
-              ดาวน์โหลด (JSON)
-            </Button>
-          </Flex>
-        </Col>
-      </Row>
+      {isLoading ? (
+        <Row gutter={[24, 16]}>
+          {[0, 1, 2, 3].map((i) => (
+            <Col xs={24} sm={12} md={6} key={i}>
+              <Skeleton active paragraph={{ rows: 2 }} title={false} />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <Row gutter={[24, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Flex vertical gap={6}>
+              <Text type="secondary" strong>
+                ข้อมูลล่าสุด
+              </Text>
+              {lastUser && (
+                <>
+                  <Text>
+                    ผู้ใช้ล่าสุด: {formatDateThai(lastUser.createdAt)}
+                  </Text>
+                  <Text>อีเมล: {lastUser.email}</Text>
+                </>
+              )}
+            </Flex>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Flex vertical gap={6}>
+              <Text type="secondary" strong>
+                สถิติบทบาท
+              </Text>
+              <Text>ผู้ดูแล: {countByRole("ADMIN")}</Text>
+              <Text>โรงเรียน: {countByRole("EMPLOYER")}</Text>
+              <Text>ครู: {countByRole("EMPLOYEE")}</Text>
+            </Flex>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Flex vertical gap={6}>
+              <Text type="secondary" strong>
+                สถิติข้อมูล
+              </Text>
+              <Text>มีชื่อเต็ม: {users.filter((u) => u.fullName).length}</Text>
+              <Text>
+                ยังไม่มีชื่อ: {users.filter((u) => !u.fullName).length}
+              </Text>
+            </Flex>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Flex vertical gap={6}>
+              <Text type="secondary" strong>
+                การจัดการ
+              </Text>
+              <Button
+                type="text"
+                size="small"
+                style={{ padding: 0, textAlign: "left" }}
+                onClick={handleDownloadJson}
+              >
+                ดาวน์โหลด (JSON)
+              </Button>
+            </Flex>
+          </Col>
+        </Row>
+      )}
     </Card>
   );
 }

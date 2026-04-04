@@ -1,6 +1,15 @@
 "use client";
 
-import { Card, Col, Row, Statistic, Typography, theme } from "antd";
+import {
+  Card,
+  Col,
+  Flex,
+  Row,
+  Skeleton,
+  Statistic,
+  Typography,
+  theme,
+} from "antd";
 import { useUserManagementStore } from "../_state/user-management-store";
 
 const { Text } = Typography;
@@ -9,6 +18,7 @@ const { Text } = Typography;
 export function StatsSection() {
   const { token } = theme.useToken();
   const users = useUserManagementStore((s) => s.users);
+  const isLoading = useUserManagementStore((s) => s.isLoading);
   const countByRole = useUserManagementStore((s) => s.countByRole);
 
   const stats = [
@@ -33,13 +43,28 @@ export function StatsSection() {
               borderRadius: token.borderRadiusLG,
             }}
           >
-            <Statistic
-              title={<Text type="secondary">{stat.title}</Text>}
-              value={stat.value}
-              styles={{
-                content: { fontSize: 28, fontWeight: 700, color: stat.color },
-              }}
-            />
+            {isLoading ? (
+              <Flex vertical gap={8}>
+                <Skeleton.Input
+                  active
+                  size="small"
+                  style={{ width: 80, height: 16 }}
+                />
+                <Skeleton.Input
+                  active
+                  size="large"
+                  style={{ width: 120, height: 36 }}
+                />
+              </Flex>
+            ) : (
+              <Statistic
+                title={<Text type="secondary">{stat.title}</Text>}
+                value={stat.value}
+                styles={{
+                  content: { fontSize: 28, fontWeight: 700, color: stat.color },
+                }}
+              />
+            )}
           </Card>
         </Col>
       ))}

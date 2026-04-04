@@ -9,8 +9,8 @@ import {
   Flex,
   Modal,
   Row,
+  Skeleton,
   Space,
-  Spin,
   Table,
   Tag,
   Tooltip,
@@ -172,7 +172,53 @@ export function UserTable() {
       }}
       styles={{ body: { padding: 0 } }}
     >
-      <Spin spinning={isLoading} description="กำลังโหลดผู้ใช้...">
+      {isLoading ? (
+        // ── Skeleton Table ──
+        <div style={{ padding: "16px 24px" }}>
+          {/* Skeleton Header */}
+          <Flex
+            gap={8}
+            style={{
+              marginBottom: 16,
+              paddingBottom: 12,
+              borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            }}
+          >
+            {[140, 220, 160, 110, 160, 160, 100].map((w, i) => (
+              <Skeleton.Input
+                key={i}
+                active
+                size="small"
+                style={{ width: w, minWidth: w }}
+              />
+            ))}
+          </Flex>
+          {/* Skeleton Rows */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Flex
+              key={i}
+              gap={8}
+              align="center"
+              style={{
+                padding: "12px 0",
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                background:
+                  i % 2 === 1 ? token.colorFillQuaternary : "transparent",
+                borderRadius: token.borderRadius,
+              }}
+            >
+              {[140, 220, 160, 110, 160, 160, 100].map((w, j) => (
+                <Skeleton.Input
+                  key={j}
+                  active
+                  size="small"
+                  style={{ width: w, minWidth: w }}
+                />
+              ))}
+            </Flex>
+          ))}
+        </div>
+      ) : (
         <Table<UserRecord>
           columns={columns}
           dataSource={filteredUsers()}
@@ -268,7 +314,7 @@ export function UserTable() {
             ),
           }}
         />
-      </Spin>
+      )}
     </Card>
   );
 }
