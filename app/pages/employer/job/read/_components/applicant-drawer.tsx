@@ -4,6 +4,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  EyeOutlined,
   MailOutlined,
   PhoneOutlined,
   SolutionOutlined,
@@ -27,6 +28,7 @@ import {
   useApplicantDrawerStore,
   type ApplicantStatus,
 } from "../_state/applicant-drawer-store";
+import { ApplicantProfileModal } from "./applicant-profile-modal";
 
 const { Text, Title } = Typography;
 
@@ -63,6 +65,7 @@ export const ApplicantDrawer = () => {
     getApplicants,
     getAllApplicants,
     updateApplicantStatus,
+    openProfileModal,
   } = useApplicantDrawerStore();
 
   const isNewMode = selectedJobId === NEW_APPLICANTS_MODE;
@@ -77,6 +80,7 @@ export const ApplicantDrawer = () => {
   };
 
   return (
+    <>
     <Drawer
       title={
         <Flex vertical gap={2}>
@@ -242,7 +246,7 @@ export const ApplicantDrawer = () => {
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       สมัครเมื่อ{" "}
                       <Text strong style={{ fontSize: 12 }}>
-                        {applicant.appliedAt}
+                        {applicant.appliedAt.split("-").reverse().join("/")}
                       </Text>
                     </Text>
                   </Flex>
@@ -264,7 +268,7 @@ export const ApplicantDrawer = () => {
                   wrap="wrap"
                   gap={8}
                 >
-                  <Flex gap={12}>
+                  <Flex gap={4} align="center">
                     <Tooltip title={applicant.email}>
                       <Button
                         type="text"
@@ -287,6 +291,15 @@ export const ApplicantDrawer = () => {
                           />
                         }
                         style={{ padding: "0 4px", height: "auto" }}
+                      />
+                    </Tooltip>
+                    <Tooltip title="ดูโปรไฟล์เต็ม">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EyeOutlined style={{ color: PRIMARY }} />}
+                        style={{ padding: "0 4px", height: "auto" }}
+                        onClick={() => openProfileModal(applicant)}
                       />
                     </Tooltip>
                   </Flex>
@@ -388,5 +401,9 @@ export const ApplicantDrawer = () => {
         )}
       </Flex>
     </Drawer>
+
+    {/* Modal โปรไฟล์เต็มของผู้สมัคร */}
+    <ApplicantProfileModal />
+    </>
   );
 };

@@ -14,6 +14,14 @@ export interface ApplicantRecord {
   status: ApplicantStatus;
   jobTitle?: string; // แสดงเฉพาะใน mode ผู้สมัครใหม่ทั้งหมด
   jobId?: string;
+  // ข้อมูลโปรไฟล์เพิ่มเติม
+  summary?: string;
+  gradeCanTeach?: string[];
+  languagesSpoken?: string[];
+  itSkills?: string[];
+  preferredProvinces?: string[];
+  workExperiences?: { jobTitle: string; companyName: string; period: string; description: string }[];
+  educations?: { level: string; institution: string; major: string; graduationYear?: number; gpa?: number }[];
 }
 
 // Map ชื่อตำแหน่งตาม jobId — ใช้ในการ aggregate "ผู้สมัครใหม่ทั้งหมด"
@@ -36,6 +44,18 @@ const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
       education: "ครุศาสตรบัณฑิต ม.ราชภัฏ",
       appliedAt: "2026-03-20",
       status: "INTERVIEW",
+      summary: "ครูผู้เชี่ยวชาญด้านภาษาอังกฤษสื่อสาร มีประสบการณ์สอนระดับมัธยมศึกษา เน้น Active Learning และ Communicative Approach",
+      gradeCanTeach: ["มัธยมศึกษาตอนต้น", "มัธยมศึกษาตอนปลาย"],
+      languagesSpoken: ["ไทย (Native)", "อังกฤษ (Fluent)"],
+      itSkills: ["Google Classroom", "Canva for Education", "Microsoft Office"],
+      preferredProvinces: ["กรุงเทพมหานคร", "นนทบุรี"],
+      workExperiences: [
+        { jobTitle: "ครูสอนภาษาอังกฤษ", companyName: "โรงเรียนสาธิตมหาวิทยาลัยราชภัฏ", period: "2021 – ปัจจุบัน", description: "สอนภาษาอังกฤษระดับ ม.1–ม.6 เน้นทักษะการสื่อสาร จัดกิจกรรม English Camp ประจำปี" },
+        { jobTitle: "ครูอาสา", companyName: "มูลนิธิเด็กไทยเติบโต", period: "2019 – 2021", description: "สอนเสริมภาษาอังกฤษในชุมชนขาดแคลน ทุกสุดสัปดาห์" },
+      ],
+      educations: [
+        { level: "ปริญญาตรี", institution: "มหาวิทยาลัยราชภัฏสวนดุสิต", major: "ครุศาสตรบัณฑิต (ภาษาอังกฤษ)", graduationYear: 2562, gpa: 3.65 },
+      ],
     },
     {
       key: "a1-2",
@@ -47,6 +67,17 @@ const MOCK_APPLICANTS: Record<string, ApplicantRecord[]> = {
       education: "ศิลปศาสตรบัณฑิต ม.ธรรมศาสตร์",
       appliedAt: "2026-03-22",
       status: "PENDING",
+      summary: "บัณฑิตด้านภาษาอังกฤษจากมหาวิทยาลัยธรรมศาสตร์ มีความสนใจงานด้านการศึกษาและพัฒนาหลักสูตร",
+      gradeCanTeach: ["ประถมศึกษา", "มัธยมศึกษาตอนต้น"],
+      languagesSpoken: ["ไทย (Native)", "อังกฤษ (Advanced)"],
+      itSkills: ["Microsoft Office", "Zoom"],
+      preferredProvinces: ["กรุงเทพมหานคร"],
+      workExperiences: [
+        { jobTitle: "ติวเตอร์ภาษาอังกฤษ", companyName: "สถาบันกวดวิชา Enconcept", period: "2024 – ปัจจุบัน", description: "ติวเตอร์ภาษาอังกฤษสำหรับ TCAS รับนักเรียนส่วนตัวและกลุ่ม" },
+      ],
+      educations: [
+        { level: "ปริญญาตรี", institution: "มหาวิทยาลัยธรรมศาสตร์", major: "ศิลปศาสตรบัณฑิต (ภาษาอังกฤษ)", graduationYear: 2565, gpa: 3.45 },
+      ],
     },
     {
       key: "a1-3",
@@ -185,6 +216,11 @@ interface ApplicantDrawerState {
   selectedJobId: string | null;
   selectedJobTitle: string;
   filterStatus: ApplicantStatus | "ALL";
+  // Profile Modal
+  profileModalOpen: boolean;
+  selectedApplicant: ApplicantRecord | null;
+  openProfileModal: (applicant: ApplicantRecord) => void;
+  closeProfileModal: () => void;
   openDrawer: (jobId: string, jobTitle: string) => void;
   openNewApplicantsDrawer: () => void; // เปิดในโหมดผู้สมัครใหม่ทั้งหมด
   closeDrawer: () => void;
@@ -199,6 +235,11 @@ export const useApplicantDrawerStore = create<ApplicantDrawerState>((set, get) =
   selectedJobId: null,
   selectedJobTitle: "",
   filterStatus: "ALL",
+  profileModalOpen: false,
+  selectedApplicant: null,
+
+  openProfileModal: (applicant) => set({ profileModalOpen: true, selectedApplicant: applicant }),
+  closeProfileModal: () => set({ profileModalOpen: false, selectedApplicant: null }),
 
   // เปิด Drawer พร้อมระบุ jobId และชื่อตำแหน่ง
   openDrawer: (jobId, jobTitle) =>
