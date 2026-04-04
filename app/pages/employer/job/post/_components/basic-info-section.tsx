@@ -73,7 +73,6 @@ export const BasicInfoSection = () => {
           <Form.Item
             label="ระดับชั้นที่สอน"
             name="grades"
-            rules={[{ required: true, message: "กรุณาเลือกระดับชั้น" }]}
           >
             <Select mode="multiple" size="large" placeholder="เลือกระดับชั้น" style={{ width: "100%" }}>
               <Option value="อนุบาล">อนุบาล</Option>
