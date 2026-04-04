@@ -9,7 +9,6 @@ import {
 } from "@ant-design/icons";
 import {
   theme as antTheme,
-  Badge,
   Button,
   Cascader,
   Col,
@@ -79,57 +78,142 @@ export default function HeroSection() {
   return (
     <div
       style={{
-        padding: "160px 24px 80px 24px",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        paddingTop: "calc(64px + 48px)",
+        paddingBottom: "48px",
+        paddingLeft: "24px",
+        paddingRight: "24px",
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
         background: isDark
-          ? `linear-gradient(180deg, #1A202C 0%, ${token.colorBgBase} 100%)`
-          : "linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)",
+          ? "#0a0f1e"
+          : "#f8fbff",
       }}
     >
-      {/* Decorative Glow */}
+      {/* ── Grid / Dot pattern overlay ── */}
       <div
         style={{
           position: "absolute",
-          top: "-10%",
-          right: "-5%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(17, 182, 245, 0.1) 0%, rgba(255,255,255,0) 70%)",
-          filter: "blur(100px)",
+          inset: 0,
+          backgroundImage: isDark
+            ? "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)"
+            : "radial-gradient(circle, rgba(17,182,245,0.15) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          pointerEvents: "none",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
         }}
       />
 
-      <div style={{ zIndex: 1, maxWidth: "1200px", margin: "0 auto" }}>
-        <Badge
-          count="สมัครฟรีสำหรับคนหางาน"
-          style={{
-            fontWeight: 600,
-            padding: "0 12px",
-            height: "32px",
-            lineHeight: "32px",
-            borderRadius: "100px",
-            marginBottom: "24px",
-          }}
-        />
+      {/* ── Gradient fade top & bottom ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: isDark
+            ? "linear-gradient(180deg, #0a0f1e 0%, transparent 25%, transparent 75%, #0a0f1e 100%)"
+            : "linear-gradient(180deg, #f8fbff 0%, transparent 20%, transparent 80%, #f8fbff 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Glow blob — primary top-left ── */}
+      <div
+        style={{
+          position: "absolute",
+          top: "5%",
+          left: "-10%",
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, rgba(17,182,245,0.18) 0%, transparent 65%)"
+            : "radial-gradient(circle, rgba(17,182,245,0.22) 0%, transparent 65%)",
+          filter: "blur(60px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Glow blob — purple bottom-right ── */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "0%",
+          right: "-10%",
+          width: "500px",
+          height: "500px",
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(circle, rgba(99,102,241,0.16) 0%, transparent 65%)"
+            : "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 65%)",
+          filter: "blur(60px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Glow blob — teal center ── */}
+      <div
+        style={{
+          position: "absolute",
+          top: "40%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "700px",
+          height: "300px",
+          borderRadius: "50%",
+          background: isDark
+            ? "radial-gradient(ellipse, rgba(17,182,245,0.07) 0%, transparent 70%)"
+            : "radial-gradient(ellipse, rgba(17,182,245,0.10) 0%, transparent 70%)",
+          filter: "blur(40px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "900px", width: "100%" }}>
+        {/* Badge pill */}
+        <Flex justify="center" style={{ marginBottom: 12 }}>
+          <Tag
+            style={{
+              fontWeight: 600,
+              fontSize: 12,
+              padding: "4px 16px",
+              borderRadius: "100px",
+              backgroundColor: `${token.colorPrimary}18`,
+              border: `1px solid ${token.colorPrimary}50`,
+              color: token.colorPrimary,
+              letterSpacing: "0.3px",
+            }}
+          >
+            ✦ สมัครฟรีสำหรับคนหางาน
+          </Tag>
+        </Flex>
 
         <Title
           style={{
-            fontSize: "56px",
-            fontWeight: 600,
-            marginBottom: "16px",
+            fontSize: "clamp(36px, 5vw, 52px)",
+            fontWeight: 700,
+            marginBottom: 10,
             lineHeight: 1.2,
+            letterSpacing: "-0.5px",
           }}
         >
-          ศูนย์รวมงานสายการศึกษา <br />
-          <span>จากโรงเรียนทั่วประเทศ</span>
+          ศูนย์รวมงานสายการศึกษา{" "}
+          <span style={{ color: token.colorPrimary }}>จากโรงเรียนทั่วประเทศ</span>
         </Title>
 
         <Paragraph
-          style={{ fontSize: "18px", maxWidth: "800px", margin: "0 auto 40px auto" }}
+          style={{
+            fontSize: 16,
+            maxWidth: 580,
+            margin: "0 auto 28px",
+            color: token.colorTextSecondary,
+            lineHeight: 1.7,
+          }}
         >
           เชื่อมต่อโรงเรียนชั้นนำกับบุคลากรคุณภาพ ไม่ว่าจะเป็นครู อาจารย์
           ติวเตอร์ หรือบุคลากรทางการศึกษา ค้นหาและสมัครงานได้ในที่เดียว
@@ -138,15 +222,14 @@ export default function HeroSection() {
         {/* Search Card */}
         <div
           style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
+            width: "100%",
             background: token.colorBgContainer,
             boxShadow: isDark
-              ? "0 30px 60px rgba(0, 0, 0, 0.4)"
-              : "0 30px 60px rgba(0, 0, 0, 0.12)",
-            borderRadius: "32px",
-            padding: "24px",
-            border: isDark ? `1px solid ${token.colorBorder}` : "none",
+              ? "0 20px 60px rgba(0,0,0,0.5)"
+              : "0 20px 60px rgba(17,182,245,0.10), 0 4px 20px rgba(0,0,0,0.06)",
+            borderRadius: "20px",
+            padding: "20px",
+            border: `1px solid ${isDark ? token.colorBorder : token.colorBorderSecondary}`,
           }}
         >
           {/* Main Search Row */}
@@ -322,19 +405,19 @@ export default function HeroSection() {
           </div>
 
           {/* Search Button */}
-          <div style={{ marginTop: "24px", padding: "0 8px" }}>
+          <div style={{ marginTop: "16px", padding: "0 4px" }}>
             <Button
               type="primary"
               block
               size="large"
-              icon={<SearchOutlined style={{ fontSize: "20px" }} />}
+              icon={<SearchOutlined style={{ fontSize: "18px" }} />}
               onClick={handleSearch}
               style={{
-                height: "60px",
-                borderRadius: "20px",
+                height: "52px",
+                borderRadius: "16px",
                 fontWeight: 600,
-                fontSize: "18px",
-                boxShadow: "0 10px 20px rgba(24, 144, 255, 0.2)",
+                fontSize: "16px",
+                boxShadow: "0 8px 20px rgba(24, 144, 255, 0.25)",
               }}
             >
               ค้นหาตำแหน่งงาน
@@ -346,7 +429,7 @@ export default function HeroSection() {
         <Space
           size={8}
           wrap
-          style={{ marginTop: "24px", justifyContent: "center" }}
+          style={{ marginTop: "16px", justifyContent: "center" }}
         >
           <Text type="secondary">ตำแหน่งยอดนิยม: </Text>
           {POPULAR_TAGS.map((tag) => (
