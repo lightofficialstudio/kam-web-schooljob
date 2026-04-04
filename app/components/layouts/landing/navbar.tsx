@@ -116,13 +116,15 @@ export default function Navbar() {
             ? "rgba(10, 15, 30, 0.70)"
             : "rgba(255, 255, 255, 0.70)",
 
-          // ── Border ──
-          border: scrolled
-            ? `1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(17,182,245,0.20)"}`
-            : `0px solid transparent`,
-          borderBottom: scrolled
-            ? undefined
-            : `1px solid ${token.colorBorderSecondary}`,
+          // ── Border — ใช้แยก 4 ด้านเพื่อหลีกเลี่ยง shorthand conflict ──
+          borderTopWidth: scrolled ? "1px" : "0px",
+          borderRightWidth: scrolled ? "1px" : "0px",
+          borderBottomWidth: "1px",
+          borderLeftWidth: scrolled ? "1px" : "0px",
+          borderStyle: "solid",
+          borderColor: scrolled
+            ? isDark ? "rgba(255,255,255,0.10)" : "rgba(17,182,245,0.20)"
+            : token.colorBorderSecondary,
 
           // ── Shadow — เหมือน Dynamic Island ──
           boxShadow: scrolled
