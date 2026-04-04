@@ -1,29 +1,43 @@
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-// 🔍 [ดึงข้อมูล User ทั้งหมด (Admin เท่านั้น)]
+// ✨ [Supabase Admin Client — ใช้ SERVICE_ROLE_KEY เพื่อเข้าถึง auth.users]
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
+
+// 🔍 [ดึงข้อมูล User ทั้งหมดจาก auth.users (Admin เท่านั้น)]
 export async function GET() {
   try {
     console.log("📊 [ADMIN] Fetching all users...");
 
-    // ✨ [ดึง Profile ทั้งหมด]
-    const profiles = await prisma.profile.findMany({
-      select: {
-        id: true,
-        userId: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+    // ✨ [ดึง auth.users ทั้งหมดผ่าน Admin API]
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000,
     });
 
-    console.log(`✅ [ADMIN] Found ${profiles.length} users`);
+    if (error) throw new Error(error.message);
+
+    // ✨ [Map ข้อมูลให้ตรงกับ UserRecord interface ของ page]
+    const users = data.users.map((user) => ({
+      id: user.id,
+      userId: user.id,
+      email: user.email ?? "",
+      fullName:
+        user.user_metadata?.full_name ??
+        user.user_metadata?.name ??
+        null,
+      role:
+        (user.user_metadata?.role as "EMPLOYEE" | "EMPLOYER" | "ADMIN") ??
+        "EMPLOYEE",
+      createdAt: user.created_at,
+      updatedAt: user.updated_at ?? user.created_at,
+    }));
+
+    console.log(`✅ [ADMIN] Found ${users.length} users`);
 
     return NextResponse.json(
       {
@@ -31,11 +45,11 @@ export async function GET() {
         message_th: "ดึงข้อมูล User สำเร็จ",
         message_en: "Fetched users successfully",
         data: {
-          total: profiles.length,
-          users: profiles,
+          total: users.length,
+          users,
         },
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error: unknown) {
     const errorMessage =
@@ -49,7 +63,7 @@ export async function GET() {
         message_en: "Failed to fetch users",
         data: null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

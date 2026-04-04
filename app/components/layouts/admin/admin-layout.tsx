@@ -78,6 +78,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
               onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               title={title}
               mode={mode}
+              sidebarCollapsed={sidebarCollapsed}
             />
           </Layout.Header>
 
