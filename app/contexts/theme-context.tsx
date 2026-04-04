@@ -46,7 +46,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     token: {
       fontFamily:
         "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      fontSize: 16,
+      fontSize: 14,
       colorPrimary: "#11b6f5",
       borderRadius: 12,
       // ✨ [Enhanced color tokens for high visibility & Modern look]
@@ -96,26 +96,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         paddingLG: 24,
       },
 
-      // ✨ [Button Styling]
+      // ✨ [Button Styling - Capsule Style]
       Button: {
-        controlHeight: 44,
-        borderRadius: 10,
-        fontWeight: 600,
+        controlHeight: 36,
+        borderRadius: 100,
+        fontWeight: 500,
       },
 
       // ✨ [Input Styling]
       Input: {
-        controlHeight: 48,
-        borderRadius: 10,
+        controlHeight: 36,
+        borderRadius: 8,
         colorBgContainer: mode === "dark" ? "#0F172A" : "#ffffff",
         colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
       },
 
       // ✨ [Form Styling]
       Form: {
-        labelFontSize: 15,
-        labelHeight: 32,
-        itemMarginBottom: 24,
+        labelFontSize: 14,
+        labelHeight: 28,
+        itemMarginBottom: 20,
       },
 
       // ✨ [Select Styling]

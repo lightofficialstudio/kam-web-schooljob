@@ -172,7 +172,7 @@ export function UserTable() {
       }}
       styles={{ body: { padding: 0 } }}
     >
-      <Spin spinning={isLoading} tip="กำลังโหลดผู้ใช้...">
+      <Spin spinning={isLoading} description="กำลังโหลดผู้ใช้...">
         <Table<UserRecord>
           columns={columns}
           dataSource={filteredUsers()}
