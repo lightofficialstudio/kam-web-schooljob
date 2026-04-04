@@ -3,6 +3,7 @@
 import { useTheme } from "@/app/contexts/theme-context";
 import { useLandingStore } from "@/app/pages/landing/_state/landing-store";
 import {
+  DownOutlined,
   GlobalOutlined,
   SearchOutlined,
   SolutionOutlined,
@@ -12,6 +13,7 @@ import {
   Button,
   Cascader,
   Col,
+  Divider,
   Flex,
   Input,
   Row,
@@ -21,6 +23,7 @@ import {
   Typography,
 } from "antd";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -66,6 +69,8 @@ export default function HeroSection() {
   const { mode } = useTheme();
   const { token } = antTheme.useToken();
   const isDark = mode === "dark";
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { searchParams, setSearchParam, resetSearchParams, buildQueryString } =
     useLandingStore();
@@ -174,7 +179,7 @@ export default function HeroSection() {
         }}
       />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "900px", width: "100%" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "1100px", width: "100%" }}>
         {/* Badge pill */}
         <Flex justify="center" style={{ marginBottom: 12 }}>
           <Tag
@@ -225,22 +230,19 @@ export default function HeroSection() {
             width: "100%",
             background: token.colorBgContainer,
             boxShadow: isDark
-              ? "0 20px 60px rgba(0,0,0,0.5)"
-              : "0 20px 60px rgba(17,182,245,0.10), 0 4px 20px rgba(0,0,0,0.06)",
-            borderRadius: "20px",
-            padding: "20px",
+              ? "0 24px 64px rgba(0,0,0,0.55)"
+              : "0 24px 64px rgba(17,182,245,0.12), 0 4px 20px rgba(0,0,0,0.06)",
+            borderRadius: "24px",
+            padding: "24px",
             border: `1px solid ${isDark ? token.colorBorder : token.colorBorderSecondary}`,
           }}
         >
           {/* Main Search Row */}
-          <Row gutter={[0, 0]} align="middle">
+          <Row gutter={[12, 12]} align="bottom">
             {/* ช่องค้นหาคีย์เวิร์ด */}
-            <Col xs={24} lg={8}>
-              <Flex vertical gap={4} style={{ padding: "0 12px" }}>
-                <Text
-                  strong
-                  style={{ fontSize: "14px", color: isDark ? "#A0AEC0" : "#8c8c8c" }}
-                >
+            <Col xs={24} lg={9}>
+              <Flex vertical gap={6}>
+                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
                   ค้นหางานที่สนใจ
                 </Text>
                 <Input
@@ -249,24 +251,16 @@ export default function HeroSection() {
                   value={searchParams.keyword}
                   onChange={(e) => setSearchParam("keyword", e.target.value)}
                   size="large"
-                  style={{
-                    borderRadius: "12px",
-                    backgroundColor: isDark ? "#1A202C" : "#f5f5f5",
-                    border: isDark
-                      ? `1px solid ${token.colorBorder}`
-                      : "1px solid #e8e8e8",
-                  }}
+                  style={{ borderRadius: 12, height: 48 }}
+                  onPressEnter={handleSearch}
                 />
               </Flex>
             </Col>
 
             {/* ตัวเลือกหมวดหมู่งาน */}
-            <Col xs={24} lg={9}>
-              <Flex vertical gap={4} style={{ padding: "0 12px" }}>
-                <Text
-                  strong
-                  style={{ fontSize: "14px", color: isDark ? "#A0AEC0" : "#8c8c8c" }}
-                >
+            <Col xs={24} lg={8}>
+              <Flex vertical gap={6}>
+                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
                   ตำแหน่งงาน
                 </Text>
                 <Cascader
@@ -274,21 +268,15 @@ export default function HeroSection() {
                   multiple
                   maxTagCount={1}
                   value={searchParams.category}
-                  onChange={(value) =>
-                    setSearchParam("category", value as string[][])
-                  }
-                  maxTagPlaceholder={(omittedValues) => (
-                    <Tag color="processing" style={{ borderRadius: "6px" }}>
-                      +{omittedValues.length} ประเภท
-                    </Tag>
+                  onChange={(value) => setSearchParam("category", value as string[][])}
+                  maxTagPlaceholder={(omitted) => (
+                    <Tag color="processing" style={{ borderRadius: 6 }}>+{omitted.length}</Tag>
                   )}
                   placeholder="เลือกตำแหน่งที่สนใจ"
                   style={{ width: "100%" }}
                   size="large"
                   showCheckedStrategy={Cascader.SHOW_CHILD}
-                  suffixIcon={
-                    <SolutionOutlined style={{ color: token.colorPrimary }} />
-                  }
+                  suffixIcon={<SolutionOutlined style={{ color: token.colorPrimary }} />}
                   expandTrigger="click"
                 />
               </Flex>
@@ -296,22 +284,18 @@ export default function HeroSection() {
 
             {/* ตัวเลือกสถานที่ */}
             <Col xs={24} lg={7}>
-              <Flex vertical gap={4} style={{ padding: "0 12px" }}>
-                <Text
-                  strong
-                  style={{ fontSize: "14px", color: isDark ? "#A0AEC0" : "#8c8c8c" }}
-                >
+              <Flex vertical gap={6}>
+                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
                   สถานที่
                 </Text>
                 <Select
                   placeholder="ทุกจังหวัด"
                   style={{ width: "100%" }}
                   size="large"
+                  allowClear
                   value={searchParams.location}
                   onChange={(value) => setSearchParam("location", value)}
-                  suffixIcon={
-                    <GlobalOutlined style={{ color: token.colorPrimary }} />
-                  }
+                  suffixIcon={<GlobalOutlined style={{ color: token.colorPrimary }} />}
                 >
                   <Option value="bkk">กรุงเทพมหานคร</Option>
                   <Option value="center">ภาคกลาง</Option>
@@ -322,16 +306,18 @@ export default function HeroSection() {
             </Col>
           </Row>
 
-          {/* Advanced Filters Row */}
+          {/* Advanced Filters — toggle */}
           <div
             style={{
-              marginTop: "12px",
-              padding: "16px 12px 0",
-              borderTop: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
+              maxHeight: showAdvanced ? "300px" : "0px",
+              overflow: "hidden",
+              transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
+              opacity: showAdvanced ? 1 : 0,
             }}
           >
-            <Row gutter={[16, 16]}>
-              <Col xs={12} md={6} lg={5}>
+            <Divider style={{ margin: "16px 0 12px" }} />
+            <Row gutter={[12, 12]}>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="รูปแบบการจ้างงาน"
                   style={{ width: "100%" }}
@@ -340,12 +326,12 @@ export default function HeroSection() {
                   value={searchParams.employmentType}
                   onChange={(value) => setSearchParam("employmentType", value)}
                 >
-                  <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
-                  <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
-                  <Option value="contract">สัญญาจ้าง / อัตราจ้าง</Option>
+                  <Option value="fulltime">Full-time</Option>
+                  <Option value="parttime">Part-time</Option>
+                  <Option value="contract">สัญญาจ้าง</Option>
                 </Select>
               </Col>
-              <Col xs={12} md={6} lg={5}>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="ใบประกอบวิชาชีพ"
                   style={{ width: "100%" }}
@@ -355,11 +341,11 @@ export default function HeroSection() {
                   onChange={(value) => setSearchParam("license", value)}
                 >
                   <Option value="required">ต้องมีใบประกอบฯ</Option>
-                  <Option value="not-required">ไม่ต้องมีใบประกอบฯ</Option>
-                  <Option value="pending">อยู่ระหว่างขอรับใบประกอบฯ</Option>
+                  <Option value="not-required">ไม่ต้องมี</Option>
+                  <Option value="pending">อยู่ระหว่างขอ</Option>
                 </Select>
               </Col>
-              <Col xs={12} md={6} lg={5}>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="ช่วงเงินเดือน"
                   style={{ width: "100%" }}
@@ -369,12 +355,12 @@ export default function HeroSection() {
                   onChange={(value) => setSearchParam("salaryRange", value)}
                 >
                   <Option value="0-15000">ต่ำกว่า 15,000</Option>
-                  <Option value="15000-25000">15,000 - 25,000</Option>
-                  <Option value="25000-40000">25,000 - 40,000</Option>
+                  <Option value="15000-25000">15,000 – 25,000</Option>
+                  <Option value="25000-40000">25,000 – 40,000</Option>
                   <Option value="40000+">40,000 ขึ้นไป</Option>
                 </Select>
               </Col>
-              <Col xs={12} md={6} lg={5}>
+              <Col xs={12} md={6}>
                 <Select
                   placeholder="ประกาศเมื่อ"
                   style={{ width: "100%" }}
@@ -389,40 +375,69 @@ export default function HeroSection() {
                   <Option value="30days">30 วันที่ผ่านมา</Option>
                 </Select>
               </Col>
-              <Col xs={24} lg={4}>
-                <Flex justify="flex-end">
-                  <Button
-                    type="link"
-                    block
-                    style={{ color: "#8c8c8c" }}
-                    onClick={resetSearchParams}
-                  >
-                    รีเซ็ตเงื่อนไข
-                  </Button>
-                </Flex>
-              </Col>
             </Row>
           </div>
 
-          {/* Search Button */}
-          <div style={{ marginTop: "16px", padding: "0 4px" }}>
+          {/* Action Row: toggle + search button */}
+          <Flex gap={10} style={{ marginTop: 16 }} align="center">
+            {/* ปุ่มค้นหาแบบละเอียด */}
+            <Button
+              onClick={() => setShowAdvanced((v) => !v)}
+              style={{
+                borderRadius: 12,
+                height: 48,
+                fontWeight: 600,
+                fontSize: 14,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                color: showAdvanced ? token.colorPrimary : token.colorTextSecondary,
+                borderColor: showAdvanced ? token.colorPrimary : token.colorBorderSecondary,
+                backgroundColor: showAdvanced ? `${token.colorPrimary}10` : "transparent",
+                flexShrink: 0,
+                transition: "all 0.25s ease",
+              }}
+              icon={
+                <DownOutlined
+                  style={{
+                    fontSize: 11,
+                    transition: "transform 0.3s ease",
+                    transform: showAdvanced ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              }
+              iconPlacement="end"
+            >
+              ค้นหาแบบละเอียด
+            </Button>
+
+            {/* ปุ่มรีเซ็ต (แสดงเฉพาะเมื่อเปิด advanced) */}
+            {showAdvanced && (
+              <Button
+                type="text"
+                style={{ height: 48, color: token.colorTextDescription, flexShrink: 0 }}
+                onClick={() => { resetSearchParams(); }}
+              >
+                รีเซ็ต
+              </Button>
+            )}
+
+            {/* ปุ่มค้นหาหลัก */}
             <Button
               type="primary"
               block
               size="large"
-              icon={<SearchOutlined style={{ fontSize: "18px" }} />}
+              icon={<SearchOutlined />}
               onClick={handleSearch}
               style={{
-                height: "52px",
-                borderRadius: "16px",
-                fontWeight: 600,
-                fontSize: "16px",
-                boxShadow: "0 8px 20px rgba(24, 144, 255, 0.25)",
+                height: 48,
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: 15,
+                boxShadow: `0 8px 24px ${token.colorPrimary}40`,
               }}
             >
               ค้นหาตำแหน่งงาน
             </Button>
-          </div>
+          </Flex>
         </div>
 
         {/* Popular Tags */}
