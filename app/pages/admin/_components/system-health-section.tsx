@@ -89,7 +89,7 @@ export function SystemHealthSection() {
             <Progress
               percent={svc.percent}
               strokeColor={svc.barColor}
-              trailColor={token.colorFillSecondary}
+              railColor={token.colorFillSecondary}
               format={(p) => `${p}% ${svc.note}`}
               size="small"
             />
