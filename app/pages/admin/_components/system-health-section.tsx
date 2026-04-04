@@ -18,17 +18,65 @@ export function SystemHealthSection() {
   const { token } = theme.useToken();
 
   const services = [
-    { icon: <DatabaseOutlined />, label: "PostgreSQL Database", tagLabel: "Online", barColor: token.colorSuccess, percent: 100, note: "ปกติ" },
-    { icon: <ApiOutlined />, label: "Next.js API Server", tagLabel: "Running", barColor: token.colorInfo, percent: 100, note: "ใช้งานได้" },
-    { icon: <SafetyOutlined />, label: "Supabase Auth", tagLabel: "Secure", barColor: token.colorWarning, percent: 100, note: "ปลอดภัย" },
-    { icon: <FileOutlined />, label: "Storage", tagLabel: "45%", barColor: token.colorError, percent: 45, note: "ใช้งาน" },
+    {
+      icon: <DatabaseOutlined />,
+      label: "PostgreSQL Database",
+      tagLabel: "Online",
+      barColor: token.colorSuccess,
+      percent: 100,
+      note: "ปกติ",
+    },
+    {
+      icon: <ApiOutlined />,
+      label: "Next.js API Server",
+      tagLabel: "Running",
+      barColor: token.colorInfo,
+      percent: 100,
+      note: "ใช้งานได้",
+    },
+    {
+      icon: <SafetyOutlined />,
+      label: "Supabase Auth",
+      tagLabel: "Secure",
+      barColor: token.colorWarning,
+      percent: 100,
+      note: "ปลอดภัย",
+    },
+    {
+      icon: <FileOutlined />,
+      label: "Storage",
+      tagLabel: "45%",
+      barColor: token.colorError,
+      percent: 45,
+      note: "ใช้งาน",
+    },
   ];
 
   const metrics = [
-    { icon: <ClockCircleOutlined />, label: "Avg Response", value: "145ms", color: token.colorPrimary },
-    { icon: <CheckCircleOutlined />, label: "Uptime", value: "99.9%", color: token.colorSuccess },
-    { icon: <DatabaseOutlined />, label: "DB Size", value: "~2.5 MB", color: token.colorText },
-    { icon: <ApiOutlined />, label: "Connections", value: "1", color: token.colorText },
+    {
+      icon: <ClockCircleOutlined />,
+      label: "Avg Response",
+      value: "145ms",
+      color: token.colorPrimary,
+    },
+    {
+      icon: <CheckCircleOutlined />,
+      label: "Uptime",
+      value: "99.9%",
+      color: token.colorSuccess,
+    },
+    {
+      icon: <DatabaseOutlined />,
+      label: "DB Size",
+      value: "~2.5 MB",
+      color: token.colorText,
+    },
+    {
+      icon: <ApiOutlined />,
+      label: "Connections",
+      value: "1",
+      color: token.colorText,
+    },
   ];
 
   return (
@@ -37,7 +85,10 @@ export function SystemHealthSection() {
         <Flex align="center" gap={8}>
           <ControlOutlined style={{ color: token.colorPrimary }} />
           <Text strong>System Health</Text>
-          <Tag color="success" style={{ borderRadius: 100, marginLeft: "auto" }}>
+          <Tag
+            color="success"
+            style={{ borderRadius: 100, marginLeft: "auto" }}
+          >
             All Systems Operational
           </Tag>
         </Flex>
@@ -64,8 +115,12 @@ export function SystemHealthSection() {
                 }}
               >
                 <Text style={{ color: m.color, fontSize: 16 }}>{m.icon}</Text>
-                <Text strong style={{ color: m.color, fontSize: 16 }}>{m.value}</Text>
-                <Text type="secondary" style={{ fontSize: 11 }}>{m.label}</Text>
+                <Text strong style={{ color: m.color, fontSize: 16 }}>
+                  {m.value}
+                </Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  {m.label}
+                </Text>
               </Flex>
             </Col>
           ))}
@@ -73,7 +128,11 @@ export function SystemHealthSection() {
 
         {services.map((svc) => (
           <div key={svc.label}>
-            <Flex justify="space-between" align="center" style={{ marginBottom: 6 }}>
+            <Flex
+              justify="space-between"
+              align="center"
+              style={{ marginBottom: 6 }}
+            >
               <Flex align="center" gap={6}>
                 <Text style={{ color: svc.barColor }}>{svc.icon}</Text>
                 <Text style={{ fontSize: 13 }}>{svc.label}</Text>
