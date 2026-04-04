@@ -64,6 +64,7 @@ interface EmployeeProfile {
   phoneNumber: string;
   gender: string;
   dateOfBirth: string;
+  nationality: string;
   profileImageFile?: File;
   profileImageUrl?: string;
 
@@ -150,6 +151,7 @@ const initialProfile: Partial<EmployeeProfile> = {
   phoneNumber: "",
   gender: "",
   dateOfBirth: "",
+  nationality: "",
   profileImageUrl: "",
   educationLevel: "",
   institution: "",

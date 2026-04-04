@@ -97,6 +97,9 @@ export default function EmployeeProfilePage() {
         firstName: profile.firstName,
         lastName: profile.lastName,
         phoneNumber: profile.phoneNumber,
+        gender: profile.gender,
+        dateOfBirth: profile.dateOfBirth,
+        nationality: profile.nationality,
       });
     } else if (sectionId === "personal-info") {
       form.setFieldsValue({
