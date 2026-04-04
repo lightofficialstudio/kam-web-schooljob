@@ -12,6 +12,7 @@ import {
   Button,
   Card,
   Col,
+  Flex,
   Input,
   Modal,
   Row,
@@ -20,6 +21,7 @@ import {
   Statistic,
   Table,
   Tag,
+  theme,
   Tooltip,
   Typography,
 } from "antd";
@@ -29,15 +31,14 @@ import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 
-// ✨ [Date Format Utility - Thai Style dd/mm/yyyy hh:mm]
+// ✨ [แปลงวันที่เป็นรูปแบบไทย dd/mm/yyyy hh:mm]
 const formatDateThai = (dateString: string): string => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
-  const thaiYear = date.getFullYear() + 543; // Convert to Thai year
+  const thaiYear = date.getFullYear() + 543;
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-
   return `${day}/${month}/${thaiYear} ${hours}:${minutes}`;
 };
 
@@ -52,8 +53,9 @@ interface UserRecord {
   updatedAt: string;
 }
 
-// ✨ [Component]
+// ✨ [Component หลัก]
 export default function UserManagementPage() {
+  const { token } = theme.useToken();
   const { openNotification } = useNotificationModalStore();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,6 @@ export default function UserManagementPage() {
     setLoading(true);
     try {
       console.log("📊 [USER MANAGEMENT] Fetching users...");
-
       const response = await fetch("/api/v1/admin/users");
       const data = await response.json();
 
@@ -98,12 +99,12 @@ export default function UserManagementPage() {
     }
   };
 
-  // 🔄 [Load users on mount]
+  // 🔄 [โหลด users เมื่อ mount]
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 🔍 [Filter users by search text]
+  // 🔍 [Filter users ตาม search text]
   useEffect(() => {
     const filtered = users.filter((user) =>
       [user.email, user.fullName, user.role]
@@ -114,7 +115,7 @@ export default function UserManagementPage() {
     setFilteredUsers(filtered);
   }, [searchText, users]);
 
-  // ✨ [Delete user]
+  // ✨ [ลบ user]
   const handleDelete = (userId: string, email: string) => {
     Modal.confirm({
       title: "ลบผู้ใช้",
@@ -123,7 +124,6 @@ export default function UserManagementPage() {
       okType: "danger",
       cancelText: "ยกเลิก",
       onOk: async () => {
-        // TODO: Implement delete API
         openNotification({
           type: "info",
           mainTitle: "แจ้งเตือน",
@@ -134,6 +134,13 @@ export default function UserManagementPage() {
     });
   };
 
+  // ✨ [helper แปลง role เป็น label + color]
+  const getRoleDisplay = (role: string) => {
+    if (role === "ADMIN") return { color: "error", label: "ผู้ดูแล" };
+    if (role === "EMPLOYER") return { color: "processing", label: "โรงเรียน" };
+    return { color: "success", label: "ครู" };
+  };
+
   // ✨ [Column Definitions]
   const columns: ColumnsType<UserRecord> = [
     {
@@ -142,8 +149,8 @@ export default function UserManagementPage() {
       key: "userId",
       width: 140,
       render: (userId: string) => (
-        <Tooltip title="User ID ของระบบ">
-          <Text code>{userId.substring(0, 12)}...</Text>
+        <Tooltip title={userId}>
+          <Text code style={{ fontSize: 12 }}>{userId.substring(0, 12)}...</Text>
         </Tooltip>
       ),
     },
@@ -151,11 +158,9 @@ export default function UserManagementPage() {
       title: "อีเมล",
       dataIndex: "email",
       key: "email",
-      width: 200,
+      width: 220,
       render: (email: string) => (
-        <Tooltip title={email}>
-          <Text strong>{email}</Text>
-        </Tooltip>
+        <Text strong style={{ color: token.colorText }}>{email}</Text>
       ),
     },
     {
@@ -163,9 +168,10 @@ export default function UserManagementPage() {
       dataIndex: "fullName",
       key: "fullName",
       width: 160,
-      render: (fullName: string | null) => (
-        <Text>{fullName || <Text type="secondary">-</Text>}</Text>
-      ),
+      render: (fullName: string | null) =>
+        fullName
+          ? <Text>{fullName}</Text>
+          : <Text type="secondary">-</Text>,
     },
     {
       title: "บทบาท",
@@ -173,19 +179,7 @@ export default function UserManagementPage() {
       key: "role",
       width: 110,
       render: (role: string) => {
-        let color = "default";
-        let label = role;
-        if (role === "ADMIN") {
-          color = "red";
-          label = "ผู้ดูแล";
-        } else if (role === "EMPLOYER") {
-          color = "#11b6f5";
-          label = "โรงเรียน";
-        } else if (role === "EMPLOYEE") {
-          color = "green";
-          label = "ครู";
-        }
-
+        const { color, label } = getRoleDisplay(role);
         return <Tag color={color}>{label}</Tag>;
       },
     },
@@ -195,9 +189,7 @@ export default function UserManagementPage() {
       key: "createdAt",
       width: 160,
       render: (date: string) => (
-        <Tooltip title="วันที่สร้างบัญชี">
-          <Text type="secondary">{formatDateThai(date)}</Text>
-        </Tooltip>
+        <Text type="secondary" style={{ fontSize: 13 }}>{formatDateThai(date)}</Text>
       ),
     },
     {
@@ -206,20 +198,7 @@ export default function UserManagementPage() {
       key: "updatedAt",
       width: 160,
       render: (date: string) => (
-        <Tooltip title="วันที่แก้ไขล่าสุด">
-          <Text type="secondary">{formatDateThai(date)}</Text>
-        </Tooltip>
-      ),
-    },
-    {
-      title: "ID ระเบียน",
-      dataIndex: "id",
-      key: "id",
-      width: 140,
-      render: (id: string) => (
-        <Tooltip title="ID ของระเบียนในฐานข้อมูล">
-          <Text code>{id.substring(0, 12)}...</Text>
-        </Tooltip>
+        <Text type="secondary" style={{ fontSize: 13 }}>{formatDateThai(date)}</Text>
       ),
     },
     {
@@ -248,106 +227,105 @@ export default function UserManagementPage() {
     },
   ];
 
+  // ✨ [คำนวณ stats จาก raw data]
+  const countByRole = (role: string) => users.filter((u) => u.role === role).length;
+
   return (
     <Row gutter={[16, 16]}>
-      {/* ✨ [Header Section] */}
+
+      {/* ── Header ── */}
       <Col xs={24}>
         <Card
+          styles={{ body: { padding: "20px 24px" } }}
           style={{
-            background: "linear-gradient(135deg, #11b6f5 0%, #0ea5e0 100%)",
-            borderRadius: "8px",
+            background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
+            border: "none",
+            borderRadius: token.borderRadiusLG,
           }}
         >
-          <Title level={2} style={{ color: "white", margin: 0 }}>
+          <Title level={3} style={{ color: "#fff", margin: 0 }}>
             จัดการผู้ใช้
           </Title>
-          <Text style={{ color: "rgba(255, 255, 255, 0.8)" }}>
+          <Text style={{ color: "rgba(255,255,255,0.80)", fontSize: 14 }}>
             ดูและจัดการผู้ใช้ที่ลงทะเบียนทั้งหมดในระบบ
           </Text>
         </Card>
       </Col>
 
-      {/* ✨ [Stats Section] */}
+      {/* ── Stats ── */}
       <Col xs={24}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="จำนวนผู้ใช้ทั้งหมด"
-                value={users.length}
-                styles={{ content: { fontSize: "28px", fontWeight: 700 } }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="ครู"
-                value={users.filter((u) => u.role === "EMPLOYEE").length}
-                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#52C41A" } }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="โรงเรียน"
-                value={users.filter((u) => u.role === "EMPLOYER").length}
-                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#11b6f5" } }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="ผู้ดูแล"
-                value={users.filter((u) => u.role === "ADMIN").length}
-                styles={{ content: { fontSize: "28px", fontWeight: 700, color: "#f5222d" } }}
-              />
-            </Card>
-          </Col>
+          {[
+            { title: "ผู้ใช้ทั้งหมด", value: users.length, color: token.colorText },
+            { title: "ครู", value: countByRole("EMPLOYEE"), color: token.colorSuccess },
+            { title: "โรงเรียน", value: countByRole("EMPLOYER"), color: token.colorPrimary },
+            { title: "ผู้ดูแล", value: countByRole("ADMIN"), color: token.colorError },
+          ].map((stat) => (
+            <Col xs={24} sm={12} lg={6} key={stat.title}>
+              <Card
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: token.borderRadiusLG,
+                }}
+              >
+                <Statistic
+                  title={<Text type="secondary">{stat.title}</Text>}
+                  value={stat.value}
+                  styles={{ content: { fontSize: 28, fontWeight: 700, color: stat.color } }}
+                />
+              </Card>
+            </Col>
+          ))}
         </Row>
       </Col>
 
-      {/* ✨ [Toolbar] */}
+      {/* ── Toolbar ── */}
       <Col xs={24}>
-        <Card>
+        <Card
+          style={{
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+          }}
+        >
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} sm={12}>
               <Input
                 placeholder="ค้นหาจากอีเมล ชื่อ หรือบทบาท..."
-                prefix={<SearchOutlined />}
+                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 allowClear
               />
             </Col>
             <Col xs={24} sm={12}>
-              <Row justify="end">
-                <Space>
-                  <Button
-                    icon={<ReloadOutlined />}
-                    onClick={fetchUsers}
-                    loading={loading}
-                  >
-                    รีเฟรช
+              <Flex justify="flex-end" gap={8}>
+                <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
+                  รีเฟรช
+                </Button>
+                <Link href="/pages/admin/users/new">
+                  <Button type="primary" icon={<PlusOutlined />}>
+                    เพิ่มผู้ใช้ใหม่
                   </Button>
-                  <Link href="/pages/admin/users/new">
-                    <Button type="primary" icon={<PlusOutlined />}>
-                      เพิ่มผู้ใช้ใหม่
-                    </Button>
-                  </Link>
-                </Space>
-              </Row>
+                </Link>
+              </Flex>
             </Col>
           </Row>
         </Card>
       </Col>
 
-      {/* ✨ [Data Table] */}
+      {/* ── Table ── */}
       <Col xs={24}>
-        <Card>
-          <Spin spinning={loading} description="กำลังโหลดผู้ใช้...">
+        <Card
+          style={{
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+          }}
+          styles={{ body: { padding: 0 } }}
+        >
+          <Spin spinning={loading} tip="กำลังโหลดผู้ใช้...">
             <Table<UserRecord>
               columns={columns}
               dataSource={filteredUsers}
@@ -356,92 +334,69 @@ export default function UserManagementPage() {
                 pageSize: 10,
                 total: filteredUsers.length,
                 showTotal: (total, range) =>
-                  `แสดง ${range[0]} ถึง ${range[1]} จากทั้งหมด ${total} ผู้ใช้`,
+                  `แสดง ${range[0]}–${range[1]} จากทั้งหมด ${total} ผู้ใช้`,
                 showSizeChanger: true,
                 showQuickJumper: true,
               }}
               scroll={{ x: 1200 }}
-              locale={{
-                emptyText: "ไม่พบผู้ใช้",
-              }}
+              locale={{ emptyText: "ไม่พบผู้ใช้" }}
               rowSelection={{
                 selectedRowKeys,
                 onChange: (keys) => setSelectedRowKeys(keys),
               }}
               expandable={{
                 expandedRowRender: (record) => (
-                  <Row gutter={[24, 16]}>
+                  <Row
+                    gutter={[24, 16]}
+                    style={{
+                      padding: "12px 16px",
+                      background: token.colorFillQuaternary,
+                      borderRadius: token.borderRadius,
+                    }}
+                  >
                     <Col xs={24} sm={12} md={8}>
-                      <Space orientation="vertical" style={{ width: "100%" }}>
+                      <Flex vertical gap={8}>
                         <div>
-                          <Text type="secondary" strong>
-                            User ID:
-                          </Text>
+                          <Text type="secondary" strong>User ID:</Text>
                           <br />
                           <Text code>{record.userId}</Text>
                         </div>
                         <div>
-                          <Text type="secondary" strong>
-                            ID ระเบียน:
-                          </Text>
+                          <Text type="secondary" strong>ID ระเบียน:</Text>
                           <br />
                           <Text code>{record.id}</Text>
                         </div>
-                      </Space>
+                      </Flex>
                     </Col>
                     <Col xs={24} sm={12} md={8}>
-                      <Space orientation="vertical" style={{ width: "100%" }}>
+                      <Flex vertical gap={8}>
                         <div>
-                          <Text type="secondary" strong>
-                            สร้างเมื่อ:
-                          </Text>
+                          <Text type="secondary" strong>สร้างเมื่อ:</Text>
                           <br />
                           <Text>{formatDateThai(record.createdAt)}</Text>
                         </div>
                         <div>
-                          <Text type="secondary" strong>
-                            แก้ไขล่าสุด:
-                          </Text>
+                          <Text type="secondary" strong>แก้ไขล่าสุด:</Text>
                           <br />
                           <Text>{formatDateThai(record.updatedAt)}</Text>
                         </div>
-                      </Space>
+                      </Flex>
                     </Col>
                     <Col xs={24} sm={12} md={8}>
-                      <Space orientation="vertical" style={{ width: "100%" }}>
+                      <Flex vertical gap={8}>
                         <div>
-                          <Text type="secondary" strong>
-                            ชื่อเต็ม:
-                          </Text>
+                          <Text type="secondary" strong>ชื่อเต็ม:</Text>
                           <br />
-                          <Text>
-                            {record.fullName || (
-                              <Text type="secondary">ยังไม่ได้ตั้ง</Text>
-                            )}
-                          </Text>
+                          <Text>{record.fullName || <Text type="secondary">ยังไม่ได้ตั้ง</Text>}</Text>
                         </div>
                         <div>
-                          <Text type="secondary" strong>
-                            บทบาท:
-                          </Text>
+                          <Text type="secondary" strong>บทบาท:</Text>
                           <br />
-                          {(() => {
-                            let color = "default";
-                            let label: string = record.role;
-                            if (record.role === "ADMIN") {
-                              color = "red";
-                              label = "ผู้ดูแล";
-                            } else if (record.role === "EMPLOYER") {
-                              color = "#11b6f5";
-                              label = "โรงเรียน";
-                            } else if (record.role === "EMPLOYEE") {
-                              color = "green";
-                              label = "ครู";
-                            }
-                            return <Tag color={color}>{label}</Tag>;
-                          })()}
+                          <Tag color={getRoleDisplay(record.role).color}>
+                            {getRoleDisplay(record.role).label}
+                          </Tag>
                         </div>
-                      </Space>
+                      </Flex>
                     </Col>
                   </Row>
                 ),
@@ -451,145 +406,84 @@ export default function UserManagementPage() {
         </Card>
       </Col>
 
-      {/* ✨ [Bulk Actions] */}
+      {/* ── Bulk Actions ── */}
       {selectedRowKeys.length > 0 && (
         <Col xs={24}>
           <Card
             style={{
-              background: "linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)",
-              border: "1px solid #91d5ff",
-              borderRadius: "8px",
+              background: `${token.colorPrimaryBg}`,
+              border: `1px solid ${token.colorPrimaryBorder}`,
+              borderRadius: token.borderRadiusLG,
             }}
           >
-            <Space orientation="vertical" style={{ width: "100%" }} size="middle">
-              <Row justify="space-between" align="middle">
-                <Col>
-                  <Text>
-                    เลือก <Text strong>{selectedRowKeys.length}</Text> ผู้ใช้
-                  </Text>
-                </Col>
-                <Col>
-                  <Space>
-                    <Button danger>ลบที่เลือก</Button>
-                    <Button>ส่งออก CSV (ทั้งหมด)</Button>
-                    <Button>ส่งออก CSV (ที่เลือก)</Button>
-                  </Space>
-                </Col>
-              </Row>
-
-              <div>
-                <Text type="secondary" strong>
-                  รายละเอียดที่เลือก:
-                </Text>
-                <Row gutter={[8, 8]} style={{ marginTop: "8px" }}>
-                  {(() => {
-                    const selectedUsers = users.filter((u) =>
-                      selectedRowKeys.includes(u.id),
-                    );
-                    const adminCount = selectedUsers.filter(
-                      (u) => u.role === "ADMIN",
-                    ).length;
-                    const schoolCount = selectedUsers.filter(
-                      (u) => u.role === "EMPLOYER",
-                    ).length;
-                    const teacherCount = selectedUsers.filter(
-                      (u) => u.role === "EMPLOYEE",
-                    ).length;
-
-                    return (
-                      <>
-                        <Col xs={12} sm={6}>
-                          <Text>ผู้ดูแล: {adminCount}</Text>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                          <Text>โรงเรียน: {schoolCount}</Text>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                          <Text>ครู: {teacherCount}</Text>
-                        </Col>
-                      </>
-                    );
-                  })()}
-                </Row>
-              </div>
-            </Space>
+            <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
+              <Text>
+                เลือก <Text strong style={{ color: token.colorPrimary }}>{selectedRowKeys.length}</Text> ผู้ใช้
+              </Text>
+              <Space>
+                <Button danger onClick={() => {}}>ลบที่เลือก</Button>
+                <Button onClick={() => {}}>ส่งออก CSV (ทั้งหมด)</Button>
+                <Button onClick={() => {}}>ส่งออก CSV (ที่เลือก)</Button>
+              </Space>
+            </Flex>
           </Card>
         </Col>
       )}
 
-      {/* ✨ [Summary Section] */}
+      {/* ── Summary ── */}
       <Col xs={24}>
-        <Card>
-          <Row gutter={[16, 16]}>
+        <Card
+          style={{
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+          }}
+        >
+          <Row gutter={[24, 16]}>
             <Col xs={24} sm={12} md={6}>
-              <Space orientation="vertical">
-                <Text type="secondary" strong>
-                  ข้อมูลล่าสุด
-                </Text>
+              <Flex vertical gap={6}>
+                <Text type="secondary" strong>ข้อมูลล่าสุด</Text>
                 {users.length > 0 && (
                   <>
-                    <Text>
-                      ผู้ใช้ล่าสุด:{" "}
-                      {formatDateThai(users[users.length - 1].createdAt)}
-                    </Text>
+                    <Text>ผู้ใช้ล่าสุด: {formatDateThai(users[users.length - 1].createdAt)}</Text>
                     <Text>อีเมล: {users[users.length - 1].email}</Text>
                   </>
                 )}
-              </Space>
+              </Flex>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space orientation="vertical">
-                <Text type="secondary" strong>
-                  สถิติบทบาท
-                </Text>
-                <Text>
-                  ผู้ดูแล: {users.filter((u) => u.role === "ADMIN").length}
-                </Text>
-                <Text>
-                  โรงเรียน: {users.filter((u) => u.role === "EMPLOYER").length}
-                </Text>
-                <Text>
-                  ครู: {users.filter((u) => u.role === "EMPLOYEE").length}
-                </Text>
-              </Space>
+              <Flex vertical gap={6}>
+                <Text type="secondary" strong>สถิติบทบาท</Text>
+                <Text>ผู้ดูแล: {countByRole("ADMIN")}</Text>
+                <Text>โรงเรียน: {countByRole("EMPLOYER")}</Text>
+                <Text>ครู: {countByRole("EMPLOYEE")}</Text>
+              </Flex>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space orientation="vertical">
-                <Text type="secondary" strong>
-                  สถิติข้อมูล
-                </Text>
-                <Text>
-                  ได้ชื่อเต็ม: {users.filter((u) => u.fullName).length}
-                </Text>
-                <Text>
-                  ยังไม่มีชื่อเต็ม: {users.filter((u) => !u.fullName).length}
-                </Text>
-              </Space>
+              <Flex vertical gap={6}>
+                <Text type="secondary" strong>สถิติข้อมูล</Text>
+                <Text>มีชื่อเต็ม: {users.filter((u) => u.fullName).length}</Text>
+                <Text>ยังไม่มีชื่อ: {users.filter((u) => !u.fullName).length}</Text>
+              </Flex>
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Space orientation="vertical">
-                <Text type="secondary" strong>
-                  การจัดการ
-                </Text>
-                <Text>
-                  <Button
-                    type="text"
-                    size="small"
-                    onClick={() => {
-                      console.log(
-                        "Export data:",
-                        users.map((u) => ({
-                          ...u,
-                          createdAt: formatDateThai(u.createdAt),
-                          updatedAt: formatDateThai(u.updatedAt),
-                        })),
-                      );
-                    }}
-                  >
-                    ดาวน์โหลด (JSON)
-                  </Button>
-                </Text>
-              </Space>
+              <Flex vertical gap={6}>
+                <Text type="secondary" strong>การจัดการ</Text>
+                <Button
+                  type="text"
+                  size="small"
+                  style={{ padding: 0, textAlign: "left" }}
+                  onClick={() => {
+                    console.log("Export data:", users.map((u) => ({
+                      ...u,
+                      createdAt: formatDateThai(u.createdAt),
+                      updatedAt: formatDateThai(u.updatedAt),
+                    })));
+                  }}
+                >
+                  ดาวน์โหลด (JSON)
+                </Button>
+              </Flex>
             </Col>
           </Row>
         </Card>

@@ -10,42 +10,36 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Button, Layout, Menu, Tooltip } from "antd";
+import { Button, Layout, Menu, Tooltip, theme } from "antd";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
+const { useToken } = theme;
 
 interface AdminSidebarProps {
-  collapsed?: boolean;
-  onCollapse?: (collapsed: boolean) => void;
+  collapsed: boolean;
+  onCollapse: (v: boolean) => void;
 }
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
+export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [mode, setMode] = useState<"light" | "dark">("dark");
+  const { mode, toggleTheme } = useTheme();
+  const { token } = useToken();
 
-  // ✨ [Initialize theme from localStorage]
-  useEffect(() => {
-    const savedTheme =
-      (localStorage.getItem("app-theme") as "light" | "dark") || "dark";
-    setMode(savedTheme);
-    setMounted(true);
-  }, []);
+  const isDark = mode === "dark";
 
-  // ✨ [Try to use theme context for live updates]
-  try {
-    const themeContext = useTheme();
-    useEffect(() => {
-      if (themeContext && mounted) {
-        setMode(themeContext.mode);
-      }
-    }, [themeContext?.mode]);
-  } catch {
-    // Fall back to localStorage if context not available
-  }
+  // ✨ [สีพื้นหลัง Sidebar]
+  const sidebarBg = isDark
+    ? "linear-gradient(160deg, #0f172a 0%, #0f1f3d 55%, #0f172a 100%)"
+    : "linear-gradient(160deg, #ffffff 0%, #f0f7ff 55%, #f8fafc 100%)";
+
+  const borderColor = isDark
+    ? "rgba(255,255,255,0.07)"
+    : "rgba(17,182,245,0.12)";
+
+  const textMuted = isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
 
   // ✨ [Menu Items สำหรับ Admin]
   const menuItems: MenuItem[] = [
@@ -75,12 +69,12 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
     },
   ];
 
-  // ✨ [หา current pathname match - match longest (most specific) path first]
-  const validMenuItems = menuItems.filter(
+  // ✨ [หา selected key จาก pathname — match ยาวสุดก่อน]
+  const validItems = menuItems.filter(
     (item): item is NonNullable<typeof item> => !!item && "key" in item,
   );
   const selectedKey =
-    validMenuItems
+    validItems
       .sort(
         (a, b) =>
           ((b.key as string).length || 0) - ((a.key as string).length || 0),
@@ -88,349 +82,292 @@ export function AdminSidebar({ collapsed = false }: AdminSidebarProps) {
       .find((item) => pathname.startsWith(item.key as string))?.key ||
     "/pages/admin";
 
-  if (!mounted) return null;
-
   return (
     <Layout.Sider
       collapsed={collapsed}
-      width={280}
-      theme={mode}
+      collapsible
+      trigger={null}
+      width={260}
+      collapsedWidth={72}
       style={{
-        background:
-          mode === "dark"
-            ? "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1a1f3a 100%)"
-            : "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
-        boxShadow:
-          mode === "dark"
-            ? "4px 0 16px rgba(0, 0, 0, 0.25)"
-            : "4px 0 16px rgba(0, 0, 0, 0.08)",
+        background: sidebarBg,
+        boxShadow: isDark
+          ? "4px 0 24px rgba(0,0,0,0.35)"
+          : "4px 0 20px rgba(17,182,245,0.08)",
+        borderRight: `1px solid ${borderColor}`,
         position: "relative",
         overflow: "hidden",
+        transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
+        flexShrink: 0,
       }}
     >
-      {/* ✨ [Background Animation Element] */}
+      {/* ✨ [Dot-grid background pattern] */}
       <div
+        suppressHydrationWarning
         style={{
           position: "absolute",
-          top: -50,
-          right: -50,
-          width: 200,
-          height: 200,
-          background:
-            mode === "dark"
-              ? "radial-gradient(circle, rgba(30, 58, 138, 0.15) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(96, 165, 250, 0.08) 0%, transparent 70%)",
-          borderRadius: "50%",
+          inset: 0,
+          backgroundImage: isDark
+            ? "radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)"
+            : "radial-gradient(circle, rgba(17,182,245,0.12) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
           pointerEvents: "none",
-          animation: "float 6s ease-in-out infinite",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: -100,
-          left: -50,
-          width: 300,
-          height: 300,
-          background:
-            mode === "dark"
-              ? "radial-gradient(circle, rgba(17, 182, 245, 0.1) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(17, 182, 245, 0.05) 0%, transparent 70%)",
-          borderRadius: "50%",
-          pointerEvents: "none",
-          animation: "float 8s ease-in-out infinite reverse",
+          zIndex: 0,
         }}
       />
 
-      {/* ✨ [Logo Section - Premium Style] */}
+      {/* ✨ [Glow Blob — top right] */}
       <div
         style={{
-          height: "72px",
+          position: "absolute",
+          top: -60,
+          right: -60,
+          width: 220,
+          height: 220,
+          background: isDark
+            ? `radial-gradient(circle, rgba(17,182,245,0.18) 0%, transparent 70%)`
+            : `radial-gradient(circle, rgba(17,182,245,0.14) 0%, transparent 70%)`,
+          borderRadius: "50%",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      {/* ✨ [Glow Blob — bottom left] */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: -80,
+          left: -60,
+          width: 280,
+          height: 280,
+          background: isDark
+            ? `radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)`
+            : `radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)`,
+          borderRadius: "50%",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      {/* ✨ [Logo Area] */}
+      <div
+        style={{
+          height: 72,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderBottom:
-            mode === "dark"
-              ? "1px solid rgba(255, 255, 255, 0.08)"
-              : "1px solid rgba(0, 0, 0, 0.08)",
-          background:
-            mode === "dark"
-              ? "linear-gradient(135deg, rgba(17, 182, 245, 0.4) 0%, rgba(17, 182, 245, 0.2) 100%)"
-              : "linear-gradient(135deg, rgba(17, 182, 245, 0.1) 0%, rgba(17, 182, 245, 0.05) 100%)",
-          backdropFilter: "blur(10px)",
+          borderBottom: `1px solid ${borderColor}`,
+          background: isDark
+            ? "linear-gradient(135deg, rgba(17,182,245,0.18) 0%, rgba(17,182,245,0.06) 100%)"
+            : "linear-gradient(135deg, rgba(17,182,245,0.10) 0%, rgba(17,182,245,0.03) 100%)",
+          backdropFilter: "blur(8px)",
           position: "relative",
           zIndex: 1,
+          overflow: "hidden",
+          transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        {collapsed ? (
+        {/* Icon circle — always visible */}
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            background: `linear-gradient(135deg, ${token.colorPrimary} 0%, #6366f1 100%)`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 800,
+            fontSize: 16,
+            color: "#fff",
+            flexShrink: 0,
+            boxShadow: `0 4px 12px rgba(17,182,245,0.45)`,
+            transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        >
+          S
+        </div>
+
+        {/* Text — ซ่อนเมื่อ collapsed */}
+        <div
+          style={{
+            maxWidth: collapsed ? 0 : 160,
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            transition: "max-width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease",
+            opacity: collapsed ? 0 : 1,
+            marginLeft: collapsed ? 0 : 10,
+          }}
+        >
           <div
             style={{
-              fontSize: "20px",
+              fontSize: 13,
               fontWeight: 800,
-              background: "linear-gradient(135deg, #7dd3fc 0%, #11b6f5 100%)",
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              background: isDark
+                ? "linear-gradient(135deg, #7dd3fc 0%, #a5b4fc 100%)"
+                : `linear-gradient(135deg, ${token.colorPrimary} 0%, #6366f1 100%)`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              textAlign: "center",
-              letterSpacing: "2px",
-              animation: "fadeInScale 0.5s ease-out",
+              lineHeight: 1.2,
             }}
           >
-            K
+            SCHOOL BOARD
           </div>
-        ) : (
-          <div style={{ textAlign: "center" }}>
-            <div
-              style={{
-                fontSize: "24px",
-                fontWeight: 800,
-                background: "linear-gradient(135deg, #7dd3fc 0%, #11b6f5 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                marginBottom: "4px",
-                letterSpacing: "3px",
-                animation: "fadeInScale 0.5s ease-out",
-              }}
-            >
-              KAM
-            </div>
-            <div
-              style={{
-                fontSize: "10px",
-                color:
-                  mode === "dark"
-                    ? "rgba(139, 189, 255, 0.7)"
-                    : "rgba(96, 165, 250, 0.7)",
-                marginTop: "2px",
-                fontWeight: 600,
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-              }}
-            >
-              Admin Panel
-            </div>
+          <div style={{ fontSize: 10, color: textMuted, letterSpacing: "0.5px", marginTop: 2 }}>
+            Admin Panel
           </div>
-        )}
+        </div>
       </div>
 
-      {/* ✨ [Menu Items - Enhanced] */}
+      {/* ✨ [Menu Items] */}
       <div
         style={{
-          paddingTop: "16px",
-          paddingBottom: "80px",
+          paddingTop: 12,
+          paddingBottom: 120,
           position: "relative",
           zIndex: 1,
         }}
       >
         <Menu
-          theme={mode}
           mode="inline"
           selectedKeys={[selectedKey as string]}
           items={menuItems}
+          inlineIndent={12}
           style={{
             background: "transparent",
             border: "none",
-            paddingLeft: "8px",
-            paddingRight: "8px",
+            paddingLeft: collapsed ? 0 : 8,
+            paddingRight: collapsed ? 0 : 8,
           }}
-          inlineIndent={12}
+          // ✨ [ใช้ token สี — ไม่มี style tag]
+          theme={isDark ? "dark" : "light"}
         />
       </div>
 
-      {/* ✨ [Footer Section - Home Button] */}
+      {/* ✨ [Active left-bar indicator — inject via data attribute + CSS variable] */}
+      <style>{`
+        /* ── Shared menu item base ── */
+        .admin-sidebar .ant-menu-item {
+          position: relative !important;
+          border-radius: 10px !important;
+          margin: 4px 0 !important;
+          transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+        }
+
+        /* ── Active bar indicator ── */
+        .admin-sidebar .ant-menu-item-selected::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 20%;
+          bottom: 20%;
+          width: 3px;
+          background: linear-gradient(180deg, #7dd3fc 0%, #11b6f5 100%);
+          border-radius: 0 3px 3px 0;
+        }
+
+        /* ── Hover translate ── */
+        .admin-sidebar .ant-menu-item:not(.ant-menu-item-selected):hover {
+          transform: translateX(3px);
+        }
+      `}</style>
+
+      {/* ✨ [Footer — Theme toggle + กลับหน้าหลัก] */}
       <div
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          padding: "16px",
-          background:
-            "linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%)",
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-          zIndex: 1,
+          padding: "12px 12px 16px",
+          borderTop: `1px solid ${borderColor}`,
+          background: isDark
+            ? "linear-gradient(0deg, rgba(0,0,0,0.25) 0%, transparent 100%)"
+            : "linear-gradient(0deg, rgba(255,255,255,0.6) 0%, transparent 100%)",
+          backdropFilter: "blur(8px)",
+          zIndex: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
         }}
       >
-        {/* ✨ [Theme Toggle Button] */}
-        <div
+        {/* Theme toggle */}
+        <Tooltip
+          title={
+            collapsed
+              ? mode === "dark"
+                ? "Light Mode"
+                : "Dark Mode"
+              : undefined
+          }
+          placement="right"
+        >
+          <Button
+            block
+            type="text"
+            icon={<BgColorsOutlined />}
+            onClick={toggleTheme}
+            style={{
+              color: isDark ? "rgba(255,255,255,0.65)" : token.colorTextSecondary,
+              borderRadius: 10,
+              height: 40,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: collapsed ? "center" : "flex-start",
+              gap: 8,
+              paddingLeft: collapsed ? 0 : 12,
+              transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+            }}
+          >
+            {!collapsed && (mode === "dark" ? "Light Mode" : "Dark Mode")}
+          </Button>
+        </Tooltip>
+
+        {/* กลับหน้าหลัก */}
+        <Tooltip
+          title={collapsed ? "กลับหน้าหลัก" : undefined}
+          placement="right"
+        >
+          <Button
+            block
+            type="text"
+            icon={<HomeOutlined />}
+            onClick={() => router.push("/")}
+            style={{
+              color: isDark ? "rgba(255,255,255,0.65)" : token.colorTextSecondary,
+              borderRadius: 10,
+              height: 40,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: collapsed ? "center" : "flex-start",
+              gap: 8,
+              paddingLeft: collapsed ? 0 : 12,
+              transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+            }}
+          >
+            {!collapsed && "กลับหน้าหลัก"}
+          </Button>
+        </Tooltip>
+
+        {/* Collapse toggle */}
+        <Button
+          block
+          type="text"
+          onClick={() => onCollapse(!collapsed)}
           style={{
-            marginBottom: "12px",
-            paddingBottom: "12px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            color: isDark ? "rgba(255,255,255,0.35)" : token.colorTextQuaternary,
+            borderRadius: 10,
+            height: 32,
+            fontSize: 11,
+            letterSpacing: "0.5px",
           }}
         >
-          <Tooltip
-            title={
-              mode === "dark" ? "สวิตช์เป็น Light Mode" : "สวิตช์เป็น Dark Mode"
-            }
-          >
-            <Button
-              block
-              type="text"
-              icon={<BgColorsOutlined style={{ fontSize: "16px" }} />}
-              onClick={() => {
-                const newMode = mode === "dark" ? "light" : "dark";
-                setMode(newMode);
-                localStorage.setItem("app-theme", newMode);
-                window.location.reload();
-              }}
-              style={{
-                color:
-                  mode === "dark"
-                    ? "rgba(255, 255, 255, 0.75)"
-                    : "rgba(0, 0, 0, 0.75)",
-                borderRadius: "8px",
-                transition: "all 0.3s ease",
-              }}
-            >
-              {!collapsed && (mode === "dark" ? "Light Mode" : "Dark Mode")}
-            </Button>
-          </Tooltip>
-        </div>
-
-        {/* ✨ [Home Menu] */}
-        <Menu
-          theme={mode === "dark" ? "dark" : "light"}
-          mode="inline"
-          items={[
-            {
-              key: "home",
-              icon: <HomeOutlined style={{ fontSize: "16px" }} />,
-              label: collapsed ? "" : "กลับหน้าหลัก",
-              onClick: () => router.push("/"),
-            },
-          ]}
-          style={{
-            background: "transparent",
-            border: "none",
-          }}
-        />
+          {collapsed ? "›" : "‹ ย่อ Sidebar"}
+        </Button>
       </div>
-
-      {/* ✨ [CSS Animations] */}
-      <style>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(20px);
-          }
-        }
-
-        @keyframes fadeInScale {
-          0% {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        /* Dark Mode Menu Styles */
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item {
-          position: relative;
-          border-radius: 8px !important;
-          margin: 8px 0 !important;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          color: rgba(255, 255, 255, 0.75) !important;
-          background: rgba(255, 255, 255, 0.02) !important;
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item:hover {
-          background: rgba(17, 182, 245, 0.12) !important;
-          color: #11b6f5 !important;
-          transform: translateX(4px);
-          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.2);
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected {
-          background: linear-gradient(135deg, rgba(17, 182, 245, 0.2) 0%, rgba(17, 182, 245, 0.15) 100%) !important;
-          color: #7dd3fc !important;
-          font-weight: 600;
-          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.3);
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 3px;
-          background: linear-gradient(180deg, #7dd3fc 0%, #11b6f5 100%);
-          border-radius: 0 3px 3px 0;
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-icon {
-          font-size: 16px !important;
-          transition: all 0.3s ease !important;
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item:hover .ant-menu-item-icon {
-          color: #11b6f5 !important;
-          transform: rotate(5deg) scale(1.1);
-        }
-
-        .ant-layout-sider-dark .ant-menu-dark .ant-menu-item-selected .ant-menu-item-icon {
-          color: #7dd3fc !important;
-        }
-
-        /* Light Mode Menu Styles */
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item {
-          position: relative;
-          border-radius: 8px !important;
-          margin: 8px 0 !important;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          color: rgba(0, 0, 0, 0.75) !important;
-          background: rgba(0, 0, 0, 0.02) !important;
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item:hover {
-          background: rgba(17, 182, 245, 0.1) !important;
-          color: #11b6f5 !important;
-          transform: translateX(4px);
-          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.2);
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected {
-          background: linear-gradient(135deg, rgba(17, 182, 245, 0.15) 0%, rgba(17, 182, 245, 0.1) 100%) !important;
-          color: #11b6f5 !important;
-          font-weight: 600;
-          box-shadow: inset 0 0 0 1px rgba(17, 182, 245, 0.3);
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 3px;
-          background: linear-gradient(180deg, #11b6f5 0%, #0099d6 100%);
-          border-radius: 0 3px 3px 0;
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item-icon {
-          font-size: 16px !important;
-          transition: all 0.3s ease !important;
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item:hover .ant-menu-item-icon {
-          color: #11b6f5 !important;
-          transform: rotate(5deg) scale(1.1);
-        }
-
-        .ant-layout-sider-light .ant-menu-light .ant-menu-item-selected .ant-menu-item-icon {
-          color: #11b6f5 !important;
-        }
-
-        .ant-menu-item-divider {
-          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%) !important;
-          margin: 12px 0 !important;
-        }
-      `}</style>
     </Layout.Sider>
   );
 }

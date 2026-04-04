@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   LogoutOutlined,
@@ -9,36 +10,42 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Avatar, Dropdown, Flex, Space, theme, Tooltip, Typography } from "antd";
+import { Avatar, Dropdown, Flex, theme, Tooltip, Typography } from "antd";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+const { useToken } = theme;
 const { Text } = Typography;
 
 interface AdminNavbarProps {
   onMenuClick?: () => void;
   title?: string;
-  mode: "light" | "dark";
   sidebarCollapsed?: boolean;
 }
 
-export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: AdminNavbarProps) {
+export function AdminNavbar({ onMenuClick, title, sidebarCollapsed }: AdminNavbarProps) {
   const { user, logout } = useAuthStore();
   const router = useRouter();
-  const { token } = theme.useToken();
-  const [mounted, setMounted] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const { mode } = useTheme();
+  const { token } = useToken();
   const isDark = mode === "dark";
 
-  useEffect(() => { setMounted(true); }, []);
+  // ✨ [Scroll detection — ไม่มี mounted state, setState ใน callback ไม่ใช่ใน body ของ effect]
+  const [scrolled, setScrolled] = useState(false);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
-    if (!mounted) return;
-    const el = document.querySelector(".ant-layout-content");
-    const handleScroll = () => setScrolled((el?.scrollTop ?? 0) > 20);
-    el?.addEventListener("scroll", handleScroll, { passive: true });
-    return () => el?.removeEventListener("scroll", handleScroll);
-  }, [mounted]);
+    const handleScroll = () => {
+      const next = window.scrollY > 60;
+      if (next !== scrolledRef.current) {
+        scrolledRef.current = next;
+        setScrolled(next);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // ✨ [Dropdown menu สำหรับ User]
   const userMenu: MenuProps["items"] = [
@@ -67,14 +74,43 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
     },
   ];
 
-  if (!mounted) return null;
+  // ✨ [Token-based colors — ไม่มี hardcode]
+  const pillBg = isDark
+    ? "rgba(10,15,30,0.82)"
+    : "rgba(255,255,255,0.82)";
+
+  const barBg = isDark
+    ? "rgba(10,15,30,0.55)"
+    : "rgba(255,255,255,0.55)";
+
+  const pillBorder = isDark
+    ? "rgba(255,255,255,0.10)"
+    : `rgba(17,182,245,0.20)`;
+
+  const barBorder = isDark
+    ? "rgba(255,255,255,0.06)"
+    : token.colorBorderSecondary;
+
+  const pillShadow = isDark
+    ? "0 8px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
+    : "0 8px 32px rgba(17,182,245,0.15), 0 2px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)";
+
+  const roleLabel =
+    user?.role === "ADMIN"
+      ? "ผู้ดูแลระบบ"
+      : user?.role === "EMPLOYER"
+      ? "โรงเรียน"
+      : "ครู";
 
   return (
-    // ✨ [Outer wrapper — จัด floating pill ให้อยู่กลาง]
+    // ✨ [Outer wrapper — จัด alignment และ padding เมื่อ scroll]
     <div
+      suppressHydrationWarning
       style={{
-        padding: scrolled ? "8px 16px" : "8px 16px",
+        padding: scrolled ? "8px 24px" : "8px 0",
         transition: "padding 0.4s cubic-bezier(0.4,0,0.2,1)",
+        display: "flex",
+        justifyContent: scrolled ? "center" : "stretch",
       }}
     >
       <div
@@ -82,67 +118,54 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          height: "48px",
+          height: 52,
           padding: "0 16px",
+          width: "100%",
 
-          // ── Pill shape เมื่อ scroll ──
-          borderRadius: scrolled ? "100px" : "16px",
+          // ── Dynamic Island morph ──
+          maxWidth: scrolled ? 820 : "100%",
+          borderRadius: scrolled ? 100 : 0,
 
-          // ── Background ──
+          // ── Glass background ──
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          backgroundColor: scrolled
-            ? isDark
-              ? "rgba(10, 15, 30, 0.85)"
-              : "rgba(255, 255, 255, 0.85)"
-            : isDark
-            ? "rgba(10, 15, 30, 0.60)"
-            : "rgba(255, 255, 255, 0.60)",
+          backgroundColor: scrolled ? pillBg : barBg,
 
           // ── Border ──
-          borderWidth: "1px",
-          borderStyle: "solid",
-          borderColor: scrolled
-            ? isDark
-              ? "rgba(255,255,255,0.10)"
-              : "rgba(17,182,245,0.20)"
-            : isDark
-            ? "rgba(255,255,255,0.06)"
-            : token.colorBorderSecondary,
+          border: `1px solid ${scrolled ? pillBorder : barBorder}`,
 
-          // ── Shadow — Dynamic Island style ──
-          boxShadow: scrolled
-            ? isDark
-              ? "0 8px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
-              : "0 8px 32px rgba(17,182,245,0.15), 0 2px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)"
-            : "none",
+          // ── Shadow ──
+          boxShadow: scrolled ? pillShadow : "none",
 
           transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
-        {/* ── Left: Toggle + Title ── */}
+        {/* ── Left: Sidebar Toggle + Page Title ── */}
         <Flex align="center" gap={12}>
           <Tooltip title={sidebarCollapsed ? "ขยาย Sidebar" : "ย่อ Sidebar"}>
             <div
               onClick={onMenuClick}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: "10px",
+                width: 34,
+                height: 34,
+                borderRadius: 10,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
                 color: token.colorTextSecondary,
-                transition: "all 0.2s ease",
-                backgroundColor: "transparent",
+                transition: "background 0.2s ease, color 0.2s ease",
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor =
-                  isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = isDark
+                  ? "rgba(255,255,255,0.09)"
+                  : "rgba(0,0,0,0.06)";
+                (e.currentTarget as HTMLDivElement).style.color = token.colorPrimary;
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+                (e.currentTarget as HTMLDivElement).style.color = token.colorTextSecondary;
               }}
             >
               {sidebarCollapsed
@@ -152,13 +175,13 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
             </div>
           </Tooltip>
 
-          {/* Title */}
+          {/* Page title */}
           <Flex vertical gap={0}>
             <Text
               strong
               style={{
                 fontSize: 14,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
                 color: token.colorText,
                 letterSpacing: "-0.2px",
               }}
@@ -169,7 +192,8 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
               style={{
                 fontSize: 11,
                 color: token.colorTextDescription,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
+                letterSpacing: "0.3px",
               }}
             >
               SCHOOL BOARD — Admin
@@ -181,38 +205,34 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
         <Flex align="center" gap={8}>
           {user && (
             <>
-              {/* User info — ซ่อนเมื่อ pill */}
+              {/* User name+role — ซ่อนเมื่อเป็น pill */}
               <div
                 style={{
-                  maxWidth: scrolled ? "0px" : "180px",
+                  maxWidth: scrolled ? 0 : 180,
                   overflow: "hidden",
-                  transition: "max-width 0.35s cubic-bezier(0.4,0,0.2,1)",
+                  transition: "max-width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease",
+                  opacity: scrolled ? 0 : 1,
                   whiteSpace: "nowrap",
                 }}
               >
-                <Flex
-                  vertical
-                  gap={0}
-                  align="flex-end"
-                  style={{ paddingRight: 8 }}
-                >
-                  <Text strong style={{ fontSize: 13 }}>
+                <Flex vertical gap={0} align="flex-end" style={{ paddingRight: 8 }}>
+                  <Text strong style={{ fontSize: 13, color: token.colorText }}>
                     {user.full_name || "ผู้ดูแล"}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>
-                    {user.role === "ADMIN"
-                      ? "ผู้ดูแลระบบ"
-                      : user.role === "EMPLOYER"
-                      ? "โรงเรียน"
-                      : "ครู"}
+                  <Text style={{ fontSize: 11, color: token.colorTextDescription }}>
+                    {roleLabel}
                   </Text>
                 </Flex>
               </div>
 
-              {/* Avatar */}
-              <Dropdown menu={{ items: userMenu }} placement="bottomRight" trigger={["click"]}>
+              {/* Avatar + Dropdown */}
+              <Dropdown
+                menu={{ items: userMenu }}
+                placement="bottomRight"
+                trigger={["click"]}
+              >
                 <Avatar
-                  size={32}
+                  size={34}
                   style={{
                     background: "linear-gradient(135deg, #11b6f5 0%, #6366f1 100%)",
                     cursor: "pointer",
@@ -228,7 +248,7 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
             </>
           )}
 
-          {/* Separator */}
+          {/* Divider */}
           <div
             style={{
               width: 1,
@@ -237,37 +257,40 @@ export function AdminNavbar({ onMenuClick, title, mode, sidebarCollapsed }: Admi
                 ? "rgba(255,255,255,0.12)"
                 : "rgba(0,0,0,0.10)",
               margin: "0 4px",
+              flexShrink: 0,
             }}
           />
 
           {/* Settings shortcut */}
-          <Space size={4}>
-            <Tooltip title="การตั้งค่า">
-              <div
-                onClick={() => router.push("/pages/admin/settings")}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  color: token.colorTextSecondary,
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.backgroundColor =
-                    isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
-                }}
-              >
-                <SettingOutlined style={{ fontSize: 15 }} />
-              </div>
-            </Tooltip>
-          </Space>
+          <Tooltip title="การตั้งค่า">
+            <div
+              onClick={() => router.push("/pages/admin/settings")}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: token.colorTextSecondary,
+                transition: "background 0.2s ease, color 0.2s ease",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = isDark
+                  ? "rgba(255,255,255,0.09)"
+                  : "rgba(0,0,0,0.06)";
+                (e.currentTarget as HTMLDivElement).style.color = token.colorPrimary;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+                (e.currentTarget as HTMLDivElement).style.color = token.colorTextSecondary;
+              }}
+            >
+              <SettingOutlined style={{ fontSize: 15 }} />
+            </div>
+          </Tooltip>
         </Flex>
       </div>
     </div>

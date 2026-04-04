@@ -1,10 +1,12 @@
 "use client";
 
-import { Layout } from "antd";
-import { ReactNode, useEffect, useState } from "react";
+import { theme, Layout } from "antd";
+import { ReactNode, useState } from "react";
 import { AdminBreadcrumb } from "./breadcrumb";
 import { AdminNavbar } from "./navbar";
 import { AdminSidebar } from "./sidebar";
+
+const { useToken } = theme;
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -13,39 +15,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [mode, setMode] = useState<"light" | "dark">("dark");
-
-  // ✨ [Initialize theme from localStorage]
-  useEffect(() => {
-    const savedTheme =
-      (localStorage.getItem("app-theme") as "light" | "dark") || "dark";
-    setMode(savedTheme);
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Layout>
-          <AdminSidebar collapsed={false} onCollapse={() => {}} />
-          <Layout>
-            <Layout.Header
-              style={{
-                padding: 0,
-              }}
-            >
-              <AdminNavbar onMenuClick={() => {}} title={title} mode={mode} />
-            </Layout.Header>
-            <Layout.Content style={{ padding: "24px", overflow: "auto" }}>
-              <AdminBreadcrumb />
-              {children}
-            </Layout.Content>
-          </Layout>
-        </Layout>
-      </Layout>
-    );
-  }
+  const { token } = useToken();
 
   return (
     <Layout
@@ -53,9 +23,10 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         minHeight: "100vh",
         fontFamily:
           "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        background: token.colorBgLayout,
       }}
     >
-      <Layout>
+      <Layout style={{ minHeight: "100vh" }}>
         {/* ✨ [Sidebar] */}
         <AdminSidebar
           collapsed={sidebarCollapsed}
@@ -63,36 +34,38 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         />
 
         {/* ✨ [Main Content Area] */}
-        <Layout>
-          {/* ✨ [Navbar with Theme Styling] */}
+        <Layout style={{ background: token.colorBgLayout }}>
+          {/* ✨ [Floating Navbar] */}
           <Layout.Header
             style={{
-              boxShadow:
-                mode === "dark"
-                  ? "0 2px 8px rgba(0, 0, 0, 0.15)"
-                  : "0 2px 8px rgba(0, 0, 0, 0.08)",
+              height: "auto",
               padding: 0,
+              lineHeight: "normal",
+              background: "transparent",
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
             }}
           >
             <AdminNavbar
               onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               title={title}
-              mode={mode}
               sidebarCollapsed={sidebarCollapsed}
             />
           </Layout.Header>
 
-          {/* ✨ [Content] */}
+          {/* ✨ [Page Content] */}
           <Layout.Content
             style={{
               padding: "24px",
               overflow: "auto",
+              background: token.colorBgLayout,
             }}
           >
             {/* ✨ [Breadcrumb Navigation] */}
             <AdminBreadcrumb />
 
-            {/* ✨ [Page Content] */}
+            {/* ✨ [Page Children] */}
             {children}
           </Layout.Content>
         </Layout>
