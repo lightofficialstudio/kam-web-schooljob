@@ -27,6 +27,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const savedTheme = localStorage.getItem("app-theme") as ThemeMode | null;
     if (savedTheme) {
       setMode(savedTheme);
+      document.documentElement.setAttribute("data-theme", savedTheme);
     }
     setMounted(true);
   }, []);
@@ -36,6 +37,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const newMode = mode === "dark" ? "light" : "dark";
     setMode(newMode);
     localStorage.setItem("app-theme", newMode);
+    document.documentElement.setAttribute("data-theme", newMode);
   };
 
   // ✨ [Provide context value - always available even during SSR]
@@ -126,14 +128,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         borderRadius: 8,
       },
 
-      // ✨ [Table Styling]
+      // ✨ [Table Styling - Striped Rows]
       Table: {
-        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
-        colorBgElevated: mode === "dark" ? "#1A202C" : "#fafafa",
-        colorBorder: mode === "dark" ? "#404854" : "#f0f0f0",
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBgElevated: mode === "dark" ? "#0F172A" : "#fafafa",
+        colorBorder: mode === "dark" ? "#334155" : "#f0f0f0",
         rowHoverBg:
-          mode === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.02)",
-        headerBg: mode === "dark" ? "#1A202C" : "#fafafa",
+          mode === "dark"
+            ? "rgba(17, 182, 245, 0.08)"
+            : "rgba(17, 182, 245, 0.05)",
+        headerBg: mode === "dark" ? "#0F172A" : "#f0f7ff",
+        headerColor: mode === "dark" ? "#94A3B8" : "#64748B",
+        headerSplitColor: mode === "dark" ? "#334155" : "#E2E8F0",
+        rowExpandedBg: mode === "dark" ? "#162032" : "#f8fbff",
+        bodySortBg: mode === "dark" ? "#1a2744" : "#f0f7ff",
       },
 
       // ✨ [Statistic Styling]

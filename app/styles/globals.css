@@ -1,0 +1,10 @@
+/* ✨ [Table Striped Rows - Light Mode] */
+.table-row-striped > td {
+  background-color: #f5faff !important;
+}
+
+/* ✨ [Table Striped Rows - Dark Mode] */
+.dark .table-row-striped > td,
+[data-theme="dark"] .table-row-striped > td {
+  background-color: rgba(17, 182, 245, 0.04) !important;
+}

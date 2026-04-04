@@ -177,6 +177,9 @@ export function UserTable() {
           columns={columns}
           dataSource={filteredUsers()}
           rowKey="id"
+          rowClassName={(_, index) =>
+            index % 2 === 1 ? "table-row-striped" : ""
+          }
           pagination={{
             pageSize: 10,
             total: filteredUsers().length,
