@@ -152,7 +152,7 @@ export const InsightsCard = () => {
                     percent={100}
                     showInfo={false}
                     strokeColor="rgba(255,255,255,0.4)"
-                    trailColor="rgba(255,255,255,0.15)"
+                    railColor="rgba(255,255,255,0.15)"
                     size="small"
                   />
                 </Flex>
@@ -188,7 +188,7 @@ export const InsightsCard = () => {
                     }
                     showInfo={false}
                     strokeColor="rgba(255,255,255,0.7)"
-                    trailColor="rgba(255,255,255,0.15)"
+                    railColor="rgba(255,255,255,0.15)"
                     size="small"
                   />
                 </Flex>
@@ -220,7 +220,7 @@ export const InsightsCard = () => {
                     percent={hiringRate}
                     showInfo={false}
                     strokeColor="#fff"
-                    trailColor="rgba(255,255,255,0.15)"
+                    railColor="rgba(255,255,255,0.15)"
                     size="small"
                   />
                 </Flex>
