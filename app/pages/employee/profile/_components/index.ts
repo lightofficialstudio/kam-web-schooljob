@@ -16,6 +16,9 @@ export { SkillsLocationSection } from "./skills-location-section";
 // Resume Upload
 export { ResumeUploadSection } from "./resume-upload-section";
 
+// Teaching Skills (free-text tags)
+export { TeachingSkillsSection } from "./teaching-skills-section";
+
 // Teaching License Status + Attachment
 export { TeachingLicenseSection } from "./teaching-license-section";
 

@@ -39,11 +39,12 @@ import {
   PersonalSummarySection,
   ProfileEditDrawer,
   ProfileSectionWrapper,
+  ResumeUploadSection,
   SkillsLocationSection,
   TeachingInfoSection,
-  WorkExperienceSection,
-  ResumeUploadSection,
   TeachingLicenseSection,
+  TeachingSkillsSection,
+  WorkExperienceSection,
 } from "./_components";
 import { useProfileStore } from "./_stores/profile-store";
 
@@ -57,6 +58,7 @@ type SectionId =
   | "work-experience"
   | "teaching"
   | "skills"
+  | "teaching-skills"
   | "personal-summary";
 
 export default function EmployeeProfilePage() {
@@ -80,9 +82,27 @@ export default function EmployeeProfilePage() {
 
   // ข้อมูล preset สำหรับแสดงใน Modal
   const MOCKUP_PRESETS = [
-    { preset: 1 as const, label: "รูปแบบที่ 1", title: "ครูภาษาอังกฤษ", desc: "ประสบการณ์สูง 5–10 ปี · มีใบประกอบวิชาชีพ · มหาวิทยาลัยธรรมศาสตร์", color: "#11b6f5" },
-    { preset: 2 as const, label: "รูปแบบที่ 2", title: "ครูคณิตศาสตร์-วิทยาศาสตร์", desc: "ครูรุ่นใหม่ ประสบการณ์น้อย · อยู่ระหว่างขอใบประกอบฯ · ม.เกษตรศาสตร์", color: "#52c41a" },
-    { preset: 3 as const, label: "รูปแบบที่ 3", title: "ครูปฐมวัย", desc: "ประสบการณ์ 3–5 ปี · ไม่ต้องใช้ใบประกอบฯ · ม.ราชภัฏพระนคร", color: "#fa8c16" },
+    {
+      preset: 1 as const,
+      label: "รูปแบบที่ 1",
+      title: "ครูภาษาอังกฤษ",
+      desc: "ประสบการณ์สูง 5–10 ปี · มีใบประกอบวิชาชีพ · มหาวิทยาลัยธรรมศาสตร์",
+      color: "#11b6f5",
+    },
+    {
+      preset: 2 as const,
+      label: "รูปแบบที่ 2",
+      title: "ครูคณิตศาสตร์-วิทยาศาสตร์",
+      desc: "ครูรุ่นใหม่ ประสบการณ์น้อย · อยู่ระหว่างขอใบประกอบฯ · ม.เกษตรศาสตร์",
+      color: "#52c41a",
+    },
+    {
+      preset: 3 as const,
+      label: "รูปแบบที่ 3",
+      title: "ครูปฐมวัย",
+      desc: "ประสบการณ์ 3–5 ปี · ไม่ต้องใช้ใบประกอบฯ · ม.ราชภัฏพระนคร",
+      color: "#fa8c16",
+    },
   ];
 
   const [editSection, setEditSection] = useState<SectionId | null>(null);
@@ -125,11 +145,13 @@ export default function EmployeeProfilePage() {
         gradeCanTeach: profile.gradeCanTeach,
         teachingExperience: profile.teachingExperience,
       });
-    } else if (sectionId === "skills") {
+    } else if (sectionId === "skills" || sectionId === "teaching-skills") {
       form.setFieldsValue({
-        languagesSpoken: profile.languagesSpoken,
-        itSkills: profile.itSkills,
-        preferredProvinces: profile.preferredProvinces,
+        specialization: profile.specialization,
+        languageAndItSkills: [
+          ...(profile.languagesSpoken ?? []),
+          ...(profile.itSkills ?? []),
+        ],
       });
     } else if (sectionId === "personal-summary") {
       form.setFieldsValue({
@@ -142,7 +164,19 @@ export default function EmployeeProfilePage() {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
-      setProfile({ ...profile, ...values });
+      const { languageAndItSkills, ...rest } = values as Record<
+        string,
+        unknown
+      > & { languageAndItSkills?: string[] };
+      const merged = {
+        ...profile,
+        ...rest,
+        // ✨ [เก็บ languageAndItSkills รวมไว้ใน languagesSpoken]
+        ...(languageAndItSkills !== undefined
+          ? { languagesSpoken: languageAndItSkills, itSkills: [] }
+          : {}),
+      };
+      setProfile(merged);
       openNotification({
         type: "success",
         mainTitle: "บันทึกข้อมูลสำเร็จ",
@@ -352,7 +386,7 @@ export default function EmployeeProfilePage() {
                   {/* Teaching & Skills */}
                   <ProfileSectionWrapper
                     title="ความเชี่ยวชาญการสอนและทักษะ"
-                    onEdit={() => handleOpenEdit("teaching")}
+                    onEdit={() => handleOpenEdit("teaching-skills")}
                   >
                     <Flex vertical gap={24} style={{ width: "100%" }}>
                       <Flex vertical gap={12} style={{ width: "100%" }}>
@@ -430,7 +464,10 @@ export default function EmployeeProfilePage() {
                   </ProfileSectionWrapper>
 
                   {/* ใบประกอบวิชาชีพ */}
-                  <ProfileSectionWrapper id="teaching-license" title="ใบประกอบวิชาชีพ">
+                  <ProfileSectionWrapper
+                    id="teaching-license"
+                    title="ใบประกอบวิชาชีพ"
+                  >
                     <TeachingLicenseSection />
                   </ProfileSectionWrapper>
                 </Flex>
@@ -451,15 +488,22 @@ export default function EmployeeProfilePage() {
                       <Radio.Group
                         value={profile.profileVisibility ?? "public"}
                         onChange={(e) =>
-                          setProfile({ ...profile, profileVisibility: e.target.value })
+                          setProfile({
+                            ...profile,
+                            profileVisibility: e.target.value,
+                          })
                         }
                       >
                         <Flex vertical gap={12}>
                           <Radio value="public">
                             <Flex gap={6} align="center">
-                              <EyeOutlined style={{ color: token.colorSuccess }} />
+                              <EyeOutlined
+                                style={{ color: token.colorSuccess }}
+                              />
                               <Flex vertical gap={0}>
-                                <Text strong style={{ fontSize: 13 }}>เปิดสาธารณะ</Text>
+                                <Text strong style={{ fontSize: 13 }}>
+                                  เปิดสาธารณะ
+                                </Text>
                                 <Text type="secondary" style={{ fontSize: 12 }}>
                                   โรงเรียนสามารถค้นหาและดูโปรไฟล์ของคุณได้
                                 </Text>
@@ -468,9 +512,13 @@ export default function EmployeeProfilePage() {
                           </Radio>
                           <Radio value="apply_only">
                             <Flex gap={6} align="center">
-                              <LockOutlined style={{ color: token.colorWarning }} />
+                              <LockOutlined
+                                style={{ color: token.colorWarning }}
+                              />
                               <Flex vertical gap={0}>
-                                <Text strong style={{ fontSize: 13 }}>เฉพาะเมื่อสมัครงาน</Text>
+                                <Text strong style={{ fontSize: 13 }}>
+                                  เฉพาะเมื่อสมัครงาน
+                                </Text>
                                 <Text type="secondary" style={{ fontSize: 12 }}>
                                   โรงเรียนจะเห็นโปรไฟล์เมื่อคุณสมัครตำแหน่งงาน
                                 </Text>
@@ -513,7 +561,6 @@ export default function EmployeeProfilePage() {
                       เพิ่มใบประกอบวิชาชีพ
                     </Button>
                   </Card>
-
                 </Flex>
               </Col>
             </Row>
@@ -535,9 +582,11 @@ export default function EmployeeProfilePage() {
                 ? "แก้ไขข้อมูลการสอน"
                 : editSection === "skills"
                   ? "แก้ไขทักษะและสถานที่ทำงาน"
-                  : editSection === "personal-summary"
-                    ? "แก้ไขสรุปข้อมูลส่วนตัว"
-                    : "แก้ไขข้อมูล"
+                  : editSection === "teaching-skills"
+                    ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
+                    : editSection === "personal-summary"
+                      ? "แก้ไขสรุปข้อมูลส่วนตัว"
+                      : "แก้ไขข้อมูล"
         }
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
@@ -547,6 +596,9 @@ export default function EmployeeProfilePage() {
           )}
           {editSection === "teaching" && <TeachingInfoSection form={form} />}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
+          {editSection === "teaching-skills" && (
+            <TeachingSkillsSection form={form} />
+          )}
           {editSection === "personal-summary" && (
             <PersonalSummarySection form={form} />
           )}
@@ -568,7 +620,8 @@ export default function EmployeeProfilePage() {
       >
         <Flex vertical gap={12} style={{ padding: "8px 0 4px" }}>
           <Text type="secondary" style={{ fontSize: 13 }}>
-            เลือกรูปแบบโปรไฟล์ครูที่ต้องการจำลอง ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด
+            เลือกรูปแบบโปรไฟล์ครูที่ต้องการจำลอง
+            ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด
           </Text>
           {MOCKUP_PRESETS.map(({ preset, label, title, desc, color }) => (
             <Flex
@@ -603,10 +656,16 @@ export default function EmployeeProfilePage() {
                 </Flex>
                 <Flex vertical gap={2}>
                   <Flex align="center" gap={8}>
-                    <Text strong style={{ fontSize: 14 }}>{title}</Text>
-                    <Tag color={color} style={{ fontSize: 11, margin: 0 }}>{label}</Tag>
+                    <Text strong style={{ fontSize: 14 }}>
+                      {title}
+                    </Text>
+                    <Tag color={color} style={{ fontSize: 11, margin: 0 }}>
+                      {label}
+                    </Tag>
                   </Flex>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{desc}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {desc}
+                  </Text>
                 </Flex>
               </Flex>
             </Flex>
