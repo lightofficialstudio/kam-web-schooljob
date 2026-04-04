@@ -139,14 +139,20 @@ export default function Navbar() {
                 ค้นหางาน
               </Text>
             </Link>
-            <Link
-              href="/pages/employee/profile"
-              style={{ textDecoration: "none" }}
+            {/* ✨ [ฝากประวัติ: ต้อง login ก่อน — พาไปหน้า signin พร้อม callback] */}
+            <Text
+              strong
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                if (user) {
+                  router.push("/pages/employee/profile");
+                } else {
+                  router.push("/pages/signin?redirect=%2Fpages%2Femployee%2Fprofile");
+                }
+              }}
             >
-              <Text strong style={{ cursor: "pointer" }}>
-                ฝากประวัติ
-              </Text>
-            </Link>
+              ฝากประวัติ
+            </Text>
             <Link
               href="/pages/employee/school"
               style={{ textDecoration: "none" }}
