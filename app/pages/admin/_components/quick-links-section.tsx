@@ -1,105 +1,79 @@
 "use client";
 
 import {
-  FileOutlined,
-  LineChartOutlined,
-  ProjectOutlined,
-  SafetyOutlined,
+  ApiOutlined,
+  BookOutlined,
+  RocketOutlined,
+  SettingOutlined,
   TeamOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Flex, Row, Space, Typography, theme } from "antd";
+import { Card, Col, Flex, Row, Typography, theme } from "antd";
 import Link from "next/link";
 
 const { Text } = Typography;
 
-// ✨ [type สำหรับ quick link card]
-interface QuickLink {
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-  gradient: string;
-  href: string;
-}
+const links = [
+  { icon: <TeamOutlined />, label: "จัดการผู้ใช้", href: "/pages/admin/user-management", colorKey: "colorPrimary" as const },
+  { icon: <BookOutlined />, label: "จัดการงาน", href: "/pages/job", colorKey: "colorSuccess" as const },
+  { icon: <ApiOutlined />, label: "API Docs", href: "/api/v1/authenticate/docs", colorKey: "colorInfo" as const },
+  { icon: <SettingOutlined />, label: "ตั้งค่าระบบ", href: "#", colorKey: "colorWarning" as const },
+  { icon: <RocketOutlined />, label: "Deploy", href: "#", colorKey: "colorError" as const },
+  { icon: <ThunderboltOutlined />, label: "Diagnostics", href: "#", colorKey: "colorPurple" as const },
+];
 
-// ✨ [Quick Links Section — shortcut cards ไปยังส่วนต่างๆ]
+// ✨ [Quick Links Section]
 export function QuickLinksSection() {
   const { token } = theme.useToken();
-
-  const links: QuickLink[] = [
-    {
-      label: "จัดการผู้ใช้",
-      description: "ดูและจัดการผู้ใช้ทั้งหมด",
-      icon: <TeamOutlined style={{ fontSize: 24 }} />,
-      gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      href: "/pages/admin/user-management",
-    },
-    {
-      label: "ดูรายงาน",
-      description: "การวิเคราะห์ระบบ",
-      icon: <LineChartOutlined style={{ fontSize: 24 }} />,
-      gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-      href: "/pages/admin/reports",
-    },
-    {
-      label: "ความปลอดภัย",
-      description: "ตั้งค่าความปลอดภัย",
-      icon: <SafetyOutlined style={{ fontSize: 24 }} />,
-      gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-      href: "/pages/admin/security",
-    },
-    {
-      label: "ตั้งค่าระบบ",
-      description: "จัดการการตั้งค่า",
-      icon: <FileOutlined style={{ fontSize: 24 }} />,
-      gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-      href: "/pages/admin/settings",
-    },
-  ];
 
   return (
     <Card
       title={
-        <Space>
-          <ProjectOutlined />
-          <Text strong>การจัดการด่วน</Text>
-        </Space>
+        <Flex align="center" gap={8}>
+          <RocketOutlined style={{ color: token.colorPrimary }} />
+          <Text strong>Quick Links</Text>
+        </Flex>
       }
       style={{
         background: token.colorBgContainer,
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
+        height: "100%",
       }}
     >
-      <Row gutter={[16, 16]}>
-        {links.map((link) => (
-          <Col xs={24} sm={12} lg={6} key={link.label}>
-            <Link href={link.href} style={{ display: "block" }}>
-              <Card
-                hoverable
-                style={{
-                  background: link.gradient,
-                  border: "none",
-                  borderRadius: token.borderRadius,
-                }}
-                styles={{ body: { padding: "16px" } }}
-              >
-                <Flex align="center" gap={12}>
-                  <span style={{ color: "#fff" }}>{link.icon}</span>
-                  <Flex vertical gap={2}>
-                    <Text strong style={{ color: "#fff", fontSize: 14 }}>
-                      {link.label}
-                    </Text>
-                    <Text
-                      style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}
-                    >
-                      {link.description}
-                    </Text>
-                  </Flex>
+      <Row gutter={[10, 10]}>
+        {links.map((lnk) => {
+          const color = (token as Record<string, unknown>)[lnk.colorKey] as string ?? token.colorPrimary;
+          return (
+            <Col xs={12} key={lnk.label}>
+              <Link href={lnk.href} style={{ textDecoration: "none" }}>
+                <Flex
+                  align="center"
+                  gap={8}
+                  style={{
+                    background: token.colorFillQuaternary,
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                    borderRadius: token.borderRadius,
+                    padding: "10px 12px",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.borderColor = color;
+                    (e.currentTarget as HTMLDivElement).style.background = token.colorFillSecondary;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLDivElement).style.borderColor = token.colorBorderSecondary;
+                    (e.currentTarget as HTMLDivElement).style.background = token.colorFillQuaternary;
+                  }}
+                >
+                  <span style={{ color, fontSize: 16 }}>{lnk.icon}</span>
+                  <Text style={{ fontSize: 13 }}>{lnk.label}</Text>
                 </Flex>
-              </Card>
-            </Link>
-          </Col>
-        ))}
+              </Link>
+            </Col>
+          );
+        })}
       </Row>
     </Card>
   );

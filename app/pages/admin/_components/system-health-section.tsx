@@ -3,104 +3,95 @@
 import {
   ApiOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   ControlOutlined,
   DatabaseOutlined,
   FileOutlined,
   SafetyOutlined,
 } from "@ant-design/icons";
-import {
-  Card,
-  Col,
-  Divider,
-  Flex,
-  Progress,
-  Row,
-  Space,
-  Tag,
-  Typography,
-  theme,
-} from "antd";
+import { Card, Col, Flex, Progress, Row, Tag, Typography, theme } from "antd";
 
 const { Text } = Typography;
 
-// ✨ [System Health Section — แสดงสถานะระบบแต่ละส่วน]
+// ✨ [System Health Section — service status grid + progress bars]
 export function SystemHealthSection() {
   const { token } = theme.useToken();
 
   const services = [
-    {
-      icon: <DatabaseOutlined style={{ color: token.colorPrimary }} />,
-      label: "ฐานข้อมูล PostgreSQL",
-      tagLabel: "เชื่อมต่อ",
-      barColor: token.colorSuccess,
-      percent: 100,
-      barLabel: "ปกติ",
-    },
-    {
-      icon: <ApiOutlined style={{ color: token.colorInfo }} />,
-      label: "Next.js API Server",
-      tagLabel: "ทำงาน",
-      barColor: token.colorInfo,
-      percent: 100,
-      barLabel: "ใช้งานได้",
-    },
-    {
-      icon: <SafetyOutlined style={{ color: token.colorWarning }} />,
-      label: "ระบบยืนยันตัวตน",
-      tagLabel: "ใช้งานอยู่",
-      barColor: token.colorWarning,
-      percent: 100,
-      barLabel: "ปลอดภัย",
-    },
-    {
-      icon: <FileOutlined style={{ color: token.colorError }} />,
-      label: "พื้นที่เก็บข้อมูล",
-      tagLabel: "45%",
-      barColor: token.colorError,
-      percent: 45,
-      barLabel: "ใช้งาน",
-    },
+    { icon: <DatabaseOutlined />, label: "PostgreSQL Database", tagLabel: "Online", barColor: token.colorSuccess, percent: 100, note: "ปกติ" },
+    { icon: <ApiOutlined />, label: "Next.js API Server", tagLabel: "Running", barColor: token.colorInfo, percent: 100, note: "ใช้งานได้" },
+    { icon: <SafetyOutlined />, label: "Supabase Auth", tagLabel: "Secure", barColor: token.colorWarning, percent: 100, note: "ปลอดภัย" },
+    { icon: <FileOutlined />, label: "Storage", tagLabel: "45%", barColor: token.colorError, percent: 45, note: "ใช้งาน" },
+  ];
+
+  const metrics = [
+    { icon: <ClockCircleOutlined />, label: "Avg Response", value: "145ms", color: token.colorPrimary },
+    { icon: <CheckCircleOutlined />, label: "Uptime", value: "99.9%", color: token.colorSuccess },
+    { icon: <DatabaseOutlined />, label: "DB Size", value: "~2.5 MB", color: token.colorText },
+    { icon: <ApiOutlined />, label: "Connections", value: "1", color: token.colorText },
   ];
 
   return (
     <Card
       title={
-        <Space>
-          <ControlOutlined />
-          <Text strong>สถานะระบบ</Text>
-        </Space>
+        <Flex align="center" gap={8}>
+          <ControlOutlined style={{ color: token.colorPrimary }} />
+          <Text strong>System Health</Text>
+          <Tag color="success" style={{ borderRadius: 100, marginLeft: "auto" }}>
+            All Systems Operational
+          </Tag>
+        </Flex>
       }
       style={{
         background: token.colorBgContainer,
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
+        height: "100%",
       }}
     >
-      <Flex vertical gap={0}>
-        {services.map((svc, i) => (
+      <Flex vertical gap={16}>
+        <Row gutter={[12, 12]}>
+          {metrics.map((m) => (
+            <Col xs={12} key={m.label}>
+              <Flex
+                vertical
+                gap={4}
+                align="center"
+                style={{
+                  background: token.colorFillQuaternary,
+                  borderRadius: token.borderRadius,
+                  padding: "12px 8px",
+                }}
+              >
+                <Text style={{ color: m.color, fontSize: 16 }}>{m.icon}</Text>
+                <Text strong style={{ color: m.color, fontSize: 16 }}>{m.value}</Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>{m.label}</Text>
+              </Flex>
+            </Col>
+          ))}
+        </Row>
+
+        {services.map((svc) => (
           <div key={svc.label}>
-            {i > 0 && <Divider style={{ margin: "12px 0" }} />}
-            <Row
-              justify="space-between"
-              align="middle"
-              style={{ marginBottom: 8 }}
-            >
-              <Col>
-                <Space>
-                  {svc.icon}
-                  <Text strong>{svc.label}</Text>
-                </Space>
-              </Col>
-              <Col>
-                <Tag color="success" icon={<CheckCircleOutlined />}>
-                  {svc.tagLabel}
-                </Tag>
-              </Col>
-            </Row>
+            <Flex justify="space-between" align="center" style={{ marginBottom: 6 }}>
+              <Flex align="center" gap={6}>
+                <Text style={{ color: svc.barColor }}>{svc.icon}</Text>
+                <Text style={{ fontSize: 13 }}>{svc.label}</Text>
+              </Flex>
+              <Tag
+                color={svc.percent === 100 ? "success" : "warning"}
+                icon={svc.percent === 100 ? <CheckCircleOutlined /> : undefined}
+                style={{ borderRadius: 100 }}
+              >
+                {svc.tagLabel}
+              </Tag>
+            </Flex>
             <Progress
               percent={svc.percent}
               strokeColor={svc.barColor}
-              format={(pct) => `${pct}% ${svc.barLabel}`}
+              trailColor={token.colorFillSecondary}
+              format={(p) => `${p}% ${svc.note}`}
+              size="small"
             />
           </div>
         ))}

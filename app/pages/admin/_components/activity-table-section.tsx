@@ -1,90 +1,99 @@
 "use client";
 
-import { CalendarOutlined } from "@ant-design/icons";
-import type { TableColumnsType } from "antd";
-import { Card, Space, Table, Tag, Typography, theme } from "antd";
+import { FileTextOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Card, Flex, Table, Tag, Typography, theme } from "antd";
+import type { ColumnsType } from "antd/es/table";
 
 const { Text } = Typography;
 
-// ✨ [type สำหรับ activity row]
-interface ActivityRecord {
+interface ActivityItem {
   key: string;
-  action: string;
   user: string;
+  action: string;
+  entity: string;
+  status: "success" | "processing" | "warning" | "error";
+  statusLabel: string;
   time: string;
-  status: "success" | "info" | "error";
 }
 
-// ข้อมูล mock สำหรับ recent activities
-const recentActivities: ActivityRecord[] = [
+const mockData: ActivityItem[] = [
+  { key: "1", user: "Admin", action: "สร้างผู้ใช้", entity: "teacher@school.th", status: "success", statusLabel: "สำเร็จ", time: "5 นาทีก่อน" },
+  { key: "2", user: "System", action: "Sync ฐานข้อมูล", entity: "PostgreSQL", status: "processing", statusLabel: "กำลังทำ", time: "12 นาทีก่อน" },
+  { key: "3", user: "Admin", action: "ลบผู้ใช้", entity: "old@user.th", status: "error", statusLabel: "ลบแล้ว", time: "30 นาทีก่อน" },
+  { key: "4", user: "System", action: "Backup", entity: "DB Snapshot", status: "success", statusLabel: "สำเร็จ", time: "1 ชม.ก่อน" },
+  { key: "5", user: "Admin", action: "เปลี่ยนสิทธิ์", entity: "employer@co.th", status: "warning", statusLabel: "รอยืนยัน", time: "2 ชม.ก่อน" },
+];
+
+const columns: ColumnsType<ActivityItem> = [
   {
-    key: "1",
-    action: "ผู้ใช้ใหม่ลงทะเบียน",
-    user: "Demo User",
-    time: "10 นาทีที่แล้ว",
-    status: "success",
+    title: "ผู้ดำเนินการ",
+    dataIndex: "user",
+    render: (user: string) => (
+      <Flex align="center" gap={8}>
+        <Avatar size={28} icon={<UserOutlined />} />
+        <Text style={{ fontSize: 13 }}>{user}</Text>
+      </Flex>
+    ),
   },
   {
-    key: "2",
-    action: "เปลี่ยนแปลงการตั้งค่า",
-    user: "Admin",
-    time: "1 ชั่วโมงที่แล้ว",
-    status: "info",
+    title: "กิจกรรม",
+    dataIndex: "action",
+    render: (action: string, row) => (
+      <Flex align="center" gap={6}>
+        <FileTextOutlined style={{ opacity: 0.4 }} />
+        <span>
+          <Text style={{ fontSize: 13 }}>{action}</Text>
+          <Text type="secondary" style={{ fontSize: 12, marginLeft: 6 }}>· {row.entity}</Text>
+        </span>
+      </Flex>
+    ),
   },
   {
-    key: "3",
-    action: "สำเร็จการยืนยันการเชื่อมต่อฐานข้อมูล",
-    user: "System",
-    time: "2 ชั่วโมงที่แล้ว",
-    status: "success",
+    title: "สถานะ",
+    dataIndex: "status",
+    render: (status: ActivityItem["status"], row) => (
+      <Badge status={status} text={<Text style={{ fontSize: 12 }}>{row.statusLabel}</Text>} />
+    ),
+    filters: [
+      { text: "สำเร็จ", value: "success" },
+      { text: "กำลังทำ", value: "processing" },
+      { text: "รอยืนยัน", value: "warning" },
+      { text: "ลบ/ผิดพลาด", value: "error" },
+    ],
+    onFilter: (value, record) => record.status === value,
+  },
+  {
+    title: "เวลา",
+    dataIndex: "time",
+    render: (t: string) => <Tag style={{ borderRadius: 100, fontSize: 11 }}>{t}</Tag>,
+    align: "right",
   },
 ];
 
-// ✨ [Activity Table Section — ตารางกิจกรรมล่าสุดในระบบ]
+// ✨ [Activity Table Section]
 export function ActivityTableSection() {
   const { token } = theme.useToken();
-
-  const statusColorMap: Record<ActivityRecord["status"], string> = {
-    success: "success",
-    info: "processing",
-    error: "error",
-  };
-
-  const columns: TableColumnsType<ActivityRecord> = [
-    { title: "กิจกรรม", dataIndex: "action", key: "action" },
-    { title: "ผู้ใช้", dataIndex: "user", key: "user" },
-    { title: "เวลา", dataIndex: "time", key: "time" },
-    {
-      title: "สถานะ",
-      dataIndex: "status",
-      key: "status",
-      render: (status: ActivityRecord["status"]) => (
-        <Tag color={statusColorMap[status]}>{status.toUpperCase()}</Tag>
-      ),
-    },
-  ];
 
   return (
     <Card
       title={
-        <Space>
-          <CalendarOutlined />
+        <Flex align="center" gap={8}>
+          <FileTextOutlined style={{ color: token.colorPrimary }} />
           <Text strong>กิจกรรมล่าสุด</Text>
-        </Space>
+        </Flex>
       }
       style={{
         background: token.colorBgContainer,
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
       }}
-      styles={{ body: { padding: 0 } }}
     >
       <Table
+        dataSource={mockData}
         columns={columns}
-        dataSource={recentActivities}
-        pagination={false}
+        pagination={{ pageSize: 5, size: "small" }}
         size="small"
-        rowClassName={(_, i) => (i % 2 === 1 ? "table-row-striped" : "")}
+        rowClassName={(_, idx) => (idx % 2 === 1 ? "table-row-striped" : "")}
       />
     </Card>
   );
