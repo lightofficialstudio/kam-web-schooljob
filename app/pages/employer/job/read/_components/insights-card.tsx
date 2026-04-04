@@ -58,12 +58,12 @@ export const InsightsCard = () => {
   const { jobs } = useJobReadStore();
   const { token } = theme.useToken();
 
-  // คำนวณ Pipeline จาก Mock Data
+  // คำนวณ Pipeline จาก Mock Data — ผู้ที่ได้รับการตอบรับ vs เป้าหมายที่ต้องการรับ
   const totalApplicants = jobs.reduce((sum, j) => sum + j.applicants, 0);
   const interviewed = Math.floor(totalApplicants * 0.27); // ~27% เข้าสัมภาษณ์
-  const hired = Math.floor(interviewed * 0.33); // ~33% ได้รับการตอบรับ
-  const hiringRate =
-    totalApplicants > 0 ? Math.round((hired / totalApplicants) * 100) : 0;
+  const hiredCount = 3;   // จำนวนผู้ที่ได้รับการตอบรับแล้ว
+  const hiredTarget = 4;  // เป้าหมายที่ต้องการรับทั้งหมด
+  const hiringRate = Math.round((hiredCount / hiredTarget) * 100); // 75%
 
   return (
     <Row gutter={[16, 16]}>
@@ -113,9 +113,10 @@ export const InsightsCard = () => {
                         fontSize: 9,
                         color: "rgba(255,255,255,0.8)",
                         lineHeight: 1.2,
+                        textAlign: "center",
                       }}
                     >
-                      อัตราสำเร็จ
+                      ได้ผู้สมัครแล้ว
                     </Text>
                   </Flex>
                 )}
@@ -197,10 +198,10 @@ export const InsightsCard = () => {
                   <Text
                     style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}
                   >
-                    ตอบรับเข้าทำงาน
+                    ได้ผู้สมัครแล้ว
                   </Text>
                   <Statistic
-                    value={hired}
+                    value={hiredCount}
                     suffix={
                       <span
                         style={{
@@ -208,7 +209,7 @@ export const InsightsCard = () => {
                           color: "rgba(255,255,255,0.65)",
                         }}
                       >
-                        คน
+                        / {hiredTarget} คน
                       </span>
                     }
                     styles={{
@@ -216,11 +217,7 @@ export const InsightsCard = () => {
                     }}
                   />
                   <Progress
-                    percent={
-                      totalApplicants > 0
-                        ? Math.round((hired / totalApplicants) * 100)
-                        : 0
-                    }
+                    percent={hiringRate}
                     showInfo={false}
                     strokeColor="#fff"
                     trailColor="rgba(255,255,255,0.15)"
