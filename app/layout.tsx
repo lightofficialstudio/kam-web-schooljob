@@ -25,15 +25,15 @@ export default function RootLayout({
   return (
     <html lang="th" suppressHydrationWarning>
       <body className={`${kanit.variable} antialiased font-kanit`}>
-        <AntdRegistry>
-          <ThemeProvider>
+        <ThemeProvider>
+          <AntdRegistry>
             {/* ✨ [Notification Modal Provider] */}
             <NotificationModalProvider />
 
             {/* ✨ [LayoutSelector - เลือก Layout ตามสถานะ User] */}
             <LayoutSelector>{children}</LayoutSelector>
-          </ThemeProvider>
-        </AntdRegistry>
+          </AntdRegistry>
+        </ThemeProvider>
       </body>
     </html>
   );
