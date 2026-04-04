@@ -16,6 +16,9 @@ export { SkillsLocationSection } from "./skills-location-section";
 // Resume Upload
 export { ResumeUploadSection } from "./resume-upload-section";
 
+// Teaching License Status + Attachment
+export { TeachingLicenseSection } from "./teaching-license-section";
+
 // Work Experience (multiple entries)
 export { WorkExperienceSection } from "./work-experience-section";
 

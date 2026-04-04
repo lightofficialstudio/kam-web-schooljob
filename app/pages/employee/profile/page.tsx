@@ -22,6 +22,7 @@ import {
   Flex,
   Form,
   Layout,
+  Modal,
   Progress,
   Radio,
   Row,
@@ -41,6 +42,8 @@ import {
   SkillsLocationSection,
   TeachingInfoSection,
   WorkExperienceSection,
+  ResumeUploadSection,
+  TeachingLicenseSection,
 } from "./_components";
 import { useProfileStore } from "./_stores/profile-store";
 
@@ -62,15 +65,25 @@ export default function EmployeeProfilePage() {
   const { openNotification } = useNotificationModalStore();
   const [form] = Form.useForm();
 
-  const handleMockup = () => {
-    setMockupData();
+  const [isMockupModalOpen, setIsMockupModalOpen] = useState(false);
+
+  const handleSelectPreset = (preset: 1 | 2 | 3) => {
+    setMockupData(preset);
+    setIsMockupModalOpen(false);
     openNotification({
       type: "success",
       mainTitle: "จำลองข้อมูลสำเร็จ",
-      description: "ระบบได้จำลองข้อมูลโปรไฟล์ให้คุณเรียบร้อยแล้ว",
+      description: `โหลดโปรไฟล์รูปแบบที่ ${preset} เรียบร้อยแล้ว`,
       icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
     });
   };
+
+  // ข้อมูล preset สำหรับแสดงใน Modal
+  const MOCKUP_PRESETS = [
+    { preset: 1 as const, label: "รูปแบบที่ 1", title: "ครูภาษาอังกฤษ", desc: "ประสบการณ์สูง 5–10 ปี · มีใบประกอบวิชาชีพ · มหาวิทยาลัยธรรมศาสตร์", color: "#11b6f5" },
+    { preset: 2 as const, label: "รูปแบบที่ 2", title: "ครูคณิตศาสตร์-วิทยาศาสตร์", desc: "ครูรุ่นใหม่ ประสบการณ์น้อย · อยู่ระหว่างขอใบประกอบฯ · ม.เกษตรศาสตร์", color: "#52c41a" },
+    { preset: 3 as const, label: "รูปแบบที่ 3", title: "ครูปฐมวัย", desc: "ประสบการณ์ 3–5 ปี · ไม่ต้องใช้ใบประกอบฯ · ม.ราชภัฏพระนคร", color: "#fa8c16" },
+  ];
 
   const [editSection, setEditSection] = useState<SectionId | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -258,7 +271,7 @@ export default function EmployeeProfilePage() {
                               ghost
                               size="small"
                               icon={<PlayCircleOutlined />}
-                              onClick={handleMockup}
+                              onClick={() => setIsMockupModalOpen(true)}
                               style={{
                                 borderRadius: token.borderRadiusSM,
                                 fontSize: "12px",
@@ -410,6 +423,16 @@ export default function EmployeeProfilePage() {
                       </Flex>
                     </Flex>
                   </ProfileSectionWrapper>
+
+                  {/* Resume */}
+                  <ProfileSectionWrapper id="resume" title="เรซูเม่ของฉัน">
+                    <ResumeUploadSection />
+                  </ProfileSectionWrapper>
+
+                  {/* ใบประกอบวิชาชีพ */}
+                  <ProfileSectionWrapper id="teaching-license" title="ใบประกอบวิชาชีพ">
+                    <TeachingLicenseSection />
+                  </ProfileSectionWrapper>
                 </Flex>
               </Col>
 
@@ -529,6 +552,67 @@ export default function EmployeeProfilePage() {
           )}
         </Form>
       </ProfileEditDrawer>
+
+      {/* ─── Modal เลือกรูปแบบ Mockup Data ─── */}
+      <Modal
+        open={isMockupModalOpen}
+        onCancel={() => setIsMockupModalOpen(false)}
+        footer={null}
+        title={
+          <Flex align="center" gap={8}>
+            <PlayCircleOutlined style={{ color: token.colorPrimary }} />
+            <span>เลือกรูปแบบข้อมูลจำลอง</span>
+          </Flex>
+        }
+        width={480}
+      >
+        <Flex vertical gap={12} style={{ padding: "8px 0 4px" }}>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            เลือกรูปแบบโปรไฟล์ครูที่ต้องการจำลอง ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด
+          </Text>
+          {MOCKUP_PRESETS.map(({ preset, label, title, desc, color }) => (
+            <Flex
+              key={preset}
+              align="center"
+              justify="space-between"
+              onClick={() => handleSelectPreset(preset)}
+              style={{
+                padding: "16px 20px",
+                borderRadius: token.borderRadius,
+                border: `1.5px solid ${token.colorBorderSecondary}`,
+                backgroundColor: token.colorFillQuaternary,
+                cursor: "pointer",
+              }}
+            >
+              <Flex align="center" gap={14}>
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    backgroundColor: `${color}18`,
+                    color,
+                    fontWeight: 700,
+                    fontSize: 16,
+                    flexShrink: 0,
+                  }}
+                >
+                  {preset}
+                </Flex>
+                <Flex vertical gap={2}>
+                  <Flex align="center" gap={8}>
+                    <Text strong style={{ fontSize: 14 }}>{title}</Text>
+                    <Tag color={color} style={{ fontSize: 11, margin: 0 }}>{label}</Tag>
+                  </Flex>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{desc}</Text>
+                </Flex>
+              </Flex>
+            </Flex>
+          ))}
+        </Flex>
+      </Modal>
     </Layout>
   );
 }
