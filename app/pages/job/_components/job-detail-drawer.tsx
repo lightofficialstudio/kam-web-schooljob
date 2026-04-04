@@ -102,6 +102,7 @@ export const JobDetailDrawer = () => {
               background: `linear-gradient(135deg, ${token.colorError} 0%, ${token.colorPrimary} 100%)`,
               padding: 40,
               textAlign: "center",
+              
             }}
           >
             <Flex vertical>

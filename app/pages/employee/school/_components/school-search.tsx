@@ -23,8 +23,6 @@ export const SchoolSearch = () => {
     setSearchQuery,
     setProvinceFilter,
     setTypeFilter,
-    setGradeFilter,
-    setContractFilter,
   } = useSchoolStore();
 
   return (
@@ -64,7 +62,7 @@ export const SchoolSearch = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </Col>
-        <Col xs={12} md={4}>
+        <Col xs={24} md={6}>
           <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
@@ -86,7 +84,7 @@ export const SchoolSearch = () => {
             ]}
           />
         </Col>
-        <Col xs={12} md={4}>
+        <Col xs={24} md={6}>
           <Flex vertical style={{ marginBottom: 8 }}>
             <Text
               strong
@@ -111,49 +109,6 @@ export const SchoolSearch = () => {
             ]}
           />
         </Col>
-        <Col xs={12} md={4}>
-          <Flex vertical style={{ marginBottom: 8 }}>
-            <Text
-              strong
-              style={{ fontSize: 13, color: token.colorTextSecondary }}
-            >
-              ระดับชั้นที่สอน
-            </Text>
-          </Flex>
-          <Select
-            size="large"
-            placeholder="ทุกระดับ"
-            style={{ width: "100%", height: 48 }}
-            allowClear
-            onChange={setGradeFilter}
-            options={[
-              { value: "ประถมศึกษา", label: "ประถมศึกษา" },
-              { value: "มัธยมศึกษาตอนต้น", label: "มัธยมศึกษาตอนต้น" },
-              { value: "มัธยมศึกษาตอนปลาย", label: "มัธยมศึกษาตอนปลาย" },
-            ]}
-          />
-        </Col>
-        <Col xs={12} md={4}>
-          <Flex vertical style={{ marginBottom: 8 }}>
-            <Text
-              strong
-              style={{ fontSize: 13, color: token.colorTextSecondary }}
-            >
-              ประเภทสัญญา
-            </Text>
-          </Flex>
-          <Select
-            size="large"
-            placeholder="ทุกประเภท"
-            style={{ width: "100%", height: 48 }}
-            allowClear
-            onChange={setContractFilter}
-            options={[
-              { value: "Full-time", label: "Full-time" },
-              { value: "Part-time", label: "Part-time" },
-            ]}
-          />
-        </Col>
         <Col xs={24} md={4}>
           <Button
             type="primary"
@@ -166,7 +121,7 @@ export const SchoolSearch = () => {
               boxShadow: `0 4px 12px ${token.colorPrimary}40`,
             }}
           >
-            ค้นหาเลย
+            ค้นหา
           </Button>
         </Col>
       </Row>

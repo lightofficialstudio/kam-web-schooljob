@@ -18,7 +18,6 @@ import {
   Col,
   Empty,
   Flex,
-  List,
   Row,
   Tag,
   theme,
@@ -179,20 +178,18 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
             color="#52c41a"
             text="สวัสดิการและจุดเด่น"
           />
-          <List
-            grid={{ gutter: 16, xs: 1, sm: 2, md: 2 }}
-            dataSource={profile.benefits}
-            renderItem={(benefit) => (
-              <List.Item style={{ marginBottom: 4 }}>
-                <Flex align="center" gap={10}>
+          <Row gutter={[16, 8]}>
+            {profile.benefits.map((benefit) => (
+              <Col key={benefit} xs={24} sm={12}>
+                <Flex align="center" gap={10} style={{ marginBottom: 4 }}>
                   <CheckCircleOutlined
                     style={{ color: "#52c41a", fontSize: 18, flexShrink: 0 }}
                   />
                   <Text style={{ fontSize: 15 }}>{benefit}</Text>
                 </Flex>
-              </List.Item>
-            )}
-          />
+              </Col>
+            ))}
+          </Row>
         </Card>
       )}
 

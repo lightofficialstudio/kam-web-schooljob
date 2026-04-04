@@ -147,25 +147,11 @@ export const SearchFilterSection = () => {
                 </Flex>
               </Col>
 
-              {/* Advanced Filters — แถวที่ 1 */}
+              {/* Advanced Filters */}
               <Col span={24}>
                 <Divider style={{ margin: "8px 0 16px" }} />
                 <Row gutter={[16, 16]} align="middle">
-                  <Col xs={12} md={6}>
-                    <Select
-                      placeholder="รูปแบบการจ้างงาน"
-                      style={{ width: "100%" }}
-                      size="large"
-                      allowClear
-                      value={filters.employmentType}
-                      onChange={(value) => setFilters({ employmentType: value })}
-                    >
-                      <Option value="fulltime">งานเต็มเวลา (Full-time)</Option>
-                      <Option value="parttime">พาร์ทไทม์ (Part-time)</Option>
-                      <Option value="contract">สัญญาจ้าง / อัตราจ้าง</Option>
-                    </Select>
-                  </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={24} md={12}>
                     <Select
                       placeholder="ประเภทโรงเรียน"
                       style={{ width: "100%" }}
@@ -180,22 +166,7 @@ export const SearchFilterSection = () => {
                       <Option value="สาธิต">โรงเรียนสาธิต</Option>
                     </Select>
                   </Col>
-                  <Col xs={12} md={6}>
-                    <Select
-                      placeholder="ระดับชั้นที่สอน"
-                      style={{ width: "100%" }}
-                      size="large"
-                      allowClear
-                      value={filters.gradeLevel}
-                      onChange={(value) => setFilters({ gradeLevel: value })}
-                    >
-                      <Option value="อนุบาล">อนุบาล</Option>
-                      <Option value="ประถมศึกษา">ประถมศึกษา</Option>
-                      <Option value="มัธยมต้น">มัธยมต้น</Option>
-                      <Option value="มัธยมปลาย">มัธยมปลาย</Option>
-                    </Select>
-                  </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={24} md={12}>
                     <Select
                       placeholder="ใบประกอบวิชาชีพ"
                       style={{ width: "100%" }}

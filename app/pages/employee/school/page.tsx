@@ -27,8 +27,6 @@ export default function SchoolDirectoryPage() {
     searchQuery,
     provinceFilter,
     typeFilter,
-    gradeFilter,
-    contractFilter,
     sortBy,
     setTypeFilter,
     setProvinceFilter,
@@ -49,13 +47,7 @@ export default function SchoolDirectoryPage() {
       const matchesProvince =
         !provinceFilter || school.province === provinceFilter;
       const matchesType = !typeFilter || school.type.includes(typeFilter);
-      const matchesGrade =
-        !gradeFilter ||
-        school.jobs.some((job) => job.gradeLevels.includes(gradeFilter));
-      const matchesContract =
-        !contractFilter ||
-        school.jobs.some((job) => job.type === contractFilter);
-      return matchesSearch && matchesProvince && matchesType && matchesGrade && matchesContract;
+      return matchesSearch && matchesProvince && matchesType;
     })
     .sort((a, b) => {
       if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
