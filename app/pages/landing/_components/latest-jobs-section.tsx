@@ -27,12 +27,32 @@ export default function LatestJobsSection() {
     <div
       style={{
         padding: "80px 24px",
-        background: isDark ? "#0D1117" : "#fdfdfd",
-        borderTop: `1px solid ${token.colorBorder}`,
-        borderBottom: `1px solid ${token.colorBorder}`,
+        position: "relative",
+        overflow: "hidden",
+        background: isDark ? "#070d1a" : "#ffffff",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      {/* Grid pattern */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: isDark
+          ? "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)"
+          : "linear-gradient(rgba(17,182,245,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(17,182,245,0.06) 1px, transparent 1px)",
+        backgroundSize: "48px 48px",
+        maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        pointerEvents: "none",
+      }} />
+      {/* Glow */}
+      <div style={{
+        position: "absolute", top: "-20%", right: "5%",
+        width: "400px", height: "400px", borderRadius: "50%",
+        background: isDark
+          ? "radial-gradient(circle, rgba(17,182,245,0.10) 0%, transparent 70%)"
+          : "radial-gradient(circle, rgba(17,182,245,0.14) 0%, transparent 70%)",
+        filter: "blur(60px)", pointerEvents: "none",
+      }} />
+      <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Section Header */}
         <Flex
           justify="space-between"

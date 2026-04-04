@@ -32,12 +32,44 @@ export default function EmployerSection() {
     <div
       style={{
         padding: "100px 24px",
+        position: "relative",
+        overflow: "hidden",
         background: isDark
-          ? `linear-gradient(135deg, #1A202C 0%, ${token.colorBgBase} 100%)`
-          : "linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)",
+          ? "linear-gradient(135deg, #0d1b2a 0%, #0a0f1e 100%)"
+          : "linear-gradient(135deg, #eef7ff 0%, #f8fbff 60%, #ffffff 100%)",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      {/* Dot pattern */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: isDark
+          ? "radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)"
+          : "radial-gradient(circle, rgba(17,182,245,0.13) 1px, transparent 1px)",
+        backgroundSize: "28px 28px",
+        maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 60%, transparent 100%)",
+        WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 60%, transparent 100%)",
+        pointerEvents: "none",
+      }} />
+      {/* Glow left */}
+      <div style={{
+        position: "absolute", top: "10%", left: "-12%",
+        width: "500px", height: "500px", borderRadius: "50%",
+        background: isDark
+          ? "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 65%)"
+          : "radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 65%)",
+        filter: "blur(70px)", pointerEvents: "none",
+      }} />
+      {/* Glow right */}
+      <div style={{
+        position: "absolute", bottom: "5%", right: "-8%",
+        width: "400px", height: "400px", borderRadius: "50%",
+        background: isDark
+          ? "radial-gradient(circle, rgba(17,182,245,0.12) 0%, transparent 65%)"
+          : "radial-gradient(circle, rgba(17,182,245,0.15) 0%, transparent 65%)",
+        filter: "blur(60px)", pointerEvents: "none",
+      }} />
+
+      <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <Row gutter={[64, 48]} align="middle">
           {/* Left: Content */}
           <Col xs={24} md={12}>

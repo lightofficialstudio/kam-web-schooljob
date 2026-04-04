@@ -64,11 +64,32 @@ export default function JobSeekerSection() {
     <div
       style={{
         padding: "80px 24px",
-        background: isDark ? "#101622" : "#fafafa",
+        position: "relative",
+        overflow: "hidden",
+        background: isDark ? "#070d1a" : "#f4f9ff",
       }}
     >
+      {/* Diagonal stripe pattern */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: isDark
+          ? "repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px)"
+          : "repeating-linear-gradient(45deg, rgba(17,182,245,0.05) 0px, rgba(17,182,245,0.05) 1px, transparent 1px, transparent 40px)",
+        pointerEvents: "none",
+      }} />
+      {/* Center glow */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "800px", height: "400px", borderRadius: "50%",
+        background: isDark
+          ? "radial-gradient(ellipse, rgba(17,182,245,0.08) 0%, transparent 70%)"
+          : "radial-gradient(ellipse, rgba(17,182,245,0.12) 0%, transparent 70%)",
+        filter: "blur(50px)", pointerEvents: "none",
+      }} />
+
       <div
-        style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center" }}
+        style={{ maxWidth: "1200px", margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}
       >
         <Title level={2}>สิทธิประโยชน์สำหรับผู้หางาน</Title>
         <Paragraph style={{ marginBottom: "48px" }}>
