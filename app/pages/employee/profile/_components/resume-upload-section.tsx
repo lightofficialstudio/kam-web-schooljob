@@ -54,7 +54,7 @@ interface ResumeUploadSectionProps {
 // Section แนบเรซูเม่ — รองรับหลายไฟล์ และเลือกไฟล์ที่กำลังใช้งาน
 export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId }) => {
   const { token } = theme.useToken();
-  const { profile, addResume, removeResume, setActiveResume, saveProfile } = useProfileStore();
+  const { profile, addResume, removeResume, setActiveResume, saveProfile, deleteResumeFromDB } = useProfileStore();
 
   const resumes = profile.resumes ?? [];
   const activeResumeId = profile.activeResumeId ?? null;
@@ -62,22 +62,22 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ResumeEntry | null>(null);
 
-  // ✨ ลบเรซูเม่: ลบออกจาก Supabase Storage + ลบออกจาก DB ผ่าน saveProfile
-  const handleDeleteResume = async (resume: ResumeEntry) => {
+  // ✨ ลบเรซูเม่จริง: ลบออกจาก Storage + soft-delete ใน DB แล้วค่อยลบออกจาก store
+  const handleDeleteConfirmed = async () => {
+    if (!confirmTarget) return;
+    const resume = confirmTarget;
+    setConfirmTarget(null);
     setDeletingId(resume.id);
     try {
-      // 1. ลบไฟล์จาก Storage (ถ้ามี url)
+      // 1. ลบไฟล์จาก Supabase Storage
       if (resume.url) {
         const path = parseStoragePath(resume.url, "resumes");
-        if (path) {
-          await deleteFile("resumes", path);
-        }
+        if (path) await deleteFile("resumes", path);
       }
-      // 2. ลบออกจาก store (synchronous)
-      removeResume(resume.id);
-      // 3. บันทึกสถานะใหม่ลง DB
-      await saveProfile(userId);
+      // 2. soft-delete ใน DB + ลบออกจาก store (deleteResumeFromDB ทำทั้งสองอย่าง)
+      await deleteResumeFromDB(resume.id, userId);
       setUploadError(null);
       console.log("✅ [ResumeUploadSection] ลบเรซูเม่สำเร็จ:", resume.fileName);
     } catch (err) {
@@ -244,7 +244,7 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
                       icon={<DeleteOutlined />}
                       loading={deletingId === resume.id}
                       disabled={deletingId === resume.id}
-                      onClick={() => handleDeleteResume(resume)}
+                      onClick={() => setConfirmTarget(resume)}
                     />
                   </Tooltip>
                 </Flex>
@@ -306,6 +306,48 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
           • สามารถแนบได้หลายไฟล์ และเลือกเรซูเม่ที่กำลังใช้งาน
         </Text>
       </Flex>
+
+      {/* ─── Modal ยืนยันการลบเรซูเม่ ─── */}
+      <Modal
+        open={!!confirmTarget}
+        onCancel={() => setConfirmTarget(null)}
+        onOk={handleDeleteConfirmed}
+        okText="ลบไฟล์"
+        cancelText="ยกเลิก"
+        okButtonProps={{ danger: true, loading: deletingId !== null }}
+        title={
+          <Flex align="center" gap={8}>
+            <DeleteOutlined style={{ color: token.colorError }} />
+            <span>ยืนยันการลบเรซูเม่</span>
+          </Flex>
+        }
+        width={420}
+      >
+        <Flex vertical gap={8} style={{ padding: "8px 0" }}>
+          <Text>คุณต้องการลบไฟล์นี้ใช่หรือไม่?</Text>
+          <Flex
+            align="center"
+            gap={10}
+            style={{
+              padding: "10px 14px",
+              borderRadius: token.borderRadius,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              backgroundColor: token.colorFillQuaternary,
+            }}
+          >
+            <FilePdfOutlined style={{ fontSize: 20, color: "#ff4d4f", flexShrink: 0 }} />
+            <Flex vertical gap={2}>
+              <Text strong style={{ fontSize: 13 }}>{confirmTarget?.fileName}</Text>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                {confirmTarget ? formatFileSize(confirmTarget.fileSize) : ""}
+              </Text>
+            </Flex>
+          </Flex>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            ไฟล์จะถูกลบออกจากระบบทั้งหมดและไม่สามารถกู้คืนได้
+          </Text>
+        </Flex>
+      </Modal>
     </Flex>
   );
 };

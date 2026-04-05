@@ -57,9 +57,9 @@ const skillSchema = z.object({
 // 📝 Schema สำหรับ Resume แต่ละรายการ
 const resumeSchema = z.object({
   id: z.string().uuid().optional(),
-  file_name: z.string().min(1, "กรุณาระบุชื่อไฟล์"),
+  file_name: z.string().default(""),
   file_size: z.number().int().nonnegative().optional().nullable(),
-  file_url: z.string().min(1, "กรุณาระบุ URL ไฟล์"),
+  file_url: z.string().default(""),
   is_active: z.boolean().default(false),
   is_deleted: z.boolean().default(false),
 });

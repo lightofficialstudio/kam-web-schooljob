@@ -316,17 +316,19 @@ export const updateEmployeeProfileService = async (
     if (resumes !== undefined) {
       for (const resume of resumes) {
         if (resume.id) {
+          // มี UUID จริง → update (รองรับ soft-delete ด้วย is_deleted: true)
           await tx.resume.update({
             where: { id: resume.id },
             data: {
-              fileName: resume.file_name,
-              fileSize: resume.file_size ?? null,
-              fileUrl: resume.file_url,
+              ...(resume.file_name && { fileName: resume.file_name }),
+              ...(resume.file_size !== undefined && { fileSize: resume.file_size ?? null }),
+              ...(resume.file_url && { fileUrl: resume.file_url }),
               isActive: resume.is_active,
               isDeleted: resume.is_deleted,
             },
           });
-        } else {
+        } else if (!resume.is_deleted && resume.file_url) {
+          // ไม่มี id และไม่ได้ลบ → สร้างใหม่
           await tx.resume.create({
             data: {
               profileId,

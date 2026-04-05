@@ -162,6 +162,7 @@ interface ProfileStore {
   addResume: (resume: ResumeEntry) => void;
   removeResume: (id: string) => void;
   setActiveResume: (id: string) => void;
+  deleteResumeFromDB: (resumeId: string, userId: string) => Promise<void>;
 
   // License attachment helpers
   addLicenseAttachment: (file: ResumeEntry) => void;
@@ -399,6 +400,26 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     set((state) => ({
       profile: { ...state.profile, activeResumeId: id },
     })),
+
+  // ✨ ลบ resume ออกจาก DB โดยส่ง is_deleted: true แล้วค่อย removeResume ออกจาก store
+  deleteResumeFromDB: async (resumeId: string, userId: string) => {
+    const realId = toUuidOrUndefined(resumeId);
+    if (realId) {
+      // มี UUID จริง → ส่ง is_deleted: true ไปยัง API
+      await requestUpdateEmployeeProfile(userId, {
+        resumes: [{ id: realId, file_name: "", file_url: "", is_active: false, is_deleted: true }],
+      });
+    }
+    // ลบออกจาก store ทั้งสองกรณี (UUID จริง หรือ id ชั่วคราว)
+    set((state) => {
+      const remaining = (state.profile.resumes ?? []).filter((r) => r.id !== resumeId);
+      const newActiveId =
+        state.profile.activeResumeId === resumeId
+          ? (remaining[0]?.id ?? null)
+          : state.profile.activeResumeId;
+      return { profile: { ...state.profile, resumes: remaining, activeResumeId: newActiveId } };
+    });
+  },
 
   // เพิ่มไฟล์แนบใบประกอบวิชาชีพ
   addLicenseAttachment: (file) =>
