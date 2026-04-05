@@ -168,6 +168,7 @@ interface ProfileStore {
   addLicenseAttachment: (file: ResumeEntry) => void;
   removeLicenseAttachment: (id: string) => void;
   setLicenseStatus: (status: EmployeeProfile["licenseStatus"]) => void;
+  deleteLicenseAttachmentFromDB: (attachmentId: string, userId: string) => Promise<void>;
 
   // Mockup Data Helper — รองรับ 3 รูปแบบ
   setMockupData: (preset: 1 | 2 | 3) => void;
@@ -444,6 +445,26 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     set((state) => ({
       profile: { ...state.profile, licenseStatus: status },
     })),
+
+  // ✨ ลบไฟล์แนบใบประกอบฯ ออกจาก DB (licenses table) แล้วค่อยลบออกจาก store
+  deleteLicenseAttachmentFromDB: async (attachmentId: string, userId: string) => {
+    const realId = toUuidOrUndefined(attachmentId);
+    if (realId) {
+      // มี UUID จริง → soft-delete ใน DB ผ่าน licenses array
+      await requestUpdateEmployeeProfile(userId, {
+        licenses: [{ id: realId, license_name: "", is_deleted: true }],
+      });
+    }
+    // ลบออกจาก store
+    set((state) => ({
+      profile: {
+        ...state.profile,
+        licenseAttachments: (state.profile.licenseAttachments ?? []).filter(
+          (f) => f.id !== attachmentId
+        ),
+      },
+    }));
+  },
 
   // Mockup Data Implementation — 3 รูปแบบ: ครูภาษา / ครูวิทย์-คณิต / ครูปฐมวัย
   setMockupData: (preset) =>

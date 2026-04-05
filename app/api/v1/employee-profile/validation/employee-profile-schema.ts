@@ -29,7 +29,7 @@ const educationSchema = z.object({
 // 📝 Schema สำหรับ License แต่ละรายการ
 const licenseSchema = z.object({
   id: z.string().uuid().optional(),
-  license_name: z.string().min(1, "กรุณาระบุชื่อใบประกอบ"),
+  license_name: z.string().default(""),
   issuer: z.string().optional().nullable(),
   license_number: z.string().optional().nullable(),
   issue_date: z.string().optional().nullable(),

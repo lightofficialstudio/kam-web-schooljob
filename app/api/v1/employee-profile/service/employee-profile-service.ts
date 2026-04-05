@@ -236,20 +236,22 @@ export const updateEmployeeProfileService = async (
     if (licenses !== undefined) {
       for (const lic of licenses) {
         if (lic.id) {
+          // มี UUID จริง → update (รองรับ soft-delete ด้วย is_deleted: true)
           await tx.license.update({
             where: { id: lic.id },
             data: {
-              licenseName: lic.license_name,
-              issuer: lic.issuer ?? null,
-              licenseNumber: lic.license_number ?? null,
-              issueDate: lic.issue_date ? new Date(lic.issue_date) : null,
-              expiryDate: lic.expiry_date ? new Date(lic.expiry_date) : null,
-              fileUrl: lic.file_url ?? null,
-              credentialUrl: lic.credential_url ?? null,
+              ...(lic.license_name && { licenseName: lic.license_name }),
+              ...(lic.issuer !== undefined && { issuer: lic.issuer ?? null }),
+              ...(lic.license_number !== undefined && { licenseNumber: lic.license_number ?? null }),
+              ...(lic.issue_date !== undefined && { issueDate: lic.issue_date ? new Date(lic.issue_date) : null }),
+              ...(lic.expiry_date !== undefined && { expiryDate: lic.expiry_date ? new Date(lic.expiry_date) : null }),
+              ...(lic.file_url !== undefined && { fileUrl: lic.file_url ?? null }),
+              ...(lic.credential_url !== undefined && { credentialUrl: lic.credential_url ?? null }),
               isDeleted: lic.is_deleted,
             },
           });
-        } else {
+        } else if (!lic.is_deleted && lic.license_name) {
+          // ไม่มี id และไม่ได้ลบ → สร้างใหม่
           await tx.license.create({
             data: {
               profileId,
