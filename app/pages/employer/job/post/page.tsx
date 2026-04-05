@@ -286,7 +286,9 @@ export default function PostJobPage() {
       <Flex align="center" justify="center" style={{ minHeight: "100vh" }}>
         <Spin
           size="large"
-          tip={isMockLoading ? "กำลังสุ่มข้อมูล..." : "กำลังโหลดข้อมูลงาน..."}
+          description={
+            isMockLoading ? "กำลังสุ่มข้อมูล..." : "กำลังโหลดข้อมูลงาน..."
+          }
         >
           <div style={{ width: 240, height: 120 }} />
         </Spin>
