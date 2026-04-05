@@ -111,6 +111,9 @@ model Profile {
   // Relations — General
   blogs         Blog[]
   notifications Notification[]
+  jobViews      JobView[]      @relation("JobViewViewer")
+  profileViewsReceived ProfileView[] @relation("ProfileViewTarget")
+  profileViewsGiven    ProfileView[] @relation("ProfileViewViewer")
 
   @@index([role], name: "idx_profiles_role")
   @@index([userId], name: "idx_profiles_user_id")
@@ -334,6 +337,7 @@ model Job {
   jobGrades     JobGrade[]
   jobBenefits   JobBenefit[]
   applications  Application[]
+  jobViews      JobView[]
 
   @@index([status], name: "idx_jobs_status")
   @@index([province], name: "idx_jobs_province")
@@ -441,4 +445,42 @@ model Notification {
 
   @@index([profileId, isRead], name: "idx_notifications_profile_id_is_read")
   @@map("notifications")
+}
+
+// ─── View Tracking ────────────────────────────────────────────────────────────
+
+// 3.20 job_views — ติดตามการเข้าชมประกาศงาน (EMPLOYEE/EMPLOYER ดูงานของโรงเรียน)
+model JobView {
+  id         String    @id @default(uuid())
+  jobId      String    @map("job_id")
+  viewerId   String?   @map("viewer_id")           // NULL = anonymous
+  viewerRole UserRole? @map("viewer_role")          // snapshot role ณ เวลาที่ดู
+  viewedAt   DateTime  @default(now()) @map("viewed_at")
+  sessionId  String?   @map("session_id")           // browser session (dedup anonymous)
+
+  job    Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  viewer Profile? @relation("JobViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
+
+  @@index([jobId], name: "idx_job_views_job_id")
+  @@index([viewerId], name: "idx_job_views_viewer_id")
+  @@index([viewedAt], name: "idx_job_views_viewed_at")
+  @@map("job_views")
+}
+
+// 3.21 profile_views — ติดตามการเข้าชมโปรไฟล์ครู (Employer กดดู profile ของ Employee)
+model ProfileView {
+  id         String    @id @default(uuid())
+  profileId  String    @map("profile_id")           // เจ้าของ profile ที่ถูกดู
+  viewerId   String?   @map("viewer_id")             // ผู้ดู (NULL = anonymous)
+  viewerRole UserRole? @map("viewer_role")            // snapshot role ณ เวลาที่ดู
+  viewedAt   DateTime  @default(now()) @map("viewed_at")
+  sessionId  String?   @map("session_id")             // browser session (dedup anonymous)
+
+  profile Profile  @relation("ProfileViewTarget", fields: [profileId], references: [id], onDelete: Cascade)
+  viewer  Profile? @relation("ProfileViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
+
+  @@index([profileId], name: "idx_profile_views_profile_id")
+  @@index([viewerId], name: "idx_profile_views_viewer_id")
+  @@index([viewedAt], name: "idx_profile_views_viewed_at")
+  @@map("profile_views")
 }
