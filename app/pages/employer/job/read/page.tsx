@@ -31,18 +31,19 @@ const PRIMARY_DARK = "#0878a8";
 
 // หน้าจัดการประกาศรับสมัครครู — สำหรับฝ่ายบุคลากรของโรงเรียน
 export default function MyJobsPage() {
-  const { jobs, isLoading, fetchJobs } = useJobReadStore();
+  const { jobs, isLoading, fetchJobs, fetchPipelineData } = useJobReadStore();
   const { openNewApplicantsDrawer } = useApplicantDrawerStore();
   const { token } = theme.useToken();
   const { user } = useAuthStore();
   const totalNewApplicants = jobs.reduce((sum, j) => sum + j.newApplicants, 0);
 
-  // ✨ โหลดข้อมูลงานจาก API จริงเมื่อ user พร้อม
+  // ✨ โหลดข้อมูลงานและ pipeline จาก API จริงเมื่อ user พร้อม
   useEffect(() => {
     if (user?.user_id) {
       fetchJobs(user.user_id);
+      fetchPipelineData(user.user_id);
     }
-  }, [user?.user_id, fetchJobs]);
+  }, [user?.user_id, fetchJobs, fetchPipelineData]);
 
   return (
     <Layout

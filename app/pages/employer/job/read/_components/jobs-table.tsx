@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import {
   BarChartOutlined,
   CheckCircleOutlined,
@@ -16,6 +17,7 @@ import {
   Card,
   Empty,
   Flex,
+  Modal,
   Space,
   Table,
   Tag,
@@ -35,10 +37,26 @@ const PRIMARY = "#11b6f5";
 
 // ตารางประกาศรับสมัครครู — ข้อมูลครบถ้วนสำหรับฝ่ายบุคลากร
 export const JobsTable = () => {
-  const { jobs, searchKeyword, activeTab } = useJobReadStore();
+  const { jobs, searchKeyword, activeTab, closeJob } = useJobReadStore();
   const { openDrawer } = useApplicantDrawerStore();
   const { openModal: openStatsModal } = useJobStatsModalStore();
   const { token } = theme.useToken();
+  const { user } = useAuthStore();
+
+  const handleCloseJob = (record: JobRecord) => {
+    Modal.confirm({
+      title: "ปิดรับสมัครประกาศนี้?",
+      content: `"${record.title}" จะถูกเปลี่ยนเป็นสถานะปิดรับสมัคร ผู้สมัครจะไม่สามารถสมัครเพิ่มได้`,
+      okText: "ยืนยัน ปิดรับสมัคร",
+      cancelText: "ยกเลิก",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        if (user?.user_id) {
+          await closeJob(user.user_id, record.key);
+        }
+      },
+    });
+  };
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -222,7 +240,13 @@ export const JobsTable = () => {
             />
           </Tooltip>
           <Tooltip title="ปิดรับสมัคร">
-            <Button danger icon={<StopOutlined />} size="small" />
+            <Button
+              danger
+              icon={<StopOutlined />}
+              size="small"
+              disabled={record.status === "CLOSED"}
+              onClick={() => handleCloseJob(record)}
+            />
           </Tooltip>
         </Space>
       ),

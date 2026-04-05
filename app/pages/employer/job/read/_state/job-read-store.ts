@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { fetchJobList, requestCloseJob } from "../_api/job-read-api";
+import {
+  fetchJobList,
+  fetchPipeline,
+  requestCloseJob,
+} from "../_api/job-read-api";
 
 export interface JobRecord {
   key: string;
@@ -14,6 +18,21 @@ export interface JobRecord {
   newApplicants: number;
   conversionRate: string;
   salary: string;
+}
+
+export interface PipelineData {
+  totalApplicants: number;
+  pending: number;
+  interview: number;
+  accepted: number;
+  rejected: number;
+  totalVacancies: number;
+  urgentJobs: {
+    jobId: string;
+    title: string;
+    type: "new_applicants" | "expiring_soon" | "pending_interview";
+    count: number;
+  }[];
 }
 
 // ✨ แปลงข้อมูลจาก DB → JobRecord สำหรับ UI
@@ -46,6 +65,13 @@ const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
   const createdAt = job.createdAt as string | null;
   const deadline = job.deadline as string | null;
 
+  // ✨ นับ applicants จาก _count (จาก backend ใหม่)
+  const countObj = job._count as { applications?: number } | undefined;
+  const applicants = countObj?.applications ?? 0;
+  // ✨ นับผู้สมัครใหม่ใน 7 วัน
+  const recentApplications = (job.applications as { id: string }[]) ?? [];
+  const newApplicants = recentApplications.length;
+
   return {
     key: job.id as string,
     title: job.title as string,
@@ -57,8 +83,8 @@ const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
     expiresAt: deadline ? new Date(deadline).toISOString().split("T")[0] : "-",
     status,
     views: 0,
-    applicants: 0,
-    newApplicants: 0,
+    applicants,
+    newApplicants,
     conversionRate: "0%",
     salary,
   };
@@ -66,22 +92,27 @@ const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
 
 interface JobReadState {
   jobs: JobRecord[];
+  pipeline: PipelineData | null;
   searchKeyword: string;
   activeTab: string;
   isLoading: boolean;
+  isPipelineLoading: boolean;
   setJobs: (jobs: JobRecord[]) => void;
   setSearchKeyword: (keyword: string) => void;
   setActiveTab: (tab: string) => void;
   setLoading: (loading: boolean) => void;
   fetchJobs: (userId: string) => Promise<void>;
+  fetchPipelineData: (userId: string) => Promise<void>;
   closeJob: (userId: string, jobId: string) => Promise<void>;
 }
 
 export const useJobReadStore = create<JobReadState>((set, get) => ({
   jobs: [],
+  pipeline: null,
   searchKeyword: "",
   activeTab: "ACTIVE",
   isLoading: false,
+  isPipelineLoading: false,
   setJobs: (jobs) => set({ jobs }),
   setSearchKeyword: (searchKeyword) => set({ searchKeyword }),
   setActiveTab: (activeTab) => set({ activeTab }),
@@ -101,9 +132,23 @@ export const useJobReadStore = create<JobReadState>((set, get) => ({
     }
   },
 
+  // ✨ โหลดข้อมูล Pipeline สำหรับ InsightsCard
+  fetchPipelineData: async (userId: string) => {
+    set({ isPipelineLoading: true });
+    try {
+      const data = await fetchPipeline(userId);
+      set({ pipeline: data as PipelineData });
+    } catch (err) {
+      console.error("❌ [job-read-store] fetchPipeline error:", err);
+    } finally {
+      set({ isPipelineLoading: false });
+    }
+  },
+
   // ✨ ปิดรับสมัครประกาศงาน แล้ว refresh รายการ
   closeJob: async (userId: string, jobId: string) => {
     await requestCloseJob(userId, jobId);
     await get().fetchJobs(userId);
+    await get().fetchPipelineData(userId);
   },
 }));

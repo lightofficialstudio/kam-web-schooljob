@@ -14,15 +14,24 @@ const getSchoolProfileId = async (userId: string): Promise<string> => {
   return profile.schoolProfile.id;
 };
 
-// ✨ ดึงข้อมูลประกาศงานทั้งหมดของโรงเรียน โดยใช้ userId
+// ✨ ดึงข้อมูลประกาศงานทั้งหมดของโรงเรียน โดยใช้ userId (รวม application count)
 export const getJobsByUserService = async (userId: string) => {
   const schoolProfileId = await getSchoolProfileId(userId);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
   return await prisma.job.findMany({
     where: { schoolProfileId },
     include: {
       jobSubjects: true,
       jobGrades: true,
       jobBenefits: true,
+      _count: {
+        select: { applications: true },
+      },
+      applications: {
+        where: { appliedAt: { gte: sevenDaysAgo } },
+        select: { id: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -212,4 +221,126 @@ export const closeJobService = async (userId: string, jobId: string) => {
     where: { id: jobId },
     data: { status: JobStatus.CLOSED },
   });
+};
+
+// ─── Pipeline Summary ────────────────────────────────────────────────────────
+
+export interface UrgentJobItem {
+  jobId: string;
+  title: string;
+  type: "new_applicants" | "expiring_soon" | "pending_interview";
+  count: number; // จำนวนผู้สมัครใหม่ หรือวันที่เหลือ
+}
+
+export interface PipelineSummary {
+  totalApplicants: number;
+  pending: number;
+  interview: number;
+  accepted: number;
+  rejected: number;
+  totalVacancies: number; // sum positionsAvailable ของงานที่ OPEN
+  urgentJobs: UrgentJobItem[];
+}
+
+// ✨ สรุป Pipeline การรับสมัครทั้งหมดของโรงเรียน
+export const getPipelineService = async (
+  userId: string,
+): Promise<PipelineSummary> => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+
+  // ดึงงานทั้งหมดพร้อม applications + จำนวน
+  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+  const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  const jobs = await prisma.job.findMany({
+    where: { schoolProfileId },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      deadline: true,
+      positionsAvailable: true,
+      applications: {
+        select: { id: true, status: true, appliedAt: true },
+      },
+    },
+  });
+
+  // นับ applications แยก status
+  let pending = 0;
+  let interview = 0;
+  let accepted = 0;
+  let rejected = 0;
+  let totalVacancies = 0;
+  const urgentJobs: UrgentJobItem[] = [];
+
+  for (const job of jobs) {
+    const apps = job.applications;
+
+    // นับ status
+    for (const app of apps) {
+      if (app.status === "PENDING") pending++;
+      else if (app.status === "INTERVIEW") interview++;
+      else if (app.status === "ACCEPTED") accepted++;
+      else if (app.status === "REJECTED") rejected++;
+    }
+
+    // นับ vacancy เฉพาะงาน OPEN
+    if (job.status === JobStatus.OPEN) {
+      totalVacancies += job.positionsAvailable;
+    }
+
+    // ตรวจหา urgent items
+    const newApplicantsCount = apps.filter(
+      (a) => a.appliedAt >= threeDaysAgo,
+    ).length;
+    if (newApplicantsCount > 0) {
+      urgentJobs.push({
+        jobId: job.id,
+        title: job.title,
+        type: "new_applicants",
+        count: newApplicantsCount,
+      });
+    }
+
+    // งานใกล้หมดอายุ (OPEN + deadline ภายใน 7 วัน)
+    if (
+      job.status === JobStatus.OPEN &&
+      job.deadline &&
+      job.deadline <= sevenDaysFromNow
+    ) {
+      const daysLeft = Math.ceil(
+        (job.deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+      );
+      urgentJobs.push({
+        jobId: job.id,
+        title: job.title,
+        type: "expiring_soon",
+        count: Math.max(daysLeft, 0),
+      });
+    }
+
+    // ผู้สมัครที่รอนัดสัมภาษณ์
+    const pendingInterviewCount = apps.filter(
+      (a) => a.status === "INTERVIEW",
+    ).length;
+    if (pendingInterviewCount > 0) {
+      urgentJobs.push({
+        jobId: job.id,
+        title: job.title,
+        type: "pending_interview",
+        count: pendingInterviewCount,
+      });
+    }
+  }
+
+  return {
+    totalApplicants: pending + interview + accepted + rejected,
+    pending,
+    interview,
+    accepted,
+    rejected,
+    totalVacancies,
+    urgentJobs,
+  };
 };
