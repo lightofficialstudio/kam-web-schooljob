@@ -7,11 +7,11 @@ import {
   EditOutlined,
   EnvironmentOutlined,
   GlobalOutlined,
+  LoadingOutlined,
   MailOutlined,
   PhoneOutlined,
   PictureOutlined,
 } from "@ant-design/icons";
-import type { UploadProps } from "antd";
 import {
   Avatar,
   Button,
@@ -22,11 +22,17 @@ import {
   Flex,
   message,
   Tag,
+  Tooltip,
   Typography,
   Upload,
 } from "antd";
+import type { RcFile } from "antd/es/upload";
 import Image from "next/image";
+import { useState } from "react";
 
+import { uploadFile } from "@/app/lib/storage";
+import { useAuthStore } from "@/app/stores/auth-store";
+import { useSchoolProfileState } from "../_state/school-profile.state";
 import type { SchoolProfile } from "../_state/school-profile.state";
 
 const { Title, Text, Link } = Typography;
@@ -36,39 +42,49 @@ interface SchoolProfileSidebarProps {
   onEditClick: () => void;
 }
 
-// Upload props สำหรับเปลี่ยนรูปโลโก้โรงเรียน
-const buildUploadProps = (): UploadProps => ({
-  name: "file",
-  showUploadList: false,
-  beforeUpload: (file) => {
-    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(
-      file.type,
-    );
-    if (!isImage) {
-      message.error("รองรับเฉพาะไฟล์ JPG / PNG / WebP เท่านั้น");
-      return Upload.LIST_IGNORE;
-    }
-    if (file.size / 1024 / 1024 > 2) {
-      message.error("ขนาดไฟล์ต้องไม่เกิน 2MB");
-      return Upload.LIST_IGNORE;
-    }
-    return false; // ยับยั้ง auto-upload, จัดการเองผ่าน customRequest
-  },
-  customRequest: ({ onSuccess }) => {
-    setTimeout(() => onSuccess?.("ok"), 800);
-  },
-  onChange: ({ file }) => {
-    if (file.status === "done") {
-      message.success("อัปโหลดรูปโลโก้สำเร็จ (จำลอง)");
-    }
-  },
-});
-
 export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
   profile,
   onEditClick,
 }) => {
-  const uploadProps = buildUploadProps();
+  const { saveProfile, setProfile } = useSchoolProfileState();
+  const { user } = useAuthStore();
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+
+  // ✨ อัปโหลดโลโก้โรงเรียนไป Supabase Storage แล้ว save URL ลง DB
+  const handleLogoBeforeUpload = (file: RcFile): boolean => {
+    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+    if (!isImage) {
+      message.error("รองรับเฉพาะไฟล์ JPG / PNG / WebP เท่านั้น");
+      return false;
+    }
+    if (file.size / 1024 / 1024 > 2) {
+      message.error("ขนาดไฟล์ต้องไม่เกิน 2MB");
+      return false;
+    }
+    if (!user?.user_id) {
+      message.error("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+      return false;
+    }
+
+    (async () => {
+      setIsUploadingLogo(true);
+      try {
+        const result = await uploadFile("avatars", user.user_id, file);
+        const updated = { ...profile, logoUrl: result.url };
+        setProfile(updated);
+        await saveProfile(updated, user.user_id);
+        message.success("อัปโหลดโลโก้สำเร็จ");
+        console.log("✅ [Sidebar] อัปโหลดโลโก้โรงเรียนสำเร็จ:", result.url);
+      } catch (err) {
+        console.error("❌ [Sidebar] อัปโหลดโลโก้ไม่สำเร็จ:", err);
+        message.error("อัปโหลดโลโก้ไม่สำเร็จ กรุณาลองใหม่");
+      } finally {
+        setIsUploadingLogo(false);
+      }
+    })();
+
+    return false; // ยับยั้ง Ant Design auto-upload
+  };
 
   return (
     <Flex vertical gap={20}>
@@ -84,7 +100,7 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             <Avatar
               size={120}
               icon={<BankOutlined />}
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
+              src={profile.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
               style={{
                 backgroundColor: "#e60278",
                 border: "4px solid white",
@@ -94,22 +110,31 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             <div
               style={{ position: "absolute", bottom: 2, right: 2, zIndex: 2 }}
             >
-              <Upload {...uploadProps}>
-                <Button
-                  type="primary"
-                  shape="circle"
-                  size="small"
-                  icon={<EditOutlined style={{ fontSize: 12 }} />}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    minWidth: 28,
-                    backgroundColor: "#001e45",
-                    borderColor: "white",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
-                  }}
-                />
-              </Upload>
+              <Tooltip title="เปลี่ยนโลโก้โรงเรียน">
+                <Upload
+                  name="file"
+                  showUploadList={false}
+                  beforeUpload={handleLogoBeforeUpload}
+                  accept="image/jpeg,image/png,image/webp"
+                  disabled={isUploadingLogo}
+                >
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    size="small"
+                    loading={isUploadingLogo}
+                    icon={isUploadingLogo ? <LoadingOutlined style={{ fontSize: 12 }} /> : <EditOutlined style={{ fontSize: 12 }} />}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      minWidth: 28,
+                      backgroundColor: "#001e45",
+                      borderColor: "white",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                    }}
+                  />
+                </Upload>
+              </Tooltip>
             </div>
           </div>
 

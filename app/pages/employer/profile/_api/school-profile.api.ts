@@ -41,6 +41,8 @@ export const requestFetchSchoolProfile = async (
         teacherCount?: number | null;
         studentCount?: number | null;
         affiliation?: string | null;
+        logoUrl?: string | null;
+        coverImageUrl?: string | null;
         schoolBenefits: { benefit: string }[];
       } | null;
     }>
@@ -67,6 +69,8 @@ export const requestFetchSchoolProfile = async (
     levels: [],
     benefits: sp.schoolBenefits.map((b) => b.benefit),
     gallery: [],
+    logoUrl: sp.logoUrl ?? undefined,
+    coverImageUrl: sp.coverImageUrl ?? undefined,
   };
 };
 
@@ -92,5 +96,7 @@ export const requestUpdateSchoolProfile = async (
     curriculum: data.curriculum || null,
     size: data.size || null,
     gallery: data.gallery ?? [],
+    logo_url: data.logoUrl || null,
+    cover_image_url: data.coverImageUrl || null,
   });
 };

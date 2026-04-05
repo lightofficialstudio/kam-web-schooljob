@@ -22,6 +22,9 @@ export const updateEmployerProfileSchema = z.object({
   district: z.string().optional().nullable(),
   // สวัสดิการ — ส่งมาเป็น array of string แล้ว service จะ upsert
   benefits: z.array(z.string()).optional(),
+  // รูปภาพโลโก้และปก
+  logo_url: z.string().optional().nullable(),
+  cover_image_url: z.string().optional().nullable(),
   // ฟิลด์ UI-only ที่ยังไม่มีใน DB (เก็บ client-side เท่านั้น)
   email: z.string().email().optional().nullable(),
   levels: z.array(z.string()).optional(),

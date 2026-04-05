@@ -25,6 +25,8 @@ export interface SchoolProfile {
   levels?: string[];
   benefits?: string[];
   gallery?: string[];
+  logoUrl?: string;
+  coverImageUrl?: string;
 }
 
 interface SchoolProfileState {
