@@ -88,6 +88,7 @@ export const updateEmployeeProfileService = async (
     licenses,
     languages,
     skills,
+    resumes,
     ...basicFields
   } = payload;
 
@@ -305,6 +306,34 @@ export const updateEmployeeProfileService = async (
             data: {
               profileId,
               skillName: skill.skill_name,
+            },
+          });
+        }
+      }
+    }
+
+    // ✨ Upsert resumes — upsert by id, สร้างใหม่ถ้าไม่มี id
+    if (resumes !== undefined) {
+      for (const resume of resumes) {
+        if (resume.id) {
+          await tx.resume.update({
+            where: { id: resume.id },
+            data: {
+              fileName: resume.file_name,
+              fileSize: resume.file_size ?? null,
+              fileUrl: resume.file_url,
+              isActive: resume.is_active,
+              isDeleted: resume.is_deleted,
+            },
+          });
+        } else {
+          await tx.resume.create({
+            data: {
+              profileId,
+              fileName: resume.file_name,
+              fileSize: resume.file_size ?? null,
+              fileUrl: resume.file_url,
+              isActive: resume.is_active,
             },
           });
         }

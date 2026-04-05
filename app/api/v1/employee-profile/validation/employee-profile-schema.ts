@@ -54,6 +54,16 @@ const skillSchema = z.object({
   is_deleted: z.boolean().default(false),
 });
 
+// 📝 Schema สำหรับ Resume แต่ละรายการ
+const resumeSchema = z.object({
+  id: z.string().uuid().optional(),
+  file_name: z.string().min(1, "กรุณาระบุชื่อไฟล์"),
+  file_size: z.number().int().nonnegative().optional().nullable(),
+  file_url: z.string().min(1, "กรุณาระบุ URL ไฟล์"),
+  is_active: z.boolean().default(false),
+  is_deleted: z.boolean().default(false),
+});
+
 // 📝 Schema หลักสำหรับ Update Employee Profile (ทุก field เป็น optional — partial update)
 export const updateEmployeeProfileSchema = z.object({
   // Basic Info
@@ -88,6 +98,7 @@ export const updateEmployeeProfileSchema = z.object({
   licenses: z.array(licenseSchema).optional(),
   languages: z.array(languageSchema).optional(),
   skills: z.array(skillSchema).optional(),
+  resumes: z.array(resumeSchema).optional(),
 });
 
 export type UpdateEmployeeProfileInput = z.infer<typeof updateEmployeeProfileSchema>;

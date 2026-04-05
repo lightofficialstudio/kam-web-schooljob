@@ -23,6 +23,8 @@ import {
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
+import { uploadFile } from "@/app/lib/storage";
+import { useAuthStore } from "@/app/stores/auth-store";
 import type { ResumeEntry } from "../_stores/profile-store";
 import { useProfileStore } from "../_stores/profile-store";
 
@@ -54,14 +56,16 @@ const formatFileSize = (bytes: number): string => {
 // Section สถานะใบประกอบวิชาชีพ + แนบไฟล์
 export const TeachingLicenseSection: React.FC = () => {
   const { token } = theme.useToken();
-  const { profile, setLicenseStatus, addLicenseAttachment, removeLicenseAttachment } =
+  const { profile, setLicenseStatus, addLicenseAttachment, removeLicenseAttachment, saveProfile } =
     useProfileStore();
+  const { user } = useAuthStore();
 
   const currentStatus = profile.licenseStatus ?? "";
   const attachments   = profile.licenseAttachments ?? [];
   const showAttachment = currentStatus === "has_license" || currentStatus === "pending";
 
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleBeforeUpload = (file: RcFile): boolean => {
     setUploadError(null);
@@ -87,14 +91,37 @@ export const TeachingLicenseSection: React.FC = () => {
       return false;
     }
 
-    const newFile: ResumeEntry = {
-      id: `lic-${Date.now()}`,
-      fileName: file.name,
-      fileSize: file.size,
-      uploadedAt: new Date().toLocaleDateString("th-TH"),
-      file,
-    };
-    addLicenseAttachment(newFile);
+    if (!user?.user_id) {
+      setUploadError("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+      return false;
+    }
+
+    // ✨ Upload จริงไป Supabase Storage (licenses bucket) แล้ว save ลง DB
+    (async () => {
+      setIsUploading(true);
+      try {
+        const result = await uploadFile("licenses", user.user_id, file);
+
+        const newFile: ResumeEntry = {
+          id: `lic-${Date.now()}`,
+          fileName: file.name,
+          fileSize: file.size,
+          uploadedAt: new Date().toLocaleDateString("th-TH"),
+          url: result.url,
+        };
+        addLicenseAttachment(newFile);
+
+        // ✅ บันทึก licenses ลง DB ทันที
+        await saveProfile(user.user_id);
+        console.log("✅ [TeachingLicenseSection] อัปโหลดและบันทึกใบประกอบฯ สำเร็จ:", result.url);
+      } catch (err) {
+        console.error("❌ [TeachingLicenseSection] upload error:", err);
+        setUploadError(`อัปโหลดไฟล์ "${file.name}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
+      } finally {
+        setIsUploading(false);
+      }
+    })();
+
     return false;
   };
 
@@ -248,15 +275,18 @@ export const TeachingLicenseSection: React.FC = () => {
             showUploadList={false}
             beforeUpload={handleBeforeUpload}
             multiple={false}
+            disabled={isUploading}
           >
             <Button
               icon={<PlusOutlined />}
               type="dashed"
               block
+              loading={isUploading}
+              disabled={isUploading}
               style={{ height: 40 }}
               onClick={() => setUploadError(null)}
             >
-              แนบไฟล์ใบประกอบวิชาชีพ (PDF, JPG, PNG)
+              {isUploading ? "กำลังอัปโหลด..." : "แนบไฟล์ใบประกอบวิชาชีพ (PDF, JPG, PNG)"}
             </Button>
           </Upload>
 

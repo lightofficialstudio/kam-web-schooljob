@@ -16,8 +16,15 @@ export const requestUpdateEmployeeProfile = async (
   userId: string,
   payload: Record<string, unknown>
 ) => {
-  const { data } = await axios.patch(`${BASE_URL}/update`, payload, {
-    params: { user_id: userId },
-  });
-  return data;
+  try {
+    const { data } = await axios.patch(`${BASE_URL}/update`, payload, {
+      params: { user_id: userId },
+    });
+    return data;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err) && err.response) {
+      console.error("❌ [requestUpdateEmployeeProfile] 400 response body:", JSON.stringify(err.response.data, null, 2));
+    }
+    throw err;
+  }
 };

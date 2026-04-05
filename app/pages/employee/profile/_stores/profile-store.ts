@@ -178,6 +178,11 @@ interface ProfileStore {
   saveProfile: (userId: string) => Promise<void>;
 }
 
+// ✨ ตรวจว่า string เป็น UUID จริงหรือไม่ (ป้องกัน Zod reject id ชั่วคราว เช่น "resume-xxx", "lic-xxx")
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const toUuidOrUndefined = (id?: string): string | undefined =>
+  id && UUID_REGEX.test(id) ? id : undefined;
+
 const initialProfile: Partial<EmployeeProfile> = {
   firstName: "",
   lastName: "",
@@ -566,7 +571,6 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             specialActivities: d.specialActivities ?? "",
             canRelocate: d.canRelocate ?? false,
             licenseStatus: d.licenseStatus ?? "",
-            activeResumeId: d.activeResumeId ?? null,
             // Array relations
             specialization: d.specializations?.map((s: { subject: string }) => s.subject) ?? [],
             gradeCanTeach: d.gradeCanTeaches?.map((g: { grade: string }) => g.grade) ?? [],
@@ -599,19 +603,35 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
               startDate: edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : undefined,
               endDate: edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : undefined,
             })) ?? [],
-            licenses: d.licenses?.map((lic: {
-              id: string; licenseName: string; issuer: string | null;
-              licenseNumber: string | null; issueDate: string | null;
-              expiryDate: string | null; fileUrl: string | null; credentialUrl: string | null;
-            }) => ({
-              id: lic.id,
-              licenseName: lic.licenseName,
-              issuer: lic.issuer ?? undefined,
-              licenseNumber: lic.licenseNumber ?? undefined,
-              issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
-              expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
-              credentialUrl: lic.credentialUrl ?? undefined,
-            })) ?? [],
+            // ✨ licenses ที่มี fileUrl → map กลับเป็น licenseAttachments ด้วย
+            licenses: (d.licenses ?? [])
+              .filter((lic: { fileUrl: string | null }) => !lic.fileUrl) // license record ที่ไม่มีไฟล์แนบ
+              .map((lic: {
+                id: string; licenseName: string; issuer: string | null;
+                licenseNumber: string | null; issueDate: string | null;
+                expiryDate: string | null; credentialUrl: string | null;
+              }) => ({
+                id: lic.id,
+                licenseName: lic.licenseName,
+                issuer: lic.issuer ?? undefined,
+                licenseNumber: lic.licenseNumber ?? undefined,
+                issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
+                expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
+                credentialUrl: lic.credentialUrl ?? undefined,
+              })),
+            // ✨ licenses ที่มี fileUrl → map เป็น licenseAttachments (ไฟล์แนบใบประกอบฯ)
+            licenseAttachments: (d.licenses ?? [])
+              .filter((lic: { fileUrl: string | null }) => !!lic.fileUrl)
+              .map((lic: {
+                id: string; licenseName: string; fileSize?: number | null;
+                fileUrl: string; uploadedAt?: string; createdAt?: string;
+              }) => ({
+                id: lic.id,
+                fileName: lic.licenseName,
+                fileSize: lic.fileSize ?? 0,
+                uploadedAt: lic.createdAt ? new Date(lic.createdAt).toLocaleDateString("th-TH") : "",
+                url: lic.fileUrl,
+              })),
             languages: d.languages?.map((lang: {
               id: string; languageName: string; proficiency: string | null;
             }) => ({
@@ -623,7 +643,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
               id: sk.id,
               skillName: sk.skillName,
             })) ?? [],
-            resumes: d.resumes?.map((r: {
+            // ✨ resumes จาก DB → map กลับใส่ store พร้อม url
+            resumes: (d.resumes ?? []).map((r: {
               id: string; fileName: string; fileSize: number | null; uploadedAt: string; fileUrl: string;
             }) => ({
               id: r.id,
@@ -631,7 +652,9 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
               fileSize: r.fileSize ?? 0,
               uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
               url: r.fileUrl,
-            })) ?? [],
+            })),
+            // ✨ activeResumeId — ดึงจาก resume ที่ isActive = true
+            activeResumeId: d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ?? d.activeResumeId ?? null,
           },
         });
       }
@@ -648,8 +671,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     try {
       const p = get().profile;
       const payload: Record<string, unknown> = {
-        first_name: p.firstName,
-        last_name: p.lastName,
+        first_name: p.firstName || undefined,
+        last_name: p.lastName || undefined,
         phone_number: p.phoneNumber,
         gender: p.gender,
         date_of_birth: p.dateOfBirth || null,
@@ -661,14 +684,14 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         special_activities: p.specialActivities,
         can_relocate: p.canRelocate,
         license_status: p.licenseStatus || null,
-        active_resume_id: p.activeResumeId ?? null,
+        active_resume_id: toUuidOrUndefined(p.activeResumeId ?? undefined) ?? null,
         // Array relations
         specializations: p.specialization ?? [],
         grade_can_teaches: p.gradeCanTeach ?? [],
         preferred_provinces: p.preferredProvinces ?? [],
         // Sub-relations — ส่งเฉพาะที่มี (ไม่ส่ง field ที่ไม่เกี่ยวกับ DB)
         work_experiences: (p.workExperiences ?? []).map((exp) => ({
-          id: exp.id,
+          id: toUuidOrUndefined(exp.id),
           job_title: exp.jobTitle,
           company_name: exp.companyName,
           start_date: exp.startDate,
@@ -679,7 +702,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           is_deleted: exp.isDeleted ?? false,
         })),
         educations: (p.educations ?? []).map((edu) => ({
-          id: edu.id,
+          id: toUuidOrUndefined(edu.id),
           level: edu.level,
           institution: edu.institution,
           major: edu.major,
@@ -689,24 +712,52 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           end_date: edu.endDate || null,
           is_deleted: edu.isDeleted ?? false,
         })),
-        licenses: (p.licenses ?? []).map((lic) => ({
-          id: lic.id,
-          license_name: lic.licenseName,
-          issuer: lic.issuer ?? null,
-          license_number: lic.licenseNumber ?? null,
-          issue_date: lic.issueDate ?? null,
-          expiry_date: lic.expiryDate ?? null,
-          credential_url: lic.credentialUrl ?? null,
-          is_deleted: lic.isDeleted ?? false,
-        })),
+        // ✨ licenses = LicenseEntry + licenseAttachments (ไฟล์แนบที่ upload แล้ว)
+        licenses: [
+          ...(p.licenses ?? []).map((lic) => ({
+            id: toUuidOrUndefined(lic.id),
+            license_name: lic.licenseName,
+            issuer: lic.issuer ?? null,
+            license_number: lic.licenseNumber ?? null,
+            issue_date: lic.issueDate ?? null,
+            expiry_date: lic.expiryDate ?? null,
+            file_url: null,
+            credential_url: lic.credentialUrl ?? null,
+            is_deleted: lic.isDeleted ?? false,
+          })),
+          ...(p.licenseAttachments ?? [])
+            .filter((att) => att.url)
+            .map((att) => ({
+              id: toUuidOrUndefined(att.id),
+              license_name: att.fileName,
+              issuer: null,
+              license_number: null,
+              issue_date: null,
+              expiry_date: null,
+              file_url: att.url!,
+              credential_url: null,
+              is_deleted: false,
+            })),
+        ],
+        // ✨ ส่ง resumes ที่มี url (อัปโหลดสำเร็จแล้ว) ไปบันทึกลง DB
+        resumes: (p.resumes ?? [])
+          .filter((r) => r.url)
+          .map((r) => ({
+            id: toUuidOrUndefined(r.id),
+            file_name: r.fileName,
+            file_size: r.fileSize ?? null,
+            file_url: r.url!,
+            is_active: r.id === p.activeResumeId,
+            is_deleted: false,
+          })),
         languages: (p.languages ?? []).map((lang) => ({
-          id: lang.id,
+          id: toUuidOrUndefined(lang.id),
           language_name: lang.languageName,
           proficiency: lang.proficiency ?? null,
           is_deleted: lang.isDeleted ?? false,
         })),
         skills: (p.skills ?? []).map((sk) => ({
-          id: sk.id,
+          id: toUuidOrUndefined(sk.id),
           skill_name: sk.skillName,
           is_deleted: sk.isDeleted ?? false,
         })),

@@ -15,6 +15,20 @@ export const BUCKETS = {
 
 export type BucketName = (typeof BUCKETS)[keyof typeof BUCKETS];
 
+// ✨ Sanitize ชื่อไฟล์ให้ใช้ได้กับ Supabase Storage key (รองรับภาษาไทย + ช่องว่าง)
+// — แปลง Unicode → transliterate, แทนที่ช่องว่างด้วย underscore, เหลือเฉพาะ ASCII ที่ปลอดภัย
+const sanitizeFileName = (name: string): string => {
+  const ext = name.includes(".") ? `.${name.split(".").pop()}` : "";
+  const base = name.replace(/\.[^.]+$/, "");
+  // แปลงอักขระที่ไม่ใช่ ASCII ตัวอักษร ตัวเลข จุด ขีด → underscore
+  const safe = base
+    .replace(/\s+/g, "_")
+    .replace(/[^\w.-]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+  return `${safe || "file"}${ext}`;
+};
+
 // ✨ Upload ไฟล์ไปยัง Supabase Storage
 // path รูปแบบ: {userId}/{filename} เพื่อแยก folder ตาม user
 export const uploadFileService = async (
@@ -24,7 +38,8 @@ export const uploadFileService = async (
   fileBuffer: Buffer,
   mimeType: string
 ): Promise<{ url: string; path: string }> => {
-  const filePath = `${userId}/${Date.now()}_${fileName}`;
+  const safeFileName = sanitizeFileName(fileName);
+  const filePath = `${userId}/${Date.now()}_${safeFileName}`;
 
   const { error } = await supabaseAdmin.storage
     .from(bucket)

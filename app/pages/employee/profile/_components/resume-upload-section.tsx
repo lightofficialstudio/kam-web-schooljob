@@ -9,9 +9,9 @@ import {
   WarningFilled,
 } from "@ant-design/icons";
 import {
-  Alert,
   Button,
   Flex,
+  Modal,
   Tag,
   Tooltip,
   Typography,
@@ -20,9 +20,21 @@ import {
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
-import { uploadFile } from "@/app/lib/storage";
+import { deleteFile, uploadFile } from "@/app/lib/storage";
 import { useProfileStore } from "../_stores/profile-store";
 import type { ResumeEntry } from "../_stores/profile-store";
+
+// ✨ parse storage path จาก Supabase public URL
+// URL รูปแบบ: .../storage/v1/object/public/resumes/{userId}/{filename}
+const parseStoragePath = (url: string, bucket: string): string | null => {
+  try {
+    const marker = `/object/public/${bucket}/`;
+    const idx = url.indexOf(marker);
+    return idx !== -1 ? url.slice(idx + marker.length) : null;
+  } catch {
+    return null;
+  }
+};
 
 const { Text } = Typography;
 
@@ -42,14 +54,39 @@ interface ResumeUploadSectionProps {
 // Section แนบเรซูเม่ — รองรับหลายไฟล์ และเลือกไฟล์ที่กำลังใช้งาน
 export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId }) => {
   const { token } = theme.useToken();
-  const { profile, addResume, removeResume, setActiveResume, setProfile } = useProfileStore();
+  const { profile, addResume, removeResume, setActiveResume, saveProfile } = useProfileStore();
 
   const resumes = profile.resumes ?? [];
   const activeResumeId = profile.activeResumeId ?? null;
 
-  // state เก็บ error message เพื่อแสดง UI คำเตือน
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // ✨ ลบเรซูเม่: ลบออกจาก Supabase Storage + ลบออกจาก DB ผ่าน saveProfile
+  const handleDeleteResume = async (resume: ResumeEntry) => {
+    setDeletingId(resume.id);
+    try {
+      // 1. ลบไฟล์จาก Storage (ถ้ามี url)
+      if (resume.url) {
+        const path = parseStoragePath(resume.url, "resumes");
+        if (path) {
+          await deleteFile("resumes", path);
+        }
+      }
+      // 2. ลบออกจาก store (synchronous)
+      removeResume(resume.id);
+      // 3. บันทึกสถานะใหม่ลง DB
+      await saveProfile(userId);
+      setUploadError(null);
+      console.log("✅ [ResumeUploadSection] ลบเรซูเม่สำเร็จ:", resume.fileName);
+    } catch (err) {
+      console.error("❌ [ResumeUploadSection] ลบเรซูเม่ไม่สำเร็จ:", err);
+      setUploadError(`ลบไฟล์ "${resume.fileName}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleBeforeUpload = (file: RcFile): boolean => {
     setUploadError(null);
@@ -75,29 +112,25 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
       return false;
     }
 
-    const resumeId = `resume-${Date.now()}`;
-    const newResume: ResumeEntry = {
-      id: resumeId,
-      fileName: file.name,
-      fileSize: file.size,
-      uploadedAt: new Date().toLocaleDateString("th-TH"),
-      file,
-    };
-    addResume(newResume);
-
-    // ✨ Upload จริงไป Supabase Storage ผ่าน async IIFE
+    // ✨ Upload จริงไป Supabase Storage แล้ว save ลง DB ผ่าน saveProfile
     (async () => {
       setIsUploading(true);
       try {
         const result = await uploadFile("resumes", userId, file);
-        // ✅ อัปเดต url ใน resume entry ที่เพิ่งสร้าง
-        const currentResumes = useProfileStore.getState().profile.resumes ?? [];
-        setProfile({
-          resumes: currentResumes.map((r) =>
-            r.id === resumeId ? { ...r, url: result.url } : r
-          ),
-        });
-        console.log("✅ [ResumeUploadSection] อัปโหลดเรซูเม่สำเร็จ:", result.url);
+
+        // ✅ เพิ่ม resume entry ใน store พร้อม url จาก Storage (synchronous)
+        const newResume: ResumeEntry = {
+          id: `resume-${Date.now()}`,
+          fileName: file.name,
+          fileSize: file.size,
+          uploadedAt: new Date().toLocaleDateString("th-TH"),
+          url: result.url,
+        };
+        addResume(newResume);
+
+        // ✅ บันทึก resumes ลง DB ทันที
+        await saveProfile(userId);
+        console.log("✅ [ResumeUploadSection] อัปโหลดและบันทึกเรซูเม่สำเร็จ:", result.url);
       } catch (err) {
         console.error("❌ [ResumeUploadSection] upload error:", err);
         setUploadError(`อัปโหลดไฟล์ "${file.name}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
@@ -209,7 +242,9 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
                       type="text"
                       danger
                       icon={<DeleteOutlined />}
-                      onClick={() => { removeResume(resume.id); setUploadError(null); }}
+                      loading={deletingId === resume.id}
+                      disabled={deletingId === resume.id}
+                      onClick={() => handleDeleteResume(resume)}
                     />
                   </Tooltip>
                 </Flex>
