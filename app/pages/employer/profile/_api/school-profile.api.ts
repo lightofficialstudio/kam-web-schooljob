@@ -46,7 +46,7 @@ export const requestFetchSchoolProfile = async (
         schoolBenefits: { benefit: string }[];
       } | null;
     }>
-  >(`/employer-profile/read?${params.toString()}`);
+  >(`/employer/profile/read?${params.toString()}`);
 
   const raw = response.data.data;
   if (!raw?.schoolProfile) return null;
@@ -79,7 +79,7 @@ export const requestUpdateSchoolProfile = async (
   userId: string,
   data: SchoolProfile,
 ): Promise<void> => {
-  await employerApi.patch(`/employer-profile/update?user_id=${userId}`, {
+  await employerApi.patch(`/employer/profile/update?user_id=${userId}`, {
     school_name: data.name,
     school_type: data.type || null,
     province: data.location,
