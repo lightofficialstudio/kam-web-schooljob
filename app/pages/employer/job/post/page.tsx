@@ -9,6 +9,7 @@ import {
   ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
+  theme as antTheme,
   Breadcrumb,
   Button,
   Col,
@@ -19,7 +20,6 @@ import {
   Space,
   Spin,
   Typography,
-  theme as antTheme,
 } from "antd";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -32,7 +32,7 @@ import {
 import { BasicInfoSection } from "./_components/basic-info-section";
 import { JobDetailSection } from "./_components/job-detail-section";
 import { JobTipsSidebar } from "./_components/job-tips-sidebar";
-import { LocationSection } from "./_components/location-section";
+import { loadAll, LocationSection } from "./_components/location-section";
 import { PostSettingsSection } from "./_components/post-settings-section";
 import { SalarySection } from "./_components/salary-section";
 import { useJobPostStore } from "./_stores/job-post-store";
@@ -121,15 +121,51 @@ export default function PostJobPage() {
   const { openNotification } = useNotificationModalStore();
   const jobId = params?.id as string | undefined;
   const isEdit = !!jobId;
-  const { setSalaryType, setSubmitting, isSubmitting } = useJobPostStore();
+  const {
+    setSalaryType,
+    setSubmitting,
+    isSubmitting,
+    setSelectedProvinceId,
+    setSelectedDistrictId,
+  } = useJobPostStore();
   const [isLoadingJob, setIsLoadingJob] = useState(false);
+  const [isMockLoading, setIsMockLoading] = useState(false);
 
-  // ✨ สุ่มข้อมูล preset สำหรับทดสอบ
-  const handleFillMockData = () => {
-    const preset =
-      MOCK_PRESETS[Math.floor(Math.random() * MOCK_PRESETS.length)];
-    form.setFieldsValue(preset);
-    setSalaryType(preset.salary_type);
+  // ✨ สุ่มข้อมูล preset สำหรับทดสอบ (รวมสถานที่จากข้อมูลจริง)
+  const handleFillMockData = async () => {
+    setIsMockLoading(true);
+    try {
+      const preset =
+        MOCK_PRESETS[Math.floor(Math.random() * MOCK_PRESETS.length)];
+      const { provinces, districts, subDistricts } = await loadAll();
+
+      // สุ่มจังหวัด → อำเภอ → ตำบล
+      const province = provinces[Math.floor(Math.random() * provinces.length)];
+      const provDistricts = districts.filter(
+        (d) => d.province_id === province.id,
+      );
+      const district =
+        provDistricts[Math.floor(Math.random() * provDistricts.length)];
+      const distSubs = subDistricts.filter(
+        (s) => s.district_id === district.id,
+      );
+      const sub = distSubs[Math.floor(Math.random() * distSubs.length)];
+
+      // อัปเดต store ก่อน (เพื่อให้ LocationSection re-render ถูก)
+      setSelectedProvinceId(province.id);
+      setSelectedDistrictId(district.id);
+
+      form.setFieldsValue({
+        ...preset,
+        province: province.name_th,
+        area: district.name_th,
+        sub_district: sub?.name_th ?? undefined,
+        zipcode: sub?.zip_code ? String(sub.zip_code) : undefined,
+      });
+      setSalaryType(preset.salary_type);
+    } finally {
+      setIsMockLoading(false);
+    }
   };
 
   // ✨ โหลดข้อมูลงานที่ต้องการแก้ไขจาก API จริง
@@ -245,10 +281,15 @@ export default function PostJobPage() {
     }
   };
 
-  if (isLoadingJob) {
+  if (isLoadingJob || isMockLoading) {
     return (
       <Flex align="center" justify="center" style={{ minHeight: "100vh" }}>
-        <Spin size="large" />
+        <Spin
+          size="large"
+          tip={isMockLoading ? "กำลังสุ่มข้อมูล..." : "กำลังโหลดข้อมูลงาน..."}
+        >
+          <div style={{ width: 240, height: 120 }} />
+        </Spin>
       </Flex>
     );
   }
