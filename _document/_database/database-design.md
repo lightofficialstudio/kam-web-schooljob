@@ -1,9 +1,10 @@
 # Database Design Document
+
 ## KAM-WEB-SCHOOLJOB — Thai Education Job Marketplace
 
-**Engine:** PostgreSQL  
-**ORM:** Prisma 7.6.0  
-**Design Pattern:** Relational Database (3NF)  
+**Engine:** PostgreSQL
+**ORM:** Prisma 7.6.0
+**Design Pattern:** Relational Database (3NF)
 **Last Updated:** 2026-04-05
 
 ---
@@ -12,11 +13,11 @@
 
 ### 1.1 บทบาทผู้ใช้งาน (User Roles)
 
-| Role | คำอธิบาย | หน้าที่ใช้งาน |
-|------|----------|--------------|
-| `EMPLOYEE` | ครู / ผู้หางาน | profile, job search, apply, school directory |
+| Role       | คำอธิบาย           | หน้าที่ใช้งาน                                  |
+| ---------- | ------------------ | ---------------------------------------------- |
+| `EMPLOYEE` | ครู / ผู้หางาน     | profile, job search, apply, school directory   |
 | `EMPLOYER` | โรงเรียน / ผู้จ้าง | job post, applicant management, school profile |
-| `ADMIN` | ผู้ดูแลระบบ | user management, system settings |
+| `ADMIN`    | ผู้ดูแลระบบ        | user management, system settings               |
 
 ### 1.2 หลักการออกแบบ
 
@@ -81,6 +82,18 @@
 ┌────────────────┐ ┌──────────────────┐
 │     blogs      │ │  notifications   │
 └────────────────┘ └──────────────────┘
+
+ตาราง View Tracking (analytics):
+┌───────────────────────────────────────────────────────────┐
+│ job_views                                                 │
+│  job_id → jobs.id                                         │
+│  viewer_id → profiles.id (nullable, EMPLOYEE/EMPLOYER)    │
+└───────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│ profile_views                                             │
+│  profile_id → profiles.id  (เจ้าของ profile ที่ถูกดู)     │
+│  viewer_id → profiles.id   (ผู้ดู, nullable)              │
+└───────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -212,6 +225,7 @@ licenses
 **เหตุผล:** ต้องการแนบได้หลายไฟล์และเลือก active — จำเป็นต้องเป็น table แยก ไม่ใช่แค่ field เดียว
 
 **หมายเหตุ circular FK:** `profiles.active_resume_id` → `resumes.id` และ `resumes.profile_id` → `profiles.id` ต้องใช้ named relation ใน Prisma:
+
 - `resumes.profile` → `@relation(name: "ProfileResumes")`
 - `profiles.activeResume` → `@relation(name: "ActiveResume", fields: [active_resume_id], references: [id])`
 
@@ -496,6 +510,76 @@ notifications
 
 ---
 
+### 3.20 `job_views` — การเข้าชมประกาศงาน
+
+**เหตุผล:** ติดตามว่าใครเข้ามาดูประกาศงานใด เมื่อไร — ใช้แยก unique visitors จาก total views ได้
+แสดงเป็น "กำลังใจ" ให้ Employer รู้ว่ามีคนสนใจงานของตน
+ฝั่ง Employee ใช้ดูว่าตนเองเคย browse job นี้แล้วหรือยัง (state: viewed/saved)
+
+**ผู้ที่ดูได้:**
+
+- `EMPLOYEE` — ครูที่กำลัง browse หา job
+- `EMPLOYER` — โรงเรียนอื่นที่ขอดูงาน (competitive research)
+- `viewer_id = NULL` — ผู้เยี่ยมชมที่ไม่ได้ login (anonymous)
+
+```
+job_views
+├── id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+├── job_id          UUID FK → jobs.id ON DELETE CASCADE NOT NULL
+├── viewer_id       UUID FK → profiles.id ON DELETE SET NULL   -- NULL = anonymous
+├── viewer_role     ENUM(EMPLOYEE, EMPLOYER, ADMIN)            -- snapshot ณ เวลาที่ดู
+├── viewed_at       TIMESTAMP DEFAULT now() NOT NULL
+└── session_id      VARCHAR                                    -- browser session (ป้องกัน double-count anonymous)
+
+INDEX: (job_id)                   -- query count ต่อ job
+INDEX: (viewer_id)                -- query history ของ user
+UNIQUE CONSTRAINT: none           -- allow multiple views per user (track all visits)
+```
+
+**Use Cases:**
+
+- `SELECT COUNT(*) FROM job_views WHERE job_id = $1` → ยอดเข้าชมทั้งหมด
+- `SELECT COUNT(DISTINCT viewer_id) FROM job_views WHERE job_id = $1` → unique viewers
+- `SELECT COUNT(*) FROM job_views WHERE job_id = $1 AND viewer_role = 'EMPLOYEE'` → ครูที่สนใจ
+- `SELECT * FROM job_views WHERE viewer_id = $1 ORDER BY viewed_at DESC` → ประวัติการดู job ของ employee
+
+---
+
+### 3.21 `profile_views` — การเข้าชมโปรไฟล์ครู (Employee)
+
+**เหตุผล:** ติดตามว่า Employer เข้ามาดูโปรไฟล์ครูคนไหนบ้าง
+แสดงเป็น "กำลังใจ" ให้ Employee รู้ว่าตนเองมีคน "สนใจ" กี่คน
+ช่วย Employer จำได้ว่าเคยดูใครไปแล้วบ้าง (state: viewed)
+
+**ผู้ที่ดูได้:**
+
+- `EMPLOYER` — โรงเรียนที่กำลัง browse หาครู (primary use case)
+- `EMPLOYEE` — ครูที่ดูโปรไฟล์ครูคนอื่น
+- `viewer_id = NULL` — anonymous
+
+```
+profile_views
+├── id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+├── profile_id      UUID FK → profiles.id ON DELETE CASCADE NOT NULL  -- เจ้าของ profile ที่ถูกดู
+├── viewer_id       UUID FK → profiles.id ON DELETE SET NULL          -- ผู้ที่เข้ามาดู (NULL = anonymous)
+├── viewer_role     ENUM(EMPLOYEE, EMPLOYER, ADMIN)                   -- snapshot role ณ เวลาที่ดู
+├── viewed_at       TIMESTAMP DEFAULT now() NOT NULL
+└── session_id      VARCHAR                                           -- browser session
+
+INDEX: (profile_id)               -- query count ต่อ profile
+INDEX: (viewer_id)                -- query history ของ employer/employee
+UNIQUE CONSTRAINT: none           -- allow multiple views
+```
+
+**Use Cases:**
+
+- `SELECT COUNT(*) FROM profile_views WHERE profile_id = $1` → Employer เข้ามาดูกี่ครั้ง
+- `SELECT COUNT(DISTINCT viewer_id) FROM profile_views WHERE profile_id = $1 AND viewer_role = 'EMPLOYER'` → โรงเรียนที่ไม่ซ้ำที่สนใจ
+- `SELECT COUNT(*) FROM profile_views WHERE viewer_id = $1 AND profile_id = $2` → Employer คนนั้นดู profile นี้กี่ครั้ง
+- ใช้ร่วมกับ `applications` เพื่อคำนวณ "Employer view แล้วแต่ไม่เรียกสัมภาษณ์" ratio
+
+---
+
 ## 4. Enum Definitions
 
 ```prisma
@@ -553,54 +637,54 @@ enum BlogStatus {
 
 ## 5. Relation Summary
 
-| Table | Relation | Target | Type | Notes |
-|-------|----------|--------|------|-------|
-| profiles | has many | work_experiences | 1:N | CASCADE DELETE |
-| profiles | has many | educations | 1:N | CASCADE DELETE |
-| profiles | has many | licenses | 1:N | CASCADE DELETE |
-| profiles | has many | resumes | 1:N | CASCADE DELETE, named "ProfileResumes" |
-| profiles | belongs to one (optional) | resumes (active) | 1:1 | named "ActiveResume", SET NULL |
-| profiles | has many | specializations | 1:N | CASCADE DELETE |
-| profiles | has many | grade_can_teaches | 1:N | CASCADE DELETE |
-| profiles | has many | preferred_provinces | 1:N | CASCADE DELETE |
-| profiles | has many | languages | 1:N | CASCADE DELETE |
-| profiles | has many | skills | 1:N | CASCADE DELETE |
-| profiles | has one (optional) | school_profiles | 1:1 | CASCADE DELETE, EMPLOYER only |
-| profiles | has many | applications | 1:N | CASCADE DELETE, EMPLOYEE only |
-| profiles | has many | blogs | 1:N | SET NULL on author delete |
-| profiles | has many | notifications | 1:N | CASCADE DELETE |
-| school_profiles | has many | school_benefits | 1:N | CASCADE DELETE |
-| school_profiles | has many | jobs | 1:N | CASCADE DELETE |
-| jobs | has many | job_subjects | 1:N | CASCADE DELETE |
-| jobs | has many | job_grades | 1:N | CASCADE DELETE |
-| jobs | has many | job_benefits | 1:N | CASCADE DELETE |
-| jobs | has many | applications | 1:N | CASCADE DELETE |
-| resumes | has many | applications | 1:N | SET NULL on resume delete |
-| applications | belongs to | jobs | N:1 | |
-| applications | belongs to | profiles (employee) | N:1 | |
-| applications | belongs to (optional) | resumes | N:1 | SET NULL |
+| Table           | Relation                  | Target              | Type | Notes                                  |
+| --------------- | ------------------------- | ------------------- | ---- | -------------------------------------- |
+| profiles        | has many                  | work_experiences    | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | educations          | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | licenses            | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | resumes             | 1:N  | CASCADE DELETE, named "ProfileResumes" |
+| profiles        | belongs to one (optional) | resumes (active)    | 1:1  | named "ActiveResume", SET NULL         |
+| profiles        | has many                  | specializations     | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | grade_can_teaches   | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | preferred_provinces | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | languages           | 1:N  | CASCADE DELETE                         |
+| profiles        | has many                  | skills              | 1:N  | CASCADE DELETE                         |
+| profiles        | has one (optional)        | school_profiles     | 1:1  | CASCADE DELETE, EMPLOYER only          |
+| profiles        | has many                  | applications        | 1:N  | CASCADE DELETE, EMPLOYEE only          |
+| profiles        | has many                  | blogs               | 1:N  | SET NULL on author delete              |
+| profiles        | has many                  | notifications       | 1:N  | CASCADE DELETE                         |
+| school_profiles | has many                  | school_benefits     | 1:N  | CASCADE DELETE                         |
+| school_profiles | has many                  | jobs                | 1:N  | CASCADE DELETE                         |
+| jobs            | has many                  | job_subjects        | 1:N  | CASCADE DELETE                         |
+| jobs            | has many                  | job_grades          | 1:N  | CASCADE DELETE                         |
+| jobs            | has many                  | job_benefits        | 1:N  | CASCADE DELETE                         |
+| jobs            | has many                  | applications        | 1:N  | CASCADE DELETE                         |
+| resumes         | has many                  | applications        | 1:N  | SET NULL on resume delete              |
+| applications    | belongs to                | jobs                | N:1  |                                        |
+| applications    | belongs to                | profiles (employee) | N:1  |                                        |
+| applications    | belongs to (optional)     | resumes             | N:1  | SET NULL                               |
 
 ---
 
 ## 6. Mapping: หน้า → Tables ที่ใช้
 
-| หน้า | Tables หลัก |
-|------|------------|
-| `/pages/signup` | profiles |
-| `/pages/signin` | profiles |
-| `/pages/employee/profile` | profiles, work_experiences, educations, licenses, resumes, specializations, grade_can_teaches, preferred_provinces, languages, skills |
-| `/pages/employee/school` | school_profiles, school_benefits, jobs, job_subjects, job_grades |
-| `/pages/employee/account-setting` | profiles |
-| `/pages/job` | jobs, job_subjects, job_grades, job_benefits, school_profiles |
-| `/pages/job/[id]` | jobs, job_subjects, job_grades, job_benefits, school_profiles, school_benefits |
-| `/pages/job/[id]/apply` | applications, resumes, profiles |
-| `/pages/employer/profile` | profiles, school_profiles, school_benefits |
-| `/pages/employer/job/post` | jobs, job_subjects, job_grades, job_benefits |
-| `/pages/employer/job/read` | jobs, applications, profiles, resumes |
-| `/pages/employer/account-setting` | profiles |
-| `/pages/admin/user-management` | profiles, school_profiles |
-| `/pages/blog` | blogs |
-| `/pages/landing` | jobs, school_profiles (aggregates) |
+| หน้า                              | Tables หลัก                                                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `/pages/signup`                   | profiles                                                                                                                              |
+| `/pages/signin`                   | profiles                                                                                                                              |
+| `/pages/employee/profile`         | profiles, work_experiences, educations, licenses, resumes, specializations, grade_can_teaches, preferred_provinces, languages, skills |
+| `/pages/employee/school`          | school_profiles, school_benefits, jobs, job_subjects, job_grades                                                                      |
+| `/pages/employee/account-setting` | profiles                                                                                                                              |
+| `/pages/job`                      | jobs, job_subjects, job_grades, job_benefits, school_profiles                                                                         |
+| `/pages/job/[id]`                 | jobs, job_subjects, job_grades, job_benefits, school_profiles, school_benefits                                                        |
+| `/pages/job/[id]/apply`           | applications, resumes, profiles                                                                                                       |
+| `/pages/employer/profile`         | profiles, school_profiles, school_benefits                                                                                            |
+| `/pages/employer/job/post`        | jobs, job_subjects, job_grades, job_benefits                                                                                          |
+| `/pages/employer/job/read`        | jobs, applications, profiles, resumes                                                                                                 |
+| `/pages/employer/account-setting` | profiles                                                                                                                              |
+| `/pages/admin/user-management`    | profiles, school_profiles                                                                                                             |
+| `/pages/blog`                     | blogs                                                                                                                                 |
+| `/pages/landing`                  | jobs, school_profiles (aggregates)                                                                                                    |
 
 ---
 
@@ -639,6 +723,16 @@ CREATE INDEX idx_notifications_profile_id_is_read ON notifications(profile_id, i
 -- blogs: query ตาม status และ slug
 CREATE INDEX idx_blogs_status ON blogs(status);
 CREATE INDEX idx_blogs_slug ON blogs(slug);
+
+-- job_views: นับยอดชมต่อ job และ history ของ viewer
+CREATE INDEX idx_job_views_job_id ON job_views(job_id);
+CREATE INDEX idx_job_views_viewer_id ON job_views(viewer_id);
+CREATE INDEX idx_job_views_viewed_at ON job_views(viewed_at);
+
+-- profile_views: นับยอดชมต่อ profile และ history ของ employer
+CREATE INDEX idx_profile_views_profile_id ON profile_views(profile_id);
+CREATE INDEX idx_profile_views_viewer_id ON profile_views(viewer_id);
+CREATE INDEX idx_profile_views_viewed_at ON profile_views(viewed_at);
 ```
 
 ---
@@ -672,8 +766,9 @@ model Resume {
 ## 9. สิ่งที่ต้องทำต่อ (Next Steps)
 
 - [x] ออกแบบ Database Schema ทุก table พร้อมเหตุผล
-- [ ] เขียน Prisma Schema ใหม่ตาม design นี้ (`prisma/schema.prisma`)
+- [x] เพิ่ม `job_views` และ `profile_views` สำหรับ View Tracking (3.20–3.21)
+- [ ] เพิ่ม `job_views` และ `profile_views` ใน `prisma/schema.prisma`
 - [ ] รัน `bunx prisma db push` เพื่อสร้าง/อัปเดต table
+- [ ] สร้าง API `POST /api/v1/employer/jobs/view` และ `POST /api/v1/employee/profile/view` สำหรับบันทึก view
 - [ ] สร้าง seed data สำหรับ dev/test (`prisma/seed.ts`)
-- [ ] เชื่อม API routes กับ Prisma service ตาม backend-standard
 - [ ] ตั้งค่า Row Level Security (RLS) ใน Supabase สำหรับ profiles
