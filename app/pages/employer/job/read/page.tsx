@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import {
   Badge,
@@ -7,10 +8,12 @@ import {
   Button,
   Flex,
   Layout,
+  Spin,
   Typography,
   theme,
 } from "antd";
 import Link from "next/link";
+import { useEffect } from "react";
 import { ApplicantDrawer } from "./_components/applicant-drawer";
 import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
@@ -28,10 +31,18 @@ const PRIMARY_DARK = "#0878a8";
 
 // หน้าจัดการประกาศรับสมัครครู — สำหรับฝ่ายบุคลากรของโรงเรียน
 export default function MyJobsPage() {
-  const { jobs } = useJobReadStore();
+  const { jobs, isLoading, fetchJobs } = useJobReadStore();
   const { openNewApplicantsDrawer } = useApplicantDrawerStore();
   const { token } = theme.useToken();
+  const { user } = useAuthStore();
   const totalNewApplicants = jobs.reduce((sum, j) => sum + j.newApplicants, 0);
+
+  // ✨ โหลดข้อมูลงานจาก API จริงเมื่อ user พร้อม
+  useEffect(() => {
+    if (user?.user_id) {
+      fetchJobs(user.user_id);
+    }
+  }, [user?.user_id, fetchJobs]);
 
   return (
     <Layout
@@ -157,20 +168,22 @@ export default function MyJobsPage() {
 
       {/* Main Content — overlaps header by pulling up */}
       <Content>
-        <Flex
-          vertical
-          gap={24}
-          style={{
-            maxWidth: 1200,
-            margin: "-32px auto 0",
-            padding: "0 24px 0",
-          }}
-        >
-          <StatsSection />
-          <InsightsCard />
-          <FilterSection />
-          <JobsTable />
-        </Flex>
+        <Spin spinning={isLoading} size="large">
+          <Flex
+            vertical
+            gap={24}
+            style={{
+              maxWidth: 1200,
+              margin: "-32px auto 0",
+              padding: "0 24px 0",
+            }}
+          >
+            <StatsSection />
+            <InsightsCard />
+            <FilterSection />
+            <JobsTable />
+          </Flex>
+        </Spin>
       </Content>
 
       {/* Drawer แสดงรายชื่อผู้สมัครของตำแหน่งที่เลือก */}

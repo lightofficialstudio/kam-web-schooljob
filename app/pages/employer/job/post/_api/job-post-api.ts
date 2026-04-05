@@ -14,7 +14,7 @@ export const requestCreateJob = async (
   payload: Record<string, unknown>,
 ) => {
   const { data } = await axios.post<ApiResponse<{ id: string }>>(
-    `/api/v1/jobs/create?user_id=${userId}`,
+    `/api/v1/employer/jobs/create?user_id=${userId}`,
     payload,
   );
   return data;
@@ -27,7 +27,7 @@ export const requestUpdateJob = async (
   payload: Record<string, unknown>,
 ) => {
   const { data } = await axios.patch<ApiResponse<{ id: string }>>(
-    `/api/v1/jobs/update?user_id=${userId}&job_id=${jobId}`,
+    `/api/v1/employer/jobs/update?user_id=${userId}&job_id=${jobId}`,
     payload,
   );
   return data;
@@ -36,7 +36,7 @@ export const requestUpdateJob = async (
 // ✨ ดึงข้อมูลประกาศงานตาม ID
 export const requestFetchJobById = async (userId: string, jobId: string) => {
   const { data } = await axios.get<ApiResponse<Record<string, unknown>>>(
-    `/api/v1/jobs/read?user_id=${userId}&job_id=${jobId}`,
+    `/api/v1/employer/jobs/read?user_id=${userId}&job_id=${jobId}`,
   );
   return data.data;
 };

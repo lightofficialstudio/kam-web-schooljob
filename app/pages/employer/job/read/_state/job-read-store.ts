@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { fetchJobList, requestCloseJob } from "../_api/job-read-api";
 
 export interface JobRecord {
   key: string;
@@ -15,51 +16,53 @@ export interface JobRecord {
   salary: string;
 }
 
-// ข้อมูล Mock สำหรับรายการงานของ Employer
-const MOCK_JOBS: JobRecord[] = [
-  {
-    key: "1",
-    title: "ครูสอนภาษาอังกฤษ (Full-time)",
-    subjects: ["ภาษาอังกฤษ", "Conversation"],
-    grades: ["มัธยมต้น", "มัธยมปลาย"],
-    publishedAt: "2026-03-01",
-    expiresAt: "2026-03-31",
-    status: "ACTIVE",
-    views: 1240,
-    applicants: 45,
-    newApplicants: 12,
-    conversionRate: "3.6%",
-    salary: "25,000 - 35,000 บาท",
-  },
-  {
-    key: "2",
-    title: "ครูสอนคณิตศาสตร์ (Part-time)",
-    subjects: ["คณิตศาสตร์", "Calculus"],
-    grades: ["มัธยมปลาย"],
-    publishedAt: "2026-02-15",
-    expiresAt: "2026-03-15",
-    status: "ACTIVE",
-    views: 850,
-    applicants: 18,
-    newApplicants: 3,
-    conversionRate: "2.1%",
-    salary: "ตามตกลง",
-  },
-  {
-    key: "3",
-    title: "ครูประจำชั้นอนุบาล 3",
-    subjects: ["ปฐมวัย"],
-    grades: ["อนุบาล"],
-    publishedAt: "2025-12-01",
-    expiresAt: "2026-01-01",
-    status: "CLOSED",
-    views: 2100,
-    applicants: 89,
+// ✨ แปลงข้อมูลจาก DB → JobRecord สำหรับ UI
+const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
+  const subjects = ((job.jobSubjects as { subject: string }[]) ?? []).map(
+    (s) => s.subject,
+  );
+  const grades = ((job.jobGrades as { grade: string }[]) ?? []).map(
+    (g) => g.grade,
+  );
+
+  const min = job.salaryMin as number | null;
+  const max = job.salaryMax as number | null;
+  const negotiable = job.salaryNegotiable as boolean;
+  let salary = "ตามตกลง";
+  if (!negotiable && min && max) {
+    salary = `${min.toLocaleString()} - ${max.toLocaleString()} บาท`;
+  } else if (!negotiable && min) {
+    salary = `${min.toLocaleString()} บาท`;
+  }
+
+  const statusRaw = job.status as string;
+  const status: JobRecord["status"] =
+    statusRaw === "OPEN"
+      ? "ACTIVE"
+      : statusRaw === "CLOSED"
+        ? "CLOSED"
+        : "DRAFT";
+
+  const createdAt = job.createdAt as string | null;
+  const deadline = job.deadline as string | null;
+
+  return {
+    key: job.id as string,
+    title: job.title as string,
+    subjects,
+    grades,
+    publishedAt: createdAt
+      ? new Date(createdAt).toISOString().split("T")[0]
+      : "-",
+    expiresAt: deadline ? new Date(deadline).toISOString().split("T")[0] : "-",
+    status,
+    views: 0,
+    applicants: 0,
     newApplicants: 0,
-    conversionRate: "4.2%",
-    salary: "18,000 - 22,000 บาท",
-  },
-];
+    conversionRate: "0%",
+    salary,
+  };
+};
 
 interface JobReadState {
   jobs: JobRecord[];
@@ -70,10 +73,12 @@ interface JobReadState {
   setSearchKeyword: (keyword: string) => void;
   setActiveTab: (tab: string) => void;
   setLoading: (loading: boolean) => void;
+  fetchJobs: (userId: string) => Promise<void>;
+  closeJob: (userId: string, jobId: string) => Promise<void>;
 }
 
-export const useJobReadStore = create<JobReadState>((set) => ({
-  jobs: MOCK_JOBS,
+export const useJobReadStore = create<JobReadState>((set, get) => ({
+  jobs: [],
   searchKeyword: "",
   activeTab: "ACTIVE",
   isLoading: false,
@@ -81,4 +86,24 @@ export const useJobReadStore = create<JobReadState>((set) => ({
   setSearchKeyword: (searchKeyword) => set({ searchKeyword }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setLoading: (isLoading) => set({ isLoading }),
+
+  // ✨ โหลดรายการประกาศงานจาก API จริง
+  fetchJobs: async (userId: string) => {
+    set({ isLoading: true });
+    try {
+      const rawList = await fetchJobList(userId);
+      const jobs = (rawList as Record<string, unknown>[]).map(mapDbJobToRecord);
+      set({ jobs });
+    } catch (err) {
+      console.error("❌ [job-read-store] fetchJobs error:", err);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // ✨ ปิดรับสมัครประกาศงาน แล้ว refresh รายการ
+  closeJob: async (userId: string, jobId: string) => {
+    await requestCloseJob(userId, jobId);
+    await get().fetchJobs(userId);
+  },
 }));

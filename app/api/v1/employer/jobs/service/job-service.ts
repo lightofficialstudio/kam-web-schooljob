@@ -199,3 +199,17 @@ export const updateJobService = async (
     });
   });
 };
+
+// ✨ ปิดรับสมัครประกาศงาน (เปลี่ยน status เป็น CLOSED)
+export const closeJobService = async (userId: string, jobId: string) => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+  const existing = await prisma.job.findFirst({
+    where: { id: jobId, schoolProfileId },
+  });
+  if (!existing) throw new Error("JOB_NOT_FOUND");
+
+  return await prisma.job.update({
+    where: { id: jobId },
+    data: { status: JobStatus.CLOSED },
+  });
+};
