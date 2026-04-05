@@ -65,18 +65,18 @@ enum BlogStatus {
 
 // 3.1 profiles — ตาราง Core ของผู้ใช้ทุก Role (EMPLOYEE + EMPLOYER + ADMIN)
 model Profile {
-  id             String             @id @default(uuid())
-  userId         String             @unique @map("user_id") // Supabase Auth UID
-  email          String             @unique
-  password       String? // bcrypt hash (backup auth)
-  role           UserRole           @default(EMPLOYEE)
-  firstName      String?            @map("first_name")
-  lastName       String?            @map("last_name")
-  phoneNumber    String?            @map("phone_number")
-  gender         String? // ชาย, หญิง, ไม่ระบุ
-  dateOfBirth    DateTime?          @map("date_of_birth")
-  nationality    String? // สัญชาติ
-  profileImageUrl String?           @map("profile_image_url")
+  id                String            @id @default(uuid())
+  userId            String            @unique @map("user_id") // Supabase Auth UID
+  email             String            @unique
+  password          String? // bcrypt hash (backup auth)
+  role              UserRole          @default(EMPLOYEE)
+  firstName         String?           @map("first_name")
+  lastName          String?           @map("last_name")
+  phoneNumber       String?           @map("phone_number")
+  gender            String? // ชาย, หญิง, ไม่ระบุ
+  dateOfBirth       DateTime?         @map("date_of_birth")
+  nationality       String? // สัญชาติ
+  profileImageUrl   String?           @map("profile_image_url")
   profileVisibility ProfileVisibility @default(public) @map("profile_visibility")
 
   // [EMPLOYEE-specific fields]
@@ -96,8 +96,8 @@ model Profile {
   workExperiences    WorkExperience[]
   educations         Education[]
   licenses           License[]
-  resumes            Resume[]          @relation("ProfileResumes")
-  activeResume       Resume?           @relation("ActiveResume", fields: [activeResumeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  resumes            Resume[]            @relation("ProfileResumes")
+  activeResume       Resume?             @relation("ActiveResume", fields: [activeResumeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   specializations    Specialization[]
   gradeCanTeaches    GradeCanTeach[]
   preferredProvinces PreferredProvince[]
@@ -109,11 +109,11 @@ model Profile {
   schoolProfile SchoolProfile?
 
   // Relations — General
-  blogs         Blog[]
-  notifications Notification[]
-  jobViews      JobView[]      @relation("JobViewViewer")
-  profileViewsReceived ProfileView[] @relation("ProfileViewTarget")
-  profileViewsGiven    ProfileView[] @relation("ProfileViewViewer")
+  blogs                Blog[]
+  notifications        Notification[]
+  jobViews             JobView[]      @relation("JobViewViewer")
+  profileViewsReceived ProfileView[]  @relation("ProfileViewTarget")
+  profileViewsGiven    ProfileView[]  @relation("ProfileViewViewer")
 
   @@index([role], name: "idx_profiles_role")
   @@index([userId], name: "idx_profiles_user_id")
@@ -185,13 +185,13 @@ model License {
 // 3.5 resumes — เรซูเม่ (รองรับหลายไฟล์ต่อ 1 คน)
 // หมายเหตุ: ใช้ named relation "ProfileResumes" และ "ActiveResume" เพื่อจัดการ circular FK กับ profiles
 model Resume {
-  id        String   @id @default(uuid())
-  profileId String   @map("profile_id")
-  fileName  String   @map("file_name") // ชื่อไฟล์ที่แสดง
-  fileSize  Int?     @map("file_size") // ขนาดไฟล์ (bytes)
-  fileUrl   String   @map("file_url") // Supabase Storage URL
-  isActive  Boolean  @default(false) @map("is_active") // เรซูเม่หลักที่กำลังใช้
-  isDeleted Boolean  @default(false) @map("is_deleted")
+  id         String   @id @default(uuid())
+  profileId  String   @map("profile_id")
+  fileName   String   @map("file_name") // ชื่อไฟล์ที่แสดง
+  fileSize   Int?     @map("file_size") // ขนาดไฟล์ (bytes)
+  fileUrl    String   @map("file_url") // Supabase Storage URL
+  isActive   Boolean  @default(false) @map("is_active") // เรซูเม่หลักที่กำลังใช้
+  isDeleted  Boolean  @default(false) @map("is_deleted")
   uploadedAt DateTime @default(now()) @map("uploaded_at")
 
   profile      Profile       @relation("ProfileResumes", fields: [profileId], references: [id], onDelete: Cascade)
@@ -273,25 +273,25 @@ model Skill {
 
 // 3.11 school_profiles — โปรไฟล์โรงเรียน (1:1 กับ Profile ที่เป็น EMPLOYER)
 model SchoolProfile {
-  id             String   @id @default(uuid())
-  profileId      String   @unique @map("profile_id") // 1:1 UNIQUE
-  schoolName     String   @map("school_name")
-  schoolType     String?  @map("school_type") // รัฐบาล, เอกชน, นานาชาติ, สาธิต
-  affiliation    String? // สังกัด: สพฐ., สช., อปท., กทม., ตชด.
-  province       String // จังหวัด
-  district       String? // อำเภอ/เขต
-  address        String? // ที่อยู่เต็ม
-  website        String?
-  phone          String?
-  description    String? // เกี่ยวกับโรงเรียน
-  vision         String? // วิสัยทัศน์
-  studentCount   Int?     @map("student_count") // จำนวนนักเรียน
-  teacherCount   Int?     @map("teacher_count") // จำนวนครู
-  logoUrl        String?  @map("logo_url")
-  coverImageUrl  String?  @map("cover_image_url")
-  foundedYear    Int?     @map("founded_year") // ปีที่ก่อตั้ง (พ.ศ.)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  profileId     String   @unique @map("profile_id") // 1:1 UNIQUE
+  schoolName    String   @map("school_name")
+  schoolType    String?  @map("school_type") // รัฐบาล, เอกชน, นานาชาติ, สาธิต
+  affiliation   String? // สังกัด: สพฐ., สช., อปท., กทม., ตชด.
+  province      String // จังหวัด
+  district      String? // อำเภอ/เขต
+  address       String? // ที่อยู่เต็ม
+  website       String?
+  phone         String?
+  description   String? // เกี่ยวกับโรงเรียน
+  vision        String? // วิสัยทัศน์
+  studentCount  Int?     @map("student_count") // จำนวนนักเรียน
+  teacherCount  Int?     @map("teacher_count") // จำนวนครู
+  logoUrl       String?  @map("logo_url")
+  coverImageUrl String?  @map("cover_image_url")
+  foundedYear   Int?     @map("founded_year") // ปีที่ก่อตั้ง (พ.ศ.)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   profile        Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
   schoolBenefits SchoolBenefit[]
@@ -453,10 +453,10 @@ model Notification {
 model JobView {
   id         String    @id @default(uuid())
   jobId      String    @map("job_id")
-  viewerId   String?   @map("viewer_id")           // NULL = anonymous
-  viewerRole UserRole? @map("viewer_role")          // snapshot role ณ เวลาที่ดู
+  viewerId   String?   @map("viewer_id") // NULL = anonymous
+  viewerRole UserRole? @map("viewer_role") // snapshot role ณ เวลาที่ดู
   viewedAt   DateTime  @default(now()) @map("viewed_at")
-  sessionId  String?   @map("session_id")           // browser session (dedup anonymous)
+  sessionId  String?   @map("session_id") // browser session (dedup anonymous)
 
   job    Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   viewer Profile? @relation("JobViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
@@ -470,11 +470,11 @@ model JobView {
 // 3.21 profile_views — ติดตามการเข้าชมโปรไฟล์ครู (Employer กดดู profile ของ Employee)
 model ProfileView {
   id         String    @id @default(uuid())
-  profileId  String    @map("profile_id")           // เจ้าของ profile ที่ถูกดู
-  viewerId   String?   @map("viewer_id")             // ผู้ดู (NULL = anonymous)
-  viewerRole UserRole? @map("viewer_role")            // snapshot role ณ เวลาที่ดู
+  profileId  String    @map("profile_id") // เจ้าของ profile ที่ถูกดู
+  viewerId   String?   @map("viewer_id") // ผู้ดู (NULL = anonymous)
+  viewerRole UserRole? @map("viewer_role") // snapshot role ณ เวลาที่ดู
   viewedAt   DateTime  @default(now()) @map("viewed_at")
-  sessionId  String?   @map("session_id")             // browser session (dedup anonymous)
+  sessionId  String?   @map("session_id") // browser session (dedup anonymous)
 
   profile Profile  @relation("ProfileViewTarget", fields: [profileId], references: [id], onDelete: Cascade)
   viewer  Profile? @relation("ProfileViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
