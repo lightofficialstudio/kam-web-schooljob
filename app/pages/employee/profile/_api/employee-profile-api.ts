@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "/api/v1/employee-profile";
+const BASE_URL = "/api/v1/employee/profile";
 
 // ✨ ดึงข้อมูล Employee Profile ทั้งหมดโดยใช้ user_id
 // ส่ง email ไปด้วยเพื่อให้ API auto-create profile ถ้ายังไม่มีใน DB

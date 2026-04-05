@@ -1,6 +1,6 @@
 # API Map — KAM-WEB-SCHOOLJOB
 
-Last Updated: 2026-04-05
+Last Updated: 2026-04-05 (employee-profile → employee/profile migrated)
 
 ## API Naming Convention
 
@@ -13,8 +13,8 @@ Last Updated: 2026-04-05
 | --- | ------ | --------------------------------- | -------------------------------------- | ------------- | -------------------------------------------------- | -------------------------------------------------------------- |
 | 1   | POST   | `/api/v1/authenticate/signup`     | สมัครสมาชิกผู้ใช้ใหม่                  | Public        | `{ email, password, full_name, role }`             | `{ user_id, email, full_name, role }`                          |
 | 2   | POST   | `/api/v1/authenticate/signin`     | เข้าสู่ระบบ                            | Public        | `{ email, password }`                              | `{ user_id, email, role, full_name }`                          |
-| 3   | GET    | `/api/v1/employee-profile/read`   | ดึงโปรไฟล์ครู (employee)               | User Token    | Query: `?user_id=&email=`                          | Profile object + relations (resume, license, education, work)  |
-| 4   | PATCH  | `/api/v1/employee-profile/update` | อัปเดตโปรไฟล์ครู (employee)            | User Token    | Query: `?user_id=` + JSON body                     | Updated profile object                                         |
+| 3   | GET    | `/api/v1/employee/profile/read`   | ดึงโปรไฟล์ครู (employee)               | User Token    | Query: `?user_id=&email=`                          | Profile object + relations (resume, license, education, work)  |
+| 4   | PATCH  | `/api/v1/employee/profile/update` | อัปเดตโปรไฟล์ครู (employee)            | User Token    | Query: `?user_id=` + JSON body                     | Updated profile object                                         |
 | 5   | GET    | `/api/v1/employer/profile/read`   | ดึงโปรไฟล์โรงเรียน (employer)          | User Token    | Query: `?user_id=&email=`                          | SchoolProfile + benefits (auto-create ถ้ายังไม่มี)             |
 | 6   | PATCH  | `/api/v1/employer/profile/update` | อัปเดตโปรไฟล์โรงเรียน (employer)       | User Token    | Query: `?user_id=` + JSON body (snake_case fields) | Updated SchoolProfile                                          |
 | 7   | GET    | `/api/v1/employer/jobs/read`      | ดึงรายการประกาศงานของโรงเรียน          | User Token    | Query: `?user_id=[&job_id=]`                       | Job[] หรือ Job (ถ้าระบุ job_id) พร้อม subjects/grades/benefits |
@@ -45,6 +45,5 @@ Last Updated: 2026-04-05
 
 ## Notes
 
-- `employee-profile` ยังไม่ใช้ role prefix (legacy path) — อาจย้ายไป `/api/v1/employee/profile/` ในอนาคต
 - Job API ทุกตัวต้องการ `schoolProfileId` ซึ่ง service จะค้นหาจาก `userId` อัตโนมัติ (ต้องสร้าง SchoolProfile ก่อน)
 - Supabase Storage buckets: `avatars` (public), `resumes` (private), `licenses` (private)
