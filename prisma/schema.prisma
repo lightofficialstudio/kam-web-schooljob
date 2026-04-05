@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Design reference: _document/_database/database-design.md
 
 generator client {
   provider = "prisma-client-js"
@@ -9,84 +10,126 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- Enum Definitions ---
+// ─── Enum Definitions ────────────────────────────────────────────────────────
 
+// บทบาทผู้ใช้งาน
 enum UserRole {
-  EMPLOYEE // สำหรับคุณครู (หางาน)
-  EMPLOYER // สำหรับโรงเรียน (ประกาศงานและหาคน)
-  ADMIN // สำหรับแอดมิน (จัดการระบบหลังบ้าน)
+  EMPLOYEE // ครู / ผู้หางาน
+  EMPLOYER // โรงเรียน / ผู้จ้าง
+  ADMIN // ผู้ดูแลระบบ
 }
 
+// สถานะประกาศงาน
 enum JobStatus {
-  OPEN
-  CLOSED
-  DRAFT
+  OPEN // รับสมัครอยู่
+  CLOSED // ปิดรับสมัคร
+  DRAFT // ฉบับร่าง (ยังไม่เผยแพร่)
 }
 
-// --- Models ---
+// สถานะใบสมัคร
+enum ApplicationStatus {
+  PENDING // รอพิจารณา
+  INTERVIEW // นัดสัมภาษณ์
+  ACCEPTED // รับเข้าทำงาน
+  REJECTED // ไม่ผ่านการคัดเลือก
+}
 
+// สถานะใบประกอบวิชาชีพครู (ฝั่ง EMPLOYEE)
+enum LicenseStatus {
+  has_license // มีใบอนุญาตแล้ว
+  pending // อยู่ระหว่างขอ
+  no_license // ไม่มีใบอนุญาต
+  not_required // ตำแหน่งไม่ต้องใช้ใบ
+}
+
+// ข้อกำหนดใบประกอบฯ ในตำแหน่งงาน (ฝั่ง EMPLOYER)
+enum LicenseRequired {
+  required // ต้องมีใบประกอบฯ
+  not_required // ไม่ต้องมี
+  pending_ok // อยู่ระหว่างขอได้
+}
+
+// การมองเห็น profile ของ EMPLOYEE
+enum ProfileVisibility {
+  public // เปิดให้ทุกคนเห็น
+  apply_only // เห็นเฉพาะเมื่อสมัครงาน
+}
+
+// สถานะบทความ
+enum BlogStatus {
+  DRAFT // ฉบับร่าง
+  PUBLISHED // เผยแพร่แล้ว
+}
+
+// ─── Core Model ──────────────────────────────────────────────────────────────
+
+// 3.1 profiles — ตาราง Core ของผู้ใช้ทุก Role (EMPLOYEE + EMPLOYER + ADMIN)
 model Profile {
-  id              String    @id @default(uuid())
-  userId          String    @unique @map("user_id")
-  email           String    @unique
-  password        String?
-  firstName       String?   @map("first_name")
-  lastName        String?   @map("last_name")
-  phoneNumber     String?   @map("phone_number")
-  gender          String? // ชาย, หญิง
-  dateOfBirth     DateTime? @map("date_of_birth")
-  profileImageUrl String?   @map("profile_image_url")
+  id             String             @id @default(uuid())
+  userId         String             @unique @map("user_id") // Supabase Auth UID
+  email          String             @unique
+  password       String? // bcrypt hash (backup auth)
+  role           UserRole           @default(EMPLOYEE)
+  firstName      String?            @map("first_name")
+  lastName       String?            @map("last_name")
+  phoneNumber    String?            @map("phone_number")
+  gender         String? // ชาย, หญิง, ไม่ระบุ
+  dateOfBirth    DateTime?          @map("date_of_birth")
+  nationality    String? // สัญชาติ
+  profileImageUrl String?           @map("profile_image_url")
+  profileVisibility ProfileVisibility @default(public) @map("profile_visibility")
 
-  // Education fields
-  educationLevel  String? @map("education_level")
-  institution     String?
-  major           String?
-  gpa             Float?
-  teachingLicense String? @map("teaching_license") // มี, กำลังดำเนินการ, ไม่มี
-  licenseFileUrl  String? @map("license_file_url")
+  // [EMPLOYEE-specific fields]
+  teachingExperience String?        @map("teaching_experience") // 1-3 ปี, 3-5 ปี, 5+ ปี
+  recentSchool       String?        @map("recent_school") // โรงเรียนล่าสุด
+  specialActivities  String?        @map("special_activities") // About Me / สรุปตัวเอง
+  canRelocate        Boolean?       @default(false) @map("can_relocate")
+  licenseStatus      LicenseStatus? @map("license_status")
 
-  // Teaching info fields
-  specialization     String? // วิชาที่สอนได้ (JSON array)
-  gradeCanTeach      String? @map("grade_can_teach") // Multi-select JSON
-  teachingExperience String? @map("teaching_experience")
-  recentSchool       String? @map("recent_school")
+  // Circular FK: active resume (named relation หลีกเลี่ยง circular dependency)
+  activeResumeId String? @unique @map("active_resume_id")
 
-  // Skills fields
-  languagesSpoken   String? @map("languages_spoken") // TAG (JSON array)
-  itSkills          String? @map("it_skills") // TAG (JSON array)
-  specialActivities String? @map("special_activities")
-
-  // Work location fields
-  preferredProvinces String?  @map("preferred_provinces") // Multi-select JSON
-  canRelocate        Boolean? @map("can_relocate")
-
-  // General fields
-  resumeUrl String?  @map("resume_url")
-  role      UserRole @default(EMPLOYEE)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relations
-  workExperiences WorkExperience[]
-  educations      Education[]
-  licenses        License[]
-  languages       Language[]
-  skills          Skill[]
+  // Relations — EMPLOYEE
+  workExperiences    WorkExperience[]
+  educations         Education[]
+  licenses           License[]
+  resumes            Resume[]          @relation("ProfileResumes")
+  activeResume       Resume?           @relation("ActiveResume", fields: [activeResumeId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  specializations    Specialization[]
+  gradeCanTeaches    GradeCanTeach[]
+  preferredProvinces PreferredProvince[]
+  languages          Language[]
+  skills             Skill[]
+  applications       Application[]
 
+  // Relations — EMPLOYER
+  schoolProfile SchoolProfile?
+
+  // Relations — General
+  blogs         Blog[]
+  notifications Notification[]
+
+  @@index([role], name: "idx_profiles_role")
+  @@index([userId], name: "idx_profiles_user_id")
   @@map("profiles")
 }
 
-// Work Experience Model
+// ─── EMPLOYEE Relations ──────────────────────────────────────────────────────
+
+// 3.2 work_experiences — ประวัติการทำงาน
 model WorkExperience {
   id          String    @id @default(uuid())
   profileId   String    @map("profile_id")
-  jobTitle    String    @map("job_title")
-  companyName String    @map("company_name")
+  jobTitle    String    @map("job_title") // ตำแหน่ง
+  companyName String    @map("company_name") // โรงเรียน/บริษัท
   startDate   DateTime  @map("start_date")
-  endDate     DateTime? @map("end_date")
-  inPresent   Boolean   @default(false) @map("in_present")
-  description String?
-  workYear    Int?      @map("work_year")
+  endDate     DateTime? @map("end_date") // NULL = ยังทำงานอยู่
+  inPresent   Boolean   @default(false) @map("in_present") // ยังทำงานอยู่ถึงปัจจุบัน
+  description String? // รายละเอียดงาน
+  workYear    Int?      @map("work_year") // จำนวนปีที่ทำงาน (คำนวณ)
   isDeleted   Boolean   @default(false) @map("is_deleted")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -96,35 +139,37 @@ model WorkExperience {
   @@map("work_experiences")
 }
 
-// Education History Model
+// 3.3 educations — ประวัติการศึกษา
 model Education {
-  id          String    @id @default(uuid())
-  profileId   String    @map("profile_id")
-  level       String
-  institution String
-  major       String
-  gpa         Float?
-  startDate   DateTime? @map("start_date")
-  endDate     DateTime? @map("end_date")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  profileId      String    @map("profile_id")
+  level          String // ปริญญาตรี, โท, เอก, ปวช., ปวส.
+  institution    String // ชื่อสถาบัน
+  major          String // สาขาวิชา
+  graduationYear Int?      @map("graduation_year") // ปีที่จบ (พ.ศ.)
+  gpa            Float? // เกรดเฉลี่ย
+  startDate      DateTime? @map("start_date")
+  endDate        DateTime? @map("end_date")
+  isDeleted      Boolean   @default(false) @map("is_deleted")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("educations")
 }
 
-// License & Certification Model
+// 3.4 licenses — ใบประกอบวิชาชีพ / Certifications
 model License {
   id            String    @id @default(uuid())
   profileId     String    @map("profile_id")
-  licenseName   String    @map("license_name")
-  issuer        String?
-  licenseNumber String?   @map("license_number")
-  issueDate     DateTime? @map("issue_date")
-  expiryDate    DateTime? @map("expiry_date")
-  credentialUrl String?   @map("credential_url")
+  licenseName   String    @map("license_name") // ชื่อใบประกอบ
+  issuer        String? // ผู้ออก (คุรุสภา ฯลฯ)
+  licenseNumber String?   @map("license_number") // เลขที่ใบ
+  issueDate     DateTime? @map("issue_date") // วันที่ออก
+  expiryDate    DateTime? @map("expiry_date") // วันหมดอายุ (NULL = ไม่หมด)
+  fileUrl       String?   @map("file_url") // URL ไฟล์แนบ (Supabase Storage)
+  credentialUrl String?   @map("credential_url") // URL ออนไลน์ (ถ้ามี)
   isDeleted     Boolean   @default(false) @map("is_deleted")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
@@ -134,12 +179,70 @@ model License {
   @@map("licenses")
 }
 
-// Languages Model
+// 3.5 resumes — เรซูเม่ (รองรับหลายไฟล์ต่อ 1 คน)
+// หมายเหตุ: ใช้ named relation "ProfileResumes" และ "ActiveResume" เพื่อจัดการ circular FK กับ profiles
+model Resume {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  fileName  String   @map("file_name") // ชื่อไฟล์ที่แสดง
+  fileSize  Int?     @map("file_size") // ขนาดไฟล์ (bytes)
+  fileUrl   String   @map("file_url") // Supabase Storage URL
+  isActive  Boolean  @default(false) @map("is_active") // เรซูเม่หลักที่กำลังใช้
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  profile      Profile       @relation("ProfileResumes", fields: [profileId], references: [id], onDelete: Cascade)
+  activeFor    Profile?      @relation("ActiveResume") // back-reference จาก profiles.active_resume_id
+  applications Application[] // snapshot เรซูเม่ที่ใช้สมัคร
+
+  @@map("resumes")
+}
+
+// 3.6 specializations — วิชาที่เชี่ยวชาญ (แทน JSON string เดิม)
+model Specialization {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  subject   String // ภาษาอังกฤษ, คณิตศาสตร์, วิทยาศาสตร์ ...
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([subject], name: "idx_specializations_subject")
+  @@map("specializations")
+}
+
+// 3.7 grade_can_teaches — ระดับชั้นที่สอนได้ (แทน JSON string เดิม)
+model GradeCanTeach {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  grade     String // อนุบาล, ประถมต้น, ประถมปลาย, มัธยมต้น, มัธยมปลาย, ปวช./ปวส.
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([grade], name: "idx_grade_can_teaches_grade")
+  @@map("grade_can_teaches")
+}
+
+// 3.8 preferred_provinces — จังหวัดที่ต้องการทำงาน (แทน JSON string เดิม)
+model PreferredProvince {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  province  String // ชื่อจังหวัด (ภาษาไทย)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([province], name: "idx_preferred_provinces_province")
+  @@map("preferred_provinces")
+}
+
+// 3.9 languages — ทักษะภาษา
 model Language {
   id           String   @id @default(uuid())
   profileId    String   @map("profile_id")
-  languageName String   @map("language_name")
-  proficiency  String?
+  languageName String   @map("language_name") // ภาษาไทย, อังกฤษ, จีน, ญี่ปุ่น ...
+  proficiency  String? // native, fluent, intermediate, basic
   isDeleted    Boolean  @default(false) @map("is_deleted")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -149,43 +252,193 @@ model Language {
   @@map("languages")
 }
 
-// Skills Model
+// 3.10 skills — ทักษะ IT / ทักษะอื่นๆ
 model Skill {
-  id           String   @id @default(uuid())
-  profileId    String   @map("profile_id")
-  skillName    String   @map("skill_name")
-  endorsements Int?     @default(0)
-  isDeleted    Boolean  @default(false) @map("is_deleted")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  skillName String   @map("skill_name") // Microsoft Office, Canva, Python ...
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("skills")
 }
 
-model Job {
-  id          String        @id @default(uuid())
-  schoolId    String        @map("school_id")
-  title       String
-  description String
-  location    String
-  salaryRange String?       @map("salary_range")
-  status      JobStatus     @default(OPEN)
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  Application Application[]
+// ─── EMPLOYER Relations ──────────────────────────────────────────────────────
 
+// 3.11 school_profiles — โปรไฟล์โรงเรียน (1:1 กับ Profile ที่เป็น EMPLOYER)
+model SchoolProfile {
+  id             String   @id @default(uuid())
+  profileId      String   @unique @map("profile_id") // 1:1 UNIQUE
+  schoolName     String   @map("school_name")
+  schoolType     String?  @map("school_type") // รัฐบาล, เอกชน, นานาชาติ, สาธิต
+  affiliation    String? // สังกัด: สพฐ., สช., อปท., กทม., ตชด.
+  province       String // จังหวัด
+  district       String? // อำเภอ/เขต
+  address        String? // ที่อยู่เต็ม
+  website        String?
+  phone          String?
+  description    String? // เกี่ยวกับโรงเรียน
+  vision         String? // วิสัยทัศน์
+  studentCount   Int?     @map("student_count") // จำนวนนักเรียน
+  teacherCount   Int?     @map("teacher_count") // จำนวนครู
+  logoUrl        String?  @map("logo_url")
+  coverImageUrl  String?  @map("cover_image_url")
+  foundedYear    Int?     @map("founded_year") // ปีที่ก่อตั้ง (พ.ศ.)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  profile        Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  schoolBenefits SchoolBenefit[]
+  jobs           Job[]
+
+  @@map("school_profiles")
+}
+
+// 3.12 school_benefits — สวัสดิการของโรงเรียน
+model SchoolBenefit {
+  id              String @id @default(uuid())
+  schoolProfileId String @map("school_profile_id")
+  benefit         String // ที่พัก, ค่าอาหาร, รถรับส่ง ...
+
+  schoolProfile SchoolProfile @relation(fields: [schoolProfileId], references: [id], onDelete: Cascade)
+
+  @@map("school_benefits")
+}
+
+// ─── Job & Application ───────────────────────────────────────────────────────
+
+// 3.13 jobs — ประกาศงาน
+model Job {
+  id                 String          @id @default(uuid())
+  schoolProfileId    String          @map("school_profile_id")
+  title              String // ชื่อตำแหน่งงาน
+  description        String? // รายละเอียดงาน
+  jobType            String?         @map("job_type") // Full-time, Part-time, Contract, Volunteer
+  province           String // จังหวัดที่ทำงาน
+  district           String? // อำเภอ/เขต
+  salaryMin          Int?            @map("salary_min") // เงินเดือนต่ำสุด (บาท/เดือน)
+  salaryMax          Int?            @map("salary_max") // เงินเดือนสูงสุด
+  salaryNegotiable   Boolean         @default(false) @map("salary_negotiable") // เงินเดือนต่อรองได้
+  licenseRequired    LicenseRequired @default(not_required) @map("license_required")
+  positionsAvailable Int             @default(1) @map("positions_available") // จำนวนที่รับสมัคร
+  status             JobStatus       @default(DRAFT)
+  deadline           DateTime? // วันหมดรับสมัคร
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  schoolProfile SchoolProfile @relation(fields: [schoolProfileId], references: [id], onDelete: Cascade)
+  jobSubjects   JobSubject[]
+  jobGrades     JobGrade[]
+  jobBenefits   JobBenefit[]
+  applications  Application[]
+
+  @@index([status], name: "idx_jobs_status")
+  @@index([province], name: "idx_jobs_province")
+  @@index([schoolProfileId], name: "idx_jobs_school_profile_id")
+  @@index([deadline], name: "idx_jobs_deadline")
   @@map("jobs")
 }
 
-model Application {
-  id        String   @id @default(uuid())
-  jobId     String   @map("job_id")
-  teacherId String   @map("teacher_id")
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now()) @map("created_at")
-  job       Job      @relation(fields: [jobId], references: [id])
+// 3.14 job_subjects — วิชาที่งานต้องการ (สำหรับ matching + filter)
+model JobSubject {
+  id      String @id @default(uuid())
+  jobId   String @map("job_id")
+  subject String // ภาษาอังกฤษ, คณิตศาสตร์ ...
 
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([subject], name: "idx_job_subjects_subject")
+  @@map("job_subjects")
+}
+
+// 3.15 job_grades — ระดับชั้นที่งานต้องการสอน (สำหรับ matching + filter)
+model JobGrade {
+  id    String @id @default(uuid())
+  jobId String @map("job_id")
+  grade String // อนุบาล, ประถมต้น, ประถมปลาย, มัธยมต้น, มัธยมปลาย
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([grade], name: "idx_job_grades_grade")
+  @@map("job_grades")
+}
+
+// 3.16 job_benefits — สวัสดิการของตำแหน่งงาน
+model JobBenefit {
+  id      String @id @default(uuid())
+  jobId   String @map("job_id")
+  benefit String // ที่พัก, ค่าอาหาร, ประกันสังคม, โบนัส ...
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("job_benefits")
+}
+
+// 3.17 applications — การสมัครงาน (junction table: EMPLOYEE ↔ Job)
+model Application {
+  id          String            @id @default(uuid())
+  jobId       String            @map("job_id")
+  applicantId String            @map("applicant_id") // EMPLOYEE เท่านั้น
+  resumeId    String?           @map("resume_id") // snapshot เรซูเม่ที่ใช้สมัคร
+  status      ApplicationStatus @default(PENDING)
+  coverLetter String?           @map("cover_letter") // จดหมายสมัครงาน
+  appliedAt   DateTime          @default(now()) @map("applied_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  job       Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicant Profile @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  resume    Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+  @@unique([jobId, applicantId], name: "unique_application") // ป้องกันสมัครงานซ้ำ
+  @@index([jobId], name: "idx_applications_job_id")
+  @@index([applicantId], name: "idx_applications_applicant_id")
+  @@index([status], name: "idx_applications_status")
   @@map("applications")
+}
+
+// ─── Content & Notifications ─────────────────────────────────────────────────
+
+// 3.18 blogs — บทความ
+model Blog {
+  id            String     @id @default(uuid())
+  authorId      String?    @map("author_id") // SET NULL เมื่อ author ถูกลบ
+  title         String
+  slug          String     @unique // SEO-friendly URL
+  content       String // เนื้อหาบทความ (Markdown/HTML)
+  excerpt       String? // สรุปย่อ (แสดงในหน้า listing)
+  coverImageUrl String?    @map("cover_image_url")
+  category      String? // ข่าวการศึกษา, เคล็ดลับสมัครงาน, ...
+  tags          String? // JSON array ของ tag
+  status        BlogStatus @default(DRAFT)
+  publishedAt   DateTime?  @map("published_at") // วันที่เผยแพร่จริง
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  author Profile? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status], name: "idx_blogs_status")
+  @@index([slug], name: "idx_blogs_slug")
+  @@map("blogs")
+}
+
+// 3.19 notifications — การแจ้งเตือน
+model Notification {
+  id            String   @id @default(uuid())
+  profileId     String   @map("profile_id") // ผู้รับ notification
+  type          String // application_update, new_job, system, interview
+  title         String // หัวข้อ notification
+  message       String? // เนื้อหา
+  isRead        Boolean  @default(false) @map("is_read")
+  referenceId   String?  @map("reference_id") // id ของ entity ที่เกี่ยวข้อง (optional)
+  referenceType String?  @map("reference_type") // 'application', 'job', 'blog' (optional)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, isRead], name: "idx_notifications_profile_id_is_read")
+  @@map("notifications")
 }
