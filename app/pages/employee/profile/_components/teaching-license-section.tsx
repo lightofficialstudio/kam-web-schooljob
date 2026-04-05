@@ -5,10 +5,12 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  ExclamationCircleFilled,
   FilePdfOutlined,
   MinusCircleOutlined,
   PlusOutlined,
   SafetyCertificateOutlined,
+  WarningFilled,
 } from "@ant-design/icons";
 import {
   Button,
@@ -17,15 +19,18 @@ import {
   Tooltip,
   Typography,
   Upload,
-  message,
   theme,
 } from "antd";
 import type { RcFile } from "antd/es/upload";
-import React from "react";
+import React, { useState } from "react";
 import type { ResumeEntry } from "../_stores/profile-store";
 import { useProfileStore } from "../_stores/profile-store";
 
 const { Text } = Typography;
+
+const MAX_FILE_MB = 10;
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
+const ALLOWED_MIME = ["application/pdf", "image/jpeg", "image/png"];
 
 // Config สถานะใบประกอบวิชาชีพ
 const LICENSE_STATUS_OPTIONS: {
@@ -34,30 +39,10 @@ const LICENSE_STATUS_OPTIONS: {
   icon: React.ReactNode;
   color: string;
 }[] = [
-  {
-    value: "has_license",
-    label: "มีใบอนุญาต",
-    icon: <CheckCircleOutlined />,
-    color: "#52c41a",
-  },
-  {
-    value: "pending",
-    label: "อยู่ระหว่างขอ",
-    icon: <ClockCircleOutlined />,
-    color: "#faad14",
-  },
-  {
-    value: "no_license",
-    label: "ไม่มีใบอนุญาต",
-    icon: <CloseCircleOutlined />,
-    color: "#ff4d4f",
-  },
-  {
-    value: "not_required",
-    label: "ตำแหน่งของฉันไม่ต้องใช้ใบอนุญาต",
-    icon: <MinusCircleOutlined />,
-    color: "#8c8c8c",
-  },
+  { value: "has_license",  label: "มีใบอนุญาต",                          icon: <CheckCircleOutlined />,  color: "#52c41a" },
+  { value: "pending",      label: "อยู่ระหว่างขอ",                        icon: <ClockCircleOutlined />,  color: "#faad14" },
+  { value: "no_license",   label: "ไม่มีใบอนุญาต",                        icon: <CloseCircleOutlined />,  color: "#ff4d4f" },
+  { value: "not_required", label: "ตำแหน่งของฉันไม่ต้องใช้ใบอนุญาต",     icon: <MinusCircleOutlined />,  color: "#8c8c8c" },
 ];
 
 // แปลงขนาดไฟล์ bytes → KB/MB
@@ -73,26 +58,32 @@ export const TeachingLicenseSection: React.FC = () => {
     useProfileStore();
 
   const currentStatus = profile.licenseStatus ?? "";
-  const attachments = profile.licenseAttachments ?? [];
-
-  // แสดงส่วนแนบไฟล์เฉพาะเมื่อมีหรืออยู่ระหว่างขอใบอนุญาต
+  const attachments   = profile.licenseAttachments ?? [];
   const showAttachment = currentStatus === "has_license" || currentStatus === "pending";
 
-  const handleBeforeUpload = (file: RcFile): boolean => {
-    const isValidType = ["application/pdf", "image/jpeg", "image/png"].includes(file.type);
-    const isUnder5MB = file.size / 1024 / 1024 < 5;
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-    if (!isValidType) {
-      message.error("รองรับเฉพาะไฟล์ PDF, JPG, PNG เท่านั้น");
+  const handleBeforeUpload = (file: RcFile): boolean => {
+    setUploadError(null);
+
+    // 🔐 ตรวจประเภทไฟล์
+    if (!ALLOWED_MIME.includes(file.type)) {
+      setUploadError("ประเภทไฟล์ไม่รองรับ — อนุญาตเฉพาะ PDF, JPG, PNG เท่านั้น");
       return false;
     }
-    if (!isUnder5MB) {
-      message.error("ขนาดไฟล์ต้องไม่เกิน 5 MB");
+
+    // 🔐 ตรวจขนาดไฟล์ ≤ 10 MB
+    if (file.size > MAX_FILE_BYTES) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      setUploadError(
+        `ไฟล์ "${file.name}" มีขนาด ${sizeMB} MB — เกินขีดจำกัด ${MAX_FILE_MB} MB กรุณาบีบอัดไฟล์แล้วลองใหม่`
+      );
       return false;
     }
-    const isDuplicate = attachments.some((f) => f.fileName === file.name);
-    if (isDuplicate) {
-      message.warning(`ไฟล์ "${file.name}" ถูกแนบไปแล้ว`);
+
+    // 🔐 ป้องกันไฟล์ซ้ำ
+    if (attachments.some((f) => f.fileName === file.name)) {
+      setUploadError(`ไฟล์ "${file.name}" ถูกแนบไปแล้ว`);
       return false;
     }
 
@@ -104,7 +95,6 @@ export const TeachingLicenseSection: React.FC = () => {
       file,
     };
     addLicenseAttachment(newFile);
-    message.success(`แนบไฟล์ "${file.name}" สำเร็จ`);
     return false;
   };
 
@@ -124,7 +114,7 @@ export const TeachingLicenseSection: React.FC = () => {
                 key={opt.value}
                 align="center"
                 gap={12}
-                onClick={() => setLicenseStatus(opt.value)}
+                onClick={() => { setLicenseStatus(opt.value); setUploadError(null); }}
                 style={{
                   padding: "12px 16px",
                   borderRadius: token.borderRadius,
@@ -151,16 +141,18 @@ export const TeachingLicenseSection: React.FC = () => {
                 </Flex>
                 <Text
                   strong={isSelected}
-                  style={{
-                    fontSize: 13,
-                    color: isSelected ? opt.color : token.colorText,
-                  }}
+                  style={{ fontSize: 13, color: isSelected ? opt.color : token.colorText }}
                 >
                   {opt.label}
                 </Text>
                 {isSelected && (
                   <Tag
-                    color={opt.color === "#52c41a" ? "success" : opt.color === "#faad14" ? "warning" : opt.color === "#ff4d4f" ? "error" : "default"}
+                    color={
+                      opt.color === "#52c41a" ? "success"
+                      : opt.color === "#faad14" ? "warning"
+                      : opt.color === "#ff4d4f" ? "error"
+                      : "default"
+                    }
                     style={{ marginLeft: "auto", fontSize: 11 }}
                   >
                     เลือกอยู่
@@ -172,12 +164,46 @@ export const TeachingLicenseSection: React.FC = () => {
         </Flex>
       </Flex>
 
-      {/* ─── แนบไฟล์ใบประกอบวิชาชีพ (แสดงเฉพาะเมื่อมีหรืออยู่ระหว่างขอ) ─── */}
+      {/* ─── แนบไฟล์ใบประกอบวิชาชีพ ─── */}
       {showAttachment && (
         <Flex vertical gap={10}>
           <Text strong style={{ fontSize: 13 }}>
             แนบไฟล์ใบประกอบวิชาชีพ
           </Text>
+
+          {/* คำเตือน Error */}
+          {uploadError && (
+            <Flex
+              align="flex-start"
+              gap={10}
+              style={{
+                padding: "12px 16px",
+                borderRadius: token.borderRadius,
+                border: `1.5px solid ${token.colorError}`,
+                backgroundColor: token.colorErrorBg,
+              }}
+            >
+              <ExclamationCircleFilled
+                style={{ color: token.colorError, fontSize: 16, marginTop: 1, flexShrink: 0 }}
+              />
+              <Flex vertical gap={2}>
+                <Text strong style={{ color: token.colorError, fontSize: 13 }}>
+                  ไม่สามารถแนบไฟล์ได้
+                </Text>
+                <Text style={{ color: token.colorError, fontSize: 12 }}>
+                  {uploadError}
+                </Text>
+              </Flex>
+              <Button
+                type="text"
+                size="small"
+                style={{ marginLeft: "auto", color: token.colorError, flexShrink: 0, padding: "0 4px" }}
+                onClick={() => setUploadError(null)}
+              >
+                ✕
+              </Button>
+            </Flex>
+          )}
 
           {/* รายการไฟล์ที่แนบแล้ว */}
           {attachments.length > 0 && (
@@ -197,9 +223,7 @@ export const TeachingLicenseSection: React.FC = () => {
                   <Flex align="center" gap={10}>
                     <FilePdfOutlined style={{ fontSize: 20, color: "#ff4d4f", flexShrink: 0 }} />
                     <Flex vertical gap={2}>
-                      <Text strong style={{ fontSize: 13 }}>
-                        {file.fileName}
-                      </Text>
+                      <Text strong style={{ fontSize: 13 }}>{file.fileName}</Text>
                       <Text type="secondary" style={{ fontSize: 11 }}>
                         {formatFileSize(file.fileSize)} · อัพโหลด {file.uploadedAt}
                       </Text>
@@ -211,7 +235,7 @@ export const TeachingLicenseSection: React.FC = () => {
                       type="text"
                       danger
                       icon={<DeleteOutlined />}
-                      onClick={() => removeLicenseAttachment(file.id)}
+                      onClick={() => { removeLicenseAttachment(file.id); setUploadError(null); }}
                     />
                   </Tooltip>
                 </Flex>
@@ -225,14 +249,44 @@ export const TeachingLicenseSection: React.FC = () => {
             beforeUpload={handleBeforeUpload}
             multiple={false}
           >
-            <Button icon={<PlusOutlined />} type="dashed" block style={{ height: 40 }}>
+            <Button
+              icon={<PlusOutlined />}
+              type="dashed"
+              block
+              style={{ height: 40 }}
+              onClick={() => setUploadError(null)}
+            >
               แนบไฟล์ใบประกอบวิชาชีพ (PDF, JPG, PNG)
             </Button>
           </Upload>
 
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            • รองรับ PDF, JPG, PNG · ขนาดไม่เกิน 5 MB ต่อไฟล์
-          </Text>
+          {/* ข้อกำหนดไฟล์ */}
+          <Flex
+            vertical
+            gap={4}
+            style={{
+              padding: "10px 14px",
+              borderRadius: token.borderRadius,
+              backgroundColor: token.colorFillQuaternary,
+              border: `1px solid ${token.colorBorderSecondary}`,
+            }}
+          >
+            <Flex align="center" gap={6}>
+              <WarningFilled style={{ color: token.colorWarning, fontSize: 12 }} />
+              <Text strong style={{ fontSize: 12, color: token.colorTextSecondary }}>
+                ข้อกำหนดการอัปโหลด
+              </Text>
+            </Flex>
+            <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              • รองรับไฟล์{" "}
+              <Text strong style={{ color: token.colorText }}>PDF, JPG, PNG</Text>
+            </Text>
+            <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              • ขนาดไฟล์สูงสุด{" "}
+              <Text strong style={{ color: token.colorError }}>{MAX_FILE_MB} MB</Text>{" "}
+              ต่อไฟล์
+            </Text>
+          </Flex>
         </Flex>
       )}
     </Flex>
