@@ -69,8 +69,12 @@ export const updateEmployerProfileService = async (
         teacherCount: payload.teacher_count ?? null,
         studentCount: payload.student_count ?? null,
         affiliation: payload.affiliation ?? null,
-        ...(payload.logo_url !== undefined && { logoUrl: payload.logo_url ?? null }),
-        ...(payload.cover_image_url !== undefined && { coverImageUrl: payload.cover_image_url ?? null }),
+        ...(payload.logo_url !== undefined && {
+          logoUrl: payload.logo_url ?? null,
+        }),
+        ...(payload.cover_image_url !== undefined && {
+          coverImageUrl: payload.cover_image_url ?? null,
+        }),
       },
       create: {
         profileId: profile.id,

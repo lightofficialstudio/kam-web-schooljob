@@ -2,7 +2,7 @@
 
 import { DollarOutlined } from "@ant-design/icons";
 import { Card, Col, Form, InputNumber, Row, Select, Space, theme } from "antd";
-import { useJobPostStore } from "../_state/job-post-store";
+import { useJobPostStore } from "../_stores/job-post-store";
 
 const { Option } = Select;
 
@@ -20,7 +20,10 @@ export const SalarySection = () => {
         </Space>
       }
       variant="borderless"
-      style={{ borderRadius: 16, border: `1px solid ${token.colorBorderSecondary}` }}
+      style={{
+        borderRadius: 16,
+        border: `1px solid ${token.colorBorderSecondary}`,
+      }}
     >
       <Row gutter={[16, 16]}>
         <Col span={24}>
@@ -42,11 +45,15 @@ export const SalarySection = () => {
               <Form.Item
                 label="เงินเดือนเริ่มต้น (บาท)"
                 name="salaryFrom"
-                rules={[{ required: true, message: "กรุณาระบุเงินเดือนเริ่มต้น" }]}
+                rules={[
+                  { required: true, message: "กรุณาระบุเงินเดือนเริ่มต้น" },
+                ]}
               >
                 <InputNumber
                   size="large"
-                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
                   style={{ width: "100%" }}
                   placeholder="เช่น 15,000"
                 />
@@ -56,7 +63,9 @@ export const SalarySection = () => {
               <Form.Item label="เงินเดือนสูงสุด (บาท)" name="salaryTo">
                 <InputNumber
                   size="large"
-                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
                   style={{ width: "100%" }}
                   placeholder="เช่น 25,000"
                 />

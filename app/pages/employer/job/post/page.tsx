@@ -22,7 +22,7 @@ import { JobTipsSidebar } from "./_components/job-tips-sidebar";
 import { LocationSection } from "./_components/location-section";
 import { PostSettingsSection } from "./_components/post-settings-section";
 import { SalarySection } from "./_components/salary-section";
-import { useJobPostStore } from "./_state/job-post-store";
+import { useJobPostStore } from "./_stores/job-post-store";
 
 const { Title } = Typography;
 const { Content } = Layout;

@@ -32,8 +32,8 @@ import { useState } from "react";
 
 import { uploadFile } from "@/app/lib/storage";
 import { useAuthStore } from "@/app/stores/auth-store";
-import { useSchoolProfileState } from "../_state/school-profile.state";
 import type { SchoolProfile } from "../_state/school-profile.state";
+import { useSchoolProfileState } from "../_state/school-profile.state";
 
 const { Title, Text, Link } = Typography;
 
@@ -52,7 +52,9 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
 
   // ✨ อัปโหลดโลโก้โรงเรียนไป Supabase Storage แล้ว save URL ลง DB
   const handleLogoBeforeUpload = (file: RcFile): boolean => {
-    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+    const isImage = ["image/jpeg", "image/png", "image/webp"].includes(
+      file.type,
+    );
     if (!isImage) {
       message.error("รองรับเฉพาะไฟล์ JPG / PNG / WebP เท่านั้น");
       return false;
@@ -100,7 +102,10 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             <Avatar
               size={120}
               icon={<BankOutlined />}
-              src={profile.logoUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
+              src={
+                profile.logoUrl ||
+                `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`
+              }
               style={{
                 backgroundColor: "#e60278",
                 border: "4px solid white",
@@ -123,7 +128,13 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
                     shape="circle"
                     size="small"
                     loading={isUploadingLogo}
-                    icon={isUploadingLogo ? <LoadingOutlined style={{ fontSize: 12 }} /> : <EditOutlined style={{ fontSize: 12 }} />}
+                    icon={
+                      isUploadingLogo ? (
+                        <LoadingOutlined style={{ fontSize: 12 }} />
+                      ) : (
+                        <EditOutlined style={{ fontSize: 12 }} />
+                      )
+                    }
                     style={{
                       width: 28,
                       height: 28,
