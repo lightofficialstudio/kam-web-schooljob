@@ -72,8 +72,15 @@ export default function EmployeeProfilePage() {
   const router = useRouter();
   const [form] = Form.useForm();
 
-  // ✨ Guard: ถ้าไม่ได้ login หรือ role ไม่ใช่ EMPLOYEE ให้ redirect
+  // ✨ รอให้ Zustand hydrate จาก localStorage เสร็จก่อน (ป้องกัน redirect ผิดพลาดตอน refresh)
+  const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // ✨ Guard: ตรวจสอบหลังจาก hydrate เสร็จแล้วเท่านั้น
+  useEffect(() => {
+    if (!isMounted) return;
     if (!isAuthenticated || !user) {
       router.replace("/pages/signin?redirect=%2Fpages%2Femployee%2Fprofile");
       return;
@@ -82,16 +89,17 @@ export default function EmployeeProfilePage() {
       router.replace(user.role === "EMPLOYER" ? "/pages/employer/profile" : "/");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.role]);
+  }, [isMounted, isAuthenticated, user?.role]);
 
   // ✨ โหลดข้อมูลโปรไฟล์จาก API โดยใช้ user_id + email จาก auth-store
   // ส่ง email ไปด้วยเพื่อให้ API auto-create profile ถ้ายังไม่มีใน DB
   useEffect(() => {
+    if (!isMounted) return;
     if (user?.user_id) {
       fetchProfile(user.user_id, user.email);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.user_id]);
+  }, [isMounted, user?.user_id]);
 
   const [isMockupModalOpen, setIsMockupModalOpen] = useState(false);
 
@@ -227,6 +235,9 @@ export default function EmployeeProfilePage() {
       });
     }
   };
+
+  // ✨ รอ hydration เสร็จก่อน — ป้องกัน flash redirect ตอน refresh
+  if (!isMounted) return null;
 
   // ✨ แสดง Loading spinner ขณะโหลดข้อมูลจาก API
   if (isLoading) {
