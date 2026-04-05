@@ -8,37 +8,89 @@ const employerApi = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// ดึงข้อมูลโปรไฟล์โรงเรียน ตาม schoolId
-export const requestSchoolProfile = async (
-  schoolId: string,
-): Promise<SchoolProfile> => {
-  const response = await employerApi.get<SchoolProfile>(
-    `/employer/profile/${schoolId}`,
-  );
-  return response.data;
+// API response shape จาก backend
+interface ApiResponse<T> {
+  status_code: number;
+  message_th: string;
+  message_en: string;
+  data: T;
+}
+
+// ดึงข้อมูลโปรไฟล์โรงเรียนโดยใช้ userId (+ email สำหรับ auto-create)
+export const requestFetchSchoolProfile = async (
+  userId: string,
+  email?: string,
+): Promise<SchoolProfile | null> => {
+  const params = new URLSearchParams({ user_id: userId });
+  if (email) params.set("email", email);
+  const response = await employerApi.get<
+    ApiResponse<{
+      email: string;
+      schoolProfile: {
+        id: string;
+        schoolName: string;
+        schoolType?: string | null;
+        province: string;
+        district?: string | null;
+        address?: string | null;
+        website?: string | null;
+        phone?: string | null;
+        description?: string | null;
+        vision?: string | null;
+        foundedYear?: number | null;
+        teacherCount?: number | null;
+        studentCount?: number | null;
+        affiliation?: string | null;
+        schoolBenefits: { benefit: string }[];
+      } | null;
+    }>
+  >(`/employer-profile/read?${params.toString()}`);
+
+  const raw = response.data.data;
+  if (!raw?.schoolProfile) return null;
+
+  const sp = raw.schoolProfile;
+  return {
+    id: sp.id,
+    name: sp.schoolName,
+    type: sp.schoolType ?? "",
+    location: sp.province,
+    address: sp.address ?? "",
+    website: sp.website ?? "",
+    email: raw.email,
+    phone: sp.phone ?? "",
+    established: sp.foundedYear ? String(sp.foundedYear) : "",
+    size: sp.teacherCount ? `${sp.teacherCount} คน` : "",
+    description: sp.description ?? "",
+    vision: sp.vision ?? "",
+    curriculum: "",
+    levels: [],
+    benefits: sp.schoolBenefits.map((b) => b.benefit),
+    gallery: [],
+  };
 };
 
 // อัปเดตข้อมูลโปรไฟล์โรงเรียน
 export const requestUpdateSchoolProfile = async (
-  schoolId: string,
-  data: Partial<SchoolProfile>,
-): Promise<SchoolProfile> => {
-  const response = await employerApi.put<SchoolProfile>(
-    `/employer/profile/${schoolId}`,
-    data,
-  );
-  return response.data;
-};
-
-// อัปโหลดรูปปก/โลโก้โรงเรียน
-export const requestUploadSchoolLogo = async (
-  schoolId: string,
-  file: FormData,
-): Promise<{ url: string }> => {
-  const response = await employerApi.post<{ url: string }>(
-    `/employer/profile/${schoolId}/logo`,
-    file,
-    { headers: { "Content-Type": "multipart/form-data" } },
-  );
-  return response.data;
+  userId: string,
+  data: SchoolProfile,
+): Promise<void> => {
+  await employerApi.patch(`/employer-profile/update?user_id=${userId}`, {
+    school_name: data.name,
+    school_type: data.type || null,
+    province: data.location,
+    address: data.address || null,
+    website: data.website || null,
+    phone: data.phone || null,
+    description: data.description || null,
+    vision: data.vision || null,
+    founded_year: data.established
+      ? parseInt(data.established, 10) || null
+      : null,
+    benefits: data.benefits ?? [],
+    levels: data.levels ?? [],
+    curriculum: data.curriculum || null,
+    size: data.size || null,
+    gallery: data.gallery ?? [],
+  });
 };
