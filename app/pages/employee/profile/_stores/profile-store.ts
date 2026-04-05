@@ -1,4 +1,8 @@
 import { create } from "zustand";
+import {
+  responseEmployeeProfile,
+  requestUpdateEmployeeProfile,
+} from "../_api/employee-profile-api";
 
 // Work Experience Type
 export interface WorkExperienceEntry {
@@ -166,6 +170,12 @@ interface ProfileStore {
 
   // Mockup Data Helper — รองรับ 3 รูปแบบ
   setMockupData: (preset: 1 | 2 | 3) => void;
+
+  // API actions — ดึงและบันทึกข้อมูลกับ Backend
+  isLoading: boolean;
+  isSaving: boolean;
+  fetchProfile: (userId: string, email?: string) => Promise<void>;
+  saveProfile: (userId: string) => Promise<void>;
 }
 
 const initialProfile: Partial<EmployeeProfile> = {
@@ -203,8 +213,10 @@ const initialProfile: Partial<EmployeeProfile> = {
   skills: [],
 };
 
-export const useProfileStore = create<ProfileStore>((set) => ({
+export const useProfileStore = create<ProfileStore>((set, get) => ({
   profile: initialProfile,
+  isLoading: false,
+  isSaving: false,
 
   setProfile: (profile) =>
     set((state) => ({
@@ -526,4 +538,186 @@ export const useProfileStore = create<ProfileStore>((set) => ({
       const presetMap = { 1: preset1, 2: preset2, 3: preset3 };
       return { profile: presetMap[preset] };
     }),
+
+  // ✨ ดึงข้อมูลโปรไฟล์จาก API และ map ลง store
+  // ส่ง email ไปด้วยเพื่อให้ API auto-create profile ถ้ายังไม่มีใน DB
+  fetchProfile: async (userId: string, email?: string) => {
+    set({ isLoading: true });
+    try {
+      const res = await responseEmployeeProfile(userId, email);
+      if (res.status_code === 200 && res.data) {
+        const d = res.data;
+        // map DB field names → store field names
+        set({
+          profile: {
+            id: d.id,
+            userId: d.userId,
+            email: d.email,
+            firstName: d.firstName ?? "",
+            lastName: d.lastName ?? "",
+            phoneNumber: d.phoneNumber ?? "",
+            gender: d.gender ?? "",
+            dateOfBirth: d.dateOfBirth ? new Date(d.dateOfBirth).toISOString().split("T")[0] : "",
+            nationality: d.nationality ?? "",
+            profileImageUrl: d.profileImageUrl ?? "",
+            profileVisibility: d.profileVisibility ?? "public",
+            teachingExperience: d.teachingExperience ?? "",
+            recentSchool: d.recentSchool ?? "",
+            specialActivities: d.specialActivities ?? "",
+            canRelocate: d.canRelocate ?? false,
+            licenseStatus: d.licenseStatus ?? "",
+            activeResumeId: d.activeResumeId ?? null,
+            // Array relations
+            specialization: d.specializations?.map((s: { subject: string }) => s.subject) ?? [],
+            gradeCanTeach: d.gradeCanTeaches?.map((g: { grade: string }) => g.grade) ?? [],
+            preferredProvinces: d.preferredProvinces?.map((p: { province: string }) => p.province) ?? [],
+            workExperiences: d.workExperiences?.map((exp: {
+              id: string; jobTitle: string; companyName: string;
+              startDate: string; endDate: string | null; inPresent: boolean;
+              description: string | null; workYear: number | null;
+            }) => ({
+              id: exp.id,
+              jobTitle: exp.jobTitle,
+              companyName: exp.companyName,
+              startDate: exp.startDate ? new Date(exp.startDate).toISOString().split("T")[0] : "",
+              endDate: exp.endDate ? new Date(exp.endDate).toISOString().split("T")[0] : "",
+              inPresent: exp.inPresent,
+              description: exp.description ?? "",
+              workYear: exp.workYear ?? undefined,
+            })) ?? [],
+            educations: d.educations?.map((edu: {
+              id: string; level: string; institution: string; major: string;
+              graduationYear: number | null; gpa: number | null;
+              startDate: string | null; endDate: string | null;
+            }) => ({
+              id: edu.id,
+              level: edu.level,
+              institution: edu.institution,
+              major: edu.major,
+              graduationYear: edu.graduationYear ?? undefined,
+              gpa: edu.gpa ?? undefined,
+              startDate: edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : undefined,
+              endDate: edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : undefined,
+            })) ?? [],
+            licenses: d.licenses?.map((lic: {
+              id: string; licenseName: string; issuer: string | null;
+              licenseNumber: string | null; issueDate: string | null;
+              expiryDate: string | null; fileUrl: string | null; credentialUrl: string | null;
+            }) => ({
+              id: lic.id,
+              licenseName: lic.licenseName,
+              issuer: lic.issuer ?? undefined,
+              licenseNumber: lic.licenseNumber ?? undefined,
+              issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
+              expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
+              credentialUrl: lic.credentialUrl ?? undefined,
+            })) ?? [],
+            languages: d.languages?.map((lang: {
+              id: string; languageName: string; proficiency: string | null;
+            }) => ({
+              id: lang.id,
+              languageName: lang.languageName,
+              proficiency: lang.proficiency ?? undefined,
+            })) ?? [],
+            skills: d.skills?.map((sk: { id: string; skillName: string }) => ({
+              id: sk.id,
+              skillName: sk.skillName,
+            })) ?? [],
+            resumes: d.resumes?.map((r: {
+              id: string; fileName: string; fileSize: number | null; uploadedAt: string; fileUrl: string;
+            }) => ({
+              id: r.id,
+              fileName: r.fileName,
+              fileSize: r.fileSize ?? 0,
+              uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
+              url: r.fileUrl,
+            })) ?? [],
+          },
+        });
+      }
+    } catch (err) {
+      console.error("❌ fetchProfile error:", err);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // ✨ บันทึกโปรไฟล์ปัจจุบันใน store ไปยัง API
+  saveProfile: async (userId: string) => {
+    set({ isSaving: true });
+    try {
+      const p = get().profile;
+      const payload: Record<string, unknown> = {
+        first_name: p.firstName,
+        last_name: p.lastName,
+        phone_number: p.phoneNumber,
+        gender: p.gender,
+        date_of_birth: p.dateOfBirth || null,
+        nationality: p.nationality,
+        profile_image_url: p.profileImageUrl || null,
+        profile_visibility: p.profileVisibility,
+        teaching_experience: p.teachingExperience,
+        recent_school: p.recentSchool,
+        special_activities: p.specialActivities,
+        can_relocate: p.canRelocate,
+        license_status: p.licenseStatus || null,
+        active_resume_id: p.activeResumeId ?? null,
+        // Array relations
+        specializations: p.specialization ?? [],
+        grade_can_teaches: p.gradeCanTeach ?? [],
+        preferred_provinces: p.preferredProvinces ?? [],
+        // Sub-relations — ส่งเฉพาะที่มี (ไม่ส่ง field ที่ไม่เกี่ยวกับ DB)
+        work_experiences: (p.workExperiences ?? []).map((exp) => ({
+          id: exp.id,
+          job_title: exp.jobTitle,
+          company_name: exp.companyName,
+          start_date: exp.startDate,
+          end_date: exp.endDate || null,
+          in_present: exp.inPresent,
+          description: exp.description || null,
+          work_year: exp.workYear ?? null,
+          is_deleted: exp.isDeleted ?? false,
+        })),
+        educations: (p.educations ?? []).map((edu) => ({
+          id: edu.id,
+          level: edu.level,
+          institution: edu.institution,
+          major: edu.major,
+          graduation_year: edu.graduationYear ?? null,
+          gpa: edu.gpa ?? null,
+          start_date: edu.startDate || null,
+          end_date: edu.endDate || null,
+          is_deleted: edu.isDeleted ?? false,
+        })),
+        licenses: (p.licenses ?? []).map((lic) => ({
+          id: lic.id,
+          license_name: lic.licenseName,
+          issuer: lic.issuer ?? null,
+          license_number: lic.licenseNumber ?? null,
+          issue_date: lic.issueDate ?? null,
+          expiry_date: lic.expiryDate ?? null,
+          credential_url: lic.credentialUrl ?? null,
+          is_deleted: lic.isDeleted ?? false,
+        })),
+        languages: (p.languages ?? []).map((lang) => ({
+          id: lang.id,
+          language_name: lang.languageName,
+          proficiency: lang.proficiency ?? null,
+          is_deleted: lang.isDeleted ?? false,
+        })),
+        skills: (p.skills ?? []).map((sk) => ({
+          id: sk.id,
+          skill_name: sk.skillName,
+          is_deleted: sk.isDeleted ?? false,
+        })),
+      };
+
+      await requestUpdateEmployeeProfile(userId, payload);
+    } catch (err) {
+      console.error("❌ saveProfile error:", err);
+      throw err;
+    } finally {
+      set({ isSaving: false });
+    }
+  },
 }));

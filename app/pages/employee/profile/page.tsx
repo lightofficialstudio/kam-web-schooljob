@@ -27,11 +27,14 @@ import {
   Radio,
   Row,
   Space,
+  Spin,
   Tag,
   Typography,
   theme as antTheme,
 } from "antd";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/app/stores/auth-store";
 import {
   BasicInfoSection,
   EducationHistorySection,
@@ -63,9 +66,32 @@ type SectionId =
 
 export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
-  const { profile, setProfile, setMockupData } = useProfileStore();
+  const { profile, setProfile, setMockupData, fetchProfile, saveProfile, isLoading, isSaving } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const router = useRouter();
   const [form] = Form.useForm();
+
+  // ✨ Guard: ถ้าไม่ได้ login หรือ role ไม่ใช่ EMPLOYEE ให้ redirect
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      router.replace("/pages/signin?redirect=%2Fpages%2Femployee%2Fprofile");
+      return;
+    }
+    if (user.role !== "EMPLOYEE") {
+      router.replace(user.role === "EMPLOYER" ? "/pages/employer/profile" : "/");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.role]);
+
+  // ✨ โหลดข้อมูลโปรไฟล์จาก API โดยใช้ user_id + email จาก auth-store
+  // ส่ง email ไปด้วยเพื่อให้ API auto-create profile ถ้ายังไม่มีใน DB
+  useEffect(() => {
+    if (user?.user_id) {
+      fetchProfile(user.user_id, user.email);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.user_id]);
 
   const [isMockupModalOpen, setIsMockupModalOpen] = useState(false);
 
@@ -177,6 +203,12 @@ export default function EmployeeProfilePage() {
           : {}),
       };
       setProfile(merged);
+
+      // ✨ บันทึกไปยัง API จริงถ้ามี userId จาก auth-store
+      if (user?.user_id) {
+        await saveProfile(user.user_id);
+      }
+
       openNotification({
         type: "success",
         mainTitle: "บันทึกข้อมูลสำเร็จ",
@@ -195,6 +227,15 @@ export default function EmployeeProfilePage() {
       });
     }
   };
+
+  // ✨ แสดง Loading spinner ขณะโหลดข้อมูลจาก API
+  if (isLoading) {
+    return (
+      <Flex align="center" justify="center" style={{ minHeight: "100vh" }}>
+        <Spin size="large" />
+      </Flex>
+    );
+  }
 
   return (
     <Layout style={{ minHeight: "100vh", paddingBottom: 80 }}>
@@ -573,6 +614,7 @@ export default function EmployeeProfilePage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSave={() => form.submit()}
+        loading={isSaving}
         title={
           editSection === "basic-info"
             ? "แก้ไขข้อมูลพื้นฐาน"

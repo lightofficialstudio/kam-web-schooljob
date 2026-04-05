@@ -35,19 +35,30 @@ export const SigninForm = () => {
     if (modal.type !== "success") return;
 
     const { user } = useAuthStore.getState();
-    let destinationUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/";
 
-    // EMPLOYER — นำไปหน้า Profile เมื่อ login ครั้งแรก หรือยังไม่มี redirect
-    if (user?.role === "EMPLOYER") {
-      if (user.is_first_login) {
-        destinationUrl = "/pages/employer/profile";
-        useAuthStore.getState().setFirstLogin(false);
-      } else if (!redirectUrl) {
-        destinationUrl = "/pages/employer/profile";
-      }
+    // ✨ ถ้ามี redirect param → ใช้ค่านั้นก่อนเสมอ (เช่น กดฝากประวัติแล้วถูกกลับมา signin)
+    if (redirectUrl) {
+      const destination = decodeURIComponent(redirectUrl);
+      console.log(`🔐 [SIGNIN] Redirecting to redirect param: ${destination}`);
+      router.push(destination);
+      setTimeout(() => router.refresh(), 500);
+      return;
     }
 
-    console.log(`🔐 [SIGNIN] Redirecting to: ${destinationUrl}`);
+    // ✨ Default redirect ตาม Role
+    const ROLE_HOME: Record<string, string> = {
+      EMPLOYEE: "/pages/employee/profile",
+      EMPLOYER: "/pages/employer/profile",
+      ADMIN: "/pages/admin",
+    };
+
+    const destinationUrl = ROLE_HOME[user?.role ?? ""] ?? "/";
+
+    if (user?.role === "EMPLOYER" && user.is_first_login) {
+      useAuthStore.getState().setFirstLogin(false);
+    }
+
+    console.log(`🔐 [SIGNIN] Redirecting to role home: ${destinationUrl}`);
     router.push(destinationUrl);
     setTimeout(() => router.refresh(), 500);
   };
