@@ -20,6 +20,7 @@ import {
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
+import { uploadFile } from "@/app/lib/storage";
 import { useProfileStore } from "../_stores/profile-store";
 import type { ResumeEntry } from "../_stores/profile-store";
 
@@ -34,16 +35,21 @@ const formatFileSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+interface ResumeUploadSectionProps {
+  userId: string;
+}
+
 // Section แนบเรซูเม่ — รองรับหลายไฟล์ และเลือกไฟล์ที่กำลังใช้งาน
-export const ResumeUploadSection: React.FC = () => {
+export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId }) => {
   const { token } = theme.useToken();
-  const { profile, addResume, removeResume, setActiveResume } = useProfileStore();
+  const { profile, addResume, removeResume, setActiveResume, setProfile } = useProfileStore();
 
   const resumes = profile.resumes ?? [];
   const activeResumeId = profile.activeResumeId ?? null;
 
   // state เก็บ error message เพื่อแสดง UI คำเตือน
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleBeforeUpload = (file: RcFile): boolean => {
     setUploadError(null);
@@ -69,14 +75,37 @@ export const ResumeUploadSection: React.FC = () => {
       return false;
     }
 
+    const resumeId = `resume-${Date.now()}`;
     const newResume: ResumeEntry = {
-      id: `resume-${Date.now()}`,
+      id: resumeId,
       fileName: file.name,
       fileSize: file.size,
       uploadedAt: new Date().toLocaleDateString("th-TH"),
       file,
     };
     addResume(newResume);
+
+    // ✨ Upload จริงไป Supabase Storage ผ่าน async IIFE
+    (async () => {
+      setIsUploading(true);
+      try {
+        const result = await uploadFile("resumes", userId, file);
+        // ✅ อัปเดต url ใน resume entry ที่เพิ่งสร้าง
+        const currentResumes = useProfileStore.getState().profile.resumes ?? [];
+        setProfile({
+          resumes: currentResumes.map((r) =>
+            r.id === resumeId ? { ...r, url: result.url } : r
+          ),
+        });
+        console.log("✅ [ResumeUploadSection] อัปโหลดเรซูเม่สำเร็จ:", result.url);
+      } catch (err) {
+        console.error("❌ [ResumeUploadSection] upload error:", err);
+        setUploadError(`อัปโหลดไฟล์ "${file.name}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
+      } finally {
+        setIsUploading(false);
+      }
+    })();
+
     return false; // ป้องกัน auto-upload
   };
 
@@ -196,15 +225,18 @@ export const ResumeUploadSection: React.FC = () => {
         showUploadList={false}
         beforeUpload={handleBeforeUpload}
         multiple={false}
+        disabled={isUploading}
       >
         <Button
           icon={<PlusOutlined />}
           type="dashed"
           block
+          loading={isUploading}
+          disabled={isUploading}
           style={{ height: 44 }}
           onClick={() => setUploadError(null)}
         >
-          แนบเรซูเม่ (PDF)
+          {isUploading ? "กำลังอัปโหลด..." : "แนบเรซูเม่ (PDF)"}
         </Button>
       </Upload>
 

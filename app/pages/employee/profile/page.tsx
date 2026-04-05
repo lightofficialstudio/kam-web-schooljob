@@ -29,11 +29,14 @@ import {
   Space,
   Spin,
   Tag,
+  Tooltip,
   Typography,
   theme as antTheme,
 } from "antd";
+import { uploadFile } from "@/app/lib/storage";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   BasicInfoSection,
@@ -66,11 +69,28 @@ type SectionId =
 
 export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
-  const { profile, setProfile, setMockupData, fetchProfile, saveProfile, isLoading, isSaving } = useProfileStore();
+  const { profile, setProfile, updateField, setMockupData, fetchProfile, saveProfile, isLoading, isSaving } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [form] = Form.useForm();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // ✨ อัปโหลดรูปโปรไฟล์จากปุ่มดินสอบน Avatar โดยตรง (ไม่เปิด Drawer)
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.user_id) return;
+    e.target.value = ""; // reset เพื่อให้เลือกไฟล์เดิมซ้ำได้
+    try {
+      const result = await uploadFile("avatars", user.user_id, file);
+      // ✨ updateField เป็น synchronous — store อัปเดตทันทีก่อน saveProfile อ่านค่า
+      updateField("profileImageUrl", result.url);
+      await saveProfile(user.user_id);
+      console.log("✅ [Avatar] อัปโหลดและบันทึกรูปโปรไฟล์สำเร็จ:", result.url);
+    } catch (err) {
+      console.error("❌ [Avatar] upload error:", err);
+    }
+  };
 
   // ✨ รอให้ Zustand hydrate จาก localStorage เสร็จก่อน (ป้องกัน redirect ผิดพลาดตอน refresh)
   const [isMounted, setIsMounted] = useState(false);
@@ -165,13 +185,13 @@ export default function EmployeeProfilePage() {
         lastName: profile.lastName,
         phoneNumber: profile.phoneNumber,
         gender: profile.gender,
-        dateOfBirth: profile.dateOfBirth,
+        dateOfBirth: profile.dateOfBirth ? dayjs(profile.dateOfBirth) : null,
         nationality: profile.nationality,
       });
     } else if (sectionId === "personal-info") {
       form.setFieldsValue({
         gender: profile.gender,
-        dateOfBirth: profile.dateOfBirth,
+        dateOfBirth: profile.dateOfBirth ? dayjs(profile.dateOfBirth) : null,
       });
     } else if (sectionId === "teaching") {
       form.setFieldsValue({
@@ -198,13 +218,17 @@ export default function EmployeeProfilePage() {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
-      const { languageAndItSkills, ...rest } = values as Record<
+      const { languageAndItSkills, dateOfBirth, ...rest } = values as Record<
         string,
         unknown
-      > & { languageAndItSkills?: string[] };
+      > & { languageAndItSkills?: string[]; dateOfBirth?: unknown };
       const merged = {
         ...profile,
         ...rest,
+        // ✨ แปลง dayjs กลับเป็น string ISO เพื่อเก็บใน store
+        ...(dateOfBirth !== undefined
+          ? { dateOfBirth: dayjs.isDayjs(dateOfBirth) ? (dateOfBirth as ReturnType<typeof dayjs>).format("YYYY-MM-DD") : (dateOfBirth as string | undefined) ?? undefined }
+          : {}),
         // ✨ [เก็บ languageAndItSkills รวมไว้ใน languagesSpoken]
         ...(languageAndItSkills !== undefined
           ? { languagesSpoken: languageAndItSkills, itSkills: [] }
@@ -301,23 +325,34 @@ export default function EmployeeProfilePage() {
                   <Row justify="space-between" align="top">
                     <Col>
                       <Space size={32} align="start">
+                        {/* ─── Hidden file input สำหรับ Avatar ─── */}
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          style={{ display: "none" }}
+                          onChange={handleAvatarFileChange}
+                        />
                         <Badge
                           count={
-                            <Button
-                              shape="circle"
-                              size="small"
-                              icon={
-                                <EditOutlined
-                                  style={{
-                                    color: token.colorTextDescription,
-                                  }}
-                                />
-                              }
-                              style={{
-                                boxShadow: token.boxShadowSecondary,
-                                borderColor: token.colorBorderSecondary,
-                              }}
-                            />
+                            <Tooltip title="อัปโหลดรูปภาพส่วนตัว" placement="right">
+                              <Button
+                                shape="circle"
+                                size="small"
+                                icon={
+                                  <EditOutlined
+                                    style={{
+                                      color: token.colorTextDescription,
+                                    }}
+                                  />
+                                }
+                                style={{
+                                  boxShadow: token.boxShadowSecondary,
+                                  borderColor: token.colorBorderSecondary,
+                                }}
+                                onClick={() => avatarInputRef.current?.click()}
+                              />
+                            </Tooltip>
                           }
                           offset={[-8, 120]}
                         >
@@ -512,7 +547,7 @@ export default function EmployeeProfilePage() {
 
                   {/* Resume */}
                   <ProfileSectionWrapper id="resume" title="เรซูเม่ของฉัน">
-                    <ResumeUploadSection />
+                    <ResumeUploadSection userId={user?.user_id ?? ""} />
                   </ProfileSectionWrapper>
 
                   {/* ใบประกอบวิชาชีพ */}
@@ -539,12 +574,18 @@ export default function EmployeeProfilePage() {
                       </Text>
                       <Radio.Group
                         value={profile.profileVisibility ?? "public"}
-                        onChange={(e) =>
-                          setProfile({
-                            ...profile,
-                            profileVisibility: e.target.value,
-                          })
-                        }
+                        onChange={async (e) => {
+                          const newVisibility = e.target.value as "public" | "apply_only";
+                          // ✨ updateField เป็น synchronous — store อัปเดตทันทีก่อน saveProfile อ่านค่า
+                          updateField("profileVisibility", newVisibility);
+                          if (user?.user_id) {
+                            try {
+                              await saveProfile(user.user_id);
+                            } catch {
+                              console.error("❌ บันทึกการมองเห็นโปรไฟล์ไม่สำเร็จ");
+                            }
+                          }
+                        }}
                       >
                         <Flex vertical gap={12}>
                           <Radio value="public">
@@ -645,7 +686,7 @@ export default function EmployeeProfilePage() {
         <Form form={form} layout="vertical" onFinish={handleSave}>
           {editSection === "basic-info" && <BasicInfoSection form={form} />}
           {editSection === "personal-info" && (
-            <GenderDobPhotoSection form={form} />
+            <GenderDobPhotoSection form={form} userId={user?.user_id ?? ""} />
           )}
           {editSection === "teaching" && <TeachingInfoSection form={form} />}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
