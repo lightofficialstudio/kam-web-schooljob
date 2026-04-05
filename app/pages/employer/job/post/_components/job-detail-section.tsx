@@ -19,14 +19,20 @@ export const JobDetailSection = () => {
           </Space>
         }
         variant="borderless"
-        style={{ borderRadius: 16, border: `1px solid ${token.colorBorderSecondary}` }}
+        style={{
+          borderRadius: 16,
+          border: `1px solid ${token.colorBorderSecondary}`,
+        }}
       >
         <Form.Item
           label="รายละเอียดความรับผิดชอบ"
           name="description"
           rules={[{ required: true, message: "กรุณาระบุรายละเอียดงาน" }]}
         >
-          <Input.TextArea rows={6} placeholder="รายละเอียดหน้าที่ความรับผิดชอบ และเนื้องานเบื้องต้น..." />
+          <Input.TextArea
+            rows={6}
+            placeholder="รายละเอียดหน้าที่ความรับผิดชอบ และเนื้องานเบื้องต้น..."
+          />
         </Form.Item>
       </Card>
 
@@ -38,7 +44,11 @@ export const JobDetailSection = () => {
           </Space>
         }
         variant="borderless"
-        style={{ borderRadius: 16, border: `1px solid ${token.colorBorderSecondary}` }}
+        style={{
+          borderRadius: 16,
+          border: `1px solid ${token.colorBorderSecondary}`,
+          marginTop: 24,
+        }}
       >
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
@@ -68,7 +78,9 @@ export const JobDetailSection = () => {
               <Select size="large" placeholder="เลือกเงื่อนไข">
                 <Option value="ไม่จำเป็นต้องมี">ไม่จำเป็นต้องมี</Option>
                 <Option value="จำเป็นต้องมี">จำเป็นต้องมี</Option>
-                <Option value="ยินดีรับผู้ที่กำลังดำเนินการ">ยินดีรับผู้ที่กำลังดำเนินการ</Option>
+                <Option value="ยินดีรับผู้ที่กำลังดำเนินการ">
+                  ยินดีรับผู้ที่กำลังดำเนินการ
+                </Option>
               </Select>
             </Form.Item>
           </Col>
