@@ -115,6 +115,11 @@ model Profile {
   profileViewsReceived ProfileView[]  @relation("ProfileViewTarget")
   profileViewsGiven    ProfileView[]  @relation("ProfileViewViewer")
 
+  // Relations — Org/RBAC (สมาชิกที่ตนเองเป็น + คำเชิญที่ตนส่ง)
+  orgMemberships  OrgMember[] @relation("OrgMemberProfile")
+  orgInvitedByMe  OrgMember[] @relation("OrgMemberInviter")
+  orgInvitesSent  OrgInvite[] @relation("OrgInviteInviter")
+
   @@index([role], name: "idx_profiles_role")
   @@index([userId], name: "idx_profiles_user_id")
   @@map("profiles")
@@ -296,6 +301,9 @@ model SchoolProfile {
   profile        Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
   schoolBenefits SchoolBenefit[]
   jobs           Job[]
+  orgRoles       OrgRole[]
+  orgMembers     OrgMember[]
+  orgInvites     OrgInvite[]
 
   @@map("school_profiles")
 }
@@ -465,6 +473,103 @@ model JobView {
   @@index([viewerId], name: "idx_job_views_viewer_id")
   @@index([viewedAt], name: "idx_job_views_viewed_at")
   @@map("job_views")
+}
+
+// ─── Organization & RBAC ─────────────────────────────────────────────────────
+
+// สถานะสมาชิกองค์กร
+enum OrgMemberStatus {
+  ACTIVE   // ใช้งานปกติ
+  PENDING  // รอยืนยันอีเมล
+  INACTIVE // ถูก deactivate
+}
+
+// สถานะคำเชิญ
+enum InviteStatus {
+  PENDING  // รอการตอบรับ
+  ACCEPTED // ยอมรับแล้ว
+  EXPIRED  // หมดอายุ
+  REVOKED  // ถูกยกเลิก
+}
+
+// 3.22 org_roles — บทบาทที่กำหนดเองในองค์กร (RBAC)
+model OrgRole {
+  id          String   @id @default(uuid())
+  orgId       String   @map("org_id") // schoolProfileId
+  name        String   // เช่น "HR Manager"
+  slug        String   // เช่น "hr_manager"
+  description String?
+  color       String   @default("#94A3B8") // hex color
+  iconKey     String   @default("user") @map("icon_key") // key ของ Ant Design icon
+  isSystem    Boolean  @default(false) @map("is_system") // true = built-in, ลบไม่ได้
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  schoolProfile SchoolProfile       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  permissions   OrgRolePermission[]
+  members       OrgMember[]
+
+  @@unique([orgId, slug], name: "unique_org_role_slug")
+  @@index([orgId], name: "idx_org_roles_org_id")
+  @@map("org_roles")
+}
+
+// 3.23 org_role_permissions — สิทธิ์ของแต่ละ Role (resource:action)
+model OrgRolePermission {
+  id             String @id @default(uuid())
+  roleId         String @map("role_id")
+  permissionKey  String @map("permission_key") // เช่น "jobs:create", "applicants:view"
+
+  role OrgRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionKey], name: "unique_role_permission")
+  @@index([roleId], name: "idx_org_role_permissions_role_id")
+  @@map("org_role_permissions")
+}
+
+// 3.24 org_members — สมาชิกขององค์กร (Profile → SchoolProfile หลาย:หลาย)
+model OrgMember {
+  id        String          @id @default(uuid())
+  orgId     String          @map("org_id") // schoolProfileId
+  profileId String          @map("profile_id")
+  roleId    String          @map("role_id")
+  status    OrgMemberStatus @default(PENDING)
+  invitedBy String?         @map("invited_by") // profileId ของคนที่เชิญ
+  joinedAt  DateTime?       @map("joined_at")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  schoolProfile SchoolProfile @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  profile       Profile       @relation("OrgMemberProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  role          OrgRole       @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  inviter       Profile?      @relation("OrgMemberInviter", fields: [invitedBy], references: [id], onDelete: SetNull)
+
+  @@unique([orgId, profileId], name: "unique_org_member")
+  @@index([orgId], name: "idx_org_members_org_id")
+  @@index([profileId], name: "idx_org_members_profile_id")
+  @@map("org_members")
+}
+
+// 3.25 org_invites — คำเชิญเข้าร่วมองค์กร
+model OrgInvite {
+  id        String       @id @default(uuid())
+  orgId     String       @map("org_id") // schoolProfileId
+  email     String       // อีเมลผู้รับเชิญ
+  roleId    String       @map("role_id")
+  token     String       @unique // random UUID token สำหรับลิงก์เชิญ
+  status    InviteStatus @default(PENDING)
+  invitedBy String       @map("invited_by") // profileId ของคนส่ง
+  expiresAt DateTime     @map("expires_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  schoolProfile SchoolProfile @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  inviter       Profile       @relation("OrgInviteInviter", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@index([orgId], name: "idx_org_invites_org_id")
+  @@index([email], name: "idx_org_invites_email")
+  @@index([token], name: "idx_org_invites_token")
+  @@map("org_invites")
 }
 
 // 3.21 profile_views — ติดตามการเข้าชมโปรไฟล์ครู (Employer กดดู profile ของ Employee)

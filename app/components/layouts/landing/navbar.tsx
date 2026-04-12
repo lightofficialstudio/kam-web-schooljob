@@ -3,9 +3,7 @@
 import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
-  BankOutlined,
   CaretDownOutlined,
-  CheckCircleFilled,
   KeyOutlined,
   LogoutOutlined,
   MoonOutlined,
@@ -23,7 +21,6 @@ import {
   Dropdown,
   Flex,
   Space,
-  Tag,
   theme,
   Tooltip,
   Typography,
@@ -36,8 +33,20 @@ const { Text } = Typography;
 
 // ─── Mock delegated schools (ไว้รอ DB — แสดงเฉพาะ ACTIVE) ───────────────────
 const MOCK_DELEGATED_SCHOOLS = [
-  { id: "school-abc", name: "โรงเรียนอนุบาลกรุงเทพ",          role: "Admin",      initial: "อก", color: "#3B82F6" },
-  { id: "school-xyz", name: "โรงเรียนมัธยมเชียงใหม่วิทยา",    role: "HR Manager", initial: "มว", color: "#10B981" },
+  {
+    id: "school-abc",
+    name: "โรงเรียนอนุบาลกรุงเทพ",
+    role: "Admin",
+    initial: "อก",
+    color: "#3B82F6",
+  },
+  {
+    id: "school-xyz",
+    name: "โรงเรียนมัธยมเชียงใหม่วิทยา",
+    role: "HR Manager",
+    initial: "มว",
+    color: "#10B981",
+  },
 ];
 
 export default function Navbar() {
@@ -87,7 +96,11 @@ export default function Navbar() {
       label: (
         <Flex align="center" justify="space-between" gap={8}>
           <span>การเข้าถึงของผู้รับมอบสิทธิ์</span>
-          <Badge count={MOCK_DELEGATED_SCHOOLS.length} size="small" color={token.colorPrimary} />
+          <Badge
+            count={MOCK_DELEGATED_SCHOOLS.length}
+            size="small"
+            color={token.colorPrimary}
+          />
         </Flex>
       ),
       icon: <KeyOutlined />,
@@ -114,8 +127,18 @@ export default function Navbar() {
       type: "group" as const,
       label: (
         <Flex align="center" gap={6}>
-          <SwapOutlined style={{ color: token.colorTextSecondary, fontSize: 12 }} />
-          <Text type="secondary" style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <SwapOutlined
+            style={{ color: token.colorTextSecondary, fontSize: 12 }}
+          />
+          <Text
+            type="secondary"
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
             เข้าถึงในฐานะ
           </Text>
         </Flex>
@@ -126,13 +149,22 @@ export default function Navbar() {
           <Flex align="center" gap={10} style={{ padding: "2px 0" }}>
             <Avatar
               size={28}
-              style={{ backgroundColor: school.color, fontSize: 10, fontWeight: 700, flexShrink: 0 }}
+              style={{
+                backgroundColor: school.color,
+                fontSize: 10,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
             >
               {school.initial}
             </Avatar>
             <Flex vertical gap={1}>
-              <Text style={{ fontSize: 13, fontWeight: 500 }}>{school.name}</Text>
-              <Text type="secondary" style={{ fontSize: 11 }}>{school.role}</Text>
+              <Text style={{ fontSize: 13, fontWeight: 500 }}>
+                {school.name}
+              </Text>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                {school.role}
+              </Text>
             </Flex>
           </Flex>
         ),
@@ -184,8 +216,8 @@ export default function Navbar() {
               ? "rgba(10, 15, 30, 0.82)"
               : "rgba(255, 255, 255, 0.82)"
             : isDark
-            ? "rgba(10, 15, 30, 0.70)"
-            : "rgba(255, 255, 255, 0.70)",
+              ? "rgba(10, 15, 30, 0.70)"
+              : "rgba(255, 255, 255, 0.70)",
 
           // ── Border — ใช้แยก 4 ด้านเพื่อหลีกเลี่ยง shorthand conflict ──
           borderTopWidth: scrolled ? "1px" : "0px",
@@ -194,7 +226,9 @@ export default function Navbar() {
           borderLeftWidth: scrolled ? "1px" : "0px",
           borderStyle: "solid",
           borderColor: scrolled
-            ? isDark ? "rgba(255,255,255,0.10)" : "rgba(17,182,245,0.20)"
+            ? isDark
+              ? "rgba(255,255,255,0.10)"
+              : "rgba(17,182,245,0.20)"
             : token.colorBorderSecondary,
 
           // ── Shadow — เหมือน Dynamic Island ──
@@ -268,11 +302,17 @@ export default function Navbar() {
         </Link>
 
         {/* Nav Links */}
-        <Space size={scrolled ? 20 : 32} style={{ transition: "gap 0.4s ease" }}>
+        <Space
+          size={scrolled ? 20 : 32}
+          style={{ transition: "gap 0.4s ease" }}
+        >
           {(!user || user.role === "EMPLOYEE") && (
             <>
               <Link href="/pages/job" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   ค้นหางาน
                 </Text>
               </Link>
@@ -284,19 +324,30 @@ export default function Navbar() {
                   if (user) {
                     router.push("/pages/employee/profile");
                   } else {
-                    router.push("/pages/signin?redirect=%2Fpages%2Femployee%2Fprofile");
+                    router.push(
+                      "/pages/signin?redirect=%2Fpages%2Femployee%2Fprofile",
+                    );
                   }
                 }}
               >
                 ฝากประวัติ
               </Text>
-              <Link href="/pages/employee/school" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+              <Link
+                href="/pages/employee/school"
+                style={{ textDecoration: "none" }}
+              >
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   โรงเรียน
                 </Text>
               </Link>
               <Link href="/pages/blog" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   บทความ
                 </Text>
               </Link>
@@ -305,18 +356,36 @@ export default function Navbar() {
 
           {user && user.role === "EMPLOYER" && (
             <>
-              <Link href="/pages/employer/job/read" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+              <Link
+                href="/pages/employer/job/read"
+                style={{ textDecoration: "none" }}
+              >
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   งานของฉัน
                 </Text>
               </Link>
-              <Link href="/pages/employer/job/post" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+              <Link
+                href="/pages/employer/job/post"
+                style={{ textDecoration: "none" }}
+              >
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   ประกาศงาน
                 </Text>
               </Link>
-              <Link href="/pages/employer/school-management" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+              <Link
+                href="/pages/employer/school-management"
+                style={{ textDecoration: "none" }}
+              >
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   จัดการโรงเรียน
                 </Text>
               </Link>
@@ -325,14 +394,10 @@ export default function Navbar() {
               {MOCK_DELEGATED_SCHOOLS.length > 0 && (
                 <Dropdown
                   menu={{ items: delegatedDropdownItems }}
-                  placement="bottomCenter"
+                  placement="bottom"
                   trigger={["click"]}
                 >
-                  <Flex
-                    align="center"
-                    gap={5}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <Flex align="center" gap={5} style={{ cursor: "pointer" }}>
                     <SwapOutlined
                       style={{
                         fontSize: scrolled ? 12 : 13,
@@ -354,18 +419,29 @@ export default function Navbar() {
                       color={token.colorPrimary}
                       offset={[0, 0]}
                     />
-                    <CaretDownOutlined style={{ fontSize: 10, color: token.colorTextTertiary }} />
+                    <CaretDownOutlined
+                      style={{ fontSize: 10, color: token.colorTextTertiary }}
+                    />
                   </Flex>
                 </Dropdown>
               )}
 
-              <Link href="/pages/employer/profile" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+              <Link
+                href="/pages/employer/profile"
+                style={{ textDecoration: "none" }}
+              >
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   โปรไฟล์ของฉัน
                 </Text>
               </Link>
               <Link href="/pages/blog" style={{ textDecoration: "none" }}>
-                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+                <Text
+                  strong
+                  style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                >
                   บทความ
                 </Text>
               </Link>
@@ -399,9 +475,13 @@ export default function Navbar() {
                 }}
               >
                 <Flex align="center" gap={10} style={{ paddingRight: 8 }}>
-                  <Avatar size={32}>{user.full_name.charAt(0).toUpperCase()}</Avatar>
+                  <Avatar size={32}>
+                    {user.full_name.charAt(0).toUpperCase()}
+                  </Avatar>
                   <Flex vertical gap={0}>
-                    <Text strong style={{ fontSize: 13 }}>{user.full_name}</Text>
+                    <Text strong style={{ fontSize: 13 }}>
+                      {user.full_name}
+                    </Text>
                     <Text type="secondary" style={{ fontSize: 11 }}>
                       {user.role === "EMPLOYEE" ? "ครูผู้สอน" : "สถานศึกษา"}
                     </Text>
@@ -413,7 +493,11 @@ export default function Navbar() {
               {scrolled && (
                 <Avatar
                   size={32}
-                  style={{ backgroundColor: token.colorPrimary, cursor: "pointer", flexShrink: 0 }}
+                  style={{
+                    backgroundColor: token.colorPrimary,
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
                 >
                   {user.full_name.charAt(0).toUpperCase()}
                 </Avatar>
@@ -441,7 +525,11 @@ export default function Navbar() {
                 }}
               >
                 <Link href="/pages/signin">
-                  <Button type="text" icon={<UserOutlined />} style={{ fontWeight: 600 }}>
+                  <Button
+                    type="text"
+                    icon={<UserOutlined />}
+                    style={{ fontWeight: 600 }}
+                  >
                     เข้าสู่ระบบ
                   </Button>
                 </Link>

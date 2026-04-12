@@ -2,6 +2,8 @@
 
 import { useAuthStore } from "@/app/stores/auth-store";
 import { RbacTab } from "./_components/rbac-tab";
+import { useOrgStore } from "./_state/org-store";
+import type { OrgMember, OrgInvite } from "./_state/org-store";
 import {
   BankOutlined,
   CheckCircleFilled,
@@ -39,12 +41,13 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Table,
   Tag,
   Tooltip,
   Typography,
+  notification,
   theme,
-  message,
 } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -54,122 +57,47 @@ import type { MenuProps } from "antd";
 const { Title, Text } = Typography;
 const PRIMARY = "#11b6f5";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-type MemberRole = "OWNER" | "ADMIN" | "STAFF";
-type MemberStatus = "ACTIVE" | "PENDING" | "INACTIVE";
-
-interface SchoolMember {
-  id: string;
-  name: string;
-  email: string;
-  role: MemberRole;
-  status: MemberStatus;
-  joinedAt: string;
-  avatarUrl?: string;
-  lastActiveAt?: string;
-  permissions: string[];
-}
-
-// ─── Mock Data (Front-end only — รอ DB) ──────────────────────────────────────
-const MOCK_MEMBERS: SchoolMember[] = [
-  {
-    id: "1",
-    name: "สมชาย รักการศึกษา",
-    email: "somchai@school.ac.th",
-    role: "OWNER",
-    status: "ACTIVE",
-    joinedAt: "2024-01-15",
-    lastActiveAt: "2026-04-12",
-    permissions: ["manage_jobs", "manage_members", "manage_profile", "view_applicants"],
-  },
-  {
-    id: "2",
-    name: "สมหญิง ใจดี",
-    email: "somying@school.ac.th",
-    role: "ADMIN",
-    status: "ACTIVE",
-    joinedAt: "2024-03-20",
-    lastActiveAt: "2026-04-10",
-    permissions: ["manage_jobs", "view_applicants"],
-  },
-  {
-    id: "3",
-    name: "วิชัย มุ่งมั่น",
-    email: "wichai@school.ac.th",
-    role: "STAFF",
-    status: "ACTIVE",
-    joinedAt: "2024-06-01",
-    lastActiveAt: "2026-04-08",
-    permissions: ["view_applicants"],
-  },
-  {
-    id: "4",
-    name: "นิดา รอการตอบรับ",
-    email: "nida@gmail.com",
-    role: "STAFF",
-    status: "PENDING",
-    joinedAt: "2026-04-11",
-    permissions: [],
-  },
-];
-
-const MOCK_PENDING_INVITES = [
-  { id: "inv-1", email: "teacher1@gmail.com", role: "STAFF", invitedAt: "2026-04-10", expiresAt: "2026-04-17" },
-  { id: "inv-2", email: "hr@school.ac.th", role: "ADMIN", invitedAt: "2026-04-09", expiresAt: "2026-04-16" },
-];
-
 // ─── Config ───────────────────────────────────────────────────────────────────
-const ROLE_CONFIG: Record<MemberRole, { label: string; color: string; icon: React.ReactNode }> = {
-  OWNER: { label: "เจ้าของ", color: "gold", icon: <CrownOutlined /> },
-  ADMIN: { label: "ผู้ดูแล", color: "blue", icon: <SafetyCertificateOutlined /> },
-  STAFF: { label: "เจ้าหน้าที่", color: "default", icon: <UserOutlined /> },
+
+const ROLE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  owner:  { label: "เจ้าของ",     color: "gold",    icon: <CrownOutlined /> },
+  admin:  { label: "ผู้ดูแล",     color: "blue",    icon: <SafetyCertificateOutlined /> },
+  staff:  { label: "เจ้าหน้าที่", color: "default", icon: <UserOutlined /> },
 };
 
-const STATUS_CONFIG: Record<MemberStatus, { label: string; color: string }> = {
-  ACTIVE: { label: "ใช้งาน", color: "success" },
-  PENDING: { label: "รอยืนยัน", color: "warning" },
-  INACTIVE: { label: "ไม่ใช้งาน", color: "default" },
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  ACTIVE:   { label: "ใช้งาน",     color: "success" },
+  PENDING:  { label: "รอยืนยัน",   color: "warning" },
+  INACTIVE: { label: "ไม่ใช้งาน",  color: "default" },
 };
-
-const PERMISSION_LABELS: Record<string, string> = {
-  manage_jobs: "จัดการประกาศงาน",
-  manage_members: "จัดการสมาชิก",
-  manage_profile: "จัดการโปรไฟล์โรงเรียน",
-  view_applicants: "ดูผู้สมัคร",
-};
-
-const ALL_PERMISSIONS = Object.keys(PERMISSION_LABELS);
 
 // ─── Invite Modal ─────────────────────────────────────────────────────────────
 const InviteModal = ({
   open,
   onClose,
   onInvite,
+  roles,
 }: {
   open: boolean;
   onClose: () => void;
-  onInvite: (email: string, role: MemberRole, permissions: string[]) => void;
+  onInvite: (email: string, roleId: string) => Promise<void>;
+  roles: { id: string; name: string; slug: string; color: string }[];
 }) => {
   const [form] = Form.useForm();
-  const [selectedRole, setSelectedRole] = useState<MemberRole>("STAFF");
+  const [loading, setLoading] = useState(false);
   const { token } = theme.useToken();
 
-  const defaultPermissions: Record<MemberRole, string[]> = {
-    OWNER: ALL_PERMISSIONS,
-    ADMIN: ["manage_jobs", "view_applicants"],
-    STAFF: ["view_applicants"],
+  const handleSubmit = async (values: { email: string; role_id: string }) => {
+    setLoading(true);
+    try {
+      await onInvite(values.email, values.role_id);
+      form.resetFields();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRoleChange = (role: MemberRole) => {
-    setSelectedRole(role);
-    form.setFieldValue("permissions", defaultPermissions[role]);
-  };
-
-  const handleSubmit = (values: { email: string; role: MemberRole; permissions: string[] }) => {
-    onInvite(values.email, values.role, values.permissions);
-    form.resetFields();
-    setSelectedRole("STAFF");
-  };
+  const invitableRoles = roles.filter((r) => r.slug !== "owner");
 
   return (
     <Modal
@@ -205,7 +133,6 @@ const InviteModal = ({
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{ role: "STAFF", permissions: defaultPermissions["STAFF"] }}
         style={{ marginTop: 16 }}
       >
         <Form.Item
@@ -216,40 +143,18 @@ const InviteModal = ({
           <Input prefix={<MailOutlined />} placeholder="email@example.com" size="large" />
         </Form.Item>
 
-        <Form.Item label="บทบาท" name="role" rules={[{ required: true }]}>
-          <Select size="large" onChange={handleRoleChange}>
-            <Select.Option value="ADMIN">
-              <Flex align="center" gap={8}>
-                <SafetyCertificateOutlined style={{ color: token.colorInfo }} />
-                <Flex vertical gap={0}>
-                  <Text strong style={{ fontSize: 13 }}>ผู้ดูแล (Admin)</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>จัดการประกาศงานและดูผู้สมัครได้</Text>
+        <Form.Item label="บทบาท" name="role_id" rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}>
+          <Select size="large" placeholder="เลือกบทบาท">
+            {invitableRoles.map((r) => (
+              <Select.Option key={r.id} value={r.id}>
+                <Flex align="center" gap={8}>
+                  <Flex vertical gap={0}>
+                    <Text strong style={{ fontSize: 13 }}>{r.name}</Text>
+                  </Flex>
                 </Flex>
-              </Flex>
-            </Select.Option>
-            <Select.Option value="STAFF">
-              <Flex align="center" gap={8}>
-                <UserOutlined />
-                <Flex vertical gap={0}>
-                  <Text strong style={{ fontSize: 13 }}>เจ้าหน้าที่ (Staff)</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>ดูผู้สมัครได้เท่านั้น</Text>
-                </Flex>
-              </Flex>
-            </Select.Option>
+              </Select.Option>
+            ))}
           </Select>
-        </Form.Item>
-
-        <Form.Item label="สิทธิ์การใช้งาน" name="permissions">
-          <Select
-            mode="multiple"
-            size="large"
-            placeholder="เลือกสิทธิ์ที่ต้องการ"
-            options={ALL_PERMISSIONS.filter((p) => p !== "manage_members").map((p) => ({
-              value: p,
-              label: PERMISSION_LABELS[p],
-              disabled: selectedRole === "OWNER",
-            }))}
-          />
         </Form.Item>
 
         <Flex
@@ -269,8 +174,8 @@ const InviteModal = ({
         </Flex>
 
         <Flex justify="flex-end" gap={8}>
-          <Button onClick={onClose}>ยกเลิก</Button>
-          <Button type="primary" htmlType="submit" icon={<MailOutlined />}>
+          <Button onClick={onClose} disabled={loading}>ยกเลิก</Button>
+          <Button type="primary" htmlType="submit" icon={<MailOutlined />} loading={loading}>
             ส่งคำเชิญ
           </Button>
         </Flex>
@@ -279,27 +184,32 @@ const InviteModal = ({
   );
 };
 
-// ─── Edit Role Modal ──────────────────────────────────────────────────────────
+// ─── Edit Member Role Modal ────────────────────────────────────────────────────
 const EditMemberModal = ({
   open,
   member,
   onClose,
   onSave,
+  roles,
 }: {
   open: boolean;
-  member: SchoolMember | null;
+  member: OrgMember | null;
   onClose: () => void;
-  onSave: (id: string, role: MemberRole, permissions: string[]) => void;
+  onSave: (memberId: string, roleId: string) => Promise<void>;
+  roles: { id: string; name: string; slug: string }[];
 }) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (member) {
-      form.setFieldsValue({ role: member.role, permissions: member.permissions });
+      form.setFieldsValue({ role_id: member.roleId });
     }
   }, [member, form]);
 
   if (!member) return null;
+
+  const displayName = [member.profile.firstName, member.profile.lastName].filter(Boolean).join(" ") || member.profile.email;
 
   return (
     <Modal
@@ -314,11 +224,11 @@ const EditMemberModal = ({
             size={36}
             style={{ backgroundColor: PRIMARY, fontSize: 14, flexShrink: 0 }}
           >
-            {member.name.charAt(0)}
+            {displayName.charAt(0)}
           </Avatar>
           <Flex vertical gap={1}>
-            <Text strong style={{ fontSize: 15 }}>{member.name}</Text>
-            <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>{member.email}</Text>
+            <Text strong style={{ fontSize: 15 }}>{displayName}</Text>
+            <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>{member.profile.email}</Text>
           </Flex>
         </Flex>
       }
@@ -326,34 +236,28 @@ const EditMemberModal = ({
       <Form
         form={form}
         layout="vertical"
-        onFinish={(v) => {
-          onSave(member.id, v.role, v.permissions);
-          form.resetFields();
+        onFinish={async (v) => {
+          setLoading(true);
+          try {
+            await onSave(member.id, v.role_id);
+            form.resetFields();
+          } finally {
+            setLoading(false);
+          }
         }}
         style={{ marginTop: 16 }}
       >
-        <Form.Item label="บทบาท" name="role">
+        <Form.Item label="บทบาท" name="role_id" rules={[{ required: true }]}>
           <Select size="large">
-            <Select.Option value="ADMIN">ผู้ดูแล (Admin)</Select.Option>
-            <Select.Option value="STAFF">เจ้าหน้าที่ (Staff)</Select.Option>
+            {roles.filter((r) => r.slug !== "owner").map((r) => (
+              <Select.Option key={r.id} value={r.id}>{r.name}</Select.Option>
+            ))}
           </Select>
         </Form.Item>
 
-        <Form.Item label="สิทธิ์การใช้งาน" name="permissions">
-          <Select
-            mode="multiple"
-            size="large"
-            placeholder="เลือกสิทธิ์"
-            options={ALL_PERMISSIONS.filter((p) => p !== "manage_members").map((p) => ({
-              value: p,
-              label: PERMISSION_LABELS[p],
-            }))}
-          />
-        </Form.Item>
-
         <Flex justify="flex-end" gap={8}>
-          <Button onClick={onClose}>ยกเลิก</Button>
-          <Button type="primary" htmlType="submit" icon={<EditOutlined />}>
+          <Button onClick={onClose} disabled={loading}>ยกเลิก</Button>
+          <Button type="primary" htmlType="submit" icon={<EditOutlined />} loading={loading}>
             บันทึก
           </Button>
         </Flex>
@@ -367,14 +271,28 @@ export default function SchoolManagementPage() {
   const { token } = theme.useToken();
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const [api, contextHolder] = notification.useNotification();
+
+  const {
+    members,
+    invites,
+    roles,
+    isLoadingMembers,
+    isLoadingInvites,
+    isLoadingRoles,
+    fetchMembers,
+    fetchInvites,
+    fetchRoles,
+    inviteMember,
+    updateMemberRole,
+    removeMember,
+    revokeInvite,
+  } = useOrgStore();
 
   const [isMounted, setIsMounted] = useState(false);
-  const [members, setMembers] = useState<SchoolMember[]>(MOCK_MEMBERS);
-  const [pendingInvites, setPendingInvites] = useState(MOCK_PENDING_INVITES);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [editMember, setEditMember] = useState<SchoolMember | null>(null);
+  const [editMember, setEditMember] = useState<OrgMember | null>(null);
   const [activeTab, setActiveTab] = useState<"members" | "invites" | "rbac" | "settings">("members");
-  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => setIsMounted(true), []);
 
@@ -386,63 +304,86 @@ export default function SchoolManagementPage() {
     }
     if (user.role !== "EMPLOYER") {
       router.replace(user.role === "EMPLOYEE" ? "/pages/employee/profile" : "/");
+      return;
     }
+    // ✨ โหลดข้อมูลจาก API
+    fetchMembers(user.user_id);
+    fetchInvites(user.user_id);
+    fetchRoles(user.user_id);
   }, [isMounted, isAuthenticated, user?.role]);
 
-  if (!isMounted) return null;
+  if (!isMounted || !user) return null;
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
-  const handleInvite = (email: string, role: MemberRole, permissions: string[]) => {
-    const newInvite = {
-      id: `inv-${Date.now()}`,
-      email,
-      role,
-      invitedAt: new Date().toISOString().split("T")[0],
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    };
-    setPendingInvites((prev) => [newInvite, ...prev]);
-    setIsInviteOpen(false);
-    messageApi.success(`ส่งคำเชิญไปยัง ${email} แล้ว`);
+
+  const handleInvite = async (email: string, roleId: string) => {
+    try {
+      await inviteMember(user.user_id, email, roleId);
+      setIsInviteOpen(false);
+      api.success({ message: `ส่งคำเชิญไปยัง ${email} แล้ว` });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาด";
+      api.error({ message: "ไม่สามารถส่งคำเชิญได้", description: msg });
+    }
   };
 
-  const handleEditSave = (id: string, role: MemberRole, permissions: string[]) => {
-    setMembers((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, role, permissions } : m)),
-    );
-    setEditMember(null);
-    messageApi.success("อัปเดตสิทธิ์เรียบร้อยแล้ว");
+  const handleEditSave = async (memberId: string, roleId: string) => {
+    try {
+      await updateMemberRole(user.user_id, memberId, roleId);
+      setEditMember(null);
+      api.success({ message: "อัปเดตบทบาทเรียบร้อยแล้ว" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาด";
+      api.error({ message: "ไม่สามารถอัปเดตบทบาทได้", description: msg });
+    }
   };
 
-  const handleRemoveMember = (member: SchoolMember) => {
+  const handleRemoveMember = (member: OrgMember) => {
+    const displayName = [member.profile.firstName, member.profile.lastName].filter(Boolean).join(" ") || member.profile.email;
     Modal.confirm({
-      title: `ลบ ${member.name} ออกจากทีม?`,
+      title: `ลบ ${displayName} ออกจากทีม?`,
       content: "สมาชิกจะสูญเสียสิทธิ์การเข้าถึงระบบทั้งหมดทันที",
       okText: "ยืนยัน ลบออก",
       cancelText: "ยกเลิก",
       okButtonProps: { danger: true },
-      onOk: () => {
-        setMembers((prev) => prev.filter((m) => m.id !== member.id));
-        messageApi.success(`ลบ ${member.name} ออกจากทีมแล้ว`);
+      onOk: async () => {
+        try {
+          await removeMember(user.user_id, member.id);
+          api.success({ message: `ลบ ${displayName} ออกจากทีมแล้ว` });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาด";
+          api.error({ message: "ไม่สามารถลบสมาชิกได้", description: msg });
+        }
       },
     });
   };
 
-  const handleCancelInvite = (id: string, email: string) => {
+  const handleCancelInvite = (invite: OrgInvite) => {
     Modal.confirm({
       title: "ยกเลิกคำเชิญ?",
-      content: `คำเชิญที่ส่งไป ${email} จะถูกยกเลิก`,
+      content: `คำเชิญที่ส่งไป ${invite.email} จะถูกยกเลิก`,
       okText: "ยืนยัน",
       cancelText: "ไม่",
-      onOk: () => {
-        setPendingInvites((prev) => prev.filter((i) => i.id !== id));
-        messageApi.info("ยกเลิกคำเชิญแล้ว");
+      onOk: async () => {
+        try {
+          await revokeInvite(user.user_id, invite.id);
+          api.info({ message: "ยกเลิกคำเชิญแล้ว" });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาด";
+          api.error({ message: "ไม่สามารถยกเลิกคำเชิญได้", description: msg });
+        }
       },
     });
   };
 
   const handleCopyInviteLink = (email: string) => {
-    navigator.clipboard?.writeText(`https://schooljob.th/invite?ref=xxx&email=${email}`);
-    messageApi.success("คัดลอกลิงก์เชิญแล้ว");
+    navigator.clipboard?.writeText(`https://schooljob.th/invite?email=${email}`);
+    api.success({ message: "คัดลอกลิงก์เชิญแล้ว" });
+  };
+
+  const handleRefreshInvites = () => {
+    fetchInvites(user.user_id);
+    api.info({ message: "รีเฟรชคำเชิญแล้ว" });
   };
 
   // ─── Stats Cards ───────────────────────────────────────────────────────────
@@ -464,59 +405,69 @@ export default function SchoolManagementPage() {
     },
     {
       label: "รอยืนยัน",
-      value: pendingMembers + pendingInvites.length,
+      value: pendingMembers + invites.length,
       icon: <MailOutlined style={{ fontSize: 20, color: token.colorWarning }} />,
       bg: token.colorWarningBg,
     },
     {
       label: "คำเชิญที่ส่งออก",
-      value: pendingInvites.length,
+      value: invites.length,
       icon: <KeyOutlined style={{ fontSize: 20, color: "#6366F1" }} />,
       bg: "#EEF2FF",
     },
   ];
+
+  // ─── Role label helper ──────────────────────────────────────────────────────
+  const getRoleDisplay = (roleSlug: string) => {
+    const known = ROLE_CONFIG[roleSlug];
+    if (known) return known;
+    return { label: roleSlug, color: "default", icon: <UserOutlined /> };
+  };
 
   // ─── Members Table columns ─────────────────────────────────────────────────
   const memberColumns = [
     {
       title: "สมาชิก",
       key: "member",
-      render: (_: unknown, record: SchoolMember) => (
-        <Flex align="center" gap={12}>
-          <Avatar
-            size={40}
-            src={record.avatarUrl}
-            style={{ backgroundColor: PRIMARY, fontSize: 15, flexShrink: 0 }}
-          >
-            {record.name.charAt(0)}
-          </Avatar>
-          <Flex vertical gap={2}>
-            <Flex align="center" gap={6}>
-              <Text strong style={{ fontSize: 14 }}>{record.name}</Text>
-              {record.role === "OWNER" && (
-                <CrownOutlined style={{ color: "#F59E0B", fontSize: 12 }} />
+      render: (_: unknown, record: OrgMember) => {
+        const displayName = [record.profile.firstName, record.profile.lastName].filter(Boolean).join(" ") || record.profile.email;
+        const isOwner = record.role.slug === "owner";
+        return (
+          <Flex align="center" gap={12}>
+            <Avatar
+              size={40}
+              src={record.profile.profileImageUrl}
+              style={{ backgroundColor: PRIMARY, fontSize: 15, flexShrink: 0 }}
+            >
+              {displayName.charAt(0)}
+            </Avatar>
+            <Flex vertical gap={2}>
+              <Flex align="center" gap={6}>
+                <Text strong style={{ fontSize: 14 }}>{displayName}</Text>
+                {isOwner && (
+                  <CrownOutlined style={{ color: "#F59E0B", fontSize: 12 }} />
+                )}
+              </Flex>
+              <Text type="secondary" style={{ fontSize: 12 }}>{record.profile.email}</Text>
+              {record.joinedAt && (
+                <Text style={{ fontSize: 11, color: token.colorTextQuaternary }}>
+                  เข้าร่วม: {new Date(record.joinedAt).toLocaleDateString("th-TH")}
+                </Text>
               )}
             </Flex>
-            <Text type="secondary" style={{ fontSize: 12 }}>{record.email}</Text>
-            {record.lastActiveAt && (
-              <Text style={{ fontSize: 11, color: token.colorTextQuaternary }}>
-                ใช้งานล่าสุด: {record.lastActiveAt}
-              </Text>
-            )}
           </Flex>
-        </Flex>
-      ),
+        );
+      },
     },
     {
       title: "บทบาท",
-      dataIndex: "role",
       key: "role",
-      width: 130,
-      render: (role: MemberRole) => {
-        const cfg = ROLE_CONFIG[role];
+      width: 150,
+      render: (_: unknown, record: OrgMember) => {
+        const cfg = getRoleDisplay(record.role.slug);
         return (
           <Tag color={cfg.color} icon={cfg.icon} style={{ fontSize: 12 }}>
-            {cfg.label}
+            {record.role.name}
           </Tag>
         );
       },
@@ -526,49 +477,52 @@ export default function SchoolManagementPage() {
       dataIndex: "status",
       key: "status",
       width: 110,
-      render: (status: MemberStatus) => {
-        const cfg = STATUS_CONFIG[status];
+      render: (status: string) => {
+        const cfg = STATUS_CONFIG[status] ?? { label: status, color: "default" };
         return <Badge status={cfg.color as "success" | "warning" | "default"} text={cfg.label} />;
       },
     },
     {
       title: "สิทธิ์การใช้งาน",
-      dataIndex: "permissions",
       key: "permissions",
-      render: (permissions: string[]) => (
+      render: (_: unknown, record: OrgMember) => (
         <Flex wrap="wrap" gap={4}>
-          {permissions.length === 0 ? (
-            <Text type="secondary" style={{ fontSize: 12 }}>รอยืนยัน</Text>
+          {record.role.permissions.length === 0 ? (
+            <Text type="secondary" style={{ fontSize: 12 }}>ยังไม่มีสิทธิ์</Text>
           ) : (
-            permissions.map((p) => (
-              <Tag key={p} style={{ fontSize: 11, margin: 0 }}>
-                {PERMISSION_LABELS[p] ?? p}
+            record.role.permissions.slice(0, 4).map((p) => (
+              <Tag key={p.id} style={{ fontSize: 11, margin: 0 }}>
+                {p.permissionKey}
               </Tag>
             ))
+          )}
+          {record.role.permissions.length > 4 && (
+            <Tag style={{ fontSize: 11, margin: 0 }}>+{record.role.permissions.length - 4}</Tag>
           )}
         </Flex>
       ),
     },
     {
       title: "เข้าร่วมเมื่อ",
-      dataIndex: "joinedAt",
       key: "joinedAt",
-      width: 110,
-      render: (date: string) => (
-        <Text type="secondary" style={{ fontSize: 13 }}>{date}</Text>
+      width: 120,
+      render: (_: unknown, record: OrgMember) => (
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {record.joinedAt ? new Date(record.joinedAt).toLocaleDateString("th-TH") : "—"}
+        </Text>
       ),
     },
     {
       title: "",
       key: "action",
       width: 60,
-      render: (_: unknown, record: SchoolMember) => {
-        if (record.role === "OWNER") return null;
+      render: (_: unknown, record: OrgMember) => {
+        if (record.role.slug === "owner") return null;
         const items: MenuProps["items"] = [
           {
             key: "edit",
             icon: <EditOutlined />,
-            label: "แก้ไขสิทธิ์",
+            label: "แก้ไขบทบาท",
             onClick: () => setEditMember(record),
           },
           { type: "divider" },
@@ -604,20 +558,31 @@ export default function SchoolManagementPage() {
     },
     {
       title: "บทบาทที่เชิญ",
-      dataIndex: "role",
       key: "role",
-      width: 130,
-      render: (role: MemberRole) => {
-        const cfg = ROLE_CONFIG[role];
-        return <Tag color={cfg.color} icon={cfg.icon}>{cfg.label}</Tag>;
+      width: 150,
+      render: (_: unknown, record: OrgInvite) => {
+        const role = roles.find((r) => r.id === record.roleId);
+        if (!role) return <Tag>{record.roleId}</Tag>;
+        const cfg = getRoleDisplay(role.slug);
+        return <Tag color={cfg.color} icon={cfg.icon}>{role.name}</Tag>;
+      },
+    },
+    {
+      title: "ผู้ส่งเชิญ",
+      key: "inviter",
+      width: 150,
+      render: (_: unknown, record: OrgInvite) => {
+        if (!record.inviter) return <Text type="secondary">—</Text>;
+        const name = [record.inviter.firstName, record.inviter.lastName].filter(Boolean).join(" ") || "—";
+        return <Text style={{ fontSize: 13 }}>{name}</Text>;
       },
     },
     {
       title: "ส่งเมื่อ",
-      dataIndex: "invitedAt",
-      key: "invitedAt",
+      dataIndex: "createdAt",
+      key: "createdAt",
       width: 120,
-      render: (date: string) => <Text type="secondary" style={{ fontSize: 13 }}>{date}</Text>,
+      render: (date: string) => <Text type="secondary" style={{ fontSize: 13 }}>{new Date(date).toLocaleDateString("th-TH")}</Text>,
     },
     {
       title: "หมดอายุ",
@@ -637,7 +602,7 @@ export default function SchoolManagementPage() {
       title: "",
       key: "action",
       width: 120,
-      render: (_: unknown, record: typeof MOCK_PENDING_INVITES[0]) => (
+      render: (_: unknown, record: OrgInvite) => (
         <Space size={4}>
           <Tooltip title="คัดลอกลิงก์เชิญ">
             <Button
@@ -651,7 +616,7 @@ export default function SchoolManagementPage() {
               size="small"
               danger
               icon={<DeleteOutlined />}
-              onClick={() => handleCancelInvite(record.id, record.email)}
+              onClick={() => handleCancelInvite(record)}
             />
           </Tooltip>
         </Space>
@@ -662,7 +627,7 @@ export default function SchoolManagementPage() {
   // ─── Tab Nav ────────────────────────────────────────────────────────────────
   const tabs = [
     { key: "members",  label: "สมาชิกในทีม",   icon: <TeamOutlined />,              count: members.length },
-    { key: "invites",  label: "คำเชิญที่รอ",    icon: <MailOutlined />,              count: pendingInvites.length },
+    { key: "invites",  label: "คำเชิญที่รอ",    icon: <MailOutlined />,              count: invites.length },
     { key: "rbac",     label: "จัดการสิทธิ์",   icon: <KeyOutlined style={{ color: activeTab === "rbac" ? PRIMARY : undefined }} /> },
     { key: "settings", label: "ตั้งค่าองค์กร",  icon: <SettingOutlined /> },
   ] as const;
@@ -831,31 +796,43 @@ export default function SchoolManagementPage() {
                   <TeamOutlined style={{ color: PRIMARY }} />
                   <Text strong style={{ fontSize: 15 }}>สมาชิกในทีม</Text>
                 </Flex>
-                <Button
-                  type="primary"
-                  icon={<UserAddOutlined />}
-                  size="small"
-                  onClick={() => setIsInviteOpen(true)}
-                >
-                  เชิญสมาชิก
-                </Button>
+                <Flex gap={8}>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    size="small"
+                    loading={isLoadingMembers}
+                    onClick={() => fetchMembers(user.user_id)}
+                  >
+                    รีเฟรช
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<UserAddOutlined />}
+                    size="small"
+                    onClick={() => setIsInviteOpen(true)}
+                  >
+                    เชิญสมาชิก
+                  </Button>
+                </Flex>
               </Flex>
             }
           >
-            <Table
-              columns={memberColumns}
-              dataSource={members}
-              rowKey="id"
-              pagination={false}
-              locale={{
-                emptyText: (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={<Text type="secondary">ยังไม่มีสมาชิก</Text>}
-                  />
-                ),
-              }}
-            />
+            <Spin spinning={isLoadingMembers}>
+              <Table
+                columns={memberColumns}
+                dataSource={members}
+                rowKey="id"
+                pagination={false}
+                locale={{
+                  emptyText: (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={<Text type="secondary">ยังไม่มีสมาชิก</Text>}
+                    />
+                  ),
+                }}
+              />
+            </Spin>
           </Card>
         )}
 
@@ -874,41 +851,44 @@ export default function SchoolManagementPage() {
                 <Button
                   icon={<ReloadOutlined />}
                   size="small"
-                  onClick={() => messageApi.info("รีเฟรชแล้ว")}
+                  loading={isLoadingInvites}
+                  onClick={handleRefreshInvites}
                 >
                   รีเฟรช
                 </Button>
               </Flex>
             }
           >
-            {pendingInvites.length === 0 ? (
-              <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={<Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>}
-                >
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsInviteOpen(true)}
+            <Spin spinning={isLoadingInvites}>
+              {invites.length === 0 && !isLoadingInvites ? (
+                <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={<Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>}
                   >
-                    ส่งคำเชิญ
-                  </Button>
-                </Empty>
-              </Flex>
-            ) : (
-              <Table
-                columns={inviteColumns}
-                dataSource={pendingInvites}
-                rowKey="id"
-                pagination={false}
-              />
-            )}
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => setIsInviteOpen(true)}
+                    >
+                      ส่งคำเชิญ
+                    </Button>
+                  </Empty>
+                </Flex>
+              ) : (
+                <Table
+                  columns={inviteColumns}
+                  dataSource={invites}
+                  rowKey="id"
+                  pagination={false}
+                />
+              )}
+            </Spin>
           </Card>
         )}
 
         {/* ─── Tab: จัดการสิทธิ์ (RBAC) ─────────────────────────────── */}
-        {activeTab === "rbac" && <RbacTab />}
+        {activeTab === "rbac" && <RbacTab userId={user.user_id} />}
 
         {/* ─── Tab: ตั้งค่าองค์กร ────────────────────────────────────── */}
         {activeTab === "settings" && (
@@ -931,15 +911,21 @@ export default function SchoolManagementPage() {
                 }
               >
                 <Descriptions column={1} size="small" styles={{ label: { width: 140 } }}>
-                  <Descriptions.Item label="ชื่อโรงเรียน">
-                    <Text strong>โรงเรียนตัวอย่าง (Mock)</Text>
+                  <Descriptions.Item label="สมาชิกทั้งหมด">
+                    <Text strong>{members.length} คน</Text>
                   </Descriptions.Item>
-                  <Descriptions.Item label="ประเภท">
-                    <Tag color="blue">รัฐบาล</Tag>
+                  <Descriptions.Item label="บทบาทในระบบ">
+                    <Flex gap={4} wrap="wrap">
+                      {roles.map((r) => (
+                        <Tag key={r.id} color={r.isSystem ? "blue" : "green"} style={{ fontSize: 11 }}>
+                          {r.name}
+                        </Tag>
+                      ))}
+                    </Flex>
                   </Descriptions.Item>
-                  <Descriptions.Item label="จังหวัด">กรุงเทพมหานคร</Descriptions.Item>
-                  <Descriptions.Item label="อีเมลองค์กร">school@example.ac.th</Descriptions.Item>
-                  <Descriptions.Item label="เบอร์โทร">02-XXX-XXXX</Descriptions.Item>
+                  <Descriptions.Item label="คำเชิญที่รอ">
+                    {invites.length} รายการ
+                  </Descriptions.Item>
                 </Descriptions>
               </Card>
             </Col>
@@ -952,35 +938,38 @@ export default function SchoolManagementPage() {
                 title={
                   <Flex align="center" gap={8}>
                     <KeyOutlined style={{ color: "#6366F1" }} />
-                    <Text strong>สิทธิ์ตามบทบาท</Text>
+                    <Text strong>บทบาทในองค์กร</Text>
                   </Flex>
                 }
               >
-                <Flex vertical gap={16}>
-                  {(["OWNER", "ADMIN", "STAFF"] as MemberRole[]).map((role) => {
-                    const cfg = ROLE_CONFIG[role];
-                    const perms: Record<MemberRole, string[]> = {
-                      OWNER: ALL_PERMISSIONS,
-                      ADMIN: ["manage_jobs", "view_applicants"],
-                      STAFF: ["view_applicants"],
-                    };
-                    return (
-                      <Flex vertical gap={8} key={role}>
-                        <Tag color={cfg.color} icon={cfg.icon} style={{ width: "fit-content" }}>
-                          {cfg.label}
-                        </Tag>
-                        <Flex wrap="wrap" gap={4}>
-                          {perms[role].map((p) => (
-                            <Tag key={p} style={{ fontSize: 11, margin: 0 }}>
-                              {PERMISSION_LABELS[p]}
-                            </Tag>
-                          ))}
+                <Spin spinning={isLoadingRoles}>
+                  <Flex vertical gap={12}>
+                    {roles.map((role) => (
+                      <Flex vertical gap={6} key={role.id}>
+                        <Flex align="center" gap={8}>
+                          <Tag
+                            color={role.isSystem ? "blue" : "green"}
+                            style={{ width: "fit-content" }}
+                          >
+                            {role.name}
+                          </Tag>
+                          {role.isSystem && (
+                            <Text type="secondary" style={{ fontSize: 11 }}>System Role</Text>
+                          )}
                         </Flex>
+                        {role.description && (
+                          <Text type="secondary" style={{ fontSize: 12, paddingLeft: 4 }}>
+                            {role.description}
+                          </Text>
+                        )}
+                        <Text style={{ fontSize: 11, color: token.colorTextQuaternary, paddingLeft: 4 }}>
+                          {role.permissions.length} permissions · {role._count.members} สมาชิก
+                        </Text>
                         <Divider style={{ margin: "4px 0" }} />
                       </Flex>
-                    );
-                  })}
-                </Flex>
+                    ))}
+                  </Flex>
+                </Spin>
               </Card>
             </Col>
 
@@ -1027,12 +1016,14 @@ export default function SchoolManagementPage() {
         open={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
         onInvite={handleInvite}
+        roles={roles}
       />
       <EditMemberModal
         open={!!editMember}
         member={editMember}
         onClose={() => setEditMember(null)}
         onSave={handleEditSave}
+        roles={roles}
       />
     </div>
   );
