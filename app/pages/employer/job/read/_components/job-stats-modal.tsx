@@ -44,6 +44,7 @@ const MiniBarChart = ({
   valueKey: "views" | "applicants";
   color: string;
 }) => {
+  const { token } = theme.useToken();
   const max = Math.max(...data.map((d) => d[valueKey]), 1);
   return (
     <Flex align="flex-end" gap={4} style={{ height: 80 }}>
@@ -188,7 +189,8 @@ export const JobStatsModal = () => {
         </Flex>
       )}
       {!isLoading && stats && (
-      {/* ─── Row 1: Key Metrics ─── */}
+        <>
+        {/* ─── Row 1: Key Metrics ─── */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20, marginTop: 8 }}>
         {[
           {
@@ -465,6 +467,7 @@ export const JobStatsModal = () => {
           </Card>
         </Col>
       </Row>
+        </>
       )}
     </Modal>
   );

@@ -26,7 +26,7 @@ export const getJobsByUserService = async (userId: string) => {
       jobGrades: true,
       jobBenefits: true,
       _count: {
-        select: { applications: true },
+        select: { applications: true, jobViews: true },
       },
       applications: {
         where: { appliedAt: { gte: sevenDaysAgo } },

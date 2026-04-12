@@ -66,8 +66,9 @@ const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
   const deadline = job.deadline as string | null;
 
   // ✨ นับ applicants จาก _count (จาก backend ใหม่)
-  const countObj = job._count as { applications?: number } | undefined;
+  const countObj = job._count as { applications?: number; jobViews?: number } | undefined;
   const applicants = countObj?.applications ?? 0;
+  const views = countObj?.jobViews ?? 0;
   // ✨ นับผู้สมัครใหม่ใน 7 วัน
   const recentApplications = (job.applications as { id: string }[]) ?? [];
   const newApplicants = recentApplications.length;
@@ -82,7 +83,7 @@ const mapDbJobToRecord = (job: Record<string, unknown>): JobRecord => {
       : "-",
     expiresAt: deadline ? new Date(deadline).toISOString().split("T")[0] : "-",
     status,
-    views: 0,
+    views,
     applicants,
     newApplicants,
     conversionRate: "0%",
