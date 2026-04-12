@@ -39,16 +39,15 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
               มาสร้างประกาศงานที่น่าสนใจกันเถอะ! 🚀
             </Title>
             <Paragraph
-              style={{ color: "rgba(255,255,255,0.8)", fontSize: 14, margin: 0 }}
+              style={{
+                color: "rgba(255,255,255,0.8)",
+                fontSize: 14,
+                margin: 0,
+              }}
             >
               การระบุรายละเอียดวิชาและระดับชั้นที่ชัดเจน
               จะช่วยให้คุณพบครูที่ตรงใจได้เร็วขึ้นถึง 2 เท่า
             </Paragraph>
-            <img
-              src="https://illustrations.popsy.co/amber/launching-soon.svg"
-              alt="Success Illustration"
-              style={{ width: "100%", height: "auto", marginTop: 20 }}
-            />
           </Flex>
         </Card>
       )}
@@ -111,7 +110,8 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
             <Flex vertical gap={4}>
               <Text strong>ข้อมูลสวัสดิการ</Text>
               <Text type="secondary" style={{ fontSize: 13 }}>
-                การระบุสวัสดิการที่ชัดเจนช่วยให้คนตัดสินใจสมัครได้ง่ายขึ้น 2 เท่า
+                การระบุสวัสดิการที่ชัดเจนช่วยให้คนตัดสินใจสมัครได้ง่ายขึ้น 2
+                เท่า
               </Text>
             </Flex>
           </Space>
@@ -122,7 +122,11 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
             <Text strong>สถานะบัตรสมาชิก</Text>
             <Tag
               color="gold"
-              style={{ width: "fit-content", padding: "4px 12px", borderRadius: 8 }}
+              style={{
+                width: "fit-content",
+                padding: "4px 12px",
+                borderRadius: 8,
+              }}
             >
               Premium Account
             </Tag>
