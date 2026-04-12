@@ -3,20 +3,27 @@
 import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
+  BankOutlined,
+  CaretDownOutlined,
+  CheckCircleFilled,
+  KeyOutlined,
   LogoutOutlined,
   MoonOutlined,
   SettingOutlined,
   SolutionOutlined,
   SunOutlined,
+  SwapOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
+  Badge,
   Button,
   Card,
   Dropdown,
   Flex,
   Space,
+  Tag,
   theme,
   Tooltip,
   Typography,
@@ -26,6 +33,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const { Text } = Typography;
+
+// ─── Mock delegated schools (ไว้รอ DB — แสดงเฉพาะ ACTIVE) ───────────────────
+const MOCK_DELEGATED_SCHOOLS = [
+  { id: "school-abc", name: "โรงเรียนอนุบาลกรุงเทพ",          role: "Admin",      initial: "อก", color: "#3B82F6" },
+  { id: "school-xyz", name: "โรงเรียนมัธยมเชียงใหม่วิทยา",    role: "HR Manager", initial: "มว", color: "#10B981" },
+];
 
 export default function Navbar() {
   const router = useRouter();
@@ -68,6 +81,19 @@ export default function Navbar() {
         }
       },
     },
+    // ✨ [Delegated Access — แสดงเมื่อมีสิทธิ์ที่ได้รับมอบ]
+    {
+      key: "delegated-access",
+      label: (
+        <Flex align="center" justify="space-between" gap={8}>
+          <span>การเข้าถึงของผู้รับมอบสิทธิ์</span>
+          <Badge count={MOCK_DELEGATED_SCHOOLS.length} size="small" color={token.colorPrimary} />
+        </Flex>
+      ),
+      icon: <KeyOutlined />,
+      onClick: () => router.push("/pages/employer/delegated-access"),
+    },
+    { type: "divider" as const },
     {
       key: "logout",
       label: "ออกจากระบบ",
@@ -78,6 +104,51 @@ export default function Navbar() {
         router.refresh();
       },
       danger: true,
+    },
+  ];
+
+  // ─── Dropdown items สำหรับ "เข้าถึงในฐานะ" ──────────────────────────────
+  const delegatedDropdownItems = [
+    {
+      key: "header",
+      type: "group" as const,
+      label: (
+        <Flex align="center" gap={6}>
+          <SwapOutlined style={{ color: token.colorTextSecondary, fontSize: 12 }} />
+          <Text type="secondary" style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            เข้าถึงในฐานะ
+          </Text>
+        </Flex>
+      ),
+      children: MOCK_DELEGATED_SCHOOLS.map((school) => ({
+        key: school.id,
+        label: (
+          <Flex align="center" gap={10} style={{ padding: "2px 0" }}>
+            <Avatar
+              size={28}
+              style={{ backgroundColor: school.color, fontSize: 10, fontWeight: 700, flexShrink: 0 }}
+            >
+              {school.initial}
+            </Avatar>
+            <Flex vertical gap={1}>
+              <Text style={{ fontSize: 13, fontWeight: 500 }}>{school.name}</Text>
+              <Text type="secondary" style={{ fontSize: 11 }}>{school.role}</Text>
+            </Flex>
+          </Flex>
+        ),
+        onClick: () => router.push(`/pages/employer/job/read`), // TODO: switch context to school.id
+      })),
+    },
+    { type: "divider" as const },
+    {
+      key: "view-all",
+      label: (
+        <Flex align="center" gap={6}>
+          <KeyOutlined style={{ fontSize: 12 }} />
+          <Text style={{ fontSize: 13 }}>ดูสิทธิ์ทั้งหมด</Text>
+        </Flex>
+      ),
+      onClick: () => router.push("/pages/employer/delegated-access"),
     },
   ];
 
@@ -244,6 +315,50 @@ export default function Navbar() {
                   ประกาศงาน
                 </Text>
               </Link>
+              <Link href="/pages/employer/school-management" style={{ textDecoration: "none" }}>
+                <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
+                  จัดการโรงเรียน
+                </Text>
+              </Link>
+
+              {/* ✨ [Delegated Access Dropdown — เข้าถึงในฐานะโรงเรียนอื่น] */}
+              {MOCK_DELEGATED_SCHOOLS.length > 0 && (
+                <Dropdown
+                  menu={{ items: delegatedDropdownItems }}
+                  placement="bottomCenter"
+                  trigger={["click"]}
+                >
+                  <Flex
+                    align="center"
+                    gap={5}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <SwapOutlined
+                      style={{
+                        fontSize: scrolled ? 12 : 13,
+                        color: token.colorPrimary,
+                      }}
+                    />
+                    <Text
+                      strong
+                      style={{
+                        fontSize: scrolled ? 13 : 14,
+                        color: token.colorPrimary,
+                      }}
+                    >
+                      เข้าถึงในฐานะ
+                    </Text>
+                    <Badge
+                      count={MOCK_DELEGATED_SCHOOLS.length}
+                      size="small"
+                      color={token.colorPrimary}
+                      offset={[0, 0]}
+                    />
+                    <CaretDownOutlined style={{ fontSize: 10, color: token.colorTextTertiary }} />
+                  </Flex>
+                </Dropdown>
+              )}
+
               <Link href="/pages/employer/profile" style={{ textDecoration: "none" }}>
                 <Text strong style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}>
                   โปรไฟล์ของฉัน
