@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import {
   CalendarOutlined,
   CheckCircleOutlined,
@@ -18,6 +19,7 @@ import {
   Empty,
   Flex,
   Popconfirm,
+  Spin,
   Tag,
   Tooltip,
   Typography,
@@ -60,6 +62,7 @@ export const ApplicantDrawer = () => {
     selectedJobId,
     selectedJobTitle,
     filterStatus,
+    isLoading,
     closeDrawer,
     setFilterStatus,
     getApplicants,
@@ -67,6 +70,7 @@ export const ApplicantDrawer = () => {
     updateApplicantStatus,
     openProfileModal,
   } = useApplicantDrawerStore();
+  const { user } = useAuthStore();
 
   const isNewMode = selectedJobId === NEW_APPLICANTS_MODE;
   const applicants = getApplicants();
@@ -147,11 +151,12 @@ export const ApplicantDrawer = () => {
       </Flex>
 
       {/* Applicant List */}
+      <Spin spinning={isLoading} size="large">
       <Flex
         vertical
         style={{ padding: "16px 24px", gap: 12, overflowY: "auto" }}
       >
-        {applicants.length === 0 ? (
+        {!isLoading && applicants.length === 0 ? (
           <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -317,7 +322,7 @@ export const ApplicantDrawer = () => {
                             color: PRIMARY,
                           }}
                           onClick={() =>
-                            updateApplicantStatus(applicant.key, "INTERVIEW")
+                            updateApplicantStatus(applicant.key, "INTERVIEW", user?.user_id ?? "")
                           }
                         >
                           นัดสัมภาษณ์
@@ -329,7 +334,7 @@ export const ApplicantDrawer = () => {
                           cancelText="ยกเลิก"
                           okButtonProps={{ danger: true }}
                           onConfirm={() =>
-                            updateApplicantStatus(applicant.key, "REJECTED")
+                            updateApplicantStatus(applicant.key, "REJECTED", user?.user_id ?? "")
                           }
                         >
                           <Button
@@ -350,7 +355,7 @@ export const ApplicantDrawer = () => {
                           icon={<CheckCircleOutlined />}
                           style={{ borderRadius: 8 }}
                           onClick={() =>
-                            updateApplicantStatus(applicant.key, "ACCEPTED")
+                            updateApplicantStatus(applicant.key, "ACCEPTED", user?.user_id ?? "")
                           }
                         >
                           รับเข้าทำงาน
@@ -362,7 +367,7 @@ export const ApplicantDrawer = () => {
                           cancelText="ยกเลิก"
                           okButtonProps={{ danger: true }}
                           onConfirm={() =>
-                            updateApplicantStatus(applicant.key, "REJECTED")
+                            updateApplicantStatus(applicant.key, "REJECTED", user?.user_id ?? "")
                           }
                         >
                           <Button
@@ -400,6 +405,7 @@ export const ApplicantDrawer = () => {
           })
         )}
       </Flex>
+      </Spin>
     </Drawer>
 
     {/* Modal โปรไฟล์เต็มของผู้สมัคร */}

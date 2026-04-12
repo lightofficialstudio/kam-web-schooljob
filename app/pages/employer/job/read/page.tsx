@@ -133,7 +133,7 @@ export default function MyJobsPage() {
                 >
                   <Button
                     size="large"
-                    onClick={openNewApplicantsDrawer}
+                    onClick={() => openNewApplicantsDrawer(user?.user_id ?? "")}
                     style={{
                       borderRadius: 10,
                       background: "rgba(255,255,255,0.15)",

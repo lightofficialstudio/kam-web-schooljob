@@ -344,3 +344,161 @@ export const getPipelineService = async (
     urgentJobs,
   };
 };
+
+// ─── Applicants ────────────────────────────────────────────────────────────────
+
+// ✨ ดึงรายชื่อผู้สมัครของตำแหน่งงาน พร้อม profile ครบถ้วน
+export const getApplicantsByJobService = async (userId: string, jobId: string) => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+
+  // ตรวจสอบว่า job เป็นของโรงเรียนนี้
+  const job = await prisma.job.findFirst({
+    where: { id: jobId, schoolProfileId },
+    select: { id: true },
+  });
+  if (!job) throw new Error("JOB_NOT_FOUND");
+
+  return await prisma.application.findMany({
+    where: { jobId },
+    orderBy: { appliedAt: "desc" },
+    include: {
+      applicant: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          teachingExperience: true,
+          specialActivities: true,
+          profileImageUrl: true,
+          specializations: { select: { subject: true } },
+          gradeCanTeaches: { select: { grade: true } },
+          languages: {
+            where: { isDeleted: false },
+            select: { languageName: true, proficiency: true },
+          },
+          skills: {
+            where: { isDeleted: false },
+            select: { skillName: true },
+          },
+          workExperiences: {
+            where: { isDeleted: false },
+            orderBy: { startDate: "desc" },
+            select: {
+              jobTitle: true,
+              companyName: true,
+              startDate: true,
+              endDate: true,
+              inPresent: true,
+              description: true,
+            },
+          },
+          educations: {
+            where: { isDeleted: false },
+            orderBy: { graduationYear: "desc" },
+            select: {
+              level: true,
+              institution: true,
+              major: true,
+              graduationYear: true,
+              gpa: true,
+            },
+          },
+          preferredProvinces: { select: { province: true } },
+        },
+      },
+      resume: { select: { fileName: true, fileUrl: true } },
+    },
+  });
+};
+
+// ✨ ดึงผู้สมัครใหม่ (PENDING ใน 7 วัน) ทุกตำแหน่งของโรงเรียน
+export const getNewApplicantsService = async (userId: string) => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  return await prisma.application.findMany({
+    where: {
+      status: "PENDING",
+      appliedAt: { gte: sevenDaysAgo },
+      job: { schoolProfileId },
+    },
+    orderBy: { appliedAt: "desc" },
+    include: {
+      job: { select: { id: true, title: true } },
+      applicant: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          teachingExperience: true,
+          specialActivities: true,
+          profileImageUrl: true,
+          specializations: { select: { subject: true } },
+          gradeCanTeaches: { select: { grade: true } },
+          languages: {
+            where: { isDeleted: false },
+            select: { languageName: true, proficiency: true },
+          },
+          skills: {
+            where: { isDeleted: false },
+            select: { skillName: true },
+          },
+          workExperiences: {
+            where: { isDeleted: false },
+            orderBy: { startDate: "desc" },
+            select: {
+              jobTitle: true,
+              companyName: true,
+              startDate: true,
+              endDate: true,
+              inPresent: true,
+              description: true,
+            },
+          },
+          educations: {
+            where: { isDeleted: false },
+            orderBy: { graduationYear: "desc" },
+            select: {
+              level: true,
+              institution: true,
+              major: true,
+              graduationYear: true,
+              gpa: true,
+            },
+          },
+          preferredProvinces: { select: { province: true } },
+        },
+      },
+      resume: { select: { fileName: true, fileUrl: true } },
+    },
+  });
+};
+
+// ✨ อัปเดตสถานะผู้สมัคร (EMPLOYER เท่านั้น — ตรวจสอบ ownership ผ่าน jobId)
+export const updateApplicantStatusService = async (
+  userId: string,
+  applicationId: string,
+  status: "PENDING" | "INTERVIEW" | "ACCEPTED" | "REJECTED",
+) => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+
+  // ตรวจสอบว่า application อยู่ภายใต้โรงเรียนนี้
+  const application = await prisma.application.findFirst({
+    where: {
+      id: applicationId,
+      job: { schoolProfileId },
+    },
+    select: { id: true },
+  });
+  if (!application) throw new Error("APPLICATION_NOT_FOUND");
+
+  return await prisma.application.update({
+    where: { id: applicationId },
+    data: { status },
+    select: { id: true, status: true, updatedAt: true },
+  });
+};

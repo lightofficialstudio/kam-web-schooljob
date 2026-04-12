@@ -31,3 +31,32 @@ export const requestCloseJob = async (userId: string, jobId: string) => {
   );
   return data;
 };
+
+// ดึงรายชื่อผู้สมัครของตำแหน่งงาน
+export const fetchApplicantsByJob = async (userId: string, jobId: string) => {
+  const { data } = await axios.get<ApiResponse<unknown[]>>(
+    `/api/v1/employer/jobs/applicants/read?user_id=${userId}&job_id=${jobId}`,
+  );
+  return data.data ?? [];
+};
+
+// ดึงผู้สมัครใหม่ทุกตำแหน่ง (PENDING ใน 7 วันล่าสุด)
+export const fetchNewApplicants = async (userId: string) => {
+  const { data } = await axios.get<ApiResponse<unknown[]>>(
+    `/api/v1/employer/jobs/applicants/read?user_id=${userId}&mode=new`,
+  );
+  return data.data ?? [];
+};
+
+// อัปเดตสถานะผู้สมัคร
+export const requestUpdateApplicantStatus = async (
+  userId: string,
+  applicationId: string,
+  status: "PENDING" | "INTERVIEW" | "ACCEPTED" | "REJECTED",
+) => {
+  const { data } = await axios.patch<ApiResponse<unknown>>(
+    `/api/v1/employer/jobs/applicants/update-status`,
+    { user_id: userId, application_id: applicationId, status },
+  );
+  return data;
+};
