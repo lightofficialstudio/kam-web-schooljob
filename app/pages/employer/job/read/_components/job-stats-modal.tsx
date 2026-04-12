@@ -190,283 +190,295 @@ export const JobStatsModal = () => {
       )}
       {!isLoading && stats && (
         <>
-        {/* ─── Row 1: Key Metrics ─── */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20, marginTop: 8 }}>
-        {[
-          {
-            icon: <EyeOutlined style={{ color: PRIMARY }} />,
-            label: "ยอดเข้าชมรวม",
-            value: stats.totalViews.toLocaleString(),
-            suffix: "ครั้ง",
-            bg: token.colorPrimaryBg,
-          },
-          {
-            icon: <UserAddOutlined style={{ color: token.colorInfo }} />,
-            label: "ผู้สมัครทั้งหมด",
-            value: stats.totalApplicants,
-            suffix: "คน",
-            bg: token.colorInfoBg,
-          },
-          {
-            icon: <RiseOutlined style={{ color: token.colorSuccess }} />,
-            label: "อัตราการสมัคร",
-            value: stats.conversionRate,
-            suffix: "",
-            bg: token.colorSuccessBg,
-          },
-          {
-            icon: <ClockCircleOutlined style={{ color: token.colorWarning }} />,
-            label: "เวลาเฉลี่ยก่อนสมัคร",
-            value: stats.avgTimeToApply,
-            suffix: "",
-            bg: token.colorWarningBg,
-          },
-        ].map((item) => (
-          <Col xs={12} md={6} key={item.label}>
-            <Card
-              variant="borderless"
-              style={{ borderRadius: 12, backgroundColor: item.bg }}
-              styles={{ body: { padding: "16px 20px" } }}
-            >
-              <Flex vertical gap={8}>
-                <Flex align="center" gap={6}>
-                  {item.icon}
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {item.label}
-                  </Text>
-                </Flex>
-                <Text
-                  strong
-                  style={{
-                    fontSize: 22,
-                    color: token.colorText,
-                    lineHeight: 1,
-                  }}
+          {/* ─── Row 1: Key Metrics ─── */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 20, marginTop: 8 }}>
+            {[
+              {
+                icon: <EyeOutlined style={{ color: PRIMARY }} />,
+                label: "ยอดเข้าชมรวม",
+                value: stats.totalViews.toLocaleString(),
+                suffix: "ครั้ง",
+                bg: token.colorPrimaryBg,
+              },
+              {
+                icon: <UserAddOutlined style={{ color: token.colorInfo }} />,
+                label: "ผู้สมัครทั้งหมด",
+                value: stats.totalApplicants,
+                suffix: "คน",
+                bg: token.colorInfoBg,
+              },
+              {
+                icon: <RiseOutlined style={{ color: token.colorSuccess }} />,
+                label: "อัตราการสมัคร",
+                value: stats.conversionRate,
+                suffix: "",
+                bg: token.colorSuccessBg,
+              },
+              {
+                icon: (
+                  <ClockCircleOutlined style={{ color: token.colorWarning }} />
+                ),
+                label: "เวลาเฉลี่ยก่อนสมัคร",
+                value: stats.avgTimeToApply,
+                suffix: "",
+                bg: token.colorWarningBg,
+              },
+            ].map((item) => (
+              <Col xs={12} md={6} key={item.label}>
+                <Card
+                  variant="borderless"
+                  style={{ borderRadius: 12, backgroundColor: item.bg }}
+                  styles={{ body: { padding: "16px 20px" } }}
                 >
-                  {item.value}
-                  {item.suffix && (
+                  <Flex vertical gap={8}>
+                    <Flex align="center" gap={6}>
+                      {item.icon}
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {item.label}
+                      </Text>
+                    </Flex>
                     <Text
+                      strong
                       style={{
-                        fontSize: 13,
-                        color: token.colorTextTertiary,
-                        fontWeight: 400,
-                        marginLeft: 4,
+                        fontSize: 22,
+                        color: token.colorText,
+                        lineHeight: 1,
                       }}
                     >
-                      {item.suffix}
+                      {item.value}
+                      {item.suffix && (
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: token.colorTextTertiary,
+                            fontWeight: 400,
+                            marginLeft: 4,
+                          }}
+                        >
+                          {item.suffix}
+                        </Text>
+                      )}
                     </Text>
-                  )}
-                </Text>
-              </Flex>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                  </Flex>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-      {/* ─── Row 2: Pipeline + Trend ─── */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
-        {/* Hiring Pipeline */}
-        <Col xs={24} md={12}>
-          <Card
-            variant="borderless"
-            style={{ borderRadius: 12, height: "100%" }}
-            title={
-              <Flex align="center" gap={6}>
-                <TeamOutlined style={{ color: PRIMARY }} />
-                <Text strong style={{ fontSize: 14 }}>
-                  Pipeline การรับสมัคร
-                </Text>
-              </Flex>
-            }
-          >
-            <Flex vertical gap={12}>
-              {stats.pipeline.map((step, index) => (
-                <Flex vertical gap={4} key={step.label}>
+          {/* ─── Row 2: Pipeline + Trend ─── */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
+            {/* Hiring Pipeline */}
+            <Col xs={24} md={12}>
+              <Card
+                variant="borderless"
+                style={{ borderRadius: 12, height: "100%" }}
+                title={
+                  <Flex align="center" gap={6}>
+                    <TeamOutlined style={{ color: PRIMARY }} />
+                    <Text strong style={{ fontSize: 14 }}>
+                      Pipeline การรับสมัคร
+                    </Text>
+                  </Flex>
+                }
+              >
+                <Flex vertical gap={12}>
+                  {stats.pipeline.map((step, index) => (
+                    <Flex vertical gap={4} key={step.label}>
+                      <Flex justify="space-between" align="center">
+                        <Flex align="center" gap={8}>
+                          <Flex
+                            align="center"
+                            justify="center"
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: "50%",
+                              background: step.color,
+                              fontSize: 11,
+                              color: "#fff",
+                              fontWeight: 700,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {index + 1}
+                          </Flex>
+                          <Text style={{ fontSize: 13 }}>{step.label}</Text>
+                        </Flex>
+                        <Flex align="center" gap={6}>
+                          <Text strong style={{ fontSize: 15 }}>
+                            {step.count}
+                          </Text>
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            คน
+                          </Text>
+                        </Flex>
+                      </Flex>
+                      <Progress
+                        percent={Math.round(
+                          (step.count / stats.pipeline[0].count) * 100,
+                        )}
+                        showInfo={false}
+                        strokeColor={step.color}
+                        trailColor={token.colorFillSecondary}
+                        size="small"
+                        style={{ margin: 0 }}
+                      />
+                    </Flex>
+                  ))}
+
+                  <Divider style={{ margin: "8px 0" }} />
                   <Flex justify="space-between" align="center">
-                    <Flex align="center" gap={8}>
+                    <Text type="secondary" style={{ fontSize: 13 }}>
+                      อัตราความสำเร็จ (Offer Rate)
+                    </Text>
+                    <Tag
+                      color={
+                        hiringRate >= 10
+                          ? "green"
+                          : hiringRate >= 5
+                            ? "orange"
+                            : "red"
+                      }
+                      style={{ fontWeight: 700, fontSize: 13 }}
+                    >
+                      {hiringRate}%
+                    </Tag>
+                  </Flex>
+                </Flex>
+              </Card>
+            </Col>
+
+            {/* Daily Trend */}
+            <Col xs={24} md={12}>
+              <Card
+                variant="borderless"
+                style={{ borderRadius: 12, height: "100%" }}
+                title={
+                  <Flex align="center" gap={6}>
+                    <ThunderboltOutlined style={{ color: "#F59E0B" }} />
+                    <Text strong style={{ fontSize: 14 }}>
+                      แนวโน้ม 7 วันล่าสุด
+                    </Text>
+                  </Flex>
+                }
+              >
+                <Flex vertical gap={16}>
+                  <Flex vertical gap={6}>
+                    <Flex align="center" gap={6}>
                       <Flex
-                        align="center"
-                        justify="center"
                         style={{
-                          width: 22,
-                          height: 22,
-                          borderRadius: "50%",
-                          background: step.color,
-                          fontSize: 11,
-                          color: "#fff",
-                          fontWeight: 700,
-                          flexShrink: 0,
+                          width: 10,
+                          height: 10,
+                          borderRadius: 2,
+                          backgroundColor: PRIMARY,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextSecondary,
                         }}
                       >
-                        {index + 1}
-                      </Flex>
-                      <Text style={{ fontSize: 13 }}>{step.label}</Text>
-                    </Flex>
-                    <Flex align="center" gap={6}>
-                      <Text strong style={{ fontSize: 15 }}>
-                        {step.count}
-                      </Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        คน
+                        ยอดเข้าชม (ครั้ง)
                       </Text>
                     </Flex>
+                    <MiniBarChart
+                      data={stats.dailyTrend}
+                      valueKey="views"
+                      color={PRIMARY}
+                    />
                   </Flex>
-                  <Progress
-                    percent={Math.round(
-                      (step.count / stats.pipeline[0].count) * 100,
-                    )}
-                    showInfo={false}
-                    strokeColor={step.color}
-                    trailColor={token.colorFillSecondary}
-                    size="small"
-                    style={{ margin: 0 }}
-                  />
+
+                  <Flex vertical gap={6}>
+                    <Flex align="center" gap={6}>
+                      <Flex
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 2,
+                          backgroundColor: "#10B981",
+                        }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextSecondary,
+                        }}
+                      >
+                        ผู้สมัครใหม่ (คน)
+                      </Text>
+                    </Flex>
+                    <MiniBarChart
+                      data={stats.dailyTrend}
+                      valueKey="applicants"
+                      color="#10B981"
+                    />
+                  </Flex>
                 </Flex>
-              ))}
+              </Card>
+            </Col>
+          </Row>
 
-              <Divider style={{ margin: "8px 0" }} />
-              <Flex justify="space-between" align="center">
-                <Text type="secondary" style={{ fontSize: 13 }}>
-                  อัตราความสำเร็จ (Offer Rate)
-                </Text>
-                <Tag
-                  color={
-                    hiringRate >= 10
-                      ? "green"
-                      : hiringRate >= 5
-                        ? "orange"
-                        : "red"
-                  }
-                  style={{ fontWeight: 700, fontSize: 13 }}
-                >
-                  {hiringRate}%
-                </Tag>
-              </Flex>
-            </Flex>
-          </Card>
-        </Col>
-
-        {/* Daily Trend */}
-        <Col xs={24} md={12}>
-          <Card
-            variant="borderless"
-            style={{ borderRadius: 12, height: "100%" }}
-            title={
-              <Flex align="center" gap={6}>
-                <ThunderboltOutlined style={{ color: "#F59E0B" }} />
-                <Text strong style={{ fontSize: 14 }}>
-                  แนวโน้ม 7 วันล่าสุด
-                </Text>
-              </Flex>
-            }
-          >
-            <Flex vertical gap={16}>
-              <Flex vertical gap={6}>
-                <Flex align="center" gap={6}>
-                  <Flex
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 2,
-                      backgroundColor: PRIMARY,
-                    }}
-                  />
-                  <Text
-                    style={{ fontSize: 12, color: token.colorTextSecondary }}
-                  >
-                    ยอดเข้าชม (ครั้ง)
-                  </Text>
+          {/* ─── Row 3: Sources + Experience ─── */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                variant="borderless"
+                style={{ borderRadius: 12 }}
+                title={
+                  <Flex align="center" gap={6}>
+                    <CalendarOutlined style={{ color: "#6366F1" }} />
+                    <Text strong style={{ fontSize: 14 }}>
+                      แหล่งที่มาของผู้สมัคร
+                    </Text>
+                  </Flex>
+                }
+              >
+                <Flex vertical gap={12}>
+                  {stats.sources.map((src, i) => (
+                    <BreakdownBar
+                      key={src.label}
+                      label={src.label}
+                      count={src.count}
+                      percent={src.percent}
+                      color={
+                        ["#11b6f5", "#6366F1", "#F59E0B", "#94A3B8"][i % 4]
+                      }
+                    />
+                  ))}
                 </Flex>
-                <MiniBarChart
-                  data={stats.dailyTrend}
-                  valueKey="views"
-                  color={PRIMARY}
-                />
-              </Flex>
+              </Card>
+            </Col>
 
-              <Flex vertical gap={6}>
-                <Flex align="center" gap={6}>
-                  <Flex
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 2,
-                      backgroundColor: "#10B981",
-                    }}
-                  />
-                  <Text
-                    style={{ fontSize: 12, color: token.colorTextSecondary }}
-                  >
-                    ผู้สมัครใหม่ (คน)
-                  </Text>
+            <Col xs={24} md={12}>
+              <Card
+                variant="borderless"
+                style={{ borderRadius: 12 }}
+                title={
+                  <Flex align="center" gap={6}>
+                    <UserAddOutlined style={{ color: "#10B981" }} />
+                    <Text strong style={{ fontSize: 14 }}>
+                      ประสบการณ์ผู้สมัคร
+                    </Text>
+                  </Flex>
+                }
+              >
+                <Flex vertical gap={12}>
+                  {stats.experienceLevels.map((exp, i) => (
+                    <BreakdownBar
+                      key={exp.label}
+                      label={exp.label}
+                      count={exp.count}
+                      percent={exp.percent}
+                      color={
+                        ["#10B981", "#11b6f5", "#6366F1", "#F59E0B"][i % 4]
+                      }
+                    />
+                  ))}
                 </Flex>
-                <MiniBarChart
-                  data={stats.dailyTrend}
-                  valueKey="applicants"
-                  color="#10B981"
-                />
-              </Flex>
-            </Flex>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* ─── Row 3: Sources + Experience ─── */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <Card
-            variant="borderless"
-            style={{ borderRadius: 12 }}
-            title={
-              <Flex align="center" gap={6}>
-                <CalendarOutlined style={{ color: "#6366F1" }} />
-                <Text strong style={{ fontSize: 14 }}>
-                  แหล่งที่มาของผู้สมัคร
-                </Text>
-              </Flex>
-            }
-          >
-            <Flex vertical gap={12}>
-              {stats.sources.map((src, i) => (
-                <BreakdownBar
-                  key={src.label}
-                  label={src.label}
-                  count={src.count}
-                  percent={src.percent}
-                  color={["#11b6f5", "#6366F1", "#F59E0B", "#94A3B8"][i % 4]}
-                />
-              ))}
-            </Flex>
-          </Card>
-        </Col>
-
-        <Col xs={24} md={12}>
-          <Card
-            variant="borderless"
-            style={{ borderRadius: 12 }}
-            title={
-              <Flex align="center" gap={6}>
-                <UserAddOutlined style={{ color: "#10B981" }} />
-                <Text strong style={{ fontSize: 14 }}>
-                  ประสบการณ์ผู้สมัคร
-                </Text>
-              </Flex>
-            }
-          >
-            <Flex vertical gap={12}>
-              {stats.experienceLevels.map((exp, i) => (
-                <BreakdownBar
-                  key={exp.label}
-                  label={exp.label}
-                  count={exp.count}
-                  percent={exp.percent}
-                  color={["#10B981", "#11b6f5", "#6366F1", "#F59E0B"][i % 4]}
-                />
-              ))}
-            </Flex>
-          </Card>
-        </Col>
-      </Row>
+              </Card>
+            </Col>
+          </Row>
         </>
       )}
     </Modal>
