@@ -6,6 +6,7 @@ import {
   BookOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  EditOutlined,
   EnvironmentOutlined,
   InfoCircleOutlined,
   MedicineBoxOutlined,
@@ -13,20 +14,45 @@ import {
   TeamOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
-import {
-  Card,
-  Col,
-  Empty,
-  Flex,
-  Row,
-  Tag,
-  theme,
-  Typography,
-} from "antd";
+import { Button, Card, Col, Flex, Row, Tag, theme, Typography } from "antd";
 
 import type { SchoolProfile } from "../_state/school-profile.state";
 
 const { Title, Paragraph, Text } = Typography;
+
+// ─── EmptyFieldPrompt ────────────────────────────────────────────────────────
+// แสดงเมื่อไม่มีข้อมูล พร้อมปุ่มจูงใจให้ผู้ใช้กรอก
+const EmptyFieldPrompt: React.FC<{
+  hint: string;
+  onEdit: () => void;
+}> = ({ hint, onEdit }) => {
+  const { token } = theme.useToken();
+  return (
+    <Flex
+      align="center"
+      justify="space-between"
+      style={{
+        padding: "14px 18px",
+        borderRadius: 10,
+        border: `1.5px dashed ${token.colorBorder}`,
+        background: token.colorFillQuaternary,
+      }}
+    >
+      <Text type="secondary" style={{ fontSize: 14 }}>
+        {hint}
+      </Text>
+      <Button
+        size="small"
+        type="link"
+        icon={<EditOutlined />}
+        onClick={onEdit}
+        style={{ padding: 0, fontWeight: 600 }}
+      >
+        กรอกข้อมูล
+      </Button>
+    </Flex>
+  );
+};
 
 // InfoItem — แสดง label + value แบบ 2-column ต่อ 1 row อ่านง่าย
 const InfoItem: React.FC<{
@@ -103,81 +129,85 @@ const SectionTitle: React.FC<{
 
 interface SchoolInfoTabProps {
   profile: SchoolProfile;
+  onEditClick: () => void;
 }
 
-export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
-  const hasAboutSection = profile.description || profile.vision;
+export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
+  profile,
+  onEditClick,
+}) => {
   const hasBenefits = profile.benefits && profile.benefits.length > 0;
 
   return (
     <Flex vertical gap={20}>
       {/* ─── เกี่ยวกับเรา + วิสัยทัศน์ ─── */}
-      {hasAboutSection && (
-        <Card variant="borderless" style={{ borderRadius: 16 }}>
-          {profile.description && (
-            <>
-              <SectionTitle
-                icon={<SafetyCertificateOutlined />}
-                color="#e60278"
-                text="เกี่ยวกับเรา"
-              />
-              <Paragraph
-                style={{ fontSize: 15, lineHeight: 1.9, marginBottom: 0 }}
-              >
-                {profile.description}
-              </Paragraph>
-            </>
-          )}
+      <Card variant="borderless" style={{ borderRadius: 16 }}>
+        <SectionTitle
+          icon={<SafetyCertificateOutlined />}
+          color="#e60278"
+          text="เกี่ยวกับเรา"
+        />
+        {profile.description ? (
+          <Paragraph style={{ fontSize: 15, lineHeight: 1.9, marginBottom: 0 }}>
+            {profile.description}
+          </Paragraph>
+        ) : (
+          <EmptyFieldPrompt
+            hint="✍️ แนะนำโรงเรียนของคุณ — ข้อมูลนี้ช่วยให้ครูสนใจสมัครงานมากขึ้น!"
+            onEdit={onEditClick}
+          />
+        )}
 
-          {profile.vision && (
-            <div style={{ marginTop: profile.description ? 24 : 0 }}>
-              {profile.description && (
-                <div
-                  style={{
-                    height: 1,
-                    background: "var(--ant-color-border)",
-                    marginBottom: 24,
-                  }}
-                />
-              )}
-              <SectionTitle
-                icon={<ThunderboltOutlined />}
-                color="#001e45"
-                text="วิสัยทัศน์"
-              />
-              <div
-                style={{
-                  borderLeft: "4px solid #11b6f5",
-                  paddingLeft: 16,
-                  background: "var(--ant-color-fill-quaternary)",
-                  borderRadius: "0 8px 8px 0",
-                  padding: "12px 16px",
-                }}
-              >
-                <Paragraph
-                  style={{
-                    fontSize: 16,
-                    fontStyle: "italic",
-                    margin: 0,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  &ldquo;{profile.vision}&rdquo;
-                </Paragraph>
-              </div>
-            </div>
-          )}
-        </Card>
-      )}
+        <div
+          style={{
+            height: 1,
+            background: "var(--ant-color-border)",
+            margin: "20px 0",
+          }}
+        />
+
+        <SectionTitle
+          icon={<ThunderboltOutlined />}
+          color="#001e45"
+          text="วิสัยทัศน์"
+        />
+        {profile.vision ? (
+          <div
+            style={{
+              borderLeft: "4px solid #11b6f5",
+              paddingLeft: 16,
+              background: "var(--ant-color-fill-quaternary)",
+              borderRadius: "0 8px 8px 0",
+              padding: "12px 16px",
+            }}
+          >
+            <Paragraph
+              style={{
+                fontSize: 16,
+                fontStyle: "italic",
+                margin: 0,
+                lineHeight: 1.7,
+              }}
+            >
+              &ldquo;{profile.vision}&rdquo;
+            </Paragraph>
+          </div>
+        ) : (
+          <EmptyFieldPrompt
+            hint="🎯 วิสัยทัศน์ที่ชัดเจนสร้างความน่าเชื่อถือและดึงดูดครูที่มีคุณภาพ"
+            onEdit={onEditClick}
+          />
+        )}
+      </Card>
 
       {/* ─── สวัสดิการ ─── */}
-      {hasBenefits && (
-        <Card variant="borderless" style={{ borderRadius: 16 }}>
-          <SectionTitle
-            icon={<MedicineBoxOutlined />}
-            color="#52c41a"
-            text="สวัสดิการและจุดเด่น"
-          />
+      <Card variant="borderless" style={{ borderRadius: 16 }}>
+        <SectionTitle
+          icon={<MedicineBoxOutlined />}
+          color="#52c41a"
+          text="สวัสดิการและจุดเด่น"
+        />
+        {hasBenefits ? (
           <Row gutter={[16, 8]}>
             {profile.benefits.map((benefit) => (
               <Col key={benefit} xs={24} sm={12}>
@@ -190,8 +220,13 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
               </Col>
             ))}
           </Row>
-        </Card>
-      )}
+        ) : (
+          <EmptyFieldPrompt
+            hint="🎁 โรงเรียนที่ระบุสวัสดิการชัดเจนได้รับผู้สมัครมากกว่าถึง 3 เท่า!"
+            onEdit={onEditClick}
+          />
+        )}
+      </Card>
 
       {/* ─── ข้อมูลเพิ่มเติม ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
@@ -266,17 +301,24 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
         />
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Flex align="flex-start" gap={8}>
-              <EnvironmentOutlined
-                style={{
-                  color: "#e60278",
-                  fontSize: 16,
-                  marginTop: 3,
-                  flexShrink: 0,
-                }}
+            {profile.address ? (
+              <Flex align="flex-start" gap={8}>
+                <EnvironmentOutlined
+                  style={{
+                    color: "#e60278",
+                    fontSize: 16,
+                    marginTop: 3,
+                    flexShrink: 0,
+                  }}
+                />
+                <Text style={{ fontSize: 15 }}>{profile.address}</Text>
+              </Flex>
+            ) : (
+              <EmptyFieldPrompt
+                hint="📍 ที่อยู่เต็มช่วยให้ครูในพื้นที่ค้นพบโรงเรียนของคุณได้ง่ายขึ้น"
+                onEdit={onEditClick}
               />
-              <Text style={{ fontSize: 15 }}>{profile.address}</Text>
-            </Flex>
+            )}
           </Col>
           <Col span={24}>
             <Flex
@@ -299,11 +341,6 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({ profile }) => {
           </Col>
         </Row>
       </Card>
-
-      {/* แสดง empty state หากไม่มีข้อมูลใดเลย */}
-      {!hasAboutSection && !hasBenefits && !profile.type && (
-        <Empty description="ยังไม่มีข้อมูลโรงเรียน กรุณาแก้ไขโปรไฟล์" />
-      )}
     </Flex>
   );
 };

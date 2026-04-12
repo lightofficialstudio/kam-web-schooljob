@@ -111,7 +111,7 @@ export default function EmployerProfilePage() {
 
           {/* Right: school info */}
           <Col xs={24} lg={17}>
-            <SchoolInfoTab profile={profile} />
+            <SchoolInfoTab profile={profile} onEditClick={handleEditClick} />
           </Col>
         </Row>
       </div>
