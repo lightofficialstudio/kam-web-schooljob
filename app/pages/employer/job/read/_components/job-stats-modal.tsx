@@ -18,6 +18,7 @@ import {
   Modal,
   Progress,
   Row,
+  Skeleton,
   Tag,
   Tooltip,
   Typography,
@@ -124,13 +125,13 @@ const BreakdownBar = ({
 // ─── Modal หลัก ──────────────────────────────────────────────────────────────
 // Modal แสดงสถิติเชิงลึกของตำแหน่งงาน สำหรับฝ่ายบุคลากรของโรงเรียน
 export const JobStatsModal = () => {
-  const { isOpen, stats, closeModal } = useJobStatsModalStore();
+  const { isOpen, stats, isLoading, closeModal } = useJobStatsModalStore();
   const { token } = theme.useToken();
 
-  if (!stats) return null;
+  if (!isOpen) return null;
 
   const hiringRate =
-    stats.pipeline.length > 0
+    stats && stats.pipeline.length > 0 && stats.pipeline[0].count > 0
       ? Math.round(
           (stats.pipeline[stats.pipeline.length - 1].count /
             stats.pipeline[0].count) *
@@ -164,7 +165,7 @@ export const JobStatsModal = () => {
               สถิติการประกาศ
             </Text>
             <Text type="secondary" style={{ fontSize: 13, fontWeight: 400 }}>
-              {stats.jobTitle}
+              {stats?.jobTitle ?? "กำลังโหลด..."}
             </Text>
           </Flex>
         </Flex>
@@ -173,6 +174,20 @@ export const JobStatsModal = () => {
         body: { padding: "0 24px 24px", maxHeight: "80vh", overflowY: "auto" },
       }}
     >
+      {/* Loading skeleton */}
+      {isLoading && (
+        <Flex vertical gap={16} style={{ padding: "8px 0" }}>
+          <Skeleton active paragraph={{ rows: 2 }} />
+          <Skeleton active paragraph={{ rows: 4 }} />
+          <Skeleton active paragraph={{ rows: 4 }} />
+        </Flex>
+      )}
+      {!isLoading && !stats && (
+        <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
+          <Text type="secondary">ไม่สามารถโหลดข้อมูลได้</Text>
+        </Flex>
+      )}
+      {!isLoading && stats && (
       {/* ─── Row 1: Key Metrics ─── */}
       <Row gutter={[16, 16]} style={{ marginBottom: 20, marginTop: 8 }}>
         {[
@@ -450,6 +465,7 @@ export const JobStatsModal = () => {
           </Card>
         </Col>
       </Row>
+      )}
     </Modal>
   );
 };

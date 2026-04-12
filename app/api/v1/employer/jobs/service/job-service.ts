@@ -502,3 +502,151 @@ export const updateApplicantStatusService = async (
     select: { id: true, status: true, updatedAt: true },
   });
 };
+
+// ─── Job Stats ────────────────────────────────────────────────────────────────
+
+export interface JobStatsResult {
+  jobId: string;
+  jobTitle: string;
+  publishedAt: string;
+  expiresAt: string;
+  totalViews: number;
+  totalApplicants: number;
+  newApplicants: number;
+  conversionRate: string;
+  avgTimeToApply: string;
+  pipeline: { label: string; count: number; color: string }[];
+  dailyTrend: { date: string; views: number; applicants: number }[];
+  sources: { label: string; count: number; percent: number }[];
+  experienceLevels: { label: string; count: number; percent: number }[];
+}
+
+// ✨ ดึงสถิติเชิงลึกของตำแหน่งงาน — views, pipeline, daily trend, experience breakdown
+export const getJobStatsService = async (
+  userId: string,
+  jobId: string,
+): Promise<JobStatsResult> => {
+  const schoolProfileId = await getSchoolProfileId(userId);
+
+  // ตรวจสอบว่า job เป็นของโรงเรียนนี้
+  const job = await prisma.job.findFirst({
+    where: { id: jobId, schoolProfileId },
+    select: { id: true, title: true, createdAt: true, deadline: true },
+  });
+  if (!job) throw new Error("JOB_NOT_FOUND");
+
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  // ✨ ดึงข้อมูลพร้อมกัน (parallel queries)
+  const [jobViews, applications] = await Promise.all([
+    prisma.jobView.findMany({
+      where: { jobId },
+      select: { viewedAt: true },
+      orderBy: { viewedAt: "asc" },
+    }),
+    prisma.application.findMany({
+      where: { jobId },
+      select: {
+        id: true,
+        status: true,
+        appliedAt: true,
+        applicant: {
+          select: { teachingExperience: true },
+        },
+      },
+    }),
+  ]);
+
+  // ─── totalViews / totalApplicants / newApplicants ─────────────────────────
+  const totalViews = jobViews.length;
+  const totalApplicants = applications.length;
+  const newApplicants = applications.filter(
+    (a) => a.appliedAt >= sevenDaysAgo,
+  ).length;
+
+  const conversionRate =
+    totalViews > 0
+      ? `${((totalApplicants / totalViews) * 100).toFixed(1)}%`
+      : "0%";
+
+  // ─── Pipeline ─────────────────────────────────────────────────────────────
+  const statusCount = { PENDING: 0, INTERVIEW: 0, ACCEPTED: 0, REJECTED: 0 };
+  for (const a of applications) {
+    statusCount[a.status as keyof typeof statusCount]++;
+  }
+  const pipeline = [
+    { label: "รอพิจารณา", count: statusCount.PENDING, color: "#F59E0B" },
+    { label: "นัดสัมภาษณ์", count: statusCount.INTERVIEW, color: "#6366F1" },
+    { label: "รับเข้าทำงาน", count: statusCount.ACCEPTED, color: "#10B981" },
+    { label: "ไม่ผ่านการคัดเลือก", count: statusCount.REJECTED, color: "#EF4444" },
+  ];
+
+  // ─── Daily Trend (7 วันล่าสุด) ────────────────────────────────────────────
+  const days: { date: string; views: number; applicants: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
+
+    const thaiMonth = [
+      "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+      "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+    ];
+    const label = `${d.getDate()} ${thaiMonth[d.getMonth()]}`;
+
+    const viewsOnDay = jobViews.filter(
+      (v) => v.viewedAt.toISOString().split("T")[0] === dateStr,
+    ).length;
+    const applicantsOnDay = applications.filter(
+      (a) => a.appliedAt.toISOString().split("T")[0] === dateStr,
+    ).length;
+
+    days.push({ date: label, views: viewsOnDay, applicants: applicantsOnDay });
+  }
+
+  // ─── Experience Levels ────────────────────────────────────────────────────
+  const expBuckets: Record<string, number> = {
+    "0–2 ปี": 0,
+    "3–5 ปี": 0,
+    "6–10 ปี": 0,
+    "10 ปีขึ้นไป": 0,
+    "ไม่ระบุ": 0,
+  };
+  for (const a of applications) {
+    const exp = a.applicant.teachingExperience ?? "";
+    if (exp.includes("1") || exp.includes("2") || exp === "0–2 ปี" || exp.includes("น้อยกว่า")) {
+      expBuckets["0–2 ปี"]++;
+    } else if (exp.includes("3") || exp.includes("4") || exp.includes("5") || exp.includes("3-5") || exp.includes("3–5")) {
+      expBuckets["3–5 ปี"]++;
+    } else if (exp.includes("6") || exp.includes("7") || exp.includes("8") || exp.includes("9") || exp.includes("10") || exp.includes("6-10") || exp.includes("6–10")) {
+      expBuckets["6–10 ปี"]++;
+    } else if (exp.includes("10+") || exp.includes("10 ปีขึ้นไป") || exp.includes("มากกว่า 10")) {
+      expBuckets["10 ปีขึ้นไป"]++;
+    } else if (exp !== "") {
+      expBuckets["ไม่ระบุ"]++;
+    } else {
+      expBuckets["ไม่ระบุ"]++;
+    }
+  }
+  const experienceLevels = Object.entries(expBuckets).map(([label, count]) => ({
+    label,
+    count,
+    percent: totalApplicants > 0 ? Math.round((count / totalApplicants) * 100) : 0,
+  }));
+
+  return {
+    jobId: job.id,
+    jobTitle: job.title,
+    publishedAt: job.createdAt.toISOString().split("T")[0],
+    expiresAt: job.deadline ? job.deadline.toISOString().split("T")[0] : "-",
+    totalViews,
+    totalApplicants,
+    newApplicants,
+    conversionRate,
+    avgTimeToApply: "-", // ❌ DB ไม่เก็บข้อมูลนี้
+    pipeline,
+    dailyTrend: days,
+    sources: [],         // ❌ DB ไม่เก็บแหล่งที่มา
+    experienceLevels,
+  };
+};

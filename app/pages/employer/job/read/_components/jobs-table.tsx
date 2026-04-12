@@ -236,7 +236,7 @@ export const JobsTable = () => {
             <Button
               icon={<BarChartOutlined />}
               size="small"
-              onClick={() => openStatsModal(record.key)}
+              onClick={() => openStatsModal(record.key, user?.user_id ?? "")}
             />
           </Tooltip>
           <Tooltip title="ปิดรับสมัคร">

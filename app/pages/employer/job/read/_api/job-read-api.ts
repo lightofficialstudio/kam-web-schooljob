@@ -48,6 +48,14 @@ export const fetchNewApplicants = async (userId: string) => {
   return data.data ?? [];
 };
 
+// ดึงสถิติเชิงลึกของตำแหน่งงาน
+export const fetchJobStats = async (userId: string, jobId: string) => {
+  const { data } = await axios.get<ApiResponse<unknown>>(
+    `/api/v1/employer/jobs/stats/read?user_id=${userId}&job_id=${jobId}`,
+  );
+  return data.data;
+};
+
 // อัปเดตสถานะผู้สมัคร
 export const requestUpdateApplicantStatus = async (
   userId: string,
