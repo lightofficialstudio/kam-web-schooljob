@@ -1,16 +1,26 @@
 import axios from "axios";
 
-interface ApplyPayload {
-  jobId: string;
-  resumeOption: string;
-  selectedResume?: string;
-  coverLetterOption: string;
-}
+// ✨ ดึงข้อมูลงานตาม ID
+export const fetchJobForApply = async (jobId: string) => {
+  const response = await axios.get(`/api/v1/jobs/${jobId}`);
+  return response.data;
+};
 
-// ส่งใบสมัครงาน
-export const requestSubmitApplication = async (payload: ApplyPayload) =>
-  axios.post("/api/v1/applications", payload);
+// ✨ ดึง Employee Profile พร้อม resumes
+export const fetchEmployeeProfile = async (userId: string) => {
+  const response = await axios.get("/api/v1/employee/profile/read", {
+    params: { user_id: userId },
+  });
+  return response.data;
+};
 
-// ดึงข้อมูลงานตาม ID (สำหรับหน้า apply)
-export const fetchJobForApply = async (jobId: string) =>
-  axios.get(`/api/v1/jobs/${jobId}`);
+// ✨ ส่งใบสมัครงาน
+export const submitApplication = async (payload: {
+  user_id: string;
+  job_id: string;
+  cover_letter?: string;
+  resume_id?: string;
+}) => {
+  const response = await axios.post("/api/v1/employee/applications/create", payload);
+  return response.data;
+};
