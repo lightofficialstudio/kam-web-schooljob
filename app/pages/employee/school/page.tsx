@@ -7,11 +7,13 @@ import {
   Layout,
   Row,
   Select,
+  Skeleton,
   Space,
   Tag,
   Typography,
   theme as antTheme,
 } from "antd";
+import { useEffect } from "react";
 import { SchoolCard } from "./_components/school-card";
 import { SchoolJobsDrawer } from "./_components/school-jobs-drawer";
 import { SchoolSearch } from "./_components/school-search";
@@ -24,6 +26,7 @@ export default function SchoolDirectoryPage() {
   const { token } = antTheme.useToken();
   const {
     schools,
+    isLoading,
     searchQuery,
     provinceFilter,
     typeFilter,
@@ -31,7 +34,13 @@ export default function SchoolDirectoryPage() {
     setTypeFilter,
     setProvinceFilter,
     setSortBy,
+    fetchSchoolList,
   } = useSchoolStore();
+
+  // ✨ ดึงข้อมูลโรงเรียนเมื่อ filter เปลี่ยน
+  useEffect(() => {
+    fetchSchoolList();
+  }, [searchQuery, provinceFilter, typeFilter]);
 
   // Quick Filter Tags — toggle เมื่อกดซ้ำจะ clear
   const handleQuickType = (value: string) =>
@@ -39,20 +48,11 @@ export default function SchoolDirectoryPage() {
   const handleQuickProvince = (value: string) =>
     setProvinceFilter(provinceFilter === value ? null : value);
 
-  const filteredSchools = schools
-    .filter((school) => {
-      const matchesSearch = school.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesProvince =
-        !provinceFilter || school.province === provinceFilter;
-      const matchesType = !typeFilter || school.type.includes(typeFilter);
-      return matchesSearch && matchesProvince && matchesType;
-    })
-    .sort((a, b) => {
-      if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
-      return parseInt(a.id) - parseInt(b.id); // "latest" — ใช้ id เป็น proxy
-    });
+  // ✨ sort จาก data ที่ได้จาก API (filter ทำโดย API แล้ว)
+  const sortedSchools = [...schools].sort((a, b) => {
+    if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
+    return 0; // "latest" — API คืนมาเรียงตาม createdAt desc อยู่แล้ว
+  });
 
   return (
     <Layout
@@ -61,7 +61,7 @@ export default function SchoolDirectoryPage() {
         backgroundColor: token.colorBgLayout,
       }}
     >
-      {/* 1. Header Hero Section */}
+      {/* Header Hero Section */}
       <Flex
         vertical
         align="center"
@@ -74,7 +74,6 @@ export default function SchoolDirectoryPage() {
           overflow: "hidden",
         }}
       >
-        {/* Decorative elements using Flex/Box pattern */}
         <Flex
           style={{
             position: "absolute",
@@ -137,7 +136,7 @@ export default function SchoolDirectoryPage() {
           <Col span={24} style={{ maxWidth: 1100 }}>
             <SchoolSearch />
 
-            {/* [ข้อ 2] Quick Filter Tags */}
+            {/* Quick Filter Tags */}
             <Flex gap={8} wrap="wrap" style={{ marginBottom: 24 }}>
               <Text type="secondary" style={{ lineHeight: "28px", fontSize: 13 }}>
                 กรองด่วน:
@@ -188,7 +187,7 @@ export default function SchoolDirectoryPage() {
                       color="#11b6f5"
                       style={{ borderRadius: 4, transform: "translateY(-1px)" }}
                     >
-                      {filteredSchools.length}
+                      {sortedSchools.length}
                     </Tag>
                   </Space>
                 </Col>
@@ -207,8 +206,17 @@ export default function SchoolDirectoryPage() {
             </Flex>
 
             <Row gutter={[24, 24]}>
-              {filteredSchools.length > 0 ? (
-                filteredSchools.map((school) => (
+              {isLoading ? (
+                // ✨ Skeleton ขณะโหลด
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <Col xs={24} key={idx}>
+                    <Card style={{ borderRadius: token.borderRadiusLG }}>
+                      <Skeleton active avatar paragraph={{ rows: 2 }} />
+                    </Card>
+                  </Col>
+                ))
+              ) : sortedSchools.length > 0 ? (
+                sortedSchools.map((school) => (
                   <Col xs={24} key={school.id}>
                     <SchoolCard {...school} />
                   </Col>
@@ -227,7 +235,9 @@ export default function SchoolDirectoryPage() {
                     <Flex vertical align="center" gap={20}>
                       <Text style={{ fontSize: 48 }}>🏫</Text>
                       <Flex vertical align="center" gap={8}>
-                        <Title level={4} style={{ margin: 0 }}>ไม่พบโรงเรียนที่ตรงกับเงื่อนไข</Title>
+                        <Title level={4} style={{ margin: 0 }}>
+                          ไม่พบโรงเรียนที่ตรงกับเงื่อนไข
+                        </Title>
                         <Text type="secondary">
                           ลองเลือก Quick Filter ด้านล่างหรือเปลี่ยนตัวกรองใหม่
                         </Text>
