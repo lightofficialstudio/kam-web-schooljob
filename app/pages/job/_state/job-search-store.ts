@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { fetchJobList } from "../_api/job-search-api";
 
 export interface Job {
   id: string;
@@ -14,10 +15,15 @@ export interface Job {
   teachingExperience: string;
   licenseRequired: string;
   gender: string;
+  jobType?: string;
   schoolName: string;
   schoolType: string;
   province: string;
   address: string;
+  logoUrl?: string;
+  benefits?: string[];
+  applicantCount?: number;
+  deadline?: string | null;
   postedAt: string;
   isNew: boolean;
 }
@@ -34,229 +40,25 @@ export interface JobFilters {
   gradeLevel: string | null;
 }
 
-// Mock Data 10 รายการ — จะแทนที่ด้วย API จริง
-const MOCK_JOBS: Job[] = [
-  {
-    id: "1",
-    title: "ครูสอนภาษาอังกฤษ (English Teacher)",
-    subjects: ["ภาษาอังกฤษ"],
-    grades: ["มัธยมต้น", "มัธยมปลาย"],
-    vacancyCount: 2,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 25000,
-    salaryMax: 35000,
-    description: "รับสมัครครูสอนภาษาอังกฤษ มีประสบการณ์การสอนในระดับมัธยม เน้นทักษะการสื่อสารและกิจกรรมในห้องเรียน",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "1 - 3 ปี",
-    licenseRequired: "มีรับผู้ที่กำลังดำเนินการ",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนนานาชาติแสงทอง",
-    schoolType: "นานาชาติ",
-    province: "กรุงเทพมหานคร",
-    address: "เขตบางนา กรุงเทพฯ",
-    postedAt: "2026-03-09T10:00:00Z",
-    isNew: true,
-  },
-  {
-    id: "2",
-    title: "ครูสอนคณิตศาสตร์",
-    subjects: ["คณิตศาสตร์"],
-    grades: ["ประถมศึกษา"],
-    vacancyCount: 1,
-    salaryType: "ตามประสบการณ์",
-    description: "ต้องการครูคณิตศาสตร์ที่รักเด็ก มีเทคนิคการสอนที่สนุกสนาน เข้าใจง่าย",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "น้อยกว่า 1 ปี",
-    licenseRequired: "จำเป็นต้องมี",
-    gender: "หญิง",
-    schoolName: "โรงเรียนประถมวิทยา",
-    schoolType: "รัฐบาล",
-    province: "นนทบุรี",
-    address: "อ.เมือง นนทบุรี",
-    postedAt: "2026-03-08T15:30:00Z",
-    isNew: true,
-  },
-  {
-    id: "3",
-    title: "ครูสอนวิทยาศาสตร์ (ฟิสิกส์)",
-    subjects: ["วิทยาศาสตร์", "ฟิสิกส์"],
-    grades: ["มัธยมปลาย"],
-    vacancyCount: 1,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 30000,
-    salaryMax: 45000,
-    description: "เน้นการสอนปฏิบัติการและการเตรียมตัวสอบเข้ามหาวิทยาลัย",
-    educationLevel: "ปริญญาโทขึ้นไป",
-    teachingExperience: "3 - 5 ปี",
-    licenseRequired: "จำเป็นต้องมี",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนสาธิตเกษตร",
-    schoolType: "สาธิต",
-    province: "กรุงเทพมหานคร",
-    address: "เขตจตุจักร กรุงเทพฯ",
-    postedAt: "2026-03-07T09:00:00Z",
-    isNew: false,
-  },
-  {
-    id: "4",
-    title: "ครูพี่เลี้ยงเด็กอนุบาล",
-    subjects: ["กิจกรรมปฐมวัย"],
-    grades: ["อนุบาล"],
-    vacancyCount: 3,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 18000,
-    salaryMax: 22000,
-    description: "ดูแลเด็กเล็ก ช่วยเหลือครูประจำชั้นในกิจกรรมต่างๆ รักความสะอาดและใจเย็น",
-    educationLevel: "มัธยมศึกษา/ปวช",
-    teachingExperience: "ไม่กำหนด",
-    licenseRequired: "ไม่จำเป็นต้องมี",
-    gender: "หญิง",
-    schoolName: "โรงเรียนอนุบาลรักลูก",
-    schoolType: "เอกชน",
-    province: "ปทุมธานี",
-    address: "คลองหลวง ปทุมธานี",
-    postedAt: "2026-03-09T08:00:00Z",
-    isNew: true,
-  },
-  {
-    id: "5",
-    title: "ครูสอนคอมพิวเตอร์และ Coding",
-    subjects: ["คอมพิวเตอร์", "วิทยาการคำนวณ"],
-    grades: ["ประถมศึกษา", "มัธยมต้น"],
-    vacancyCount: 1,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 28000,
-    salaryMax: 40000,
-    description: "สอนพื้นฐานการเขียนโปรแกรม Scratch, Python และการใช้เทคโนโลยีสารสนเทศ",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "1 - 3 ปี",
-    licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนเทคโนวิทยา",
-    schoolType: "เอกชน",
-    province: "สมุทรปราการ",
-    address: "อ.เมือง สมุทรปราการ",
-    postedAt: "2026-03-05T11:00:00Z",
-    isNew: false,
-  },
-  {
-    id: "6",
-    title: "ครูสอนภาษาจีน",
-    subjects: ["ภาษาจีน"],
-    grades: ["ประถมศึกษา", "มัธยมต้น", "มัธยมปลาย"],
-    vacancyCount: 2,
-    salaryType: "ตามประสบการณ์",
-    description: "สอนภาษาจีนพื้นฐานจนถึงระดับ HSK 4 มีสื่อการสอนที่ทันสมัย",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "1 - 3 ปี",
-    licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนภาษาโลก",
-    schoolType: "เอกชน",
-    province: "กรุงเทพมหานคร",
-    address: "เขตสัมพันธวงศ์ กรุงเทพฯ",
-    postedAt: "2026-03-09T14:00:00Z",
-    isNew: true,
-  },
-  {
-    id: "7",
-    title: "ครูสอนศิลปะ (Art Teacher)",
-    subjects: ["ศิลปะ"],
-    grades: ["ประถมศึกษา"],
-    vacancyCount: 1,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 22000,
-    salaryMax: 28000,
-    description: "ส่งเสริมจินตนาการเด็กผ่านงานศิลปะหลากหลายรูปแบบ",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "น้อยกว่า 1 ปี",
-    licenseRequired: "ไม่จำเป็นต้องมี",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนสร้างสรรค์วิทย์",
-    schoolType: "เอกชน",
-    province: "เชียงใหม่",
-    address: "อ.เมือง เชียงใหม่",
-    postedAt: "2026-03-08T10:00:00Z",
-    isNew: false,
-  },
-  {
-    id: "8",
-    title: "ครูสอนวิชาสังคมศึกษา",
-    subjects: ["สังคมศึกษา", "ประวัติศาสตร์"],
-    grades: ["มัธยมต้น"],
-    vacancyCount: 1,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 24000,
-    salaryMax: 30000,
-    description: "รับสมัครครูที่มีความรู้ในวิชาสังคมศึกษาและประวัติศาสตร์ไทย-สากล",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "3 - 5 ปี",
-    licenseRequired: "จำเป็นต้องมี",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนเก่งวิทยา",
-    schoolType: "รัฐบาล",
-    province: "นครปฐม",
-    address: "อ.พุทธมณฑล นครปฐม",
-    postedAt: "2026-03-04T12:00:00Z",
-    isNew: false,
-  },
-  {
-    id: "9",
-    title: "ครูสอนพลศึกษา",
-    subjects: ["พลศึกษา", "สุขศึกษา"],
-    grades: ["มัธยมต้น", "มัธยมปลาย"],
-    vacancyCount: 2,
-    salaryType: "ระบุเงินเดือน",
-    salaryMin: 20000,
-    salaryMax: 26000,
-    description: "ดูแลกิจกรรมกีฬาและสุขภาพของนักเรียน มีทักษะกีฬาที่หลากหลาย",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "1 - 3 ปี",
-    licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
-    gender: "ชาย",
-    schoolName: "โรงเรียนกีฬาแห่งชาติ",
-    schoolType: "รัฐบาล",
-    province: "ชลบุรี",
-    address: "อ.เมือง ชลบุรี",
-    postedAt: "2026-03-09T16:00:00Z",
-    isNew: true,
-  },
-  {
-    id: "10",
-    title: "ครูสอนดนตรีไทย-สากล",
-    subjects: ["ดนตรีไทย", "ดนตรีสากล"],
-    grades: ["ประถมศึกษา", "มัธยมต้น"],
-    vacancyCount: 1,
-    salaryType: "ไม่ระบุ",
-    description: "สอนเครื่องดนตรีเบื้องต้นและทฤษฎีดนตรี จัดตั้งวงดนตรีโรงเรียน",
-    educationLevel: "ปริญญาตรีขึ้นไป",
-    teachingExperience: "ไม่กำหนด",
-    licenseRequired: "ยินดีรับผู้ที่กำลังดำเนินการ",
-    gender: "ไม่จำกัด",
-    schoolName: "โรงเรียนศิลป์ดนตรี",
-    schoolType: "เอกชน",
-    province: "กรุงเทพมหานคร",
-    address: "เขตดุสิต กรุงเทพฯ",
-    postedAt: "2026-03-06T13:00:00Z",
-    isNew: false,
-  },
-];
-
 // แผนที่จังหวัดตาม Location Filter
-const LOCATION_MAP: Record<string, string[]> = {
-  bkk: ["กรุงเทพมหานคร"],
-  center: ["นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "นครปฐม"],
-  north: ["เชียงใหม่"],
-  east: ["ชลบุรี", "ระยอง"],
+const LOCATION_MAP: Record<string, string> = {
+  bkk: "กรุงเทพมหานคร",
+  center: "นนทบุรี",
+  north: "เชียงใหม่",
+  east: "ชลบุรี",
 };
 
 interface JobSearchState {
   jobs: Job[];
+  isLoading: boolean;
+  total: number;
+  totalPages: number;
   filters: JobFilters;
   selectedJob: Job | null;
   isDrawerOpen: boolean;
   currentPage: number;
   pageSize: number;
+  fetchJobs: () => Promise<void>;
   setFilters: (filters: Partial<JobFilters>) => void;
   resetFilters: () => void;
   setSelectedJob: (job: Job | null) => void;
@@ -280,12 +82,63 @@ const DEFAULT_FILTERS: JobFilters = {
 };
 
 export const useJobSearchStore = create<JobSearchState>((set, get) => ({
-  jobs: MOCK_JOBS,
+  jobs: [],
+  isLoading: false,
+  total: 0,
+  totalPages: 0,
   filters: DEFAULT_FILTERS,
   selectedJob: null,
   isDrawerOpen: false,
   currentPage: 1,
   pageSize: 5,
+
+  // ✨ ดึงงานจาก API พร้อมแปลง filters → query params
+  fetchJobs: async () => {
+    const { filters, currentPage, pageSize } = get();
+    set({ isLoading: true });
+
+    try {
+      // ✨ แปลง location → province string
+      const province = filters.location
+        ? LOCATION_MAP[filters.location] ?? filters.location
+        : undefined;
+
+      // ✨ แปลง license filter
+      const licenseMap: Record<string, string> = {
+        required: "required",
+        "not-required": "not_required",
+        pending: "pending_ok",
+      };
+
+      const params = {
+        ...(filters.keyword && { keyword: filters.keyword }),
+        ...(province && { province }),
+        ...(filters.schoolType && { school_type: filters.schoolType }),
+        ...(filters.license && { license: licenseMap[filters.license] }),
+        ...(filters.gradeLevel && { grade_level: filters.gradeLevel }),
+        ...(filters.salaryRange[0] > 0 && { salary_min: filters.salaryRange[0] }),
+        ...(filters.salaryRange[1] < 100000 && { salary_max: filters.salaryRange[1] }),
+        page: currentPage,
+        page_size: pageSize,
+      };
+
+      const response = await fetchJobList(params);
+
+      if (response.status_code === 200 && response.data) {
+        set({
+          jobs: response.data.jobs,
+          total: response.data.total,
+          totalPages: response.data.total_pages,
+          isLoading: false,
+        });
+      } else {
+        set({ isLoading: false });
+      }
+    } catch (error) {
+      console.error("❌ fetchJobs:", error);
+      set({ isLoading: false });
+    }
+  },
 
   setFilters: (partial) =>
     set((state) => ({ filters: { ...state.filters, ...partial }, currentPage: 1 })),
@@ -300,49 +153,9 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
 
   setPageSize: (pageSize) => set({ pageSize, currentPage: 1 }),
 
-  // เปิด Drawer พร้อมเซ็ต Job ที่เลือก
+  // ✨ เปิด Drawer พร้อมเซ็ต Job ที่เลือก
   openJobDrawer: (job) => set({ selectedJob: job, isDrawerOpen: true }),
 
-  // คำนวณรายการงานที่กรองแล้วจาก Raw Data ใน Store โดยตรง
-  getFilteredJobs: () => {
-    const { jobs, filters } = get();
-    return jobs.filter((job) => {
-      // กรองด้วยคำค้นหา
-      if (
-        filters.keyword &&
-        !job.title.toLowerCase().includes(filters.keyword.toLowerCase()) &&
-        !job.schoolName.toLowerCase().includes(filters.keyword.toLowerCase())
-      ) {
-        return false;
-      }
-
-      // กรองด้วยพื้นที่
-      if (filters.location) {
-        const provinces = LOCATION_MAP[filters.location] || [filters.location];
-        if (!provinces.includes(job.province)) return false;
-      }
-
-      // กรองด้วยใบอนุญาตประกอบวิชาชีพ
-      if (filters.license) {
-        if (filters.license === "required" && job.licenseRequired !== "จำเป็นต้องมี") return false;
-        if (filters.license === "not-required" && job.licenseRequired !== "ไม่จำเป็นต้องมี") return false;
-      }
-
-      // กรองด้วยช่วงเงินเดือน (Slider)
-      const [filterMin, filterMax] = filters.salaryRange;
-      if ((filterMin > 0 || filterMax < 100000) && job.salaryType === "ระบุเงินเดือน") {
-        const sMin = job.salaryMin ?? 0;
-        const sMax = job.salaryMax ?? Infinity;
-        if (sMax < filterMin || sMin > filterMax) return false;
-      }
-
-      // กรองด้วยประเภทโรงเรียน
-      if (filters.schoolType && job.schoolType !== filters.schoolType) return false;
-
-      // กรองด้วยระดับชั้นที่สอน
-      if (filters.gradeLevel && !job.grades.includes(filters.gradeLevel)) return false;
-
-      return true;
-    });
-  },
+  // ✨ ส่งคืน jobs จาก store โดยตรง (filter ทำโดย API แล้ว)
+  getFilteredJobs: () => get().jobs,
 }));

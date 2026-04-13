@@ -2,9 +2,8 @@
 
 import { FileSearchOutlined } from "@ant-design/icons";
 import { Badge, Button, Col, Layout, Row, Tooltip } from "antd";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { ApplicationTrackerDrawer } from "./_components/application-tracker-drawer";
 import { JobDetailDrawer } from "./_components/job-detail-drawer";
 import { JobListSection } from "./_components/job-list-section";
@@ -12,19 +11,21 @@ import { SearchFilterSection } from "./_components/search-filter-section";
 import { SidebarSection } from "./_components/sidebar-section";
 import { useApplicationTrackerStore } from "./_state/application-tracker-store";
 import { useJobSearchStore } from "./_state/job-search-store";
+import { useAuthStore } from "@/app/stores/auth-store";
 
 // Inner component ที่ใช้ useSearchParams (ต้องอยู่ใน Suspense)
 function JobSearchPageContent() {
   const searchParams = useSearchParams();
   const { setFilters } = useJobSearchStore();
-  const { applications, setIsTrackerOpen } = useApplicationTrackerStore();
+  const { applications, setIsTrackerOpen, fetchApplications } = useApplicationTrackerStore();
+  const { user } = useAuthStore();
 
   // จำนวนใบสมัครที่ยังอยู่ระหว่างดำเนินการ
   const activeApplicationCount = applications.filter(
     (a) => a.status !== "accepted" && a.status !== "rejected"
   ).length;
 
-  // Sync URL params → store เมื่อ mount
+  // ✨ Sync URL params → store เมื่อ mount
   useEffect(() => {
     const keyword = searchParams.get("keyword");
     const province = searchParams.get("province");
@@ -39,6 +40,13 @@ function JobSearchPageContent() {
       setFilters(partial);
     }
   }, [searchParams, setFilters]);
+
+  // ✨ ดึงใบสมัครของ Employee เมื่อ login แล้ว
+  useEffect(() => {
+    if (user?.user_id && user?.role === "EMPLOYEE") {
+      fetchApplications(user.user_id);
+    }
+  }, [user?.user_id]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

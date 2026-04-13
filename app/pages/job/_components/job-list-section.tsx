@@ -8,11 +8,12 @@ import {
   Flex,
   Pagination,
   Row,
+  Skeleton,
   Space,
   Typography,
   theme as antTheme,
 } from "antd";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useJobSearchStore } from "../_state/job-search-store";
 import { JobCard } from "./job-card";
 
@@ -25,18 +26,20 @@ export const JobListSection = () => {
     filters,
     currentPage,
     pageSize,
+    total,
+    isLoading,
     setCurrentPage,
     setPageSize,
+    fetchJobs,
     getFilteredJobs,
   } = useJobSearchStore();
 
-  // คำนวณ filteredJobs จาก Store
-  const filteredJobs = useMemo(() => getFilteredJobs(), [filters]);
+  const jobs = getFilteredJobs();
 
-  const paginatedJobs = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredJobs.slice(startIndex, startIndex + pageSize);
-  }, [filteredJobs, currentPage, pageSize]);
+  // ✨ ดึงงานใหม่เมื่อ filter หรือ pagination เปลี่ยน
+  useEffect(() => {
+    fetchJobs();
+  }, [filters, currentPage, pageSize]);
 
   return (
     <Flex vertical gap={16}>
@@ -51,7 +54,7 @@ export const JobListSection = () => {
         </Col>
         <Col>
           <Badge
-            count={`ค้นหางานเจอทั้งหมด ${filteredJobs.length} งาน`}
+            count={`ค้นหางานเจอทั้งหมด ${total} งาน`}
             style={{
               backgroundColor: "#f50",
               padding: "0 12px",
@@ -67,8 +70,15 @@ export const JobListSection = () => {
 
       {/* Job Cards */}
       <Space orientation="vertical" size={16} style={{ width: "100%" }}>
-        {paginatedJobs.length > 0 ? (
-          paginatedJobs.map((job) => <JobCard key={job.id} job={job} />)
+        {isLoading ? (
+          // ✨ แสดง Skeleton ขณะโหลด
+          Array.from({ length: pageSize }).map((_, idx) => (
+            <Card key={idx} style={{ borderRadius: token.borderRadiusLG }}>
+              <Skeleton active paragraph={{ rows: 3 }} />
+            </Card>
+          ))
+        ) : jobs.length > 0 ? (
+          jobs.map((job) => <JobCard key={job.id} job={job} />)
         ) : (
           <Card
             style={{
@@ -93,7 +103,7 @@ export const JobListSection = () => {
       </Space>
 
       {/* Pagination */}
-      {filteredJobs.length > 0 && (
+      {total > 0 && !isLoading && (
         <Card
           style={{ borderRadius: token.borderRadiusLG, textAlign: "center" }}
           styles={{ body: { padding: "16px 24px" } }}
@@ -101,7 +111,7 @@ export const JobListSection = () => {
           <Pagination
             current={currentPage}
             pageSize={pageSize}
-            total={filteredJobs.length}
+            total={total}
             onChange={(page, size) => {
               setCurrentPage(page);
               setPageSize(size);
