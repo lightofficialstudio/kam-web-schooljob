@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       salary_min: searchParams.get("salary_min") ?? undefined,
       salary_max: searchParams.get("salary_max") ?? undefined,
       grade_level: searchParams.get("grade_level") ?? undefined,
-      page: searchParams.get("page") ?? undefined,
+      cursor: searchParams.get("cursor") ?? undefined,
       page_size: searchParams.get("page_size") ?? undefined,
     };
 

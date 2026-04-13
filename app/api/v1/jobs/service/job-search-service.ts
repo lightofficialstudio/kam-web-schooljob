@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { JobStatus, LicenseRequired, Prisma } from "@prisma/client";
 import { JobSearchQuery } from "../validation/job-search-schema";
 
-// ✨ ดึงรายการงานสำหรับหน้าค้นหา (Public — เฉพาะ Job ที่ OPEN เท่านั้น)
+// ✨ ดึงรายการงานสำหรับหน้าค้นหา (Public — เฉพาะ Job ที่ OPEN เท่านั้น) — Cursor-based Lazy Loading
 export const searchJobsService = async (query: JobSearchQuery) => {
-  const { keyword, province, school_type, license, salary_min, salary_max, grade_level, page, page_size } = query;
+  const { keyword, province, school_type, license, salary_min, salary_max, grade_level, cursor, page_size } = query;
 
   // ✨ สร้าง where clause สำหรับ filter
   const whereClause: Prisma.JobWhereInput = {
@@ -36,34 +36,30 @@ export const searchJobsService = async (query: JobSearchQuery) => {
     ];
   }
 
-  const skip = (page - 1) * page_size;
-
-  // ✨ ดึง total count และ data พร้อมกัน
-  const [total, jobs] = await Promise.all([
-    prisma.job.count({ where: whereClause }),
-    prisma.job.findMany({
-      where: whereClause,
-      include: {
-        schoolProfile: {
-          select: {
-            id: true,
-            schoolName: true,
-            schoolType: true,
-            province: true,
-            district: true,
-            logoUrl: true,
-          },
+  // ✨ ดึง data เท่านั้น (take + 1 เพื่อตรวจว่ามีหน้าถัดไปหรือไม่ — ไม่ต้อง count ทุก request)
+  const jobs = await prisma.job.findMany({
+    where: whereClause,
+    include: {
+      schoolProfile: {
+        select: {
+          id: true,
+          schoolName: true,
+          schoolType: true,
+          province: true,
+          district: true,
+          logoUrl: true,
         },
-        jobSubjects: { select: { subject: true } },
-        jobGrades: { select: { grade: true } },
-        jobBenefits: { select: { benefit: true } },
-        _count: { select: { applications: true } },
       },
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: page_size,
-    }),
-  ]);
+      jobSubjects: { select: { subject: true } },
+      jobGrades: { select: { grade: true } },
+      jobBenefits: { select: { benefit: true } },
+      _count: { select: { applications: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    // ✨ cursor-based: ข้ามเฉพาะ record เดียว (cursor) แทน skip N records
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    take: page_size + 1, // ✨ ดึงเกิน 1 เพื่อตรวจ hasMore โดยไม่ต้อง COUNT(*)
+  });
 
   // ✨ แปลง LicenseRequired enum → ข้อความภาษาไทย
   const licenseMap: Record<LicenseRequired, string> = {
@@ -72,8 +68,13 @@ export const searchJobsService = async (query: JobSearchQuery) => {
     pending_ok: "มีรับผู้ที่กำลังดำเนินการ",
   };
 
+  // ✨ ตรวจ hasMore จาก record ที่ดึงมาเกิน
+  const hasMore = jobs.length > page_size;
+  const pageJobs = hasMore ? jobs.slice(0, page_size) : jobs;
+  const nextCursor = hasMore ? pageJobs[pageJobs.length - 1].id : null;
+
   // ✨ แปลงโครงสร้างข้อมูลให้ตรงกับ Job interface ฝั่ง frontend
-  const formattedJobs = jobs.map((job) => ({
+  const formattedJobs = pageJobs.map((job) => ({
     id: job.id,
     title: job.title,
     subjects: job.jobSubjects.map((s) => s.subject),
@@ -108,9 +109,8 @@ export const searchJobsService = async (query: JobSearchQuery) => {
 
   return {
     jobs: formattedJobs,
-    total,
-    page,
+    next_cursor: nextCursor,
+    has_more: hasMore,
     page_size,
-    total_pages: Math.ceil(total / page_size),
   };
 };

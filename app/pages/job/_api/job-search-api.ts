@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// ✨ Params สำหรับค้นหางาน
+// ✨ Params สำหรับค้นหางาน (Cursor-based)
 export interface JobSearchParams {
   keyword?: string;
   province?: string;
@@ -9,7 +9,7 @@ export interface JobSearchParams {
   salary_min?: number;
   salary_max?: number;
   grade_level?: string;
-  page?: number;
+  cursor?: string;
   page_size?: number;
 }
 

@@ -2,48 +2,64 @@
 
 import { TeamOutlined } from "@ant-design/icons";
 import {
-  Badge,
+  Button,
   Card,
   Col,
   Flex,
-  Pagination,
   Row,
   Skeleton,
   Space,
   Typography,
   theme as antTheme,
 } from "antd";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useJobSearchStore } from "../_state/job-search-store";
 import { JobCard } from "./job-card";
 
 const { Title: AntTitle, Text } = Typography;
 
-// ส่วนแสดงรายการงาน พร้อม pagination และ empty state
+// ส่วนแสดงรายการงาน พร้อม Lazy Loading (Cursor-based)
 export const JobListSection = () => {
   const { token } = antTheme.useToken();
   const {
     filters,
-    currentPage,
-    pageSize,
-    total,
     isLoading,
-    setCurrentPage,
-    setPageSize,
+    isLoadingMore,
+    hasMore,
     fetchJobs,
+    loadMore,
     getFilteredJobs,
   } = useJobSearchStore();
 
   const jobs = getFilteredJobs();
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // ✨ ดึงงานใหม่เมื่อ filter หรือ pagination เปลี่ยน
+  // ✨ โหลดงานใหม่เมื่อ filter เปลี่ยน
   useEffect(() => {
     fetchJobs();
-  }, [filters, currentPage, pageSize]);
+  }, [filters]);
+
+  // ✨ IntersectionObserver — โหลดเพิ่มเมื่อ scroll ถึงล่างสุด
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore]);
 
   return (
     <Flex vertical gap={16}>
-      {/* Title + Count Badge */}
+      {/* Title */}
       <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
         <Col>
           <AntTitle level={4} style={{ margin: 0 }}>
@@ -53,75 +69,87 @@ export const JobListSection = () => {
           </AntTitle>
         </Col>
         <Col>
-          <Badge
-            count={`ค้นหางานเจอทั้งหมด ${total} งาน`}
-            style={{
-              backgroundColor: "#f50",
-              padding: "0 12px",
-              height: 28,
-              lineHeight: "28px",
-              borderRadius: 14,
-              fontSize: 13,
-              fontWeight: 600,
-            }}
-          />
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {jobs.length > 0 ? `แสดง ${jobs.length} รายการ` : ""}
+          </Text>
         </Col>
       </Row>
 
-      {/* Job Cards */}
-      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
-        {isLoading ? (
-          // ✨ แสดง Skeleton ขณะโหลด
-          Array.from({ length: pageSize }).map((_, idx) => (
+      {/* Initial Loading Skeleton */}
+      {isLoading && (
+        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          {Array.from({ length: 5 }).map((_, idx) => (
             <Card key={idx} style={{ borderRadius: token.borderRadiusLG }}>
               <Skeleton active paragraph={{ rows: 3 }} />
             </Card>
-          ))
-        ) : jobs.length > 0 ? (
-          jobs.map((job) => <JobCard key={job.id} job={job} />)
-        ) : (
-          <Card
-            style={{
-              textAlign: "center",
-              padding: 40,
-              borderRadius: token.borderRadiusLG,
-            }}
-          >
-            <Flex vertical align="center" gap={12}>
-              <TeamOutlined
-                style={{ fontSize: 48, color: token.colorTextQuaternary }}
-              />
-              <AntTitle level={4} style={{ margin: 0 }}>
-                ไม่พบงานที่ตรงตามเงื่อนไข
-              </AntTitle>
-              <Text type="secondary">
-                ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองใหม่อีกครั้ง
-              </Text>
-            </Flex>
-          </Card>
-        )}
-      </Space>
+          ))}
+        </Space>
+      )}
 
-      {/* Pagination */}
-      {total > 0 && !isLoading && (
-        <Card
-          style={{ borderRadius: token.borderRadiusLG, textAlign: "center" }}
-          styles={{ body: { padding: "16px 24px" } }}
+      {/* Job Cards */}
+      {!isLoading && (
+        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          {jobs.length > 0 ? (
+            jobs.map((job) => <JobCard key={job.id} job={job} />)
+          ) : (
+            <Card
+              style={{
+                textAlign: "center",
+                padding: 40,
+                borderRadius: token.borderRadiusLG,
+              }}
+            >
+              <Flex vertical align="center" gap={12}>
+                <TeamOutlined
+                  style={{ fontSize: 48, color: token.colorTextQuaternary }}
+                />
+                <AntTitle level={4} style={{ margin: 0 }}>
+                  ไม่พบงานที่ตรงตามเงื่อนไข
+                </AntTitle>
+                <Text type="secondary">
+                  ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองใหม่อีกครั้ง
+                </Text>
+              </Flex>
+            </Card>
+          )}
+        </Space>
+      )}
+
+      {/* Load More Skeleton (inline) */}
+      {isLoadingMore && (
+        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <Card key={`more-${idx}`} style={{ borderRadius: token.borderRadiusLG }}>
+              <Skeleton active paragraph={{ rows: 2 }} />
+            </Card>
+          ))}
+        </Space>
+      )}
+
+      {/* Sentinel div — trigger IntersectionObserver */}
+      <div ref={sentinelRef} style={{ height: 1 }} />
+
+      {/* Load More Button (fallback / explicit) */}
+      {hasMore && !isLoadingMore && !isLoading && jobs.length > 0 && (
+        <Button
+          type="default"
+          size="large"
+          block
+          onClick={loadMore}
+          style={{ borderRadius: token.borderRadius, marginTop: 8 }}
         >
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            onChange={(page, size) => {
-              setCurrentPage(page);
-              setPageSize(size);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            showSizeChanger
-            pageSizeOptions={["5", "10", "25", "50"]}
-            locale={{ items_per_page: "/ หน้า" }}
-          />
-        </Card>
+          โหลดงานเพิ่มเติม
+        </Button>
+      )}
+
+      {/* End of list */}
+      {!hasMore && !isLoading && jobs.length > 0 && (
+        <Text
+          type="secondary"
+          style={{ textAlign: "center", display: "block", padding: "16px 0", fontSize: 13 }}
+        >
+          แสดงครบทุกตำแหน่งงานแล้ว ({jobs.length} รายการ)
+        </Text>
       )}
     </Flex>
   );
