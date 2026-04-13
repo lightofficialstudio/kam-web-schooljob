@@ -99,19 +99,27 @@ export const JobDetailDrawer = () => {
             justify="center"
             style={{
               height: 240,
-              background: `linear-gradient(135deg, ${token.colorError} 0%, ${token.colorPrimary} 100%)`,
+              background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 50%, #5dd5fb 100%)",
               padding: 40,
               textAlign: "center",
-              
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <Flex vertical>
-              <Title level={2} style={{ color: token.colorWhite, margin: 0 }}>
+            {/* Grid pattern overlay */}
+            <div style={{
+              position: "absolute", inset: 0,
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+              pointerEvents: "none",
+            }} />
+            <Flex vertical style={{ position: "relative", zIndex: 1 }}>
+              <Title level={2} style={{ color: "#fff", margin: 0, letterSpacing: 2 }}>
                 KEEP LEARNING
               </Title>
               <Title
                 level={4}
-                style={{ color: token.colorWhite, opacity: 0.8, marginTop: 8 }}
+                style={{ color: "rgba(255,255,255,0.85)", marginTop: 8 }}
               >
                 AND CURIOUS ON
               </Title>
@@ -135,7 +143,8 @@ export const JobDetailDrawer = () => {
                   <Avatar
                     shape="square"
                     size={80}
-                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${selectedJob.schoolName}&backgroundColor=003366`}
+                    src={selectedJob.logoUrl ?? `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(selectedJob.schoolName)}&backgroundColor=0d8fd4`}
+                    style={{ borderRadius: 12 }}
                   />
                 </Col>
                 <Col flex="auto">
@@ -185,8 +194,8 @@ export const JobDetailDrawer = () => {
                     style={{
                       height: 48,
                       padding: "0 40px",
-                      backgroundColor: "#e60278",
-                      borderColor: "#e60278",
+                      backgroundColor: "#11b6f5",
+                      borderColor: "#11b6f5",
                       fontWeight: 600,
                     }}
                   >
@@ -260,7 +269,8 @@ export const JobDetailDrawer = () => {
                 style={{
                   marginTop: 24,
                   borderRadius: 12,
-                  border: `1px solid ${token.colorBorderSecondary}`,
+                  border: "1px solid rgba(17, 182, 245, 0.35)",
+                  background: "rgba(17, 182, 245, 0.04)",
                 }}
                 styles={{ body: { padding: 24 } }}
               >
@@ -300,15 +310,12 @@ export const JobDetailDrawer = () => {
             {/* Welfare */}
             <Flex vertical style={{ marginTop: 40 }}>
               <Title level={4}>สวัสดิการและสถานที่ทำงาน:</Title>
-              <Space wrap size={[24, 12]}>
-                {[
-                  "ประกันสังคม",
-                  "ประกันสุขภาพกลุ่ม",
-                  "โบนัสประจำปี",
-                  "ชุดยูนิฟอร์ม",
-                  "อาหารกลางวันฟรี",
-                ].map((w) => (
-                  <Tag key={w} color="default" style={{ padding: "4px 12px" }}>
+              <Space wrap size={[8, 12]}>
+                {(selectedJob.benefits && selectedJob.benefits.length > 0
+                  ? selectedJob.benefits
+                  : ["ประกันสังคม", "ประกันสุขภาพกลุ่ม", "โบนัสประจำปี", "ชุดยูนิฟอร์ม", "อาหารกลางวันฟรี"]
+                ).map((w) => (
+                  <Tag key={w} color="#11b6f5" style={{ padding: "4px 12px", borderRadius: 8 }}>
                     {w}
                   </Tag>
                 ))}
@@ -317,12 +324,9 @@ export const JobDetailDrawer = () => {
 
             <Divider style={{ margin: "40px 0" }} />
             <Flex justify="center">
-              <Title
-                level={4}
-                style={{ color: token.colorTextQuaternary, letterSpacing: 2 }}
-              >
+              <Text style={{ color: "#11b6f5", letterSpacing: 3, fontWeight: 600, fontSize: 13, opacity: 0.7 }}>
                 SCHOOL JOB BOARD
-              </Title>
+              </Text>
             </Flex>
           </Layout.Content>
         </Layout>
