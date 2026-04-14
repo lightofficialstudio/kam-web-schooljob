@@ -155,20 +155,32 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
               {profile.name}
             </Title>
             <Flex gap={6} wrap="wrap" justify="center">
-              <Tag icon={<CheckCircleFilled />} color="success" style={{ fontSize: 12 }}>
+              <Tag
+                icon={<CheckCircleFilled />}
+                color="success"
+                style={{ fontSize: 12 }}
+              >
                 ยืนยันตัวตนแล้ว
               </Tag>
               {profile.type && (
-                <Tag color="blue" style={{ fontSize: 12 }}>{profile.type}</Tag>
+                <Tag color="blue" style={{ fontSize: 12 }}>
+                  {profile.type}
+                </Tag>
               )}
               {/* ✨ แสดง Account Plan badge */}
               {profile.accountPlan && profile.accountPlan !== "basic" && (
                 <Tag
                   icon={<CrownOutlined />}
-                  color={profile.accountPlan === "enterprise" ? "purple" : "gold"}
+                  color={
+                    profile.accountPlan === "enterprise" ? "purple" : "gold"
+                  }
                   style={{ fontSize: 12 }}
                 >
-                  {profile.accountPlan === "premium" ? "Premium" : profile.accountPlan === "enterprise" ? "Enterprise" : profile.accountPlan}
+                  {profile.accountPlan === "premium"
+                    ? "Premium"
+                    : profile.accountPlan === "enterprise"
+                      ? "Enterprise"
+                      : profile.accountPlan}
                 </Tag>
               )}
             </Flex>
@@ -187,7 +199,9 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
           >
             <Descriptions.Item label={<EnvironmentOutlined />}>
               <Text>
-                {[profile.district, profile.location].filter(Boolean).join(", ")}
+                {[profile.district, profile.location]
+                  .filter(Boolean)
+                  .join(", ")}
               </Text>
             </Descriptions.Item>
             {profile.website && (
