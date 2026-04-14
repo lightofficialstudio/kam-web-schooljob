@@ -13,6 +13,7 @@ export interface Job {
   description: string;
   educationLevel: string;
   teachingExperience: string;
+  qualifications: string;
   licenseRequired: string;
   gender: string;
   jobType?: string;
@@ -190,10 +191,11 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
         salaryMin: d.salaryMin ?? undefined,
         salaryMax: d.salaryMax ?? undefined,
         description: d.description ?? "",
-        educationLevel: "",
-        teachingExperience: "",
+        educationLevel: d.educationLevel ?? "",
+        teachingExperience: d.experience ?? "",
+        qualifications: d.qualifications ?? "",
         licenseRequired: d.licenseRequired ?? "",
-        gender: "ไม่จำกัด",
+        gender: d.gender ?? "ไม่จำกัด",
         jobType: d.jobType ?? undefined,
         schoolName: d.schoolName ?? "",
         schoolType: d.schoolType ?? "",

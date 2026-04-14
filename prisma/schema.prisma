@@ -335,6 +335,10 @@ model Job {
   salaryNegotiable   Boolean         @default(false) @map("salary_negotiable") // เงินเดือนต่อรองได้
   licenseRequired    LicenseRequired @default(not_required) @map("license_required")
   positionsAvailable Int             @default(1) @map("positions_available") // จำนวนที่รับสมัคร
+  educationLevel     String?         @map("education_level") // ปริญญาตรีขึ้นไป, ปริญญาโท ฯลฯ
+  experience         String?         // ประสบการณ์สอนที่ต้องการ เช่น 1-3 ปี
+  qualifications     String?         // คุณสมบัติเพิ่มเติม (free text)
+  gender             String?         // เพศ: ไม่จำกัด, ชาย, หญิง
   status             JobStatus       @default(DRAFT)
   deadline           DateTime? // วันหมดรับสมัคร
   createdAt          DateTime        @default(now()) @map("created_at")

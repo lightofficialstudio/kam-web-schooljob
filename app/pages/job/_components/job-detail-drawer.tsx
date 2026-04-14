@@ -382,62 +382,82 @@ export const JobDetailDrawer = () => {
               </Flex>
             </Card>
 
-            {/* Roles & Responsibilities */}
-            <Flex vertical style={{ marginTop: 40 }}>
-              <Title level={4}>หน้าที่และความรับผิดชอบ:</Title>
-              <ul
-                style={{
-                  paddingLeft: 20,
-                  lineHeight: 2,
-                  color: token.colorText,
-                  fontSize: 15,
-                }}
-              >
-                <li>
-                  <strong>จัดการเรียนการสอน:</strong> {selectedJob.description}{" "}
-                  ในระดับชั้น {selectedJob.grades.join(", ")}
-                </li>
-                <li>
-                  <strong>เตรียมแผนการจัดการเรียนรู้:</strong>{" "}
-                  ออกแบบกิจกรรมการเรียนรู้ที่สอดคล้องกับหลักสูตรและเน้นผู้เรียนเป็นสำคัญ
-                </li>
-                <li>
-                  <strong>วัดและประเมินผล:</strong>{" "}
-                  ประเมินพัฒนาการของนักเรียนอย่างต่อเนื่องและจัดทำรายงานผลการเรียน
-                </li>
-                <li>
-                  <strong>ให้คำปรึกษา:</strong>{" "}
-                  ดูแลความประพฤติและให้คำแนะนำแก่นักเรียนร่วมกับผู้ปกครอง
-                </li>
-                <li>
-                  เข้าร่วมกิจกรรมต่างๆ ของโรงเรียนและพัฒนาตนเองอย่างสม่ำเสมอ
-                </li>
-              </ul>
-            </Flex>
+            {/* หน้าที่และความรับผิดชอบ — ดึงจาก description จริง */}
+            {selectedJob.description && (
+              <Flex vertical style={{ marginTop: 40 }}>
+                <Title level={4}>หน้าที่และความรับผิดชอบ</Title>
+                <Card
+                  variant="borderless"
+                  style={{
+                    background: token.colorBgLayout,
+                    borderRadius: token.borderRadius,
+                  }}
+                  styles={{ body: { padding: "16px 20px" } }}
+                >
+                  <Text style={{ fontSize: 15, lineHeight: 2, whiteSpace: "pre-line" }}>
+                    {selectedJob.description}
+                  </Text>
+                  {selectedJob.grades.length > 0 && (
+                    <Flex gap={6} wrap="wrap" style={{ marginTop: 12 }}>
+                      <Text type="secondary" style={{ fontSize: 13 }}>ระดับชั้น:</Text>
+                      {selectedJob.grades.map((g) => (
+                        <Tag key={g} style={{ borderRadius: 6 }}>{g}</Tag>
+                      ))}
+                    </Flex>
+                  )}
+                </Card>
+              </Flex>
+            )}
 
-            {/* Qualifications */}
+            {/* คุณสมบัติผู้สมัคร — ดึงจาก DB จริง ไม่ hardcode */}
             <Flex vertical style={{ marginTop: 40 }}>
-              <Title level={4}>คุณสมบัติผู้สมัคร:</Title>
-              <ul
-                style={{
-                  paddingLeft: 20,
-                  lineHeight: 2,
-                  color: token.colorText,
-                  fontSize: 15,
-                }}
-              >
-                <li>
-                  วุฒิการศึกษระดับ {selectedJob.educationLevel}{" "}
-                  ในสาขาที่เกี่ยวข้อง
-                </li>
-                <li>มีทักษะในการสื่อสารดีเยี่ยมและมีจิตวิทยาในการสอนเด็ก</li>
-                <li>
-                  หากมีใบอนุญาตประกอบวิชาชีพครู ({selectedJob.licenseRequired})
-                  จะพิจารณาเป็นพิเศษ
-                </li>
-                <li>มีประสบการณ์การสอน {selectedJob.teachingExperience}</li>
-                <li>สามารถทำงานร่วมกับผู้อื่นได้ดีและมีความรับผิดชอบสูง</li>
-              </ul>
+              <Title level={4}>คุณสมบัติผู้สมัคร</Title>
+              <Flex vertical gap={8}>
+                {selectedJob.educationLevel && (
+                  <Flex gap={10} align="flex-start">
+                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <Text style={{ fontSize: 15 }}>
+                      วุฒิการศึกษาระดับ <Text strong>{selectedJob.educationLevel}</Text>
+                    </Text>
+                  </Flex>
+                )}
+                {selectedJob.teachingExperience && (
+                  <Flex gap={10} align="flex-start">
+                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <Text style={{ fontSize: 15 }}>
+                      ประสบการณ์สอน <Text strong>{selectedJob.teachingExperience}</Text>
+                    </Text>
+                  </Flex>
+                )}
+                {selectedJob.licenseRequired && (
+                  <Flex gap={10} align="flex-start">
+                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <Text style={{ fontSize: 15 }}>
+                      ใบอนุญาตประกอบวิชาชีพครู: <Text strong>{selectedJob.licenseRequired}</Text>
+                    </Text>
+                  </Flex>
+                )}
+                {selectedJob.gender && selectedJob.gender !== "ไม่จำกัด" && (
+                  <Flex gap={10} align="flex-start">
+                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <Text style={{ fontSize: 15 }}>
+                      เพศ <Text strong>{selectedJob.gender}</Text>
+                    </Text>
+                  </Flex>
+                )}
+                {selectedJob.qualifications && (
+                  <Flex gap={10} align="flex-start">
+                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <Text style={{ fontSize: 15, whiteSpace: "pre-line" }}>
+                      {selectedJob.qualifications}
+                    </Text>
+                  </Flex>
+                )}
+                {/* fallback เมื่อยังไม่ได้กรอกข้อมูล */}
+                {!selectedJob.educationLevel && !selectedJob.teachingExperience && !selectedJob.qualifications && (
+                  <Text type="secondary" style={{ fontSize: 14 }}>โรงเรียนยังไม่ได้ระบุคุณสมบัติเพิ่มเติม</Text>
+                )}
+              </Flex>
             </Flex>
 
             {/* How You Match — แสดงเมื่อ Login แล้ว */}

@@ -73,6 +73,10 @@ export const createJobService = async (
         salaryMax: payload.salary_max ?? null,
         salaryNegotiable: payload.salary_negotiable ?? false,
         description: payload.description ?? null,
+        educationLevel: payload.education_level ?? null,
+        experience: payload.experience ?? null,
+        qualifications: payload.qualifications ?? null,
+        gender: payload.gender ?? null,
         province: payload.province,
         district: payload.area ?? null,
         deadline,
@@ -158,6 +162,18 @@ export const updateJobService = async (
         }),
         ...(payload.description !== undefined && {
           description: payload.description ?? null,
+        }),
+        ...(payload.education_level !== undefined && {
+          educationLevel: payload.education_level ?? null,
+        }),
+        ...(payload.experience !== undefined && {
+          experience: payload.experience ?? null,
+        }),
+        ...(payload.qualifications !== undefined && {
+          qualifications: payload.qualifications ?? null,
+        }),
+        ...(payload.gender !== undefined && {
+          gender: payload.gender ?? null,
         }),
         ...(payload.province !== undefined && { province: payload.province }),
         ...(payload.area !== undefined && { district: payload.area ?? null }),
