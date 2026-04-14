@@ -2,14 +2,18 @@
 
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
+  BankOutlined,
+  BookOutlined,
   CheckCircleFilled,
   ClockCircleOutlined,
   CloseOutlined,
   EnvironmentOutlined,
+  FireOutlined,
   InfoCircleOutlined,
   MoreOutlined,
   ShareAltOutlined,
   TeamOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -37,6 +41,209 @@ dayjs.extend(relativeTime);
 dayjs.locale("th");
 
 const { Title, Text } = Typography;
+
+// ✨ ชุด banner สำหรับสุ่มแสดงเมื่อโรงเรียนไม่ได้อัปโหลดรูป
+const BANNER_THEMES = [
+  {
+    gradient: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 55%, #5dd5fb 100%)",
+    headline: (school: string) => school,
+    sub: "เปิดรับสมัครบุคลากรทางการศึกษา",
+    accent: "กำลังมองหาครูผู้มีอุดมการณ์",
+    Icon: BankOutlined,
+  },
+  {
+    gradient: "linear-gradient(135deg, #0878a8 0%, #0d8fd4 50%, #11b6f5 100%)",
+    headline: () => "ร่วมทีมวิชาการ",
+    sub: "กับ {school}",
+    accent: "สร้างอนาคตที่ดีให้เยาวชนไทยไปด้วยกัน",
+    Icon: BookOutlined,
+  },
+  {
+    gradient: "linear-gradient(135deg, #001e45 0%, #0a4a8a 60%, #11b6f5 100%)",
+    headline: () => "ตำแหน่งว่างใหม่",
+    sub: "โรงเรียนกำลังมองหาครูที่ใช่",
+    accent: "สมัครได้วันนี้ — อย่าพลาดโอกาสนี้",
+    Icon: ThunderboltOutlined,
+  },
+  {
+    gradient: "linear-gradient(135deg, #0d8fd4 0%, #0878a8 40%, #055a7a 100%)",
+    headline: () => "รับสมัครครูด่วน",
+    sub: "มีตำแหน่งว่างหลายอัตรา รอคุณอยู่",
+    accent: "เปิดรับสมัครอย่างเป็นทางการ",
+    Icon: FireOutlined,
+  },
+];
+
+// ✨ Banner ของ Drawer — แสดงรูปจริงถ้ามี, ไม่มีสุ่ม banner สำหรับประกาศรับสมัคร
+const JobBanner = ({ job }: { job: { id: string; schoolName: string; logoUrl?: string; subjects: string[]; vacancyCount: number } }) => {
+  // ✨ กำหนด theme ตาม job.id (คงที่ต่อ job ไม่เปลี่ยนทุก render)
+  const themeIndex = job.id.charCodeAt(0) % BANNER_THEMES.length;
+  const theme = BANNER_THEMES[themeIndex];
+  const { Icon } = theme;
+
+  // ✨ Decorators ที่ใช้ร่วมกันทั้ง 2 โหมด
+  const SharedDecorators = () => (
+    <>
+      {/* grid */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundSize: "48px 48px",
+      }} />
+      {/* glow top-right */}
+      <div style={{
+        position: "absolute", top: "-30%", right: "-8%", pointerEvents: "none",
+        width: 360, height: 360, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,255,255,0.11) 0%, transparent 65%)",
+      }} />
+      {/* glow bottom-left */}
+      <div style={{
+        position: "absolute", bottom: "-40%", left: "-6%", pointerEvents: "none",
+        width: 280, height: 280, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(17,182,245,0.18) 0%, transparent 65%)",
+      }} />
+      {/* shimmer sweep — CSS keyframe via style tag */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.07) 50%, transparent 60%)",
+        backgroundSize: "200% 100%",
+        animation: "bannerShimmer 4s ease-in-out infinite",
+      }} />
+      {/* bottom fade → content card ลอยขึ้น smooth */}
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: 64, pointerEvents: "none",
+        background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.18) 100%)",
+      }} />
+    </>
+  );
+
+  // ✨ มีรูปโรงเรียน → blur เป็น BG + โลโก้ชัดพร้อม glow ring
+  if (job.logoUrl) {
+    return (
+      <div style={{ height: 240, position: "relative", overflow: "hidden", background: "#07101f" }}>
+        {/* รูป blur */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(${job.logoUrl})`,
+          backgroundSize: "cover", backgroundPosition: "center",
+          filter: "blur(28px) brightness(0.25) saturate(1.4)",
+          transform: "scale(1.14)",
+        }} />
+        {/* overlay gradient */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(160deg, rgba(13,143,212,0.25) 0%, rgba(0,15,40,0.7) 100%)",
+        }} />
+        <SharedDecorators />
+
+        {/* content */}
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center",
+          gap: 20, padding: "0 48px",
+        }}>
+          {/* logo card + blue ring */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            {/* glow ring */}
+            <div style={{
+              position: "absolute", inset: -4, borderRadius: 20,
+              background: "linear-gradient(135deg, rgba(17,182,245,0.6) 0%, rgba(93,213,251,0.3) 100%)",
+              filter: "blur(6px)",
+            }} />
+            <div style={{
+              position: "relative", width: 80, height: 80, borderRadius: 16,
+              background: "#fff", overflow: "hidden",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px rgba(17,182,245,0.4)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={job.logoUrl} alt={job.schoolName} style={{ width: 64, height: 64, objectFit: "contain" }} />
+            </div>
+          </div>
+
+          {/* text */}
+          <div>
+            {/* pill */}
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 5,
+              background: "rgba(17,182,245,0.25)", backdropFilter: "blur(10px)",
+              border: "1px solid rgba(17,182,245,0.45)",
+              borderRadius: 100, padding: "3px 12px", marginBottom: 10,
+            }}>
+              <BankOutlined style={{ fontSize: 11, color: "#5dd5fb" }} />
+              <Text style={{ color: "#5dd5fb", fontSize: 11, fontWeight: 600, letterSpacing: 0.4 }}>
+                เปิดรับสมัคร {job.vacancyCount} อัตรา
+              </Text>
+            </div>
+            <Title level={3} style={{ color: "#fff", margin: 0, lineHeight: 1.25, textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}>
+              {job.schoolName}
+            </Title>
+            {job.subjects.length > 0 && (
+              <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginTop: 4, display: "block" }}>
+                {job.subjects.slice(0, 3).join(" · ")}
+              </Text>
+            )}
+          </div>
+        </div>
+
+        {/* shimmer keyframe */}
+        <style>{`@keyframes bannerShimmer { 0%,100%{background-position:200% 0} 50%{background-position:0% 0} }`}</style>
+      </div>
+    );
+  }
+
+  // ✨ ไม่มีรูป → banner gradient + decorators + left-aligned content
+  const headline = theme.headline(job.schoolName);
+  const sub = theme.sub.replace("{school}", job.schoolName);
+
+  return (
+    <div style={{
+      height: 240, background: theme.gradient,
+      position: "relative", overflow: "hidden",
+    }}>
+      <SharedDecorators />
+
+      {/* large ghost icon — bottom-right depth layer */}
+      <Icon style={{
+        position: "absolute", bottom: -20, right: 20, pointerEvents: "none",
+        fontSize: 180, color: "rgba(255,255,255,0.045)",
+        lineHeight: 1,
+      }} />
+
+      {/* content */}
+      <div style={{
+        position: "relative", zIndex: 1,
+        padding: "0 48px", height: "100%",
+        display: "flex", flexDirection: "column", justifyContent: "center",
+      }}>
+        {/* pill badge */}
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 6, alignSelf: "flex-start",
+          background: "rgba(255,255,255,0.14)", backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.22)",
+          borderRadius: 100, padding: "5px 14px", marginBottom: 18,
+        }}>
+          <Icon style={{ fontSize: 11, color: "#fff" }} />
+          <Text style={{ color: "#fff", fontSize: 12, fontWeight: 600, letterSpacing: 0.4 }}>
+            เปิดรับสมัคร {job.vacancyCount} อัตรา
+          </Text>
+        </div>
+
+        <Title level={2} style={{ color: "#fff", margin: 0, lineHeight: 1.15, fontWeight: 700, letterSpacing: -0.3 }}>
+          {headline}
+        </Title>
+        <Title level={5} style={{ color: "rgba(255,255,255,0.82)", margin: "6px 0 0", fontWeight: 400 }}>
+          {sub}
+        </Title>
+        <Text style={{ color: "rgba(255,255,255,0.48)", fontSize: 11, display: "block", marginTop: 12, letterSpacing: 1.2, fontWeight: 500 }}>
+          {theme.accent.toUpperCase()}
+        </Text>
+      </div>
+
+      <style>{`@keyframes bannerShimmer { 0%,100%{background-position:200% 0} 50%{background-position:0% 0} }`}</style>
+    </div>
+  );
+};
 
 // Drawer แสดงรายละเอียดงานแบบเต็ม (80% width) พร้อมปุ่มสมัคร
 export const JobDetailDrawer = () => {
@@ -93,38 +300,8 @@ export const JobDetailDrawer = () => {
             </Flex>
           </Layout.Header>
 
-          {/* Banner */}
-          <Flex
-            align="center"
-            justify="center"
-            style={{
-              height: 240,
-              background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 50%, #5dd5fb 100%)",
-              padding: 40,
-              textAlign: "center",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* Grid pattern overlay */}
-            <div style={{
-              position: "absolute", inset: 0,
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-              pointerEvents: "none",
-            }} />
-            <Flex vertical style={{ position: "relative", zIndex: 1 }}>
-              <Title level={2} style={{ color: "#fff", margin: 0, letterSpacing: 2 }}>
-                KEEP LEARNING
-              </Title>
-              <Title
-                level={4}
-                style={{ color: "rgba(255,255,255,0.85)", marginTop: 8 }}
-              >
-                AND CURIOUS ON
-              </Title>
-            </Flex>
-          </Flex>
+          {/* Banner — ใช้รูปโรงเรียนถ้ามี, ถ้าไม่มีสุ่ม banner ที่สื่อถึงประกาศรับสมัคร */}
+          <JobBanner job={selectedJob} />
 
           {/* Content */}
           <Layout.Content style={{ padding: "0 40px 80px", marginTop: -40 }}>
