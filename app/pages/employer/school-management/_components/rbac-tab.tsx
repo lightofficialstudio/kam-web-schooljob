@@ -1307,7 +1307,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
             >
               <Alert
                 style={{ marginBottom: 16, borderRadius: 8 }}
-                message="Role Assignment"
+                title="Role Assignment"
                 description="เปลี่ยน Role ของสมาชิกได้โดยตรง — ระบบจะอัปเดตทันที กด 'ดูรายละเอียด' เพื่อตรวจสอบ Effective Permissions"
                 type="info"
                 showIcon
