@@ -24,6 +24,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Avatar,
   Badge,
   Breadcrumb,
@@ -268,6 +269,7 @@ const EditMemberModal = ({
 
 // ─── หน้าหลัก ─────────────────────────────────────────────────────────────────
 export default function SchoolManagementPage() {
+  const { modal } = App.useApp();
   const { token } = theme.useToken();
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
@@ -340,7 +342,7 @@ export default function SchoolManagementPage() {
 
   const handleRemoveMember = (member: OrgMember) => {
     const displayName = [member.profile.firstName, member.profile.lastName].filter(Boolean).join(" ") || member.profile.email;
-    Modal.confirm({
+    modal.confirm({
       title: `ลบ ${displayName} ออกจากทีม?`,
       content: "สมาชิกจะสูญเสียสิทธิ์การเข้าถึงระบบทั้งหมดทันที",
       okText: "ยืนยัน ลบออก",
@@ -359,7 +361,7 @@ export default function SchoolManagementPage() {
   };
 
   const handleCancelInvite = (invite: OrgInvite) => {
-    Modal.confirm({
+    modal.confirm({
       title: "ยกเลิกคำเชิญ?",
       content: `คำเชิญที่ส่งไป ${invite.email} จะถูกยกเลิก`,
       okText: "ยืนยัน",

@@ -12,12 +12,12 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Badge,
   Button,
   Card,
   Empty,
   Flex,
-  Modal,
   Space,
   Table,
   Tag,
@@ -37,6 +37,7 @@ const PRIMARY = "#11b6f5";
 
 // ตารางประกาศรับสมัครครู — ข้อมูลครบถ้วนสำหรับฝ่ายบุคลากร
 export const JobsTable = () => {
+  const { modal } = App.useApp();
   const { jobs, searchKeyword, activeTab, closeJob } = useJobReadStore();
   const { openDrawer } = useApplicantDrawerStore();
   const { openModal: openStatsModal } = useJobStatsModalStore();
@@ -44,7 +45,7 @@ export const JobsTable = () => {
   const { user } = useAuthStore();
 
   const handleCloseJob = (record: JobRecord) => {
-    Modal.confirm({
+    modal.confirm({
       title: "ปิดรับสมัครประกาศนี้?",
       content: `"${record.title}" จะถูกเปลี่ยนเป็นสถานะปิดรับสมัคร ผู้สมัครจะไม่สามารถสมัครเพิ่มได้`,
       okText: "ยืนยัน ปิดรับสมัคร",

@@ -1,6 +1,11 @@
 "use client";
 
-import { theme as antTheme, ConfigProvider, type ThemeConfig } from "antd";
+import {
+  theme as antTheme,
+  App,
+  ConfigProvider,
+  type ThemeConfig,
+} from "antd";
 import {
   createContext,
   ReactNode,
@@ -243,7 +248,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <ConfigProvider theme={themeConfig}>{children}</ConfigProvider>
+      <ConfigProvider theme={themeConfig}>
+        <App>{children}</App>
+      </ConfigProvider>
     </ThemeContext.Provider>
   );
 }
