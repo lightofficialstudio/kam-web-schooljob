@@ -6,7 +6,6 @@ import {
   CheckCircleFilled,
   CrownOutlined,
   LockOutlined,
-  Space,
   ThunderboltOutlined,
   UpCircleOutlined,
 } from "@ant-design/icons";
@@ -17,6 +16,7 @@ import {
   Flex,
   Progress,
   Skeleton,
+  Space,
   Tag,
   theme,
   Tooltip,
@@ -176,12 +176,20 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
           />
 
           {/* ─── Quota Usage ─── */}
-          <Flex vertical gap={6} style={{ minWidth: 260, flex: 2, padding: "4px 0" }}>
+          <Flex
+            vertical
+            gap={6}
+            style={{ minWidth: 260, flex: 2, padding: "4px 0" }}
+          >
             <Flex align="center" justify="space-between">
               <Space gap={6} align="center">
                 <Text style={{ fontSize: 13, fontWeight: 700 }}>Job Quota</Text>
-                <Tag color={pkg.isAtLimit ? "error" : "primary"} style={{ margin: 0, fontSize: 10, borderRadius: 4 }}>
-                  {pkg.jobQuotaUsed} / {pkg.jobQuotaMax === 999 ? "∞" : pkg.jobQuotaMax}
+                <Tag
+                  color={pkg.isAtLimit ? "error" : "primary"}
+                  style={{ margin: 0, fontSize: 10, borderRadius: 4 }}
+                >
+                  {pkg.jobQuotaUsed} /{" "}
+                  {pkg.jobQuotaMax === 999 ? "∞" : pkg.jobQuotaMax}
                 </Tag>
               </Space>
               <Text type="secondary" style={{ fontSize: 11 }}>
@@ -189,31 +197,11 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
               </Text>
             </Flex>
             <Progress
-              <Flex align="center" gap={6}>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: progressColor,
-                  }}
-                >
-                  {pkg.jobQuotaUsed}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  / {pkg.jobQuotaMax === 999 ? "∞" : pkg.jobQuotaMax} ประกาศ
-                </Text>
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  ({pkg.quotaUsagePercent}%)
-                </Text>
-              </Flex>
-            </Flex>
-            <Progress
               percent={pkg.quotaUsagePercent}
-              size="small"
+              size={[undefined, 8]}
               showInfo={false}
               strokeColor={progressColor}
               railColor={token.colorFillQuaternary}
-              strokeWidth={8}
             />
             <Flex align="center" justify="space-between">
               <Text type="secondary" style={{ fontSize: 11 }}>
@@ -221,7 +209,9 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
                   ? "ใช้ quota ครบแล้ว — ต้องอัปเกรดเพื่อลงประกาศเพิ่ม"
                   : `เหลืออีก ${pkg.jobQuotaRemaining} ตำแหน่งที่ลงได้`}
               </Text>
-              <Text style={{ fontSize: 11, fontWeight: 700, color: progressColor }}>
+              <Text
+                style={{ fontSize: 11, fontWeight: 700, color: progressColor }}
+              >
                 {pkg.quotaUsagePercent}%
               </Text>
             </Flex>
