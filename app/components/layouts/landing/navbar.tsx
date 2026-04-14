@@ -25,6 +25,7 @@ import {
   Tooltip,
   Typography,
 } from "antd";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -65,11 +66,11 @@ export default function Navbar() {
   // ✨ ดึง delegated access เฉพาะ EMPLOYEE — EMPLOYER เจ้าของไม่มี delegated
   useEffect(() => {
     if (!user?.user_id || user.role === "EMPLOYER") return;
-    fetch(`/api/v1/employer/organization/delegated?user_id=${user.user_id}`)
-      .then((r) => r.json())
+    axios
+      .get(`/api/v1/employer/organization/delegated?user_id=${user.user_id}`)
       .then((res) => {
-        if (res.status_code === 200 && Array.isArray(res.data)) {
-          setDelegatedSchools(res.data);
+        if (res.data.status_code === 200 && Array.isArray(res.data.data)) {
+          setDelegatedSchools(res.data.data);
         }
       })
       .catch(() => {/* ไม่แสดง error บน Navbar */});
@@ -509,13 +510,14 @@ export default function Navbar() {
               {scrolled && (
                 <Avatar
                   size={32}
+                  src={user.profile_image_url || undefined}
                   style={{
                     backgroundColor: token.colorPrimary,
                     cursor: "pointer",
                     flexShrink: 0,
                   }}
                 >
-                  {user.full_name.charAt(0).toUpperCase()}
+                  {!user.profile_image_url && user.full_name.charAt(0).toUpperCase()}
                 </Avatar>
               )}
 

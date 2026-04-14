@@ -126,12 +126,13 @@ export class AuthenticateService {
       console.log(`   📧 User email: ${data.user?.email}`);
       console.log(`   💾 User metadata:`, data.user?.user_metadata);
 
-      // 2. ✨ [ดึงข้อมูล extra จาก Prisma (optional)]
+      // 2. ✨ [ดึงข้อมูล extra จาก Prisma พร้อม SchoolProfile สำหรับ EMPLOYER]
       let profile = null;
       if (data.user) {
         try {
           profile = await prisma.profile.findUnique({
             where: { userId: data.user.id },
+            include: { schoolProfile: true },
           });
           console.log(`✅ [SIGNIN] Profile fetched from Prisma:`, profile?.id);
         } catch (prismaError) {
@@ -143,11 +144,13 @@ export class AuthenticateService {
         }
       }
 
-      // 3. ✨ [รวมข้อมูล Supabase + Prisma]
-      const fullName =
-        data.user?.user_metadata?.full_name || profile?.firstName || "";
+      // 3. ✨ [รวมข้อมูล Supabase + Prisma — EMPLOYER ใช้ schoolName แทน firstName]
       const role =
         data.user?.user_metadata?.role || profile?.role || "EMPLOYEE";
+      const isEmployer = role === "EMPLOYER";
+      const fullName = isEmployer
+        ? profile?.schoolProfile?.schoolName || profile?.firstName || data.user?.user_metadata?.full_name || ""
+        : data.user?.user_metadata?.full_name || profile?.firstName || "";
 
       console.log(`✅ [SIGNIN] Ready to return user data:`, {
         user_id: data.user?.id,

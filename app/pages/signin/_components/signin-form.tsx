@@ -76,6 +76,7 @@ export const SigninForm = () => {
         full_name: result.data.full_name,
         role: result.data.role,
         is_first_login: result.data.is_first_login || false,
+        profile_image_url: result.data.profile_image_url || undefined,
       });
 
       showModal("success", "เข้าสู่ระบบสำเร็จ", result.message_th || "เข้าสู่ระบบเรียบร้อยแล้ว");
