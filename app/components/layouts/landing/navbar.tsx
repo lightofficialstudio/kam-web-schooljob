@@ -79,7 +79,7 @@ export default function Navbar() {
   const userMenuItems = [
     {
       key: "profile",
-      label: "โปรไฟล์ของฉัน",
+      label: user?.role === "EMPLOYER" ? "โปรไฟล์โรงเรียน" : "โปรไฟล์ของฉัน",
       icon: <UserOutlined />,
       onClick: () => {
         if (user?.role === "EMPLOYER") {

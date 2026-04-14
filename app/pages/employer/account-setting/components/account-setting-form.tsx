@@ -1,16 +1,19 @@
 "use client";
 
-// ✨ ฟอร์มตั้งค่าบัญชี Employer — ข้อมูลส่วนตัวผู้ดูแล, เปลี่ยนอีเมล, เปลี่ยนรหัสผ่าน
+// ✨ ฟอร์มตั้งค่าบัญชี Employer — ข้อมูลส่วนตัวผู้ดูแล, เปลี่ยนรหัสผ่าน, ข้อมูลบัญชี
 import {
+  CheckCircleOutlined,
+  CopyOutlined,
+  IdcardOutlined,
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
+  SafetyCertificateOutlined,
   SaveOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
   Button,
-  Card,
   Col,
   Divider,
   Flex,
@@ -18,6 +21,8 @@ import {
   Input,
   message,
   Row,
+  Tag,
+  theme,
   Typography,
 } from "antd";
 import { useEffect } from "react";
@@ -32,10 +37,62 @@ import { useAccountSettingStore } from "../_state/account-setting-store";
 
 const { Title, Text, Paragraph } = Typography;
 
+// ✨ Section header พร้อม icon pill
+const SectionHeader: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  color: string;
+}> = ({ icon, title, desc, color }) => {
+  const { token } = theme.useToken();
+  return (
+    <Flex align="flex-start" gap={16} style={{ marginBottom: 28 }}>
+      <Flex
+        align="center"
+        justify="center"
+        style={{
+          width: 48, height: 48, borderRadius: 14,
+          background: `linear-gradient(135deg, ${color}22 0%, ${color}44 100%)`,
+          border: `1.5px solid ${color}44`,
+          color: color, fontSize: 20, flexShrink: 0,
+        }}
+      >
+        {icon}
+      </Flex>
+      <Flex vertical gap={2}>
+        <Title level={4} style={{ margin: 0 }}>{title}</Title>
+        <Text type="secondary" style={{ fontSize: 13 }}>{desc}</Text>
+      </Flex>
+    </Flex>
+  );
+};
+
+// ✨ Card wrapper มี top accent bar
+const SectionCard: React.FC<{ children: React.ReactNode; accentColor: string }> = ({ children, accentColor }) => {
+  const { token } = theme.useToken();
+  return (
+    <div
+      style={{
+        background: token.colorBgContainer,
+        borderRadius: 16,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        overflow: "hidden",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+      }}
+    >
+      {/* Accent bar */}
+      <div style={{ height: 4, background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}55 100%)` }} />
+      <div style={{ padding: "28px 28px 24px" }}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function AccountSettingForm() {
-  const { user, setUser } = useAuthStore();
+  const { user } = useAuthStore();
+  const { token } = theme.useToken();
   const {
-    personalInfo,
     isLoadingPersonal,
     isLoadingPassword,
     setPersonalInfo,
@@ -53,7 +110,6 @@ export default function AccountSettingForm() {
       .then((res) => {
         const d = res.data?.data;
         if (!d) return;
-        // ✨ ดึง firstName/lastName/phoneNumber จาก profile (ไม่ใช่ schoolName)
         const info = {
           firstName: d.contact_person_name || d.first_name || "",
           lastName: d.last_name || "",
@@ -66,7 +122,7 @@ export default function AccountSettingForm() {
           phone_number: info.phoneNumber,
         });
       })
-      .catch(() => {/* ไม่แสดง error ถ้าโหลดไม่สำเร็จ */});
+      .catch(() => {});
   }, [user?.user_id]);
 
   // ✨ บันทึกข้อมูลส่วนตัว
@@ -112,86 +168,114 @@ export default function AccountSettingForm() {
   };
 
   return (
-    <Flex vertical gap={24}>
+    <Flex vertical gap={20}>
 
-      {/* ─── ข้อมูลส่วนตัวผู้ดูแลระบบ ─── */}
-      <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <Flex align="center" gap={10} style={{ marginBottom: 4 }}>
-          <UserOutlined style={{ fontSize: 20 }} />
-          <Title level={4} style={{ margin: 0 }}>ข้อมูลส่วนตัวผู้ดูแลระบบ</Title>
-        </Flex>
-        <Paragraph type="secondary" style={{ marginBottom: 20 }}>
-          ชื่อ-นามสกุล และเบอร์โทรของผู้ดูแลระบบ (แยกจากชื่อโรงเรียน)
-        </Paragraph>
-        <Form
-          form={personalForm}
-          layout="vertical"
-          onFinish={handleSavePersonal}
-          size="large"
-        >
-          <Row gutter={16}>
+      {/* ─── Section 1: ข้อมูลส่วนตัว ─── */}
+      <SectionCard accentColor="#11b6f5">
+        <SectionHeader
+          icon={<UserOutlined />}
+          title="ข้อมูลส่วนตัวผู้ดูแลระบบ"
+          desc="ชื่อ-นามสกุล และเบอร์โทรของผู้ดูแล (แยกจากชื่อโรงเรียน)"
+          color="#11b6f5"
+        />
+        <Form form={personalForm} layout="vertical" onFinish={handleSavePersonal} size="large">
+          <Row gutter={[16, 0]}>
             <Col xs={24} md={12}>
               <Form.Item
                 name="first_name"
                 label="ชื่อ"
                 rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
               >
-                <Input prefix={<UserOutlined />} placeholder="ชื่อผู้ดูแลระบบ" />
+                <Input
+                  prefix={<UserOutlined style={{ color: token.colorTextTertiary }} />}
+                  placeholder="ชื่อผู้ดูแลระบบ"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
               <Form.Item name="last_name" label="นามสกุล">
-                <Input prefix={<UserOutlined />} placeholder="นามสกุล" />
+                <Input
+                  prefix={<UserOutlined style={{ color: token.colorTextTertiary }} />}
+                  placeholder="นามสกุล"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
             <Col xs={24} md={12}>
               <Form.Item name="phone_number" label="เบอร์โทรศัพท์">
-                <Input prefix={<PhoneOutlined />} placeholder="0812345678" />
+                <Input
+                  prefix={<PhoneOutlined style={{ color: token.colorTextTertiary }} />}
+                  placeholder="0812345678"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="อีเมล (แก้ไขได้ด้านล่าง)">
+              <Form.Item label="อีเมล">
                 <Input
-                  prefix={<MailOutlined />}
+                  prefix={<MailOutlined style={{ color: token.colorTextTertiary }} />}
                   value={user?.email}
                   disabled
+                  style={{ borderRadius: 10 }}
+                  suffix={
+                    <Tag color="default" style={{ fontSize: 11, margin: 0 }}>
+                      ไม่สามารถแก้ไขได้
+                    </Tag>
+                  }
                 />
               </Form.Item>
             </Col>
           </Row>
-          <Flex justify="flex-end">
+          <Flex justify="flex-end" style={{ marginTop: 4 }}>
             <Button
               type="primary"
               htmlType="submit"
               icon={<SaveOutlined />}
               loading={isLoadingPersonal}
-              style={{ minWidth: 140 }}
+              style={{
+                minWidth: 148, height: 44, borderRadius: 10,
+                background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+                border: "none", fontWeight: 600,
+              }}
             >
               บันทึกข้อมูล
             </Button>
           </Flex>
         </Form>
-      </Card>
+      </SectionCard>
 
-      {/* ─── เปลี่ยนรหัสผ่าน ─── */}
-      <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <Flex align="center" gap={10} style={{ marginBottom: 4 }}>
-          <LockOutlined style={{ fontSize: 20 }} />
-          <Title level={4} style={{ margin: 0 }}>เปลี่ยนรหัสผ่าน</Title>
-        </Flex>
-        <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-          รหัสผ่านควรมีความยาวอย่างน้อย 8 ตัวอักษร
-        </Paragraph>
-        <Divider style={{ margin: "0 0 20px" }} />
-        <Form
-          form={passwordForm}
-          layout="vertical"
-          onFinish={handleChangePassword}
-          size="large"
+      {/* ─── Section 2: ความปลอดภัย ─── */}
+      <SectionCard accentColor="#52c41a">
+        <SectionHeader
+          icon={<SafetyCertificateOutlined />}
+          title="ความปลอดภัย"
+          desc="ตั้งรหัสผ่านใหม่ — ควรมีความยาวอย่างน้อย 8 ตัวอักษร"
+          color="#52c41a"
+        />
+
+        {/* Security tips */}
+        <div
+          style={{
+            padding: "12px 16px",
+            borderRadius: 10,
+            background: "#52c41a12",
+            border: "1px solid #52c41a33",
+            marginBottom: 24,
+          }}
         >
-          <Row gutter={16}>
+          <Flex gap={8} wrap="wrap">
+            {["8 ตัวอักษรขึ้นไป", "มีตัวเลขอย่างน้อย 1 ตัว", "หลีกเลี่ยงข้อมูลส่วนตัว"].map((tip) => (
+              <Flex key={tip} align="center" gap={5}>
+                <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 12 }} />
+                <Text style={{ fontSize: 12, color: "#52c41a" }}>{tip}</Text>
+              </Flex>
+            ))}
+          </Flex>
+        </div>
+
+        <Form form={passwordForm} layout="vertical" onFinish={handleChangePassword} size="large">
+          <Row gutter={[16, 0]}>
             <Col xs={24} md={12}>
               <Form.Item
                 name="new_password"
@@ -201,7 +285,11 @@ export default function AccountSettingForm() {
                   { min: 8, message: "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร" },
                 ]}
               >
-                <Input.Password prefix={<LockOutlined />} placeholder="รหัสผ่านใหม่" />
+                <Input.Password
+                  prefix={<LockOutlined style={{ color: token.colorTextTertiary }} />}
+                  placeholder="รหัสผ่านใหม่"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -221,45 +309,97 @@ export default function AccountSettingForm() {
                   }),
                 ]}
               >
-                <Input.Password prefix={<LockOutlined />} placeholder="ยืนยันรหัสผ่านใหม่" />
+                <Input.Password
+                  prefix={<LockOutlined style={{ color: token.colorTextTertiary }} />}
+                  placeholder="ยืนยันรหัสผ่านใหม่"
+                  style={{ borderRadius: 10 }}
+                />
               </Form.Item>
             </Col>
           </Row>
-          <Flex justify="flex-end">
+          <Flex justify="flex-end" style={{ marginTop: 4 }}>
             <Button
               type="primary"
               htmlType="submit"
               icon={<LockOutlined />}
               loading={isLoadingPassword}
-              style={{ minWidth: 160 }}
+              style={{
+                minWidth: 164, height: 44, borderRadius: 10,
+                background: "linear-gradient(135deg, #389e0d 0%, #52c41a 100%)",
+                border: "none", fontWeight: 600,
+              }}
             >
               เปลี่ยนรหัสผ่าน
             </Button>
           </Flex>
         </Form>
-      </Card>
+      </SectionCard>
 
-      {/* ─── ข้อมูลบัญชี (read-only) ─── */}
-      <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <Flex align="center" gap={10} style={{ marginBottom: 16 }}>
-          <MailOutlined style={{ fontSize: 20 }} />
-          <Title level={4} style={{ margin: 0 }}>ข้อมูลบัญชี</Title>
+      {/* ─── Section 3: ข้อมูลบัญชี (read-only) ─── */}
+      <SectionCard accentColor="#fa8c16">
+        <SectionHeader
+          icon={<IdcardOutlined />}
+          title="ข้อมูลบัญชี"
+          desc="ข้อมูลที่ใช้ระบุตัวตนในระบบ — ไม่สามารถแก้ไขได้"
+          color="#fa8c16"
+        />
+        <Flex vertical gap={0}>
+          {[
+            {
+              icon: <MailOutlined />,
+              label: "อีเมล",
+              value: <Text copyable style={{ fontSize: 14 }}>{user?.email}</Text>,
+            },
+            {
+              icon: <UserOutlined />,
+              label: "Role",
+              value: (
+                <Tag color="blue" style={{ fontSize: 13 }}>
+                  {user?.role === "EMPLOYER" ? "สถานศึกษา" : user?.role}
+                </Tag>
+              ),
+            },
+            {
+              icon: <CopyOutlined />,
+              label: "User ID",
+              value: (
+                <Text
+                  copyable
+                  type="secondary"
+                  style={{ fontSize: 12, fontFamily: "monospace" }}
+                >
+                  {user?.user_id}
+                </Text>
+              ),
+            },
+          ].map((row, i, arr) => (
+            <div key={row.label}>
+              <Flex
+                align="center"
+                justify="space-between"
+                style={{ padding: "14px 0" }}
+              >
+                <Flex align="center" gap={10}>
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: token.colorFillTertiary,
+                      color: token.colorTextSecondary, fontSize: 14,
+                    }}
+                  >
+                    {row.icon}
+                  </Flex>
+                  <Text type="secondary" style={{ fontSize: 13 }}>{row.label}</Text>
+                </Flex>
+                {row.value}
+              </Flex>
+              {i < arr.length - 1 && <Divider style={{ margin: 0 }} />}
+            </div>
+          ))}
         </Flex>
-        <Flex vertical gap={8}>
-          <Flex gap={8}>
-            <Text type="secondary" style={{ minWidth: 100 }}>อีเมล:</Text>
-            <Text copyable>{user?.email}</Text>
-          </Flex>
-          <Flex gap={8}>
-            <Text type="secondary" style={{ minWidth: 100 }}>Role:</Text>
-            <Text>{user?.role === "EMPLOYER" ? "สถานศึกษา" : user?.role}</Text>
-          </Flex>
-          <Flex gap={8}>
-            <Text type="secondary" style={{ minWidth: 100 }}>User ID:</Text>
-            <Text type="secondary" style={{ fontSize: 12 }} copyable>{user?.user_id}</Text>
-          </Flex>
-        </Flex>
-      </Card>
+      </SectionCard>
 
     </Flex>
   );
