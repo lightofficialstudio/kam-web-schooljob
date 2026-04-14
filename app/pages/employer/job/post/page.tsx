@@ -17,8 +17,8 @@ import {
   Form,
   Layout,
   Row,
+  Skeleton,
   Space,
-  Spin,
   Typography,
 } from "antd";
 import Link from "next/link";
@@ -33,6 +33,7 @@ import { BasicInfoSection } from "./_components/basic-info-section";
 import { JobDetailSection } from "./_components/job-detail-section";
 import { JobTipsSidebar } from "./_components/job-tips-sidebar";
 import { loadAll, LocationSection } from "./_components/location-section";
+import { PostJobSkeleton } from "./_components/post-job-skeleton";
 import { PostSettingsSection } from "./_components/post-settings-section";
 import { SalarySection } from "./_components/salary-section";
 import { useJobPostStore } from "./_stores/job-post-store";
@@ -283,16 +284,43 @@ export default function PostJobPage() {
 
   if (isLoadingJob || isMockLoading) {
     return (
-      <Flex align="center" justify="center" style={{ minHeight: "100vh" }}>
-        <Spin
-          size="large"
-          description={
-            isMockLoading ? "กำลังสุ่มข้อมูล..." : "กำลังโหลดข้อมูลงาน..."
-          }
+      <Layout
+        style={{
+          minHeight: "100vh",
+          backgroundColor: token.colorBgLayout,
+          paddingBottom: 100,
+        }}
+      >
+        <Flex
+          vertical
+          style={{
+            backgroundColor: token.colorBgContainer,
+            padding: "16px 0 24px",
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            marginBottom: 40,
+          }}
         >
-          <div style={{ width: 240, height: 120 }} />
-        </Spin>
-      </Flex>
+          <div
+            style={{
+              maxWidth: 1152,
+              margin: "12px auto 0",
+              padding: "0 24px",
+              width: "100%",
+            }}
+          >
+            <Skeleton
+              active
+              title={false}
+              paragraph={{ rows: 1 }}
+              style={{ width: 200, marginBottom: 16 }}
+            />
+            <Skeleton active title paragraph={false} style={{ width: "40%" }} />
+          </div>
+        </Flex>
+        <Content>
+          <PostJobSkeleton />
+        </Content>
+      </Layout>
     );
   }
 
