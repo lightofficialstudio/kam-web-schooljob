@@ -8,6 +8,7 @@ import {
   Divider,
   Flex,
   Progress,
+  Skeleton,
   Space,
   Spin,
   Tag,
