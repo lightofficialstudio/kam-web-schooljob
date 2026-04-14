@@ -36,6 +36,7 @@ import {
   requestUpdatePersonalInfo,
 } from "../_api/account-setting-api";
 import { useAccountSettingStore } from "../_state/account-setting-store";
+import PackageSection from "./package-section";
 
 const { Title, Text } = Typography;
 
@@ -428,6 +429,11 @@ export default function AccountSettingForm() {
           ))}
         </Flex>
       </SectionCard>
+      </div>
+
+      {/* ─── Section 4: แพ็คเกจ ─── */}
+      <div id="section-package">
+        <PackageSection userId={user?.user_id || ""} />
       </div>
 
     </Flex>

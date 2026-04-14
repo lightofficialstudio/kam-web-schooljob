@@ -20,6 +20,7 @@ import {
   theme,
   Typography,
 } from "antd";
+import axios from "axios";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -48,6 +49,12 @@ const SECTIONS = [
     label: "ข้อมูลบัญชี",
     color: "#fa8c16",
   },
+  {
+    id: "section-package",
+    icon: <CrownOutlined />,
+    label: "แพ็คเกจ",
+    color: "#722ed1",
+  },
 ];
 
 export default function EmployerAccountSettingPage() {
@@ -55,10 +62,23 @@ export default function EmployerAccountSettingPage() {
   const { token } = theme.useToken();
   const [activeSection, setActiveSection] = useState("section-personal");
   const observerRef = useRef<IntersectionObserver | null>(null);
+  // ✨ planLabel สำหรับ hero banner — โหลดจาก API แบบ fire-and-forget
+  const [planLabel, setPlanLabel] = useState<string | null>(null);
 
   const initials = user?.full_name
     ? user.full_name.slice(0, 2).toUpperCase()
     : "?";
+
+  // ✨ ดึง planLabel จาก API เพื่อแสดงใน hero banner
+  useEffect(() => {
+    if (!user?.user_id) return;
+    axios
+      .get(`/api/v1/employer/package/read?user_id=${user.user_id}`)
+      .then((res) => {
+        if (res.data?.data?.planLabel) setPlanLabel(res.data.data.planLabel);
+      })
+      .catch(() => {});
+  }, [user?.user_id]);
 
   // ✨ IntersectionObserver — ติดตาม section ที่กำลังมองเห็นอยู่
   useEffect(() => {
@@ -218,7 +238,7 @@ export default function EmployerAccountSettingPage() {
                     fontSize: 12,
                   }}
                 >
-                  Basic Plan
+                  {planLabel ? `${planLabel} Plan` : "..."}
                 </Tag>
               </Flex>
             </Flex>
