@@ -119,7 +119,10 @@ export const JobListSection = () => {
       {isLoadingMore && (
         <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {Array.from({ length: 3 }).map((_, idx) => (
-            <Card key={`more-${idx}`} style={{ borderRadius: token.borderRadiusLG }}>
+            <Card
+              key={`more-${idx}`}
+              style={{ borderRadius: token.borderRadiusLG }}
+            >
               <Skeleton active paragraph={{ rows: 2 }} />
             </Card>
           ))}
@@ -146,7 +149,12 @@ export const JobListSection = () => {
       {!hasMore && !isLoading && jobs.length > 0 && (
         <Text
           type="secondary"
-          style={{ textAlign: "center", display: "block", padding: "16px 0", fontSize: 13 }}
+          style={{
+            textAlign: "center",
+            display: "block",
+            padding: "16px 0",
+            fontSize: 13,
+          }}
         >
           แสดงครบทุกตำแหน่งงานแล้ว ({jobs.length} รายการ)
         </Text>
