@@ -14,7 +14,9 @@ import {
   Tag,
   theme,
 } from "antd";
+import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import { useAuthStore } from "@/app/stores/auth-store";
 import { useJobPostStore } from "../_stores/job-post-store";
 
 // ─── Types จาก GitHub Raw API ─────────────────────────────────────────────
@@ -65,6 +67,7 @@ export const loadAll = async () => {
 export const LocationSection = () => {
   const { token } = theme.useToken();
   const form = Form.useFormInstance();
+  const { user } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -78,17 +81,51 @@ export const LocationSection = () => {
     setSelectedDistrictId,
   } = useJobPostStore();
 
-  // โหลดข้อมูลครั้งแรก
+  // ✨ โหลดข้อมูลจังหวัด + auto-fill จาก SchoolProfile ครั้งแรก
   useEffect(() => {
     setIsLoading(true);
-    loadAll()
-      .then(({ provinces, districts, subDistricts }) => {
-        setProvinces(provinces);
-        setDistricts(districts);
-        setSubDistricts(subDistricts);
+
+    // ✨ โหลด dropdown ข้อมูลจังหวัด + SchoolProfile พร้อมกัน
+    const profilePromise = user?.user_id
+      ? axios
+          .get<{ status_code: number; data: { schoolProfile: { province: string; district?: string; address?: string } | null } }>(
+            `/api/v1/employer/profile/read?user_id=${user.user_id}`,
+          )
+          .then((res) => (res.data.status_code === 200 ? res.data.data?.schoolProfile : null))
+          .catch(() => null)
+      : Promise.resolve(null);
+
+    Promise.all([loadAll(), profilePromise])
+      .then(([{ provinces: p, districts: d, subDistricts: s }, schoolProfile]) => {
+        setProvinces(p);
+        setDistricts(d);
+        setSubDistricts(s);
+
+        // ✨ auto-fill เฉพาะเมื่อฟอร์มยังว่าง (ไม่ override ข้อมูลที่ user กรอกไว้แล้ว)
+        const currentProvince = form.getFieldValue("province");
+        if (!currentProvince && schoolProfile?.province) {
+          const matchedProvince = p.find((pv) => pv.name_th === schoolProfile.province);
+          if (matchedProvince) {
+            setSelectedProvinceId(matchedProvince.id);
+          }
+          form.setFieldsValue({
+            province: schoolProfile.province || undefined,
+            area: schoolProfile.district || undefined,
+            address: schoolProfile.address || undefined,
+          });
+
+          // ✨ set districtId ถ้าพบ district ที่ตรงกัน
+          if (schoolProfile.district && matchedProvince) {
+            const matchedDistrict = d.find(
+              (dist) => dist.name_th === schoolProfile.district && dist.province_id === matchedProvince.id,
+            );
+            if (matchedDistrict) setSelectedDistrictId(matchedDistrict.id);
+          }
+        }
       })
       .finally(() => setIsLoading(false));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.user_id]);
 
   // ✨ filter อำเภอตามจังหวัดที่เลือก
   const filteredDistricts = useMemo(
@@ -147,7 +184,7 @@ export const LocationSection = () => {
       }}
     >
       <Alert
-        description="ระบบจะดึงข้อมูลจาก School Profile ของคุณ หากสถาบันมีหลายสาขา สามารถแก้ไขที่อยู่สำหรับประกาศนี้ได้โดยเฉพาะ"
+        description="ระบบดึงข้อมูลจาก School Profile ของคุณโดยอัตโนมัติ หากสถาบันมีหลายสาขาสามารถแก้ไขที่อยู่สำหรับประกาศนี้ได้โดยเฉพาะ"
         type="info"
         showIcon
         style={{ marginBottom: 24 }}

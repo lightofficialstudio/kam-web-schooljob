@@ -295,6 +295,8 @@ model SchoolProfile {
   logoUrl       String?  @map("logo_url")
   coverImageUrl String?  @map("cover_image_url")
   foundedYear   Int?     @map("founded_year") // ปีที่ก่อตั้ง (พ.ศ.)
+  accountPlan   String   @default("basic") @map("account_plan") // แผนบัญชี: basic, premium, enterprise (จัดการโดย Admin)
+  jobQuotaMax   Int      @default(3) @map("job_quota_max")      // จำนวนประกาศสูงสุดที่ลงได้ (จัดการโดย Admin)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
