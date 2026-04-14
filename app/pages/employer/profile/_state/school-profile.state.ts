@@ -12,21 +12,26 @@ export interface SchoolProfile {
   id?: string;
   name: string;
   type: string;
-  location: string;
+  location: string;            // province
+  district?: string;           // อำเภอ/เขต
   address: string;
   website?: string;
   email: string;
   phone: string;
-  established?: string;
-  size?: string;
+  established?: string;        // foundedYear (พ.ศ.)
+  teacherCount?: number;       // จำนวนครู
+  studentCount?: number;       // จำนวนนักเรียน
+  affiliation?: string;        // สังกัด เช่น สพฐ., สช.
   description?: string;
   vision?: string;
-  curriculum?: string;
-  levels?: string[];
+  curriculum?: string;         // หลักสูตร — persist ลง DB แล้ว
+  levels?: string[];           // ระดับชั้น — persist ลง DB แล้ว
   benefits?: string[];
   gallery?: string[];
   logoUrl?: string;
   coverImageUrl?: string;
+  accountPlan?: string;        // read-only — จัดการโดย Admin
+  jobQuotaMax?: number;        // read-only — จัดการโดย Admin
 }
 
 interface SchoolProfileState {

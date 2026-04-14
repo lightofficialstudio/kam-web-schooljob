@@ -8,6 +8,7 @@ import {
   Drawer,
   Form,
   Input,
+  InputNumber,
   Row,
   Select,
   Space,
@@ -21,7 +22,7 @@ import {
   useSchoolProfileState as useSchoolProfileStore,
 } from "../_state/school-profile.state";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 // ✨ รูปแบบตัวเลือกจาก API
 interface ConfigOption {
@@ -29,6 +30,17 @@ interface ConfigOption {
   label: string;
   value: string;
 }
+
+// ✨ ตัวเลือกสังกัดโรงเรียน (fixed enum — ไม่เปลี่ยนบ่อย)
+const AFFILIATION_OPTIONS = [
+  "สพฐ. (สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน)",
+  "สช. (สำนักงานคณะกรรมการส่งเสริมการศึกษาเอกชน)",
+  "อปท. (องค์กรปกครองส่วนท้องถิ่น)",
+  "กทม. (กรุงเทพมหานคร)",
+  "ตชด. (กองบัญชาการตำรวจตระเวนชายแดน)",
+  "สถาบันอุดมศึกษา",
+  "อื่นๆ",
+];
 
 interface ProfileEditDrawerProps {
   onSave: (values: SchoolProfile) => void;
@@ -44,7 +56,7 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
   const [schoolLevels, setSchoolLevels] = useState<ConfigOption[]>([]);
   const [isLoadingOptions, setIsLoadingOptions] = useState(false);
 
-  // ✨ โหลดตัวเลือกจาก API ครั้งแรก
+  // ✨ โหลดตัวเลือกจาก Config API ครั้งแรก
   useEffect(() => {
     setIsLoadingOptions(true);
     Promise.all([
@@ -59,9 +71,17 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       .finally(() => setIsLoadingOptions(false));
   }, []);
 
+  // ✨ ซิงค์ข้อมูลจาก store เข้า form ทุกครั้งที่เปิด Drawer
   React.useEffect(() => {
     if (isDrawerOpen) {
-      form.setFieldsValue(profile);
+      form.setFieldsValue({
+        ...profile,
+        // แปลง teacherCount/studentCount เป็น number สำหรับ InputNumber
+        teacherCount: profile.teacherCount ?? undefined,
+        studentCount: profile.studentCount ?? undefined,
+        // established เป็น string ของปี พ.ศ.
+        established: profile.established ?? undefined,
+      });
     }
   }, [isDrawerOpen, profile, form]);
 
@@ -89,6 +109,8 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
         <Spin style={{ display: "block", margin: "40px auto" }} />
       ) : (
         <Form form={form} layout="vertical" onFinish={handleFinish}>
+
+          {/* ─── ข้อมูลพื้นฐาน ─── */}
           <Title level={5}>ข้อมูลพื้นฐาน</Title>
           <Form.Item
             name="name"
@@ -100,34 +122,45 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="type"
-                label="ประเภทโรงเรียน"
-                rules={[{ required: true }]}
-              >
-                {/* ✨ ดึงตัวเลือกจาก DB ผ่าน API แทน hardcode */}
-                <Select placeholder="เลือกประเภท" options={schoolTypes.map((t) => ({ value: t.value, label: t.label }))} />
+              <Form.Item name="type" label="ประเภทโรงเรียน" rules={[{ required: true }]}>
+                {/* ✨ ดึงตัวเลือกจาก Config API */}
+                <Select
+                  placeholder="เลือกประเภท"
+                  options={schoolTypes.map((t) => ({ value: t.value, label: t.label }))}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="location"
-                label="จังหวัด"
-                rules={[{ required: true }]}
-              >
+              <Form.Item name="affiliation" label="สังกัด">
+                <Select
+                  placeholder="เลือกสังกัด"
+                  allowClear
+                  options={AFFILIATION_OPTIONS.map((a) => ({ value: a, label: a }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="location" label="จังหวัด" rules={[{ required: true }]}>
                 <Input placeholder="เช่น กรุงเทพมหานคร" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="district" label="อำเภอ / เขต">
+                <Input placeholder="เช่น เขตจตุจักร" />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item name="address" label="ที่อยู่เต็ม">
-            <Input.TextArea
-              rows={3}
-              placeholder="ระบุที่อยู่สำหรับการติดต่อและแสดงแผนที่"
-            />
+            <Input.TextArea rows={3} placeholder="เลขที่ ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์" />
           </Form.Item>
 
           <Divider />
+
+          {/* ─── ข้อมูลติดต่อ ─── */}
           <Title level={5}>ข้อมูลติดต่อ</Title>
           <Row gutter={16}>
             <Col span={12}>
@@ -140,59 +173,80 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="phone"
-                label="เบอร์โทรศัพท์"
-                rules={[{ required: true }]}
-              >
+              <Form.Item name="phone" label="เบอร์โทรศัพท์" rules={[{ required: true }]}>
                 <Input prefix={<PhoneOutlined />} />
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="website" label="เว็บไซต์ (ไม่ต้องใส่ https://)">
-            <Input prefix="https://" />
+          <Form.Item name="website" label="เว็บไซต์">
+            <Input prefix="https://" placeholder="www.example.ac.th" />
           </Form.Item>
 
           <Divider />
-          <Title level={5}>รายละเอียดเชิงลึก (SEO & Employer Branding)</Title>
+
+          {/* ─── รายละเอียดโรงเรียน ─── */}
+          <Title level={5}>รายละเอียด (SEO & Employer Branding)</Title>
           <Form.Item name="description" label="เกี่ยวกับโรงเรียน">
-            <Input.TextArea
-              rows={6}
-              placeholder="เล่าประวัติความเป็นมา วัฒนธรรมองค์กร"
-            />
+            <Input.TextArea rows={6} placeholder="เล่าประวัติความเป็นมา วัฒนธรรมองค์กร จุดเด่นของสถาบัน" />
           </Form.Item>
           <Form.Item name="vision" label="วิสัยทัศน์">
-            <Input.TextArea
-              rows={3}
-              placeholder="เช่น สร้างผู้นำแห่งอนาคต ด้วยคุณธรรม..."
-            />
+            <Input.TextArea rows={3} placeholder="เช่น สร้างผู้นำแห่งอนาคต ด้วยคุณธรรมและความรู้" />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="curriculum" label="หลักสูตร">
-                <Input placeholder="เช่น British, IB, Thai" />
+                <Input placeholder="เช่น British, IB, Thai National" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="size" label="จำนวนบุคลากร">
-                <Input placeholder="เช่น 20-50 คน" />
+              <Form.Item name="established" label="ปีที่ก่อตั้ง (พ.ศ.)">
+                <Input placeholder="เช่น 2510" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="teacherCount" label="จำนวนครู (คน)">
+                <InputNumber min={0} style={{ width: "100%" }} placeholder="เช่น 120" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="studentCount" label="จำนวนนักเรียน (คน)">
+                <InputNumber min={0} style={{ width: "100%" }} placeholder="เช่น 2500" />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item name="levels" label="ระดับชั้นที่เปิดสอน">
-            {/* ✨ ดึงตัวเลือกจาก DB ผ่าน API แทน hardcode */}
+            {/* ✨ ดึงตัวเลือกจาก Config API */}
             <Select
-              mode="tags"
-              placeholder="เลือกหรือพิมพ์ระดับชั้น"
+              mode="multiple"
+              placeholder="เลือกระดับชั้น"
               options={schoolLevels.map((l) => ({ value: l.value, label: l.label }))}
             />
           </Form.Item>
 
           <Form.Item name="benefits" label="สวัสดิการ (เพิ่มได้หลายรายการ)">
-            <Select mode="tags" placeholder="เช่น ประกันสุขภาพ, อาหารกลางวัน" />
+            <Select mode="tags" placeholder="เช่น ประกันสุขภาพ, อาหารกลางวัน, โบนัส" />
           </Form.Item>
+
+          {/* ✨ แสดง accountPlan แบบ read-only — Admin เป็นคนจัดการ */}
+          {profile.accountPlan && (
+            <>
+              <Divider />
+              <Form.Item label="แผนบัญชี">
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  {profile.accountPlan === "basic" && "Basic"}
+                  {profile.accountPlan === "premium" && "Premium"}
+                  {profile.accountPlan === "enterprise" && "Enterprise"}
+                  {!["basic", "premium", "enterprise"].includes(profile.accountPlan ?? "") && profile.accountPlan}
+                  {" "}— ติดต่อทีมงานเพื่ออัปเกรด
+                </Text>
+              </Form.Item>
+            </>
+          )}
         </Form>
       )}
     </Drawer>

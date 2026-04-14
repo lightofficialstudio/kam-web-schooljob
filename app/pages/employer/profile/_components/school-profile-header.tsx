@@ -64,14 +64,18 @@ export const SchoolProfileHeader: React.FC<SchoolProfileHeaderProps> = ({
           >
             <Avatar
               size={100}
-              icon={<BankOutlined />}
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`}
+              icon={!profile.logoUrl ? <BankOutlined /> : undefined}
+              src={profile.logoUrl || undefined}
               style={{
-                backgroundColor: "#e60278",
+                background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
                 border: "4px solid rgba(255,255,255,0.25)",
                 flexShrink: 0,
+                fontSize: 36,
+                color: "#fff",
               }}
-            />
+            >
+              {!profile.logoUrl && profile.name?.charAt(0)}
+            </Avatar>
           </Badge>
 
           <Flex vertical gap={8} style={{ flex: 1, minWidth: 200 }}>
@@ -82,9 +86,25 @@ export const SchoolProfileHeader: React.FC<SchoolProfileHeaderProps> = ({
               {profile.name}
             </Title>
             <Flex gap={8} wrap="wrap">
-              <Tag color="gold" style={{ fontSize: 13, margin: 0 }}>
-                {profile.type}
-              </Tag>
+              {profile.type && (
+                <Tag color="gold" style={{ fontSize: 13, margin: 0 }}>
+                  {profile.type}
+                </Tag>
+              )}
+              {profile.affiliation && (
+                <Tag
+                  color="default"
+                  style={{
+                    fontSize: 13,
+                    margin: 0,
+                    background: "rgba(255,255,255,0.12)",
+                    borderColor: "rgba(255,255,255,0.25)",
+                    color: "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  {profile.affiliation.split(" ")[0]}
+                </Tag>
+              )}
               <Tag
                 icon={<EnvironmentOutlined />}
                 color="default"
@@ -96,7 +116,7 @@ export const SchoolProfileHeader: React.FC<SchoolProfileHeaderProps> = ({
                   color: "white",
                 }}
               >
-                {profile.location}
+                {[profile.district, profile.location].filter(Boolean).join(", ")}
               </Tag>
             </Flex>
           </Flex>

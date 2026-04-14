@@ -4,6 +4,7 @@
 import {
   BankOutlined,
   CheckCircleFilled,
+  CrownOutlined,
   EditOutlined,
   EnvironmentOutlined,
   GlobalOutlined,
@@ -154,16 +155,22 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
               {profile.name}
             </Title>
             <Flex gap={6} wrap="wrap" justify="center">
-              <Tag
-                icon={<CheckCircleFilled />}
-                color="success"
-                style={{ fontSize: 12 }}
-              >
+              <Tag icon={<CheckCircleFilled />} color="success" style={{ fontSize: 12 }}>
                 ยืนยันตัวตนแล้ว
               </Tag>
-              <Tag color="blue" style={{ fontSize: 12 }}>
-                {profile.type}
-              </Tag>
+              {profile.type && (
+                <Tag color="blue" style={{ fontSize: 12 }}>{profile.type}</Tag>
+              )}
+              {/* ✨ แสดง Account Plan badge */}
+              {profile.accountPlan && profile.accountPlan !== "basic" && (
+                <Tag
+                  icon={<CrownOutlined />}
+                  color={profile.accountPlan === "enterprise" ? "purple" : "gold"}
+                  style={{ fontSize: 12 }}
+                >
+                  {profile.accountPlan === "premium" ? "Premium" : profile.accountPlan === "enterprise" ? "Enterprise" : profile.accountPlan}
+                </Tag>
+              )}
             </Flex>
           </Flex>
 
@@ -179,7 +186,9 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             }}
           >
             <Descriptions.Item label={<EnvironmentOutlined />}>
-              <Text>{profile.location}</Text>
+              <Text>
+                {[profile.district, profile.location].filter(Boolean).join(", ")}
+              </Text>
             </Descriptions.Item>
             {profile.website && (
               <Descriptions.Item label={<GlobalOutlined />}>

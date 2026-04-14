@@ -69,6 +69,8 @@ export const updateEmployerProfileService = async (
         teacherCount: payload.teacher_count ?? null,
         studentCount: payload.student_count ?? null,
         affiliation: payload.affiliation ?? null,
+        curriculum: payload.curriculum ?? null,
+        levels: payload.levels ? JSON.stringify(payload.levels) : null,
         ...(payload.logo_url !== undefined && {
           logoUrl: payload.logo_url ?? null,
         }),
@@ -91,6 +93,8 @@ export const updateEmployerProfileService = async (
         teacherCount: payload.teacher_count ?? null,
         studentCount: payload.student_count ?? null,
         affiliation: payload.affiliation ?? null,
+        curriculum: payload.curriculum ?? null,
+        levels: payload.levels ? JSON.stringify(payload.levels) : null,
         logoUrl: payload.logo_url ?? null,
         coverImageUrl: payload.cover_image_url ?? null,
       },
