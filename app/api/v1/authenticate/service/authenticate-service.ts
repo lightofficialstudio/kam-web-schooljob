@@ -144,13 +144,18 @@ export class AuthenticateService {
         }
       }
 
-      // 3. ✨ [รวมข้อมูล Supabase + Prisma — EMPLOYER ใช้ schoolName แทน firstName]
+      // 3. ✨ [รวมข้อมูล Supabase + Prisma]
       const role =
         data.user?.user_metadata?.role || profile?.role || "EMPLOYEE";
-      const isEmployer = role === "EMPLOYER";
-      const fullName = isEmployer
-        ? profile?.schoolProfile?.schoolName || profile?.firstName || data.user?.user_metadata?.full_name || ""
-        : data.user?.user_metadata?.full_name || profile?.firstName || "";
+      // ✨ full_name = ชื่อ-นามสกุลผู้ดูแลเสมอ (ทุก role)
+      const fullName =
+        profile?.firstName
+          ? [profile.firstName, profile.lastName].filter(Boolean).join(" ")
+          : data.user?.user_metadata?.full_name || "";
+      // ✨ school_name แยกต่างหาก — เฉพาะ EMPLOYER
+      const schoolName = role === "EMPLOYER"
+        ? (profile?.schoolProfile?.schoolName || "")
+        : undefined;
 
       console.log(`✅ [SIGNIN] Ready to return user data:`, {
         user_id: data.user?.id,
@@ -169,6 +174,7 @@ export class AuthenticateService {
           userId: data.user?.id || "",
           email: data.user?.email || "",
           fullName: fullName,
+          schoolName: schoolName || null, // ✨ ชื่อโรงเรียน — เฉพาะ EMPLOYER
           role: role as UserRole,
           password: "", // ❌ ไม่คืน password
           id: profile?.id || "",

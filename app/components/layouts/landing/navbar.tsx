@@ -495,12 +495,14 @@ export default function Navbar() {
                     <Text strong style={{ fontSize: 13 }}>
                       {user.full_name}
                     </Text>
-                    {/* ✨ แสดง role label ให้ทุก role เพื่อความชัดเจน */}
+                    {/* ✨ EMPLOYER: แสดงชื่อโรงเรียน / EMPLOYEE: แสดง role / ADMIN: ผู้ดูแลระบบ */}
                     <Text type="secondary" style={{ fontSize: 11 }}>
                       {user.role === "EMPLOYER"
-                        ? "โรงเรียน"
+                        ? (user.school_name || "โรงเรียน")
                         : user.role === "EMPLOYEE"
-                          ? "ครูผู้สอน"
+                          ? delegatedSchools.length > 0
+                            ? delegatedSchools[0].schoolProfile.schoolName
+                            : "ครูผู้สอน"
                           : "ผู้ดูแลระบบ"}
                     </Text>
                   </Flex>

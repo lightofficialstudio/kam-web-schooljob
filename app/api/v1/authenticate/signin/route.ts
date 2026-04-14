@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
           email: result.user?.email,
           role: result.profile?.role || "EMPLOYEE",
           full_name: result.profile?.fullName || "",
+          school_name: result.profile?.schoolName || null, // ✨ ชื่อโรงเรียน — เฉพาะ EMPLOYER
           profile_image_url: result.profile?.profileImageUrl || null,
         },
       },

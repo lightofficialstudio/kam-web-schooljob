@@ -74,6 +74,7 @@ export const SigninForm = () => {
         user_id: result.data.user_id,
         email: result.data.email,
         full_name: result.data.full_name,
+        school_name: result.data.school_name || undefined, // ✨ ชื่อโรงเรียน — เฉพาะ EMPLOYER
         role: result.data.role,
         is_first_login: result.data.is_first_login || false,
         profile_image_url: result.data.profile_image_url || undefined,

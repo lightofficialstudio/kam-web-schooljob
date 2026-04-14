@@ -4,7 +4,8 @@ import { persist } from "zustand/middleware";
 export interface User {
   user_id: string;
   email: string;
-  full_name: string;
+  full_name: string;       // ชื่อ-นามสกุลผู้ดูแล (firstName + lastName)
+  school_name?: string;    // ชื่อโรงเรียน — เฉพาะ EMPLOYER
   role: string;
   is_first_login?: boolean;
   profile_image_url?: string;
