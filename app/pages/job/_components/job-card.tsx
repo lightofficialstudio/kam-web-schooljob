@@ -131,9 +131,19 @@ export const JobCard = ({ job }: JobCardProps) => {
           <Avatar
             shape="square"
             size={100}
-            src={`https://api.dicebear.com/7.x/initials/svg?seed=${job.schoolName}&backgroundColor=003366`}
-            style={{ border: `1px solid ${token.colorBorderSecondary}` }}
-          />
+            src={job.logoUrl || undefined}
+            style={{
+              border: `1px solid ${token.colorBorderSecondary}`,
+              borderRadius: 12,
+              background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#fff",
+            }}
+            onError={() => true}
+          >
+            {job.schoolName?.charAt(0) || "S"}
+          </Avatar>
         </Col>
       </Row>
 

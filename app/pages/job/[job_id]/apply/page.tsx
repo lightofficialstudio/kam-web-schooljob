@@ -15,7 +15,7 @@ import {
 } from "antd";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DocumentSection from "./_components/document-section";
 import JobSummary from "./_components/job-summary";
 import UserProfileCard from "./_components/user-profile-card";
@@ -43,7 +43,19 @@ export default function JobApplyPage() {
     reset,
   } = useApplyStore();
 
-  // ✨ ดึง job info + profile เมื่อ mount
+  // ✨ ป้องกัน flash ก่อน hydration เสร็จ
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
+
+  // ✨ Redirect ไปหน้า Login หากยังไม่ได้เข้าสู่ระบบ (พร้อม return URL)
+  useEffect(() => {
+    if (!isMounted) return;
+    if (!user?.user_id) {
+      router.replace(`/pages/signin?redirect=/pages/job/${jobId}/apply`);
+    }
+  }, [isMounted, user?.user_id, jobId, router]);
+
+  // ✨ ดึง job info + profile เมื่อ mount และมี user แล้ว
   useEffect(() => {
     if (jobId) fetchJob(jobId);
     if (user?.user_id) fetchProfile(user.user_id);
@@ -53,7 +65,7 @@ export default function JobApplyPage() {
   const handleApply = () => {
     if (!user?.user_id) {
       message.warning("กรุณาเข้าสู่ระบบก่อนสมัครงาน");
-      router.push("/pages/signin");
+      router.push(`/pages/signin?redirect=/pages/job/${jobId}/apply`);
       return;
     }
     setIsConfirmModalOpen(true);
@@ -71,7 +83,8 @@ export default function JobApplyPage() {
     }
   };
 
-  if (isLoadingJob) {
+  // ✨ ยังไม่ hydrate หรือกำลัง redirect → แสดง spinner แทนเนื้อหา
+  if (!isMounted || !user?.user_id || isLoadingJob) {
     return (
       <Layout style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Spin size="large" />

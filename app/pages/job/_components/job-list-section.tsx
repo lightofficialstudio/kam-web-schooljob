@@ -77,7 +77,7 @@ export const JobListSection = () => {
 
       {/* Initial Loading Skeleton */}
       {isLoading && (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {Array.from({ length: 5 }).map((_, idx) => (
             <Card key={idx} style={{ borderRadius: token.borderRadiusLG }}>
               <Skeleton active paragraph={{ rows: 3 }} />
@@ -88,7 +88,7 @@ export const JobListSection = () => {
 
       {/* Job Cards */}
       {!isLoading && (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {jobs.length > 0 ? (
             jobs.map((job) => <JobCard key={job.id} job={job} />)
           ) : (
@@ -117,7 +117,7 @@ export const JobListSection = () => {
 
       {/* Load More Skeleton (inline) */}
       {isLoadingMore && (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {Array.from({ length: 3 }).map((_, idx) => (
             <Card key={`more-${idx}`} style={{ borderRadius: token.borderRadiusLG }}>
               <Skeleton active paragraph={{ rows: 2 }} />
