@@ -106,10 +106,11 @@ export default function AccountSettingForm() {
       .then((res) => {
         const d = res.data?.data;
         if (!d) return;
+        // ✨ d คือ Profile object จาก Prisma — ใช้ field ตรงๆ (camelCase)
         const info = {
-          firstName: d.contact_person_name || d.first_name || "",
-          lastName: d.last_name || "",
-          phoneNumber: d.contact_phone || d.phone_number || "",
+          firstName: d.firstName || "",
+          lastName: d.lastName || "",
+          phoneNumber: d.phoneNumber || "",
         };
         setPersonalInfo(info);
         personalForm.setFieldsValue({
