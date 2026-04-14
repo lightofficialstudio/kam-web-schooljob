@@ -19,6 +19,7 @@ import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
 import { JobStatsModal } from "./_components/job-stats-modal";
 import { JobsTable } from "./_components/jobs-table";
+import { PackageBanner } from "./_components/package-banner";
 import { StatsSection } from "./_components/stats-section";
 import { useApplicantDrawerStore } from "./_state/applicant-drawer-store";
 import { useJobReadStore } from "./_state/job-read-store";
@@ -179,6 +180,8 @@ export default function MyJobsPage() {
               padding: "0 24px 0",
             }}
           >
+            {/* ✨ Package Banner — ดึงข้อมูลจาก DB real-time, Admin เปลี่ยนได้จากหลังบ้าน */}
+            {user?.user_id && <PackageBanner userId={user.user_id} />}
             <StatsSection />
             <InsightsCard />
             <FilterSection />
