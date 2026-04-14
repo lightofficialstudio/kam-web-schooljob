@@ -14,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
+  Card,
   Col,
   Divider,
   Flex,
@@ -37,7 +38,7 @@ import { useAccountSettingStore } from "../_state/account-setting-store";
 
 const { Title, Text, Paragraph } = Typography;
 
-// ✨ Section header พร้อม icon pill
+// ✨ Section header พร้อม icon pill — ใช้ token เพื่อ dark mode support
 const SectionHeader: React.FC<{
   icon: React.ReactNode;
   title: string;
@@ -52,8 +53,8 @@ const SectionHeader: React.FC<{
         justify="center"
         style={{
           width: 48, height: 48, borderRadius: 14,
-          background: `linear-gradient(135deg, ${color}22 0%, ${color}44 100%)`,
-          border: `1.5px solid ${color}44`,
+          background: token.colorFillTertiary,
+          border: `1.5px solid ${token.colorBorderSecondary}`,
           color: color, fontSize: 20, flexShrink: 0,
         }}
       >
@@ -67,27 +68,22 @@ const SectionHeader: React.FC<{
   );
 };
 
-// ✨ Card wrapper มี top accent bar
-const SectionCard: React.FC<{ children: React.ReactNode; accentColor: string }> = ({ children, accentColor }) => {
-  const { token } = theme.useToken();
-  return (
-    <div
-      style={{
-        background: token.colorBgContainer,
-        borderRadius: 16,
-        border: `1px solid ${token.colorBorderSecondary}`,
-        overflow: "hidden",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-      }}
-    >
-      {/* Accent bar */}
-      <div style={{ height: 4, background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}55 100%)` }} />
-      <div style={{ padding: "28px 28px 24px" }}>
-        {children}
-      </div>
+// ✨ Card wrapper มี top accent bar — ใช้ Ant Design Card เพื่อ dark mode support
+const SectionCard: React.FC<{ children: React.ReactNode; accentColor: string }> = ({ children, accentColor }) => (
+  <Card
+    variant="borderless"
+    style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
+    styles={{
+      body: { padding: 0 },
+    }}
+  >
+    {/* Accent bar */}
+    <div style={{ height: 4, background: `linear-gradient(90deg, ${accentColor} 0%, ${accentColor}55 100%)` }} />
+    <div style={{ padding: "28px 28px 24px" }}>
+      {children}
     </div>
-  );
-};
+  </Card>
+);
 
 export default function AccountSettingForm() {
   const { user } = useAuthStore();
@@ -171,6 +167,7 @@ export default function AccountSettingForm() {
     <Flex vertical gap={20}>
 
       {/* ─── Section 1: ข้อมูลส่วนตัว ─── */}
+      <div id="section-personal">
       <SectionCard accentColor="#11b6f5">
         <SectionHeader
           icon={<UserOutlined />}
@@ -244,8 +241,10 @@ export default function AccountSettingForm() {
           </Flex>
         </Form>
       </SectionCard>
+      </div>
 
       {/* ─── Section 2: ความปลอดภัย ─── */}
+      <div id="section-security">
       <SectionCard accentColor="#52c41a">
         <SectionHeader
           icon={<SafetyCertificateOutlined />}
@@ -259,16 +258,16 @@ export default function AccountSettingForm() {
           style={{
             padding: "12px 16px",
             borderRadius: 10,
-            background: "#52c41a12",
-            border: "1px solid #52c41a33",
+            background: token.colorSuccessBg,
+            border: `1px solid ${token.colorSuccessBorder}`,
             marginBottom: 24,
           }}
         >
           <Flex gap={8} wrap="wrap">
             {["8 ตัวอักษรขึ้นไป", "มีตัวเลขอย่างน้อย 1 ตัว", "หลีกเลี่ยงข้อมูลส่วนตัว"].map((tip) => (
               <Flex key={tip} align="center" gap={5}>
-                <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 12 }} />
-                <Text style={{ fontSize: 12, color: "#52c41a" }}>{tip}</Text>
+                <CheckCircleOutlined style={{ color: token.colorSuccess, fontSize: 12 }} />
+                <Text style={{ fontSize: 12, color: token.colorSuccess }}>{tip}</Text>
               </Flex>
             ))}
           </Flex>
@@ -334,8 +333,10 @@ export default function AccountSettingForm() {
           </Flex>
         </Form>
       </SectionCard>
+      </div>
 
       {/* ─── Section 3: ข้อมูลบัญชี (read-only) ─── */}
+      <div id="section-account">
       <SectionCard accentColor="#fa8c16">
         <SectionHeader
           icon={<IdcardOutlined />}
@@ -400,6 +401,7 @@ export default function AccountSettingForm() {
           ))}
         </Flex>
       </SectionCard>
+      </div>
 
     </Flex>
   );

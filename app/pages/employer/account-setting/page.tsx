@@ -4,33 +4,68 @@
 import {
   BankOutlined,
   CrownOutlined,
-  LockOutlined,
+  IdcardOutlined,
   MailOutlined,
+  SafetyCertificateOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Avatar, Breadcrumb, Col, Flex, Row, Tag, theme, Typography } from "antd";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import { useAuthStore } from "@/app/stores/auth-store";
 import AccountSettingForm from "./components/account-setting-form";
 
 const { Title, Text } = Typography;
 
-// ✨ เมนู sidebar แต่ละ section
+// ✨ section id ต้องตรงกับ id ที่ใส่ใน AccountSettingForm
 const SECTIONS = [
-  { icon: <UserOutlined />, label: "ข้อมูลส่วนตัว", color: "#11b6f5" },
-  { icon: <LockOutlined />, label: "ความปลอดภัย", color: "#52c41a" },
-  { icon: <MailOutlined />, label: "ข้อมูลบัญชี", color: "#fa8c16" },
+  { id: "section-personal", icon: <UserOutlined />, label: "ข้อมูลส่วนตัว", color: "#11b6f5" },
+  { id: "section-security", icon: <SafetyCertificateOutlined />, label: "ความปลอดภัย", color: "#52c41a" },
+  { id: "section-account", icon: <IdcardOutlined />, label: "ข้อมูลบัญชี", color: "#fa8c16" },
 ];
 
 export default function EmployerAccountSettingPage() {
   const { user } = useAuthStore();
   const { token } = theme.useToken();
+  const [activeSection, setActiveSection] = useState("section-personal");
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const initials = user?.full_name
-    ? user.full_name.slice(0, 2).toUpperCase()
-    : "?";
+  const initials = user?.full_name ? user.full_name.slice(0, 2).toUpperCase() : "?";
+
+  // ✨ IntersectionObserver — ติดตาม section ที่กำลังมองเห็นอยู่
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        // ✨ เลือก section แรกที่ intersecting จาก top ลงล่าง
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: 0 },
+    );
+
+    SECTIONS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  // ✨ scroll ไปยัง section เมื่อกด sidebar
+  const handleScrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const offset = 96; // ความสูง navbar
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: "smooth" });
+    setActiveSection(id);
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: token.colorBgLayout }}>
@@ -44,7 +79,6 @@ export default function EmployerAccountSettingPage() {
           overflow: "hidden",
         }}
       >
-        {/* Decorative blobs */}
         <div style={{
           position: "absolute", top: -60, right: -60, width: 280, height: 280,
           borderRadius: "50%", background: "rgba(17,182,245,0.12)", pointerEvents: "none",
@@ -70,19 +104,15 @@ export default function EmployerAccountSettingPage() {
                 style={{
                   background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
                   border: "3px solid rgba(255,255,255,0.3)",
-                  fontSize: 26,
-                  fontWeight: 700,
-                  color: "#fff",
-                  flexShrink: 0,
+                  fontSize: 26, fontWeight: 700, color: "#fff", flexShrink: 0,
                 }}
               >
                 {!user?.profile_image_url && initials}
               </Avatar>
-              {/* Online dot */}
               <div style={{
                 position: "absolute", bottom: 2, right: 2,
                 width: 14, height: 14, borderRadius: "50%",
-                background: "#52c41a", border: "2px solid white",
+                background: token.colorSuccess, border: `2px solid ${token.colorBgLayout}`,
               }} />
             </div>
             <Flex vertical gap={4}>
@@ -90,28 +120,10 @@ export default function EmployerAccountSettingPage() {
                 {user?.full_name || "ผู้ดูแลระบบ"}
               </Title>
               <Flex gap={8} align="center">
-                <Tag
-                  icon={<BankOutlined />}
-                  color="default"
-                  style={{
-                    background: "rgba(255,255,255,0.15)",
-                    borderColor: "rgba(255,255,255,0.25)",
-                    color: "white",
-                    fontSize: 12,
-                  }}
-                >
+                <Tag icon={<BankOutlined />} color="default" style={{ background: "rgba(255,255,255,0.15)", borderColor: "rgba(255,255,255,0.25)", color: "white", fontSize: 12 }}>
                   สถานศึกษา
                 </Tag>
-                <Tag
-                  icon={<CrownOutlined />}
-                  color="default"
-                  style={{
-                    background: "rgba(255,255,255,0.1)",
-                    borderColor: "rgba(255,255,255,0.2)",
-                    color: "rgba(255,255,255,0.8)",
-                    fontSize: 12,
-                  }}
-                >
+                <Tag icon={<CrownOutlined />} color="default" style={{ background: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)", fontSize: 12 }}>
                   Basic Plan
                 </Tag>
               </Flex>
@@ -120,64 +132,78 @@ export default function EmployerAccountSettingPage() {
         </div>
       </div>
 
-      {/* ─── Main Content (ดึงขึ้นมาทับ banner ด้วย negative margin) ─── */}
+      {/* ─── Main Content ─── */}
       <div style={{ maxWidth: 1152, margin: "-40px auto 0", padding: "0 24px 80px", position: "relative" }}>
-        <Row gutter={24} align="top">
+        {/* ✨ align="stretch" ทำให้ Col ยืดตามความสูง content — จำเป็นสำหรับ sticky */}
+        <Row gutter={24} align="stretch" style={{ alignItems: "flex-start" }}>
 
           {/* ─── Sidebar ─── */}
-          <Col xs={0} lg={6}>
+          <Col xs={0} lg={6} style={{ alignSelf: "flex-start", position: "sticky", top: 88 }}>
             <div
               style={{
                 background: token.colorBgContainer,
                 borderRadius: 16,
                 padding: "20px 16px",
                 border: `1px solid ${token.colorBorderSecondary}`,
-                position: "sticky",
-                top: 88,
               }}
             >
               <Text type="secondary" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "0 8px" }}>
                 การตั้งค่า
               </Text>
               <Flex vertical gap={4} style={{ marginTop: 12 }}>
-                {SECTIONS.map((s, i) => (
-                  <Flex
-                    key={i}
-                    align="center"
-                    gap={12}
-                    style={{
-                      padding: "10px 12px",
-                      borderRadius: 10,
-                      cursor: "pointer",
-                      background: i === 0 ? `${token.colorPrimary}15` : "transparent",
-                      color: i === 0 ? token.colorPrimary : token.colorText,
-                      transition: "background 0.2s",
-                    }}
-                  >
+                {SECTIONS.map((s) => {
+                  const isActive = activeSection === s.id;
+                  return (
                     <Flex
+                      key={s.id}
                       align="center"
-                      justify="center"
+                      gap={12}
+                      onClick={() => handleScrollTo(s.id)}
                       style={{
-                        width: 32, height: 32, borderRadius: 8,
-                        background: i === 0 ? token.colorPrimary : token.colorFillTertiary,
-                        color: i === 0 ? "white" : token.colorTextSecondary,
-                        fontSize: 14, flexShrink: 0,
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        cursor: "pointer",
+                        background: isActive ? `${token.colorPrimary}18` : "transparent",
+                        border: `1px solid ${isActive ? `${token.colorPrimary}40` : "transparent"}`,
+                        transition: "all 0.2s",
                       }}
                     >
-                      {s.icon}
+                      <Flex
+                        align="center"
+                        justify="center"
+                        style={{
+                          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                          background: isActive ? token.colorPrimary : token.colorFillTertiary,
+                          color: isActive ? "white" : token.colorTextSecondary,
+                          fontSize: 14,
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {s.icon}
+                      </Flex>
+                      <Text style={{
+                        fontSize: 14,
+                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? token.colorPrimary : token.colorText,
+                        transition: "all 0.2s",
+                      }}>
+                        {s.label}
+                      </Text>
+                      {/* ✨ Active indicator dot */}
+                      {isActive && (
+                        <div style={{
+                          marginLeft: "auto", width: 6, height: 6,
+                          borderRadius: "50%", background: token.colorPrimary, flexShrink: 0,
+                        }} />
+                      )}
                     </Flex>
-                    <Text style={{ fontSize: 14, fontWeight: i === 0 ? 600 : 400, color: "inherit" }}>
-                      {s.label}
-                    </Text>
-                  </Flex>
-                ))}
+                  );
+                })}
               </Flex>
 
               {/* ─── Account info mini card ─── */}
               <div style={{
-                marginTop: 20,
-                padding: "14px 12px",
-                borderRadius: 12,
+                marginTop: 20, padding: "14px 12px", borderRadius: 12,
                 background: token.colorFillQuaternary,
                 border: `1px solid ${token.colorBorderSecondary}`,
               }}>

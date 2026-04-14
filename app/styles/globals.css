@@ -1,3 +1,25 @@
+/* 🌙 [Dark Mode - Browser Autofill Fix — Chrome override ทำให้ background เป็นขาว] */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus,
+[data-theme="dark"] input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc;
+}
+
+/* ☀️ [Light Mode - Browser Autofill Fix] */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #1e293b !important;
+  caret-color: #1e293b;
+}
+
 /* ✨ [Table Striped Rows - Light Mode] */
 .table-row-striped > td {
   background-color: #f5faff !important;

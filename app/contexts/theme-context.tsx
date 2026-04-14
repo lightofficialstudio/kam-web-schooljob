@@ -105,12 +105,40 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         fontWeight: 500,
       },
 
-      // ✨ [Input Styling]
+      // ✨ [Input Styling - รองรับ Dark Mode ทุก variant: Text, Password, TextArea, Search]
       Input: {
         controlHeight: 36,
         borderRadius: 8,
-        colorBgContainer: mode === "dark" ? "#0F172A" : "#ffffff",
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
         colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
+        hoverBorderColor: "#11b6f5",
+        activeBorderColor: "#11b6f5",
+        activeShadow:
+          mode === "dark"
+            ? "0 0 0 2px rgba(17,182,245,0.2)"
+            : "0 0 0 2px rgba(17,182,245,0.1)",
+        addonBg: mode === "dark" ? "#0F172A" : "#fafafa",
+        colorBgContainerDisabled: mode === "dark" ? "#0F172A" : "#f5f5f5",
+        colorTextDisabled: mode === "dark" ? "#475569" : "#00000040",
+      },
+
+      // ✨ [InputNumber Styling - รองรับ Dark Mode]
+      InputNumber: {
+        controlHeight: 36,
+        borderRadius: 8,
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
+        hoverBorderColor: "#11b6f5",
+        activeBorderColor: "#11b6f5",
+        activeShadow:
+          mode === "dark"
+            ? "0 0 0 2px rgba(17,182,245,0.2)"
+            : "0 0 0 2px rgba(17,182,245,0.1)",
+        colorBgContainerDisabled: mode === "dark" ? "#0F172A" : "#f5f5f5",
       },
 
       // ✨ [Form Styling]
@@ -122,10 +150,40 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       // ✨ [Select Styling]
       Select: {
-        colorBgContainer: mode === "dark" ? "#2D3748" : "#ffffff",
-        colorBorder: mode === "dark" ? "#404854" : "#d9d9d9",
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
         controlHeight: 40,
         borderRadius: 8,
+        optionSelectedBg:
+          mode === "dark" ? "rgba(17,182,245,0.15)" : "rgba(17,182,245,0.08)",
+        optionActiveBg:
+          mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+      },
+
+      // ✨ [DatePicker / TimePicker Styling - รองรับ Dark Mode]
+      DatePicker: {
+        controlHeight: 36,
+        borderRadius: 8,
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBgElevated: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
+        colorIcon: mode === "dark" ? "#94A3B8" : "#9CA3AF",
+        colorIconHover: "#11b6f5",
+        hoverBorderColor: "#11b6f5",
+        activeBorderColor: "#11b6f5",
+        activeShadow:
+          mode === "dark"
+            ? "0 0 0 2px rgba(17,182,245,0.2)"
+            : "0 0 0 2px rgba(17,182,245,0.1)",
+        colorTextDisabled: mode === "dark" ? "#475569" : "#00000040",
+        cellHoverBg:
+          mode === "dark" ? "rgba(17,182,245,0.1)" : "rgba(17,182,245,0.06)",
+        cellActiveWithRangeBg:
+          mode === "dark" ? "rgba(17,182,245,0.08)" : "rgba(17,182,245,0.04)",
       },
 
       // ✨ [Table Styling - Striped Rows]
