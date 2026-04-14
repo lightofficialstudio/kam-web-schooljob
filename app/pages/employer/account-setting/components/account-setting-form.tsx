@@ -5,6 +5,7 @@ import {
   CheckCircleOutlined,
   CopyOutlined,
   IdcardOutlined,
+  InfoCircleOutlined,
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
@@ -36,7 +37,7 @@ import {
 } from "../_api/account-setting-api";
 import { useAccountSettingStore } from "../_state/account-setting-store";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 // ✨ Section header พร้อม icon pill — ใช้ token เพื่อ dark mode support
 const SectionHeader: React.FC<{
@@ -172,36 +173,58 @@ export default function AccountSettingForm() {
       <SectionCard accentColor="#11b6f5">
         <SectionHeader
           icon={<UserOutlined />}
-          title="ข้อมูลส่วนตัวผู้ดูแลระบบ"
-          desc="ชื่อ-นามสกุล และเบอร์โทรของผู้ดูแล (แยกจากชื่อโรงเรียน)"
+          title="ข้อมูลผู้ดูแลระบบ"
+          desc="ชื่อ-นามสกุลของผู้ดูแลที่ login — ไม่ใช่ชื่อโรงเรียน"
           color="#11b6f5"
         />
+
+        {/* ✨ Context banner — อธิบายความต่างชัดเจน */}
+        <Flex
+          align="center"
+          gap={10}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 10,
+            background: token.colorInfoBg,
+            border: `1px solid ${token.colorInfoBorder}`,
+            marginBottom: 24,
+          }}
+        >
+          <InfoCircleOutlined style={{ color: token.colorInfo, fontSize: 14, flexShrink: 0 }} />
+          <Text style={{ fontSize: 13, color: token.colorInfoText }}>
+            <Text strong style={{ color: token.colorInfoText }}>ชื่อโรงเรียน</Text>
+            {" "}แก้ไขได้ที่{" "}
+            <Text strong style={{ color: token.colorInfoText }}>โปรไฟล์โรงเรียน</Text>
+            {" "}— ส่วนนี้คือข้อมูลของ <Text strong style={{ color: token.colorInfoText }}>ผู้ดูแลที่ login</Text> เท่านั้น
+          </Text>
+        </Flex>
+
         <Form form={personalForm} layout="vertical" onFinish={handleSavePersonal} size="large">
           <Row gutter={[16, 0]}>
             <Col xs={24} md={12}>
               <Form.Item
                 name="first_name"
-                label="ชื่อ"
+                label="ชื่อผู้ดูแลระบบ"
                 rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
               >
                 <Input
                   prefix={<UserOutlined style={{ color: token.colorTextTertiary }} />}
-                  placeholder="ชื่อผู้ดูแลระบบ"
+                  placeholder="เช่น สมชาย"
                   style={{ borderRadius: 10 }}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="last_name" label="นามสกุล">
+              <Form.Item name="last_name" label="นามสกุลผู้ดูแลระบบ">
                 <Input
                   prefix={<UserOutlined style={{ color: token.colorTextTertiary }} />}
-                  placeholder="นามสกุล"
+                  placeholder="เช่น ใจดี"
                   style={{ borderRadius: 10 }}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="phone_number" label="เบอร์โทรศัพท์">
+              <Form.Item name="phone_number" label="เบอร์โทรผู้ดูแลระบบ">
                 <Input
                   prefix={<PhoneOutlined style={{ color: token.colorTextTertiary }} />}
                   placeholder="0812345678"
@@ -210,7 +233,7 @@ export default function AccountSettingForm() {
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="อีเมล">
+              <Form.Item label="อีเมลเข้าสู่ระบบ">
                 <Input
                   prefix={<MailOutlined style={{ color: token.colorTextTertiary }} />}
                   value={user?.email}
@@ -218,7 +241,7 @@ export default function AccountSettingForm() {
                   style={{ borderRadius: 10 }}
                   suffix={
                     <Tag color="default" style={{ fontSize: 11, margin: 0 }}>
-                      ไม่สามารถแก้ไขได้
+                      แก้ไขไม่ได้
                     </Tag>
                   }
                 />

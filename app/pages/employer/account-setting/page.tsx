@@ -185,13 +185,17 @@ export default function EmployerAccountSettingPage() {
               />
             </div>
             <Flex vertical gap={4}>
+              {/* ✨ full_name คือชื่อโรงเรียน (schoolName) */}
               <Title
                 level={3}
                 style={{ margin: 0, color: "white", lineHeight: 1.2 }}
               >
-                {user?.full_name || "ผู้ดูแลระบบ"}
+                {user?.full_name || "ชื่อโรงเรียน"}
               </Title>
-              <Flex gap={8} align="center">
+              <Typography.Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
+                ตั้งค่าบัญชีผู้ดูแลระบบ
+              </Typography.Text>
+              <Flex gap={8} align="center" style={{ marginTop: 4 }}>
                 <Tag
                   icon={<BankOutlined />}
                   color="default"
