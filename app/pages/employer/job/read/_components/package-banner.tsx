@@ -6,6 +6,7 @@ import {
   CheckCircleFilled,
   CrownOutlined,
   LockOutlined,
+  Space,
   ThunderboltOutlined,
   UpCircleOutlined,
 } from "@ant-design/icons";
@@ -93,19 +94,19 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
       : pkg.planColor;
 
   return (
-    <Flex vertical gap={8}>
+    <Flex vertical gap={12}>
       {/* ─── Banner หลัก ─── */}
       <Card
         variant="borderless"
         style={{
-          borderRadius: 14,
-          border: `1.5px solid ${pkg.planColor}40`,
-          background: `linear-gradient(135deg, ${token.colorBgContainer} 0%, ${pkg.planColor}08 100%)`,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          borderRadius: 16,
+          border: `1px solid ${token.colorBorderSecondary}`,
+          background: token.colorBgContainer,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
         }}
-        styles={{ body: { padding: "16px 20px" } }}
+        styles={{ body: { padding: "20px 24px" } }}
       >
-        <Flex align="center" gap={16} wrap="wrap">
+        <Flex align="center" gap={20} wrap="wrap">
           {/* ─── Plan Badge ─── */}
           <Flex align="center" gap={10} style={{ flexShrink: 0 }}>
             <Flex
@@ -175,9 +176,19 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
           />
 
           {/* ─── Quota Usage ─── */}
-          <Flex vertical gap={4} style={{ minWidth: 200, flex: 1 }}>
+          <Flex vertical gap={6} style={{ minWidth: 260, flex: 2, padding: "4px 0" }}>
             <Flex align="center" justify="space-between">
-              <Text style={{ fontSize: 12, fontWeight: 600 }}>Job Quota</Text>
+              <Space gap={6} align="center">
+                <Text style={{ fontSize: 13, fontWeight: 700 }}>Job Quota</Text>
+                <Tag color={pkg.isAtLimit ? "error" : "primary"} style={{ margin: 0, fontSize: 10, borderRadius: 4 }}>
+                  {pkg.jobQuotaUsed} / {pkg.jobQuotaMax === 999 ? "∞" : pkg.jobQuotaMax}
+                </Tag>
+              </Space>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                การใช้งานประกาศงาน
+              </Text>
+            </Flex>
+            <Progress
               <Flex align="center" gap={6}>
                 <Text
                   style={{
@@ -201,13 +212,19 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
               size="small"
               showInfo={false}
               strokeColor={progressColor}
-              railColor={token.colorFillTertiary}
+              railColor={token.colorFillQuaternary}
+              strokeWidth={8}
             />
-            <Text type="secondary" style={{ fontSize: 11 }}>
-              {pkg.isAtLimit
-                ? "ใช้ quota ครบแล้ว — ต้องอัปเกรดเพื่อลงประกาศเพิ่ม"
-                : `เหลืออีก ${pkg.jobQuotaRemaining} ตำแหน่งที่ลงได้`}
-            </Text>
+            <Flex align="center" justify="space-between">
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                {pkg.isAtLimit
+                  ? "ใช้ quota ครบแล้ว — ต้องอัปเกรดเพื่อลงประกาศเพิ่ม"
+                  : `เหลืออีก ${pkg.jobQuotaRemaining} ตำแหน่งที่ลงได้`}
+              </Text>
+              <Text style={{ fontSize: 11, fontWeight: 700, color: progressColor }}>
+                {pkg.quotaUsagePercent}%
+              </Text>
+            </Flex>
           </Flex>
 
           {/* ─── Features (tooltip) ─── */}

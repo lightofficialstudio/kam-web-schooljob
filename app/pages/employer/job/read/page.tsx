@@ -8,7 +8,6 @@ import {
   Button,
   Flex,
   Layout,
-  Spin,
   Typography,
   theme,
 } from "antd";
@@ -19,6 +18,7 @@ import { FilterSection } from "./_components/filter-section";
 import { InsightsCard } from "./_components/insights-card";
 import { JobStatsModal } from "./_components/job-stats-modal";
 import { JobsTable } from "./_components/jobs-table";
+import { MyJobsSkeleton } from "./_components/my-jobs-skeleton";
 import { PackageBanner } from "./_components/package-banner";
 import { StatsSection } from "./_components/stats-section";
 import { useApplicantDrawerStore } from "./_state/applicant-drawer-store";
@@ -170,7 +170,9 @@ export default function MyJobsPage() {
 
       {/* Main Content — overlaps header by pulling up */}
       <Content>
-        <Spin spinning={isLoading} size="large">
+        {isLoading ? (
+          <MyJobsSkeleton />
+        ) : (
           <Flex
             vertical
             gap={24}
@@ -187,7 +189,7 @@ export default function MyJobsPage() {
             <FilterSection />
             <JobsTable />
           </Flex>
-        </Spin>
+        )}
       </Content>
 
       {/* Drawer แสดงรายชื่อผู้สมัครของตำแหน่งที่เลือก */}
