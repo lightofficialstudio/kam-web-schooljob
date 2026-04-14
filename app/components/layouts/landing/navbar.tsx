@@ -495,13 +495,12 @@ export default function Navbar() {
                     <Text strong style={{ fontSize: 13 }}>
                       {user.full_name}
                     </Text>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      {user.role === "EMPLOYEE"
-                        ? "ครูผู้สอน"
-                        : user.role === "EMPLOYER"
-                          ? "สถานศึกษา"
-                          : "ผู้ดูแลระบบ"}
-                    </Text>
+                    {/* ✨ EMPLOYER แสดงชื่อโรงเรียนด้านล่าง (full_name คือ schoolName), EMPLOYEE แสดง role label */}
+                    {user.role !== "EMPLOYER" && (
+                      <Text type="secondary" style={{ fontSize: 11 }}>
+                        {user.role === "EMPLOYEE" ? "ครูผู้สอน" : "ผู้ดูแลระบบ"}
+                      </Text>
+                    )}
                   </Flex>
                 </Flex>
               </div>
