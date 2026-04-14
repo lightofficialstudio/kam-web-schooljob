@@ -4,7 +4,7 @@
 import BaseModal from "@/app/components/layouts/modal/base-modal";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { CheckCircleFilled } from "@ant-design/icons";
-import { Button, Col, Flex, Row, Spin, theme } from "antd";
+import { Button, Col, Row, theme } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -12,6 +12,7 @@ import { ProfileEditDrawer } from "./_components/profile-edit-drawer";
 import { SchoolInfoTab } from "./_components/school-info-tab";
 import { SchoolProfileHeader } from "./_components/school-profile-header";
 import { SchoolProfileSidebar } from "./_components/school-profile-sidebar";
+import { SchoolProfileSkeleton } from "./_components/school-profile-skeleton";
 import {
   SchoolProfile,
   useSchoolProfileState,
@@ -74,13 +75,9 @@ export default function EmployerProfilePage() {
   // รอ hydration
   if (!isMounted) return null;
 
-  // แสดง Loading spinner ขณะโหลดข้อมูลจาก API
+  // ✨ แสดง Loading Skeleton ขณะโหลดข้อมูลจาก API (Smooth UX)
   if (isLoading) {
-    return (
-      <Flex align="center" justify="center" style={{ minHeight: "100vh" }}>
-        <Spin size="large" />
-      </Flex>
-    );
+    return <SchoolProfileSkeleton />;
   }
 
   return (
