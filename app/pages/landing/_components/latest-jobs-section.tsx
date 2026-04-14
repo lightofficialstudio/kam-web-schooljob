@@ -24,7 +24,7 @@ interface LatestJob {
   id: string;
   title: string;
   school: string;
-  schoolLogo: string;
+  schoolLogo: string | null;
   location: string;
   salary: string;
   postedAt: string;
@@ -156,11 +156,22 @@ export default function LatestJobsSection() {
                     {/* School Info */}
                     <Flex gap={12} align="center">
                       <Avatar
-                        src={job.schoolLogo}
+                        src={job.schoolLogo || undefined}
                         size={48}
                         shape="square"
-                        style={{ borderRadius: "8px", flexShrink: 0 }}
-                      />
+                        style={{
+                          borderRadius: "10px",
+                          flexShrink: 0,
+                          background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: "#fff",
+                          border: "none",
+                        }}
+                        onError={() => true}
+                      >
+                        {job.school.charAt(0)}
+                      </Avatar>
                       <div style={{ overflow: "hidden" }}>
                         <Title
                           level={4}
@@ -189,7 +200,7 @@ export default function LatestJobsSection() {
                       ))}
                     </Space>
 
-                    <Link href={`/pages/job/${job.id}/apply`}>
+                    <Link href={`/pages/job?job_id=${job.id}`}>
                       <Button
                         type="primary"
                         block

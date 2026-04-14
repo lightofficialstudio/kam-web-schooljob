@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.dicebear.com",
       },
+      {
+        // ✨ Supabase Storage — รูปโลโก้โรงเรียนที่ upload ผ่านระบบ
+        protocol: "https",
+        hostname: "seyhbpldvjcalqqybmzl.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
 };

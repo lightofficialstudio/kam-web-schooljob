@@ -16,7 +16,7 @@ import { useAuthStore } from "@/app/stores/auth-store";
 // Inner component ที่ใช้ useSearchParams (ต้องอยู่ใน Suspense)
 function JobSearchPageContent() {
   const searchParams = useSearchParams();
-  const { setFilters } = useJobSearchStore();
+  const { setFilters, fetchAndOpenJob } = useJobSearchStore();
   const { applications, setIsTrackerOpen, fetchApplications } = useApplicationTrackerStore();
   const { user } = useAuthStore();
 
@@ -40,6 +40,12 @@ function JobSearchPageContent() {
       setFilters(partial);
     }
   }, [searchParams, setFilters]);
+
+  // ✨ เปิด Drawer อัตโนมัติเมื่อมี ?job_id= param (เช่น มาจาก Landing Page)
+  useEffect(() => {
+    const jobId = searchParams.get("job_id");
+    if (jobId) fetchAndOpenJob(jobId);
+  }, [searchParams]);
 
   // ✨ ดึงใบสมัครของ Employee เมื่อ login แล้ว
   useEffect(() => {

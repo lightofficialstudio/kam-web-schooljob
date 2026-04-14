@@ -38,8 +38,7 @@ export async function GET() {
         id: job.id,
         title: job.title,
         school: job.schoolProfile.schoolName,
-        schoolLogo: job.schoolProfile.logoUrl
-          ?? `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(job.schoolProfile.schoolName)}`,
+        schoolLogo: job.schoolProfile.logoUrl ?? null,
         location: job.schoolProfile.province,
         salary: salaryText,
         postedAt: job.createdAt.toISOString(),

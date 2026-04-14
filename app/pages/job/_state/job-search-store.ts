@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchJobList } from "../_api/job-search-api";
+import { fetchJobById, fetchJobList } from "../_api/job-search-api";
 
 export interface Job {
   id: string;
@@ -58,8 +58,9 @@ interface JobSearchState {
   selectedJob: Job | null;
   isDrawerOpen: boolean;
   pageSize: number;
-  fetchJobs: () => Promise<void>;   // ✨ โหลดครั้งแรก (reset list)
-  loadMore: () => Promise<void>;    // ✨ โหลดเพิ่มเติม (append)
+  fetchJobs: () => Promise<void>;           // ✨ โหลดครั้งแรก (reset list)
+  loadMore: () => Promise<void>;            // ✨ โหลดเพิ่มเติม (append)
+  fetchAndOpenJob: (id: string) => Promise<void>; // ✨ ดึง job แล้วเปิด Drawer (จาก URL param)
   setFilters: (filters: Partial<JobFilters>) => void;
   resetFilters: () => void;
   setSelectedJob: (job: Job | null) => void;
@@ -165,6 +166,48 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
     } catch (error) {
       console.error("❌ loadMore:", error);
       set({ isLoadingMore: false });
+    }
+  },
+
+  // ✨ ดึง job เดี่ยวแล้วเปิด Drawer — ใช้เมื่อมาจาก ?job_id= URL param
+  fetchAndOpenJob: async (id: string) => {
+    try {
+      const res = await fetchJobById(id);
+      if (res.status_code !== 200 || !res.data) return;
+      const d = res.data;
+      // ✨ แมป response → Job interface
+      const job: Job = {
+        id: d.id,
+        title: d.title,
+        subjects: d.subjects ?? [],
+        grades: d.grades ?? [],
+        vacancyCount: d.positionsAvailable ?? 1,
+        salaryType: d.salaryNegotiable
+          ? "ตามประสบการณ์"
+          : d.salaryMin || d.salaryMax
+            ? "ระบุเงินเดือน"
+            : "ไม่ระบุ",
+        salaryMin: d.salaryMin ?? undefined,
+        salaryMax: d.salaryMax ?? undefined,
+        description: d.description ?? "",
+        educationLevel: "",
+        teachingExperience: "",
+        licenseRequired: d.licenseRequired ?? "",
+        gender: "ไม่จำกัด",
+        jobType: d.jobType ?? undefined,
+        schoolName: d.schoolName ?? "",
+        schoolType: d.schoolType ?? "",
+        province: d.province ?? "",
+        address: d.province ?? "",
+        logoUrl: d.logoUrl ?? undefined,
+        benefits: d.benefits ?? [],
+        deadline: d.deadline ?? null,
+        postedAt: d.postedAt ?? new Date().toISOString(),
+        isNew: false,
+      };
+      set({ selectedJob: job, isDrawerOpen: true });
+    } catch (err) {
+      console.error("❌ fetchAndOpenJob:", err);
     }
   },
 

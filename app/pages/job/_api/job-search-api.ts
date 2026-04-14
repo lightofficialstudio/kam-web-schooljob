@@ -19,6 +19,12 @@ export const fetchJobList = async (params?: JobSearchParams) => {
   return response.data;
 };
 
+// ✨ ดึงรายละเอียดงานตาม job_id (สำหรับเปิด Drawer จาก URL param)
+export const fetchJobById = async (jobId: string) => {
+  const response = await axios.get(`/api/v1/jobs/${jobId}`);
+  return response.data;
+};
+
 // ✨ ดึงใบสมัครของ Employee ตาม user_id
 export const fetchMyApplications = async (userId: string) => {
   const response = await axios.get("/api/v1/employee/applications/read", {

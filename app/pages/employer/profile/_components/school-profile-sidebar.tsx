@@ -101,15 +101,14 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
           <div style={{ position: "relative" }}>
             <Avatar
               size={120}
-              icon={<BankOutlined />}
-              src={
-                profile.logoUrl ||
-                `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`
-              }
+              icon={!profile.logoUrl ? <BankOutlined /> : undefined}
+              src={profile.logoUrl || undefined}
               style={{
-                backgroundColor: "#e60278",
+                background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
                 border: "4px solid white",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                boxShadow: "0 4px 16px rgba(17,182,245,0.25)",
+                fontSize: 40,
+                color: "#fff",
               }}
             />
             <div
