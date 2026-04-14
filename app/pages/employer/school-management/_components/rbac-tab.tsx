@@ -48,7 +48,6 @@ import {
   Row,
   Select,
   Skeleton,
-  Spin,
   Table,
   Tag,
   Tooltip,
@@ -1070,7 +1069,11 @@ export const RbacTab = ({ userId }: { userId: string }) => {
               </Flex>
             }
           >
-            <Spin spinning={isLoadingRoles}>
+            {isLoadingRoles ? (
+              <div style={{ padding: "16px" }}>
+                <Skeleton active paragraph={{ rows: 6 }} />
+              </div>
+            ) : (
               <Flex vertical gap={0}>
                 {roles.map((role, i) => (
                   <div
@@ -1177,7 +1180,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                   </div>
                 ))}
               </Flex>
-            </Spin>
+            )}
           </Card>
         </Col>
 
@@ -1309,13 +1312,17 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                 type="info"
                 showIcon
               />
-              <Spin spinning={isLoadingMembers}>
+              {isLoadingMembers ? (
+                <div style={{ padding: "24px" }}>
+                  <Skeleton active avatar paragraph={{ rows: 8 }} />
+                </div>
+              ) : (
                 <MemberRolePanel
                   members={members}
                   roles={roles}
                   userId={userId}
                 />
-              </Spin>
+              )}
             </Card>
           ) : null}
         </Col>

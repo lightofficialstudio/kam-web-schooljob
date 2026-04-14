@@ -39,8 +39,8 @@ import {
   Modal,
   Row,
   Select,
+  Skeleton,
   Space,
-  Spin,
   Table,
   Tag,
   Tooltip,
@@ -862,42 +862,78 @@ export default function SchoolManagementPage() {
       {/* ─── Stats Row ────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px" }}>
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          {statCards.map((card) => (
-            <Col xs={12} md={6} key={card.label}>
-              <Card
-                variant="borderless"
-                style={{
-                  borderRadius: 12,
-                  backgroundColor: card.bg,
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                }}
-                styles={{ body: { padding: "16px 20px" } }}
-              >
-                <Flex align="center" gap={12}>
-                  <Flex
-                    align="center"
-                    justify="center"
+          {isLoadingMembers || isLoadingInvites
+            ? // ✨ Stats Card Skeleton
+              [1, 2, 3, 4].map((i) => (
+                <Col xs={12} md={6} key={i}>
+                  <Card
+                    variant="borderless"
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 10,
-                      backgroundColor: "rgba(255,255,255,0.7)",
+                      borderRadius: 12,
+                      background: token.colorBgContainer,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                     }}
+                    styles={{ body: { padding: "16px 20px" } }}
                   >
-                    {card.icon}
-                  </Flex>
-                  <Flex vertical gap={2}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {card.label}
-                    </Text>
-                    <Text strong style={{ fontSize: 22, lineHeight: 1 }}>
-                      {card.value}
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Card>
-            </Col>
-          ))}
+                    <Flex align="center" gap={12}>
+                      <Skeleton.Avatar
+                        active
+                        size={44}
+                        shape="square"
+                        style={{ borderRadius: 10 }}
+                      />
+                      <Flex vertical gap={4} style={{ flex: 1 }}>
+                        <Skeleton.Input
+                          active
+                          size="small"
+                          style={{ width: "60%", height: 14 }}
+                        />
+                        <Skeleton.Input
+                          active
+                          size="small"
+                          style={{ width: "40%", height: 22 }}
+                        />
+                      </Flex>
+                    </Flex>
+                  </Card>
+                </Col>
+              ))
+            : statCards.map((card) => (
+                <Col xs={12} md={6} key={card.label}>
+                  <Card
+                    variant="borderless"
+                    style={{
+                      borderRadius: 12,
+                      backgroundColor: card.bg,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    }}
+                    styles={{ body: { padding: "16px 20px" } }}
+                  >
+                    <Flex align="center" gap={12}>
+                      <Flex
+                        align="center"
+                        justify="center"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          backgroundColor: "rgba(255,255,255,0.7)",
+                        }}
+                      >
+                        {card.icon}
+                      </Flex>
+                      <Flex vertical gap={2}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {card.label}
+                        </Text>
+                        <Text strong style={{ fontSize: 22, lineHeight: 1 }}>
+                          {card.value}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </Card>
+                </Col>
+              ))}
         </Row>
 
         {/* ─── Tab Navigation ────────────────────────────────────────── */}
@@ -1000,22 +1036,34 @@ export default function SchoolManagementPage() {
               </Flex>
             }
           >
-            <Spin spinning={isLoadingMembers}>
+            {isLoadingMembers ? (
+              <div style={{ padding: "24px" }}>
+                <Skeleton active avatar paragraph={{ rows: 6 }} />
+              </div>
+            ) : members.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <Text type="secondary">ยังไม่มีสมาชิกในทีมของคุณ</Text>
+                }
+                style={{ padding: "60px 0" }}
+              >
+                <Button
+                  type="primary"
+                  icon={<UserAddOutlined />}
+                  onClick={() => setIsInviteOpen(true)}
+                >
+                  เชิญสมาชิกคนแรก
+                </Button>
+              </Empty>
+            ) : (
               <Table
                 columns={memberColumns}
                 dataSource={members}
                 rowKey="id"
                 pagination={false}
-                locale={{
-                  emptyText: (
-                    <Empty
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      description={<Text type="secondary">ยังไม่มีสมาชิก</Text>}
-                    />
-                  ),
-                }}
               />
-            </Spin>
+            )}
           </Card>
         )}
 
@@ -1051,37 +1099,39 @@ export default function SchoolManagementPage() {
               </Flex>
             }
           >
-            <Spin spinning={isLoadingInvites}>
-              {invites.length === 0 && !isLoadingInvites ? (
-                <Flex
-                  justify="center"
-                  align="center"
-                  style={{ padding: "60px 0" }}
+            {isLoadingInvites ? (
+              <div style={{ padding: "24px" }}>
+                <Skeleton active paragraph={{ rows: 5 }} />
+              </div>
+            ) : invites.length === 0 ? (
+              <Flex
+                justify="center"
+                align="center"
+                style={{ padding: "60px 0" }}
+              >
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>
+                  }
                 >
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={
-                      <Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>
-                    }
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setIsInviteOpen(true)}
                   >
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      onClick={() => setIsInviteOpen(true)}
-                    >
-                      ส่งคำเชิญ
-                    </Button>
-                  </Empty>
-                </Flex>
-              ) : (
-                <Table
-                  columns={inviteColumns}
-                  dataSource={invites}
-                  rowKey="id"
-                  pagination={false}
-                />
-              )}
-            </Spin>
+                    ส่งคำเชิญ
+                  </Button>
+                </Empty>
+              </Flex>
+            ) : (
+              <Table
+                columns={inviteColumns}
+                dataSource={invites}
+                rowKey="id"
+                pagination={false}
+              />
+            )}
           </Card>
         )}
 
@@ -1113,31 +1163,35 @@ export default function SchoolManagementPage() {
                   </Link>
                 }
               >
-                <Descriptions
-                  column={1}
-                  size="small"
-                  styles={{ label: { width: 140 } }}
-                >
-                  <Descriptions.Item label="สมาชิกทั้งหมด">
-                    <Text strong>{members.length} คน</Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="บทบาทในระบบ">
-                    <Flex gap={4} wrap="wrap">
-                      {roles.map((r) => (
-                        <Tag
-                          key={r.id}
-                          color={r.isSystem ? "blue" : "green"}
-                          style={{ fontSize: 11 }}
-                        >
-                          {r.name}
-                        </Tag>
-                      ))}
-                    </Flex>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="คำเชิญที่รอ">
-                    {invites.length} รายการ
-                  </Descriptions.Item>
-                </Descriptions>
+                {isLoadingMembers || isLoadingRoles ? (
+                  <Skeleton active paragraph={{ rows: 3 }} />
+                ) : (
+                  <Descriptions
+                    column={1}
+                    size="small"
+                    styles={{ label: { width: 140 } }}
+                  >
+                    <Descriptions.Item label="สมาชิกทั้งหมด">
+                      <Text strong>{members.length} คน</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="บทบาทในระบบ">
+                      <Flex gap={4} wrap="wrap">
+                        {roles.map((r) => (
+                          <Tag
+                            key={r.id}
+                            color={r.isSystem ? "blue" : "green"}
+                            style={{ fontSize: 11 }}
+                          >
+                            {r.name}
+                          </Tag>
+                        ))}
+                      </Flex>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="คำเชิญที่รอ">
+                      {invites.length} รายการ
+                    </Descriptions.Item>
+                  </Descriptions>
+                )}
               </Card>
             </Col>
 
@@ -1156,7 +1210,9 @@ export default function SchoolManagementPage() {
                   </Flex>
                 }
               >
-                <Spin spinning={isLoadingRoles}>
+                {isLoadingRoles ? (
+                  <Skeleton active paragraph={{ rows: 6 }} />
+                ) : (
                   <Flex vertical gap={12}>
                     {roles.map((role) => (
                       <Flex vertical gap={6} key={role.id}>
@@ -1195,7 +1251,7 @@ export default function SchoolManagementPage() {
                       </Flex>
                     ))}
                   </Flex>
-                </Spin>
+                )}
               </Card>
             </Col>
 
