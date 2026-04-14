@@ -15,6 +15,7 @@ interface AuthStore {
   user: User | null;
   isAuthenticated: boolean;
   setUser: (user: User) => void;
+  updateUser: (patch: Partial<User>) => void; // ✨ อัปเดตบางฟิลด์โดยไม่ต้อง re-login
   setFirstLogin: (isFirst: boolean) => void;
   logout: () => void;
 }
@@ -38,6 +39,13 @@ export const useAuthStore = create<AuthStore>()(
           "role:",
           user.role,
         );
+      },
+
+      // ✨ [อัปเดตบางฟิลด์ใน user โดยไม่ต้อง re-login]
+      updateUser: (patch: Partial<User>) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...patch } : null,
+        }));
       },
 
       // ✨ [กำหนดสถานะการเข้าสู่ระบบครั้งแรก]

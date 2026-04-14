@@ -28,7 +28,7 @@ export default function EmployerProfilePage() {
   } = useSchoolProfileState();
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { token } = theme.useToken();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, updateUser } = useAuthStore();
   const router = useRouter();
 
   // ✨ รอ hydration ก่อน redirect (ป้องกัน flash)
@@ -65,6 +65,8 @@ export default function EmployerProfilePage() {
   const handleSave = async (values: SchoolProfile) => {
     if (!user?.user_id) return;
     await saveProfile(values, user.user_id);
+    // ✨ sync school_name ใน auth store ทันที — navbar อัปเดตโดยไม่ต้อง re-login
+    if (values.name) updateUser({ school_name: values.name });
     setIsDrawerOpen(false);
     setIsSuccessModalOpen(true);
   };

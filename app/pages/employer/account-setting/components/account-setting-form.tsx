@@ -87,7 +87,7 @@ const SectionCard: React.FC<{ children: React.ReactNode; accentColor: string }> 
 );
 
 export default function AccountSettingForm() {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { token } = theme.useToken();
   const {
     isLoadingPersonal,
@@ -138,6 +138,9 @@ export default function AccountSettingForm() {
         lastName: values.last_name || "",
         phoneNumber: values.phone_number || "",
       });
+      // ✨ sync full_name ใน auth store ทันที — navbar อัปเดตโดยไม่ต้อง re-login
+      const newFullName = [values.first_name, values.last_name].filter(Boolean).join(" ");
+      updateUser({ full_name: newFullName });
       message.success("บันทึกข้อมูลส่วนตัวสำเร็จ");
     } catch {
       message.error("บันทึกไม่สำเร็จ กรุณาลองใหม่");
