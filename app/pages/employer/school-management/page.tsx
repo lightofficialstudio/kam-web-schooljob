@@ -1,9 +1,6 @@
 "use client";
 
 import { useAuthStore } from "@/app/stores/auth-store";
-import { RbacTab } from "./_components/rbac-tab";
-import { useOrgStore } from "./_state/org-store";
-import type { OrgMember, OrgInvite } from "./_state/org-store";
 import {
   BankOutlined,
   CheckCircleFilled,
@@ -23,6 +20,7 @@ import {
   UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import type { MenuProps } from "antd";
 import {
   App,
   Avatar,
@@ -53,23 +51,32 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { MenuProps } from "antd";
+import { RbacTab } from "./_components/rbac-tab";
+import type { OrgInvite, OrgMember } from "./_state/org-store";
+import { useOrgStore } from "./_state/org-store";
 
 const { Title, Text } = Typography;
 const PRIMARY = "#11b6f5";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const ROLE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  owner:  { label: "เจ้าของ",     color: "gold",    icon: <CrownOutlined /> },
-  admin:  { label: "ผู้ดูแล",     color: "blue",    icon: <SafetyCertificateOutlined /> },
-  staff:  { label: "เจ้าหน้าที่", color: "default", icon: <UserOutlined /> },
+const ROLE_CONFIG: Record<
+  string,
+  { label: string; color: string; icon: React.ReactNode }
+> = {
+  owner: { label: "เจ้าของ", color: "gold", icon: <CrownOutlined /> },
+  admin: {
+    label: "ผู้ดูแล",
+    color: "blue",
+    icon: <SafetyCertificateOutlined />,
+  },
+  staff: { label: "เจ้าหน้าที่", color: "default", icon: <UserOutlined /> },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  ACTIVE:   { label: "ใช้งาน",     color: "success" },
-  PENDING:  { label: "รอยืนยัน",   color: "warning" },
-  INACTIVE: { label: "ไม่ใช้งาน",  color: "default" },
+  ACTIVE: { label: "ใช้งาน", color: "success" },
+  PENDING: { label: "รอยืนยัน", color: "warning" },
+  INACTIVE: { label: "ไม่ใช้งาน", color: "default" },
 };
 
 // ─── Invite Modal ─────────────────────────────────────────────────────────────
@@ -122,7 +129,9 @@ const InviteModal = ({
             <UserAddOutlined style={{ color: "#fff", fontSize: 16 }} />
           </Flex>
           <Flex vertical gap={1}>
-            <Text strong style={{ fontSize: 15 }}>เชิญสมาชิกใหม่</Text>
+            <Text strong style={{ fontSize: 15 }}>
+              เชิญสมาชิกใหม่
+            </Text>
             <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>
               ส่งคำเชิญทางอีเมล
             </Text>
@@ -139,18 +148,34 @@ const InviteModal = ({
         <Form.Item
           label="อีเมลผู้รับเชิญ"
           name="email"
-          rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}
+          rules={[
+            {
+              required: true,
+              type: "email",
+              message: "กรุณากรอกอีเมลที่ถูกต้อง",
+            },
+          ]}
         >
-          <Input prefix={<MailOutlined />} placeholder="email@example.com" size="large" />
+          <Input
+            prefix={<MailOutlined />}
+            placeholder="email@example.com"
+            size="large"
+          />
         </Form.Item>
 
-        <Form.Item label="บทบาท" name="role_id" rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}>
+        <Form.Item
+          label="บทบาท"
+          name="role_id"
+          rules={[{ required: true, message: "กรุณาเลือกบทบาท" }]}
+        >
           <Select size="large" placeholder="เลือกบทบาท">
             {invitableRoles.map((r) => (
               <Select.Option key={r.id} value={r.id}>
                 <Flex align="center" gap={8}>
                   <Flex vertical gap={0}>
-                    <Text strong style={{ fontSize: 13 }}>{r.name}</Text>
+                    <Text strong style={{ fontSize: 13 }}>
+                      {r.name}
+                    </Text>
                   </Flex>
                 </Flex>
               </Select.Option>
@@ -170,13 +195,21 @@ const InviteModal = ({
         >
           <MailOutlined style={{ color: token.colorInfo, marginTop: 2 }} />
           <Text style={{ fontSize: 12, color: token.colorInfoText }}>
-            ผู้รับจะได้รับอีเมลเชิญและต้องยืนยันภายใน 7 วัน ก่อนจึงจะเข้าถึงระบบได้
+            ผู้รับจะได้รับอีเมลเชิญและต้องยืนยันภายใน 7 วัน
+            ก่อนจึงจะเข้าถึงระบบได้
           </Text>
         </Flex>
 
         <Flex justify="flex-end" gap={8}>
-          <Button onClick={onClose} disabled={loading}>ยกเลิก</Button>
-          <Button type="primary" htmlType="submit" icon={<MailOutlined />} loading={loading}>
+          <Button onClick={onClose} disabled={loading}>
+            ยกเลิก
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            icon={<MailOutlined />}
+            loading={loading}
+          >
             ส่งคำเชิญ
           </Button>
         </Flex>
@@ -210,7 +243,10 @@ const EditMemberModal = ({
 
   if (!member) return null;
 
-  const displayName = [member.profile.firstName, member.profile.lastName].filter(Boolean).join(" ") || member.profile.email;
+  const displayName =
+    [member.profile.firstName, member.profile.lastName]
+      .filter(Boolean)
+      .join(" ") || member.profile.email;
 
   return (
     <Modal
@@ -228,8 +264,12 @@ const EditMemberModal = ({
             {displayName.charAt(0)}
           </Avatar>
           <Flex vertical gap={1}>
-            <Text strong style={{ fontSize: 15 }}>{displayName}</Text>
-            <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>{member.profile.email}</Text>
+            <Text strong style={{ fontSize: 15 }}>
+              {displayName}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>
+              {member.profile.email}
+            </Text>
           </Flex>
         </Flex>
       }
@@ -250,15 +290,26 @@ const EditMemberModal = ({
       >
         <Form.Item label="บทบาท" name="role_id" rules={[{ required: true }]}>
           <Select size="large">
-            {roles.filter((r) => r.slug !== "owner").map((r) => (
-              <Select.Option key={r.id} value={r.id}>{r.name}</Select.Option>
-            ))}
+            {roles
+              .filter((r) => r.slug !== "owner")
+              .map((r) => (
+                <Select.Option key={r.id} value={r.id}>
+                  {r.name}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
         <Flex justify="flex-end" gap={8}>
-          <Button onClick={onClose} disabled={loading}>ยกเลิก</Button>
-          <Button type="primary" htmlType="submit" icon={<EditOutlined />} loading={loading}>
+          <Button onClick={onClose} disabled={loading}>
+            ยกเลิก
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            icon={<EditOutlined />}
+            loading={loading}
+          >
             บันทึก
           </Button>
         </Flex>
@@ -294,18 +345,24 @@ export default function SchoolManagementPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [editMember, setEditMember] = useState<OrgMember | null>(null);
-  const [activeTab, setActiveTab] = useState<"members" | "invites" | "rbac" | "settings">("members");
+  const [activeTab, setActiveTab] = useState<
+    "members" | "invites" | "rbac" | "settings"
+  >("members");
 
   useEffect(() => setIsMounted(true), []);
 
   useEffect(() => {
     if (!isMounted) return;
     if (!isAuthenticated || !user) {
-      router.replace("/pages/signin?redirect=%2Fpages%2Femployer%2Fschool-management");
+      router.replace(
+        "/pages/signin?redirect=%2Fpages%2Femployer%2Fschool-management",
+      );
       return;
     }
     if (user.role !== "EMPLOYER") {
-      router.replace(user.role === "EMPLOYEE" ? "/pages/employee/profile" : "/");
+      router.replace(
+        user.role === "EMPLOYEE" ? "/pages/employee/profile" : "/",
+      );
       return;
     }
     // ✨ โหลดข้อมูลจาก API
@@ -341,7 +398,10 @@ export default function SchoolManagementPage() {
   };
 
   const handleRemoveMember = (member: OrgMember) => {
-    const displayName = [member.profile.firstName, member.profile.lastName].filter(Boolean).join(" ") || member.profile.email;
+    const displayName =
+      [member.profile.firstName, member.profile.lastName]
+        .filter(Boolean)
+        .join(" ") || member.profile.email;
     modal.confirm({
       title: `ลบ ${displayName} ออกจากทีม?`,
       content: "สมาชิกจะสูญเสียสิทธิ์การเข้าถึงระบบทั้งหมดทันที",
@@ -379,7 +439,9 @@ export default function SchoolManagementPage() {
   };
 
   const handleCopyInviteLink = (email: string) => {
-    navigator.clipboard?.writeText(`https://schooljob.th/invite?email=${email}`);
+    navigator.clipboard?.writeText(
+      `https://schooljob.th/invite?email=${email}`,
+    );
     api.success({ message: "คัดลอกลิงก์เชิญแล้ว" });
   };
 
@@ -402,13 +464,19 @@ export default function SchoolManagementPage() {
     {
       label: "กำลังใช้งาน",
       value: activeMembers,
-      icon: <CheckCircleFilled style={{ fontSize: 20, color: token.colorSuccess }} />,
+      icon: (
+        <CheckCircleFilled
+          style={{ fontSize: 20, color: token.colorSuccess }}
+        />
+      ),
       bg: token.colorSuccessBg,
     },
     {
       label: "รอยืนยัน",
       value: pendingMembers + invites.length,
-      icon: <MailOutlined style={{ fontSize: 20, color: token.colorWarning }} />,
+      icon: (
+        <MailOutlined style={{ fontSize: 20, color: token.colorWarning }} />
+      ),
       bg: token.colorWarningBg,
     },
     {
@@ -432,7 +500,10 @@ export default function SchoolManagementPage() {
       title: "สมาชิก",
       key: "member",
       render: (_: unknown, record: OrgMember) => {
-        const displayName = [record.profile.firstName, record.profile.lastName].filter(Boolean).join(" ") || record.profile.email;
+        const displayName =
+          [record.profile.firstName, record.profile.lastName]
+            .filter(Boolean)
+            .join(" ") || record.profile.email;
         const isOwner = record.role.slug === "owner";
         return (
           <Flex align="center" gap={12}>
@@ -445,15 +516,22 @@ export default function SchoolManagementPage() {
             </Avatar>
             <Flex vertical gap={2}>
               <Flex align="center" gap={6}>
-                <Text strong style={{ fontSize: 14 }}>{displayName}</Text>
+                <Text strong style={{ fontSize: 14 }}>
+                  {displayName}
+                </Text>
                 {isOwner && (
                   <CrownOutlined style={{ color: "#F59E0B", fontSize: 12 }} />
                 )}
               </Flex>
-              <Text type="secondary" style={{ fontSize: 12 }}>{record.profile.email}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {record.profile.email}
+              </Text>
               {record.joinedAt && (
-                <Text style={{ fontSize: 11, color: token.colorTextQuaternary }}>
-                  เข้าร่วม: {new Date(record.joinedAt).toLocaleDateString("th-TH")}
+                <Text
+                  style={{ fontSize: 11, color: token.colorTextQuaternary }}
+                >
+                  เข้าร่วม:{" "}
+                  {new Date(record.joinedAt).toLocaleDateString("th-TH")}
                 </Text>
               )}
             </Flex>
@@ -480,8 +558,16 @@ export default function SchoolManagementPage() {
       key: "status",
       width: 110,
       render: (status: string) => {
-        const cfg = STATUS_CONFIG[status] ?? { label: status, color: "default" };
-        return <Badge status={cfg.color as "success" | "warning" | "default"} text={cfg.label} />;
+        const cfg = STATUS_CONFIG[status] ?? {
+          label: status,
+          color: "default",
+        };
+        return (
+          <Badge
+            status={cfg.color as "success" | "warning" | "default"}
+            text={cfg.label}
+          />
+        );
       },
     },
     {
@@ -490,7 +576,9 @@ export default function SchoolManagementPage() {
       render: (_: unknown, record: OrgMember) => (
         <Flex wrap="wrap" gap={4}>
           {record.role.permissions.length === 0 ? (
-            <Text type="secondary" style={{ fontSize: 12 }}>ยังไม่มีสิทธิ์</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ยังไม่มีสิทธิ์
+            </Text>
           ) : (
             record.role.permissions.slice(0, 4).map((p) => (
               <Tag key={p.id} style={{ fontSize: 11, margin: 0 }}>
@@ -499,7 +587,9 @@ export default function SchoolManagementPage() {
             ))
           )}
           {record.role.permissions.length > 4 && (
-            <Tag style={{ fontSize: 11, margin: 0 }}>+{record.role.permissions.length - 4}</Tag>
+            <Tag style={{ fontSize: 11, margin: 0 }}>
+              +{record.role.permissions.length - 4}
+            </Tag>
           )}
         </Flex>
       ),
@@ -510,7 +600,9 @@ export default function SchoolManagementPage() {
       width: 120,
       render: (_: unknown, record: OrgMember) => (
         <Text type="secondary" style={{ fontSize: 13 }}>
-          {record.joinedAt ? new Date(record.joinedAt).toLocaleDateString("th-TH") : "—"}
+          {record.joinedAt
+            ? new Date(record.joinedAt).toLocaleDateString("th-TH")
+            : "—"}
         </Text>
       ),
     },
@@ -537,7 +629,11 @@ export default function SchoolManagementPage() {
           },
         ];
         return (
-          <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
             <Button type="text" icon={<MoreOutlined />} size="small" />
           </Dropdown>
         );
@@ -553,8 +649,17 @@ export default function SchoolManagementPage() {
       key: "email",
       render: (email: string) => (
         <Flex align="center" gap={8}>
-          <Avatar size={32} icon={<MailOutlined />} style={{ backgroundColor: token.colorFillSecondary, color: token.colorTextSecondary }} />
-          <Text strong style={{ fontSize: 14 }}>{email}</Text>
+          <Avatar
+            size={32}
+            icon={<MailOutlined />}
+            style={{
+              backgroundColor: token.colorFillSecondary,
+              color: token.colorTextSecondary,
+            }}
+          />
+          <Text strong style={{ fontSize: 14 }}>
+            {email}
+          </Text>
         </Flex>
       ),
     },
@@ -566,7 +671,11 @@ export default function SchoolManagementPage() {
         const role = roles.find((r) => r.id === record.roleId);
         if (!role) return <Tag>{record.roleId}</Tag>;
         const cfg = getRoleDisplay(role.slug);
-        return <Tag color={cfg.color} icon={cfg.icon}>{role.name}</Tag>;
+        return (
+          <Tag color={cfg.color} icon={cfg.icon}>
+            {role.name}
+          </Tag>
+        );
       },
     },
     {
@@ -575,7 +684,10 @@ export default function SchoolManagementPage() {
       width: 150,
       render: (_: unknown, record: OrgInvite) => {
         if (!record.inviter) return <Text type="secondary">—</Text>;
-        const name = [record.inviter.firstName, record.inviter.lastName].filter(Boolean).join(" ") || "—";
+        const name =
+          [record.inviter.firstName, record.inviter.lastName]
+            .filter(Boolean)
+            .join(" ") || "—";
         return <Text style={{ fontSize: 13 }}>{name}</Text>;
       },
     },
@@ -584,7 +696,11 @@ export default function SchoolManagementPage() {
       dataIndex: "createdAt",
       key: "createdAt",
       width: 120,
-      render: (date: string) => <Text type="secondary" style={{ fontSize: 13 }}>{new Date(date).toLocaleDateString("th-TH")}</Text>,
+      render: (date: string) => (
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {new Date(date).toLocaleDateString("th-TH")}
+        </Text>
+      ),
     },
     {
       title: "หมดอายุ",
@@ -592,9 +708,14 @@ export default function SchoolManagementPage() {
       key: "expiresAt",
       width: 120,
       render: (date: string) => {
-        const daysLeft = Math.ceil((new Date(date).getTime() - Date.now()) / 86400000);
+        const daysLeft = Math.ceil(
+          (new Date(date).getTime() - Date.now()) / 86400000,
+        );
         return (
-          <Tag color={daysLeft <= 2 ? "red" : "orange"} style={{ fontSize: 11 }}>
+          <Tag
+            color={daysLeft <= 2 ? "red" : "orange"}
+            style={{ fontSize: 11 }}
+          >
             เหลือ {daysLeft} วัน
           </Tag>
         );
@@ -628,14 +749,38 @@ export default function SchoolManagementPage() {
 
   // ─── Tab Nav ────────────────────────────────────────────────────────────────
   const tabs = [
-    { key: "members",  label: "สมาชิกในทีม",   icon: <TeamOutlined />,              count: members.length },
-    { key: "invites",  label: "คำเชิญที่รอ",    icon: <MailOutlined />,              count: invites.length },
-    { key: "rbac",     label: "จัดการสิทธิ์",   icon: <KeyOutlined style={{ color: activeTab === "rbac" ? PRIMARY : undefined }} /> },
-    { key: "settings", label: "ตั้งค่าองค์กร",  icon: <SettingOutlined /> },
+    {
+      key: "members",
+      label: "สมาชิกในทีม",
+      icon: <TeamOutlined />,
+      count: members.length,
+    },
+    {
+      key: "invites",
+      label: "คำเชิญที่รอ",
+      icon: <MailOutlined />,
+      count: invites.length,
+    },
+    {
+      key: "rbac",
+      label: "จัดการสิทธิ์",
+      icon: (
+        <KeyOutlined
+          style={{ color: activeTab === "rbac" ? PRIMARY : undefined }}
+        />
+      ),
+    },
+    { key: "settings", label: "ตั้งค่าองค์กร", icon: <SettingOutlined /> },
   ] as const;
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: token.colorBgLayout, paddingBottom: 80 }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: token.colorBgLayout,
+        paddingBottom: 80,
+      }}
+    >
       {contextHolder}
 
       {/* ─── Hero Header ──────────────────────────────────────────────── */}
@@ -650,8 +795,23 @@ export default function SchoolManagementPage() {
           <Breadcrumb
             style={{ marginBottom: 20 }}
             items={[
-              { title: <Link href="/pages/employer" style={{ color: "rgba(255,255,255,0.6)" }}>แดชบอร์ด</Link> },
-              { title: <Text style={{ color: "rgba(255,255,255,0.9)" }}>จัดการโรงเรียน</Text> },
+              {
+                title: (
+                  <Link
+                    href="/pages/employer"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
+                  >
+                    แดชบอร์ด
+                  </Link>
+                ),
+              },
+              {
+                title: (
+                  <Text style={{ color: "rgba(255,255,255,0.9)" }}>
+                    จัดการโรงเรียน
+                  </Text>
+                ),
+              },
             ]}
           />
 
@@ -727,8 +887,12 @@ export default function SchoolManagementPage() {
                     {card.icon}
                   </Flex>
                   <Flex vertical gap={2}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>{card.label}</Text>
-                    <Text strong style={{ fontSize: 22, lineHeight: 1 }}>{card.value}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {card.label}
+                    </Text>
+                    <Text strong style={{ fontSize: 22, lineHeight: 1 }}>
+                      {card.value}
+                    </Text>
                   </Flex>
                 </Flex>
               </Card>
@@ -751,13 +915,17 @@ export default function SchoolManagementPage() {
               style={{
                 padding: "12px 20px",
                 border: "none",
-                borderBottom: activeTab === tab.key ? `2px solid ${PRIMARY}` : "2px solid transparent",
+                borderBottom:
+                  activeTab === tab.key
+                    ? `2px solid ${PRIMARY}`
+                    : "2px solid transparent",
                 background: "transparent",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontSize: 14,
                 fontWeight: activeTab === tab.key ? 600 : 400,
-                color: activeTab === tab.key ? PRIMARY : token.colorTextSecondary,
+                color:
+                  activeTab === tab.key ? PRIMARY : token.colorTextSecondary,
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -770,8 +938,12 @@ export default function SchoolManagementPage() {
               {"count" in tab && tab.count > 0 && (
                 <span
                   style={{
-                    backgroundColor: activeTab === tab.key ? PRIMARY : token.colorFillSecondary,
-                    color: activeTab === tab.key ? "#fff" : token.colorTextSecondary,
+                    backgroundColor:
+                      activeTab === tab.key
+                        ? PRIMARY
+                        : token.colorFillSecondary,
+                    color:
+                      activeTab === tab.key ? "#fff" : token.colorTextSecondary,
                     borderRadius: 10,
                     padding: "0 7px",
                     fontSize: 11,
@@ -790,13 +962,22 @@ export default function SchoolManagementPage() {
         {activeTab === "members" && (
           <Card
             variant="borderless"
-            style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+            style={{
+              borderRadius: 14,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}
             styles={{ body: { padding: 0 } }}
             title={
-              <Flex justify="space-between" align="center" style={{ padding: "4px 0" }}>
+              <Flex
+                justify="space-between"
+                align="center"
+                style={{ padding: "4px 0" }}
+              >
                 <Flex align="center" gap={8}>
                   <TeamOutlined style={{ color: PRIMARY }} />
-                  <Text strong style={{ fontSize: 15 }}>สมาชิกในทีม</Text>
+                  <Text strong style={{ fontSize: 15 }}>
+                    สมาชิกในทีม
+                  </Text>
                 </Flex>
                 <Flex gap={8}>
                   <Button
@@ -842,13 +1023,22 @@ export default function SchoolManagementPage() {
         {activeTab === "invites" && (
           <Card
             variant="borderless"
-            style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+            style={{
+              borderRadius: 14,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}
             styles={{ body: { padding: 0 } }}
             title={
-              <Flex justify="space-between" align="center" style={{ padding: "4px 0" }}>
+              <Flex
+                justify="space-between"
+                align="center"
+                style={{ padding: "4px 0" }}
+              >
                 <Flex align="center" gap={8}>
                   <MailOutlined style={{ color: "#F59E0B" }} />
-                  <Text strong style={{ fontSize: 15 }}>คำเชิญที่รอการตอบรับ</Text>
+                  <Text strong style={{ fontSize: 15 }}>
+                    คำเชิญที่รอการตอบรับ
+                  </Text>
                 </Flex>
                 <Button
                   icon={<ReloadOutlined />}
@@ -863,10 +1053,16 @@ export default function SchoolManagementPage() {
           >
             <Spin spinning={isLoadingInvites}>
               {invites.length === 0 && !isLoadingInvites ? (
-                <Flex justify="center" align="center" style={{ padding: "60px 0" }}>
+                <Flex
+                  justify="center"
+                  align="center"
+                  style={{ padding: "60px 0" }}
+                >
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={<Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>}
+                    description={
+                      <Text type="secondary">ไม่มีคำเชิญที่รอการตอบรับ</Text>
+                    }
                   >
                     <Button
                       type="primary"
@@ -899,7 +1095,10 @@ export default function SchoolManagementPage() {
             <Col xs={24} lg={14}>
               <Card
                 variant="borderless"
-                style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+                style={{
+                  borderRadius: 14,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                }}
                 title={
                   <Flex align="center" gap={8}>
                     <BankOutlined style={{ color: PRIMARY }} />
@@ -908,18 +1107,28 @@ export default function SchoolManagementPage() {
                 }
                 extra={
                   <Link href="/pages/employer/profile">
-                    <Button size="small" icon={<EditOutlined />}>แก้ไขโปรไฟล์</Button>
+                    <Button size="small" icon={<EditOutlined />}>
+                      แก้ไขโปรไฟล์
+                    </Button>
                   </Link>
                 }
               >
-                <Descriptions column={1} size="small" styles={{ label: { width: 140 } }}>
+                <Descriptions
+                  column={1}
+                  size="small"
+                  styles={{ label: { width: 140 } }}
+                >
                   <Descriptions.Item label="สมาชิกทั้งหมด">
                     <Text strong>{members.length} คน</Text>
                   </Descriptions.Item>
                   <Descriptions.Item label="บทบาทในระบบ">
                     <Flex gap={4} wrap="wrap">
                       {roles.map((r) => (
-                        <Tag key={r.id} color={r.isSystem ? "blue" : "green"} style={{ fontSize: 11 }}>
+                        <Tag
+                          key={r.id}
+                          color={r.isSystem ? "blue" : "green"}
+                          style={{ fontSize: 11 }}
+                        >
                           {r.name}
                         </Tag>
                       ))}
@@ -936,7 +1145,10 @@ export default function SchoolManagementPage() {
             <Col xs={24} lg={10}>
               <Card
                 variant="borderless"
-                style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
+                style={{
+                  borderRadius: 14,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                }}
                 title={
                   <Flex align="center" gap={8}>
                     <KeyOutlined style={{ color: "#6366F1" }} />
@@ -956,16 +1168,28 @@ export default function SchoolManagementPage() {
                             {role.name}
                           </Tag>
                           {role.isSystem && (
-                            <Text type="secondary" style={{ fontSize: 11 }}>System Role</Text>
+                            <Text type="secondary" style={{ fontSize: 11 }}>
+                              System Role
+                            </Text>
                           )}
                         </Flex>
                         {role.description && (
-                          <Text type="secondary" style={{ fontSize: 12, paddingLeft: 4 }}>
+                          <Text
+                            type="secondary"
+                            style={{ fontSize: 12, paddingLeft: 4 }}
+                          >
                             {role.description}
                           </Text>
                         )}
-                        <Text style={{ fontSize: 11, color: token.colorTextQuaternary, paddingLeft: 4 }}>
-                          {role.permissions.length} permissions · {role._count.members} สมาชิก
+                        <Text
+                          style={{
+                            fontSize: 11,
+                            color: token.colorTextQuaternary,
+                            paddingLeft: 4,
+                          }}
+                        >
+                          {role.permissions.length} permissions ·{" "}
+                          {role._count.members} สมาชิก
                         </Text>
                         <Divider style={{ margin: "4px 0" }} />
                       </Flex>
@@ -988,22 +1212,25 @@ export default function SchoolManagementPage() {
                 title={
                   <Flex align="center" gap={8}>
                     <CloseCircleFilled style={{ color: token.colorError }} />
-                    <Text strong style={{ color: token.colorError }}>Danger Zone</Text>
+                    <Text strong style={{ color: token.colorError }}>
+                      Danger Zone
+                    </Text>
                   </Flex>
                 }
               >
-                <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  wrap="wrap"
+                  gap={12}
+                >
                   <Flex vertical gap={4}>
                     <Text strong>ออกจากองค์กรนี้</Text>
                     <Text type="secondary" style={{ fontSize: 13 }}>
                       คุณจะสูญเสียสิทธิ์ทั้งหมดในการจัดการโรงเรียนนี้
                     </Text>
                   </Flex>
-                  <Button
-                    danger
-                    disabled
-                    style={{ minWidth: 120 }}
-                  >
+                  <Button danger disabled style={{ minWidth: 120 }}>
                     ออกจากองค์กร
                   </Button>
                 </Flex>

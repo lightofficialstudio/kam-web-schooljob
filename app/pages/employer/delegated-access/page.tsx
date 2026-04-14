@@ -3,14 +3,13 @@
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   ApartmentOutlined,
-  BarChartOutlined,
   BankOutlined,
+  BarChartOutlined,
   CalendarOutlined,
   CheckCircleFilled,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
-  ExclamationCircleOutlined,
   FileTextOutlined,
   InfoCircleOutlined,
   KeyOutlined,
@@ -22,7 +21,6 @@ import {
   SwapOutlined,
   TeamOutlined,
   UserOutlined,
-  WarningOutlined,
 } from "@ant-design/icons";
 import {
   Alert,
@@ -39,15 +37,14 @@ import {
   Empty,
   Flex,
   Input,
-  Modal,
   Row,
   Select,
   Skeleton,
   Tag,
   Timeline,
   Typography,
-  theme,
   notification,
+  theme,
 } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -61,44 +58,44 @@ const PRIMARY = "#11b6f5";
 // ─── Permission label map ─────────────────────────────────────────────────────
 
 const RESOURCE_LABEL: Record<string, string> = {
-  jobs:       "ประกาศงาน",
+  jobs: "ประกาศงาน",
   applicants: "ผู้สมัคร",
-  profile:    "โปรไฟล์โรงเรียน",
-  members:    "จัดการสมาชิก",
-  analytics:  "สถิติ & รายงาน",
-  settings:   "ตั้งค่าระบบ",
+  profile: "โปรไฟล์โรงเรียน",
+  members: "จัดการสมาชิก",
+  analytics: "สถิติ & รายงาน",
+  settings: "ตั้งค่าระบบ",
 };
 
 const ACTION_LABEL: Record<string, string> = {
-  view:   "ดู",
+  view: "ดู",
   create: "สร้าง",
-  edit:   "แก้ไข",
+  edit: "แก้ไข",
   delete: "ลบ",
   export: "ส่งออก",
   manage: "จัดการ",
 };
 
 const RESOURCE_ICON: Record<string, React.ReactNode> = {
-  jobs:       <FileTextOutlined />,
+  jobs: <FileTextOutlined />,
   applicants: <TeamOutlined />,
-  profile:    <BankOutlined />,
-  members:    <ApartmentOutlined />,
-  analytics:  <BarChartOutlined />,
-  settings:   <SettingOutlined />,
+  profile: <BankOutlined />,
+  members: <ApartmentOutlined />,
+  analytics: <BarChartOutlined />,
+  settings: <SettingOutlined />,
 };
 
 const ROLE_ICON: Record<string, React.ReactNode> = {
-  owner:      <CheckCircleFilled style={{ color: "#F59E0B" }} />,
-  admin:      <SafetyCertificateOutlined />,
+  owner: <CheckCircleFilled style={{ color: "#F59E0B" }} />,
+  admin: <SafetyCertificateOutlined />,
   hr_manager: <TeamOutlined />,
-  staff:      <UserOutlined />,
-  recruiter:  <SearchOutlined />,
+  staff: <UserOutlined />,
+  recruiter: <SearchOutlined />,
 };
 
 const STATUS_CONFIG = {
-  ACTIVE:   { label: "ใช้งานได้",    badgeStatus: "success"    as const },
-  PENDING:  { label: "รอยืนยัน",     badgeStatus: "processing" as const },
-  INACTIVE: { label: "ไม่ใช้งาน",    badgeStatus: "default"    as const },
+  ACTIVE: { label: "ใช้งานได้", badgeStatus: "success" as const },
+  PENDING: { label: "รอยืนยัน", badgeStatus: "processing" as const },
+  INACTIVE: { label: "ไม่ใช้งาน", badgeStatus: "default" as const },
 };
 
 // ─── ฟังก์ชัน helper ──────────────────────────────────────────────────────────
@@ -113,7 +110,10 @@ const groupPermissions = (
     if (!map[resource]) map[resource] = [];
     map[resource].push(action);
   });
-  return Object.entries(map).map(([resource, actions]) => ({ resource, actions }));
+  return Object.entries(map).map(([resource, actions]) => ({
+    resource,
+    actions,
+  }));
 };
 
 // ─── Detail Drawer ────────────────────────────────────────────────────────────
@@ -134,10 +134,10 @@ const AccessDetailDrawer = ({
 
   const status = STATUS_CONFIG[access.status] ?? STATUS_CONFIG.INACTIVE;
   const canEnter = access.status === "ACTIVE";
-  const permGroups = groupPermissions(access.role.permissions.map((p) => p.permissionKey));
-  const daysLeft = access.schoolProfile.profile
-    ? null
-    : null; // expiresAt ไม่มีใน OrgMember — แสดง joinedAt แทน
+  const permGroups = groupPermissions(
+    access.role.permissions.map((p) => p.permissionKey),
+  );
+  const daysLeft = access.schoolProfile.profile ? null : null; // expiresAt ไม่มีใน OrgMember — แสดง joinedAt แทน
 
   return (
     <Drawer
@@ -149,13 +149,22 @@ const AccessDetailDrawer = ({
           <Avatar
             size={40}
             src={access.schoolProfile.logoUrl ?? undefined}
-            style={{ backgroundColor: access.role.color, fontSize: 14, fontWeight: 700, flexShrink: 0 }}
+            style={{
+              backgroundColor: access.role.color,
+              fontSize: 14,
+              fontWeight: 700,
+              flexShrink: 0,
+            }}
           >
             {access.schoolProfile.schoolName.charAt(0)}
           </Avatar>
           <Flex vertical gap={2}>
-            <Text strong style={{ fontSize: 15 }}>{access.schoolProfile.schoolName}</Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>{access.schoolProfile.province}</Text>
+            <Text strong style={{ fontSize: 15 }}>
+              {access.schoolProfile.schoolName}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {access.schoolProfile.province}
+            </Text>
           </Flex>
         </Flex>
       }
@@ -166,7 +175,10 @@ const AccessDetailDrawer = ({
             type="primary"
             icon={<LoginOutlined />}
             disabled={!canEnter}
-            onClick={() => { onEnter(access); onClose(); }}
+            onClick={() => {
+              onEnter(access);
+              onClose();
+            }}
             size="large"
             style={{ minWidth: 160 }}
           >
@@ -186,11 +198,23 @@ const AccessDetailDrawer = ({
           />
         )}
 
-        <Card variant="borderless" style={{ borderRadius: 12, backgroundColor: token.colorFillQuaternary }}>
-          <Descriptions column={1} size="small" styles={{ label: { width: 130 } }}>
+        <Card
+          variant="borderless"
+          style={{
+            borderRadius: 12,
+            backgroundColor: token.colorFillQuaternary,
+          }}
+        >
+          <Descriptions
+            column={1}
+            size="small"
+            styles={{ label: { width: 130 } }}
+          >
             <Descriptions.Item label="บทบาท">
               <Flex align="center" gap={6}>
-                <span style={{ color: access.role.color }}>{ROLE_ICON[access.role.slug] ?? <UserOutlined />}</span>
+                <span style={{ color: access.role.color }}>
+                  {ROLE_ICON[access.role.slug] ?? <UserOutlined />}
+                </span>
                 <Text strong>{access.role.name}</Text>
               </Flex>
             </Descriptions.Item>
@@ -200,12 +224,15 @@ const AccessDetailDrawer = ({
             <Descriptions.Item label="ให้สิทธิ์โดย">
               <Text>
                 {access.inviter
-                  ? `${access.inviter.firstName ?? ""} ${access.inviter.lastName ?? ""}`.trim() || access.schoolProfile.profile.email
+                  ? `${access.inviter.firstName ?? ""} ${access.inviter.lastName ?? ""}`.trim() ||
+                    access.schoolProfile.profile.email
                   : "-"}
               </Text>
             </Descriptions.Item>
             <Descriptions.Item label="เข้าร่วมเมื่อ">
-              {access.joinedAt ? new Date(access.joinedAt).toLocaleDateString("th-TH") : "-"}
+              {access.joinedAt
+                ? new Date(access.joinedAt).toLocaleDateString("th-TH")
+                : "-"}
             </Descriptions.Item>
           </Descriptions>
         </Card>
@@ -213,7 +240,9 @@ const AccessDetailDrawer = ({
         <Flex vertical gap={12}>
           <Flex align="center" gap={6}>
             <KeyOutlined style={{ color: PRIMARY }} />
-            <Text strong style={{ fontSize: 14 }}>สิทธิ์ที่ได้รับ ({access.role.permissions.length} permissions)</Text>
+            <Text strong style={{ fontSize: 14 }}>
+              สิทธิ์ที่ได้รับ ({access.role.permissions.length} permissions)
+            </Text>
           </Flex>
           {permGroups.map((grp) => (
             <Flex key={grp.resource} vertical gap={6}>
@@ -241,7 +270,9 @@ const AccessDetailDrawer = ({
         <Flex vertical gap={10}>
           <Flex align="center" gap={6}>
             <CalendarOutlined style={{ color: PRIMARY }} />
-            <Text strong style={{ fontSize: 14 }}>ประวัติ</Text>
+            <Text strong style={{ fontSize: 14 }}>
+              ประวัติ
+            </Text>
           </Flex>
           <Timeline
             items={[
@@ -249,7 +280,9 @@ const AccessDetailDrawer = ({
                 dot: <CheckCircleOutlined style={{ color: "#10B981" }} />,
                 children: (
                   <Flex vertical gap={2}>
-                    <Text style={{ fontSize: 13 }}>ได้รับสิทธิ์ Role: {access.role.name}</Text>
+                    <Text style={{ fontSize: 13 }}>
+                      ได้รับสิทธิ์ Role: {access.role.name}
+                    </Text>
                     <Text type="secondary" style={{ fontSize: 11 }}>
                       {new Date(access.createdAt).toLocaleDateString("th-TH")}
                     </Text>
@@ -257,17 +290,21 @@ const AccessDetailDrawer = ({
                 ),
               },
               ...(access.joinedAt
-                ? [{
-                    dot: <LoginOutlined style={{ color: PRIMARY }} />,
-                    children: (
-                      <Flex vertical gap={2}>
-                        <Text style={{ fontSize: 13 }}>เข้าร่วมองค์กร</Text>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                          {new Date(access.joinedAt).toLocaleDateString("th-TH")}
-                        </Text>
-                      </Flex>
-                    ),
-                  }]
+                ? [
+                    {
+                      dot: <LoginOutlined style={{ color: PRIMARY }} />,
+                      children: (
+                        <Flex vertical gap={2}>
+                          <Text style={{ fontSize: 13 }}>เข้าร่วมองค์กร</Text>
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            {new Date(access.joinedAt).toLocaleDateString(
+                              "th-TH",
+                            )}
+                          </Text>
+                        </Flex>
+                      ),
+                    },
+                  ]
                 : []),
             ]}
           />
@@ -292,7 +329,9 @@ const AccessCard = ({
   const status = STATUS_CONFIG[access.status] ?? STATUS_CONFIG.INACTIVE;
   const canEnter = access.status === "ACTIVE";
   const permCount = access.role.permissions.length;
-  const permGroups = groupPermissions(access.role.permissions.map((p) => p.permissionKey));
+  const permGroups = groupPermissions(
+    access.role.permissions.map((p) => p.permissionKey),
+  );
 
   return (
     <Card
@@ -320,17 +359,28 @@ const AccessCard = ({
             <Avatar
               size={48}
               src={access.schoolProfile.logoUrl ?? undefined}
-              style={{ backgroundColor: access.role.color, fontSize: 14, fontWeight: 700, flexShrink: 0 }}
+              style={{
+                backgroundColor: access.role.color,
+                fontSize: 14,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
             >
               {access.schoolProfile.schoolName.charAt(0)}
             </Avatar>
             <Flex vertical gap={3}>
-              <Text strong style={{ fontSize: 15 }}>{access.schoolProfile.schoolName}</Text>
+              <Text strong style={{ fontSize: 15 }}>
+                {access.schoolProfile.schoolName}
+              </Text>
               <Flex align="center" gap={6}>
                 {access.schoolProfile.schoolType && (
-                  <Tag style={{ fontSize: 11, margin: 0 }}>{access.schoolProfile.schoolType}</Tag>
+                  <Tag style={{ fontSize: 11, margin: 0 }}>
+                    {access.schoolProfile.schoolType}
+                  </Tag>
                 )}
-                <Text type="secondary" style={{ fontSize: 12 }}>{access.schoolProfile.province}</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {access.schoolProfile.province}
+                </Text>
               </Flex>
             </Flex>
           </Flex>
@@ -345,11 +395,17 @@ const AccessCard = ({
               <span style={{ color: access.role.color, fontSize: 14 }}>
                 {ROLE_ICON[access.role.slug] ?? <UserOutlined />}
               </span>
-              <Text strong style={{ fontSize: 13 }}>{access.role.name}</Text>
+              <Text strong style={{ fontSize: 13 }}>
+                {access.role.name}
+              </Text>
             </Flex>
             <Flex align="center" gap={4}>
-              <KeyOutlined style={{ fontSize: 11, color: token.colorTextQuaternary }} />
-              <Text type="secondary" style={{ fontSize: 12 }}>{permCount} permissions</Text>
+              <KeyOutlined
+                style={{ fontSize: 11, color: token.colorTextQuaternary }}
+              />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {permCount} permissions
+              </Text>
             </Flex>
           </Flex>
 
@@ -357,8 +413,16 @@ const AccessCard = ({
             {permGroups.map((grp) => (
               <Tag
                 key={grp.resource}
-                icon={<span style={{ marginRight: 3, fontSize: 11 }}>{RESOURCE_ICON[grp.resource]}</span>}
-                style={{ fontSize: 11, margin: 0, color: token.colorTextSecondary }}
+                icon={
+                  <span style={{ marginRight: 3, fontSize: 11 }}>
+                    {RESOURCE_ICON[grp.resource]}
+                  </span>
+                }
+                style={{
+                  fontSize: 11,
+                  margin: 0,
+                  color: token.colorTextSecondary,
+                }}
               >
                 {RESOURCE_LABEL[grp.resource] ?? grp.resource}
               </Tag>
@@ -366,7 +430,9 @@ const AccessCard = ({
           </Flex>
 
           <Flex align="center" gap={4}>
-            <UserOutlined style={{ fontSize: 11, color: token.colorTextQuaternary }} />
+            <UserOutlined
+              style={{ fontSize: 11, color: token.colorTextQuaternary }}
+            />
             <Text type="secondary" style={{ fontSize: 12 }}>
               {access.inviter
                 ? `ให้สิทธิ์โดย ${[access.inviter.firstName, access.inviter.lastName].filter(Boolean).join(" ")}`
@@ -406,6 +472,7 @@ const AccessCard = ({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function DelegatedAccessPage() {
+  const { modal } = App.useApp();
   const { token } = theme.useToken();
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
@@ -414,9 +481,13 @@ export default function DelegatedAccessPage() {
   const { accesses, isLoading, fetchAccesses } = useDelegatedStore();
 
   const [isMounted, setIsMounted] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<"ALL" | "ACTIVE" | "PENDING" | "INACTIVE">("ALL");
+  const [filterStatus, setFilterStatus] = useState<
+    "ALL" | "ACTIVE" | "PENDING" | "INACTIVE"
+  >("ALL");
   const [search, setSearch] = useState("");
-  const [detailAccess, setDetailAccess] = useState<DelegatedAccess | null>(null);
+  const [detailAccess, setDetailAccess] = useState<DelegatedAccess | null>(
+    null,
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => setIsMounted(true), []);
@@ -424,7 +495,9 @@ export default function DelegatedAccessPage() {
   useEffect(() => {
     if (!isMounted) return;
     if (!isAuthenticated || !user) {
-      router.replace("/pages/signin?redirect=%2Fpages%2Femployer%2Fdelegated-access");
+      router.replace(
+        "/pages/signin?redirect=%2Fpages%2Femployer%2Fdelegated-access",
+      );
       return;
     }
     fetchAccesses(user.user_id);
@@ -435,7 +508,7 @@ export default function DelegatedAccessPage() {
   // ─── Enter handler ─────────────────────────────────────────────────────────
 
   const handleEnter = (access: DelegatedAccess) => {
-    Modal.confirm({
+    modal.confirm({
       title: `เข้าถึงในฐานะ ${access.role.name}`,
       icon: <SwapOutlined style={{ color: PRIMARY }} />,
       content: (
@@ -444,15 +517,23 @@ export default function DelegatedAccessPage() {
           <Flex
             align="center"
             gap={12}
-            style={{ padding: "12px 16px", backgroundColor: token.colorFillQuaternary, borderRadius: 10 }}
+            style={{
+              padding: "12px 16px",
+              backgroundColor: token.colorFillQuaternary,
+              borderRadius: 10,
+            }}
           >
-            <Avatar size={36} style={{ backgroundColor: access.role.color, fontWeight: 700 }}>
+            <Avatar
+              size={36}
+              style={{ backgroundColor: access.role.color, fontWeight: 700 }}
+            >
               {access.schoolProfile.schoolName.charAt(0)}
             </Avatar>
             <Flex vertical gap={2}>
               <Text strong>{access.schoolProfile.schoolName}</Text>
               <Text type="secondary" style={{ fontSize: 12 }}>
-                บทบาท: {access.role.name} · {access.role.permissions.length} permissions
+                บทบาท: {access.role.name} · {access.role.permissions.length}{" "}
+                permissions
               </Text>
             </Flex>
           </Flex>
@@ -487,18 +568,25 @@ export default function DelegatedAccessPage() {
     return matchStatus && matchSearch;
   });
 
-  const activeCount  = accesses.filter((a) => a.status === "ACTIVE").length;
+  const activeCount = accesses.filter((a) => a.status === "ACTIVE").length;
   const pendingCount = accesses.filter((a) => a.status === "PENDING").length;
   const inactiveCount = accesses.filter((a) => a.status === "INACTIVE").length;
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: token.colorBgLayout, paddingBottom: 80 }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: token.colorBgLayout,
+        paddingBottom: 80,
+      }}
+    >
       {contextHolder}
 
       {/* Hero */}
       <div
         style={{
-          background: "linear-gradient(135deg, #0f2044 0%, #1a3a6b 50%, #0878a8 100%)",
+          background:
+            "linear-gradient(135deg, #0f2044 0%, #1a3a6b 50%, #0878a8 100%)",
           padding: "32px 0 48px",
           marginBottom: -24,
         }}
@@ -507,16 +595,31 @@ export default function DelegatedAccessPage() {
           <Breadcrumb
             style={{ marginBottom: 20 }}
             items={[
-              { title: <Link href="/" style={{ color: "rgba(255,255,255,0.6)" }}>หน้าแรก</Link> },
-              { title: <Text style={{ color: "rgba(255,255,255,0.9)" }}>การเข้าถึงของผู้รับมอบสิทธิ์</Text> },
+              {
+                title: (
+                  <Link href="/" style={{ color: "rgba(255,255,255,0.6)" }}>
+                    หน้าแรก
+                  </Link>
+                ),
+              },
+              {
+                title: (
+                  <Text style={{ color: "rgba(255,255,255,0.9)" }}>
+                    การเข้าถึงของผู้รับมอบสิทธิ์
+                  </Text>
+                ),
+              },
             ]}
           />
           <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
             <Flex align="center" gap={16}>
               <Flex
-                align="center" justify="center"
+                align="center"
+                justify="center"
                 style={{
-                  width: 56, height: 56, borderRadius: 14,
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
                   background: "rgba(255,255,255,0.15)",
                   backdropFilter: "blur(8px)",
                   border: "1px solid rgba(255,255,255,0.2)",
@@ -525,9 +628,12 @@ export default function DelegatedAccessPage() {
                 <KeyOutlined style={{ fontSize: 26, color: "#fff" }} />
               </Flex>
               <Flex vertical gap={4}>
-                <Title level={3} style={{ color: "#fff", margin: 0 }}>การเข้าถึงของผู้รับมอบสิทธิ์</Title>
+                <Title level={3} style={{ color: "#fff", margin: 0 }}>
+                  การเข้าถึงของผู้รับมอบสิทธิ์
+                </Title>
                 <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
-                  รายการโรงเรียนที่คุณได้รับสิทธิ์เข้าถึงในฐานะตัวแทน (Delegated Access)
+                  รายการโรงเรียนที่คุณได้รับสิทธิ์เข้าถึงในฐานะตัวแทน (Delegated
+                  Access)
                 </Text>
               </Flex>
             </Flex>
@@ -539,24 +645,73 @@ export default function DelegatedAccessPage() {
         {/* Stats */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {[
-            { label: "เข้าถึงได้",  value: activeCount,   icon: <CheckCircleOutlined style={{ fontSize: 20, color: "#10B981" }} />, bg: token.colorSuccessBg },
-            { label: "รอยืนยัน",    value: pendingCount,  icon: <ClockCircleOutlined style={{ fontSize: 20, color: token.colorWarning }} />, bg: token.colorWarningBg },
-            { label: "ไม่ใช้งาน",   value: inactiveCount, icon: <CloseCircleOutlined style={{ fontSize: 20, color: token.colorError }} />, bg: token.colorErrorBg },
-            { label: "ทั้งหมด",     value: accesses.length, icon: <BankOutlined style={{ fontSize: 20, color: PRIMARY }} />, bg: token.colorPrimaryBg },
+            {
+              label: "เข้าถึงได้",
+              value: activeCount,
+              icon: (
+                <CheckCircleOutlined
+                  style={{ fontSize: 20, color: "#10B981" }}
+                />
+              ),
+              bg: token.colorSuccessBg,
+            },
+            {
+              label: "รอยืนยัน",
+              value: pendingCount,
+              icon: (
+                <ClockCircleOutlined
+                  style={{ fontSize: 20, color: token.colorWarning }}
+                />
+              ),
+              bg: token.colorWarningBg,
+            },
+            {
+              label: "ไม่ใช้งาน",
+              value: inactiveCount,
+              icon: (
+                <CloseCircleOutlined
+                  style={{ fontSize: 20, color: token.colorError }}
+                />
+              ),
+              bg: token.colorErrorBg,
+            },
+            {
+              label: "ทั้งหมด",
+              value: accesses.length,
+              icon: <BankOutlined style={{ fontSize: 20, color: PRIMARY }} />,
+              bg: token.colorPrimaryBg,
+            },
           ].map((c) => (
             <Col xs={12} md={6} key={c.label}>
               <Card
                 variant="borderless"
-                style={{ borderRadius: 12, backgroundColor: c.bg, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: c.bg,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                }}
                 styles={{ body: { padding: "16px 20px" } }}
               >
                 <Flex align="center" gap={12}>
-                  <Flex align="center" justify="center" style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.7)" }}>
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 10,
+                      backgroundColor: "rgba(255,255,255,0.7)",
+                    }}
+                  >
                     {c.icon}
                   </Flex>
                   <Flex vertical gap={2}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>{c.label}</Text>
-                    <Text strong style={{ fontSize: 22, lineHeight: 1 }}>{c.value}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {c.label}
+                    </Text>
+                    <Text strong style={{ fontSize: 22, lineHeight: 1 }}>
+                      {c.value}
+                    </Text>
                   </Flex>
                 </Flex>
               </Card>
@@ -565,9 +720,17 @@ export default function DelegatedAccessPage() {
         </Row>
 
         {/* Filter */}
-        <Flex justify="space-between" align="center" wrap="wrap" gap={12} style={{ marginBottom: 20 }}>
+        <Flex
+          justify="space-between"
+          align="center"
+          wrap="wrap"
+          gap={12}
+          style={{ marginBottom: 20 }}
+        >
           <Input
-            prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
+            prefix={
+              <SearchOutlined style={{ color: token.colorTextQuaternary }} />
+            }
             placeholder="ค้นหาโรงเรียน, บทบาท, จังหวัด..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -579,8 +742,8 @@ export default function DelegatedAccessPage() {
             onChange={setFilterStatus}
             style={{ minWidth: 160 }}
             options={[
-              { value: "ALL",     label: "ทุกสถานะ" },
-              { value: "ACTIVE",  label: "ใช้งานได้" },
+              { value: "ALL", label: "ทุกสถานะ" },
+              { value: "ACTIVE", label: "ใช้งานได้" },
               { value: "PENDING", label: "รอยืนยัน" },
               { value: "INACTIVE", label: "ไม่ใช้งาน" },
             ]}
@@ -619,7 +782,10 @@ export default function DelegatedAccessPage() {
               <Col xs={24} md={12} xl={8} key={access.id}>
                 <AccessCard
                   access={access}
-                  onViewDetail={(a) => { setDetailAccess(a); setDrawerOpen(true); }}
+                  onViewDetail={(a) => {
+                    setDetailAccess(a);
+                    setDrawerOpen(true);
+                  }}
                   onEnter={handleEnter}
                 />
               </Col>
@@ -631,19 +797,31 @@ export default function DelegatedAccessPage() {
         <Card
           variant="borderless"
           style={{
-            borderRadius: 14, marginTop: 32,
+            borderRadius: 14,
+            marginTop: 32,
             backgroundColor: token.colorInfoBg,
             border: `1px solid ${token.colorInfoBorder}`,
           }}
           styles={{ body: { padding: "16px 20px" } }}
         >
           <Flex align="flex-start" gap={12}>
-            <InfoCircleOutlined style={{ color: token.colorInfo, fontSize: 16, marginTop: 2 }} />
+            <InfoCircleOutlined
+              style={{ color: token.colorInfo, fontSize: 16, marginTop: 2 }}
+            />
             <Flex vertical gap={4}>
-              <Text strong style={{ color: token.colorInfoText }}>Delegated Access คืออะไร?</Text>
-              <Text style={{ fontSize: 13, color: token.colorInfoText, lineHeight: 1.6 }}>
+              <Text strong style={{ color: token.colorInfoText }}>
+                Delegated Access คืออะไร?
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: token.colorInfoText,
+                  lineHeight: 1.6,
+                }}
+              >
                 เจ้าของโรงเรียนสามารถมอบสิทธิ์ให้คุณเข้าถึงระบบในฐานะตัวแทนได้
-                โดยจำกัดเฉพาะสิทธิ์ที่ได้รับเท่านั้น การกระทำทั้งหมดจะถูกบันทึกใน Audit Log
+                โดยจำกัดเฉพาะสิทธิ์ที่ได้รับเท่านั้น
+                การกระทำทั้งหมดจะถูกบันทึกใน Audit Log
                 และเจ้าของสามารถยกเลิกสิทธิ์ได้ทุกเมื่อ
               </Text>
             </Flex>

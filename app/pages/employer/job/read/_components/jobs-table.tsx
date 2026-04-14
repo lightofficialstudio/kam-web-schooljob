@@ -225,7 +225,9 @@ export const JobsTable = () => {
               type="primary"
               ghost
               size="small"
-              onClick={() => openDrawer(record.key, record.title, user?.user_id ?? "")}
+              onClick={() =>
+                openDrawer(record.key, record.title, user?.user_id ?? "")
+              }
             />
           </Tooltip>
           <Tooltip title="แก้ไขประกาศ">

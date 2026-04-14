@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  theme as antTheme,
-  App,
-  ConfigProvider,
-  type ThemeConfig,
-} from "antd";
+import { theme as antTheme, App, ConfigProvider, type ThemeConfig } from "antd";
 import {
   createContext,
   ReactNode,
@@ -221,6 +216,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Modal Styling]
       Modal: {
         colorBgElevated: mode === "dark" ? "#2D3748" : "#ffffff",
+      },
+
+      // ✨ [Drawer Styling — Apple Store Connect Style]
+      Drawer: {
+        colorBgElevated: mode === "dark" ? "#1E293B" : "#fcfcfd",
+        colorBorder: mode === "dark" ? "#475569" : "#e2e8f0",
+        paddingLG: 24,
+        footerPaddingBlock: 16,
+        footerPaddingInline: 24,
       },
 
       // ✨ [Dropdown Styling]

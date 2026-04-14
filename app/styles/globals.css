@@ -30,3 +30,122 @@
 [data-theme="dark"] .table-row-striped > td {
   background-color: rgba(17, 182, 245, 0.04) !important;
 }
+
+/* ════════════════════════════════════════════
+   ✨ Drawer — Apple Store Connect Style
+   ════════════════════════════════════════════ */
+
+/* ─── Mask: โปร่งใส ให้ page blur แทน ─── */
+.ant-drawer-mask {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+/* ─── Page blur เมื่อ Drawer เปิด ─── */
+body.ant-scrolling-effect .ant-layout,
+body.ant-scrolling-effect > div:not(.ant-drawer) {
+  filter: blur(4px) brightness(0.92) saturate(0.85);
+  transform: scale(0.994);
+  transition: filter 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: none;
+  will-change: filter;
+}
+
+/* ─── Wrapper: เว้นช่องว่างรอบ Drawer ─── */
+.ant-drawer-content-wrapper {
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* ─── Content shell: rounded + no shadow ─── */
+.ant-drawer-content {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: #fcfcfd !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: -8px 0 32px -8px rgba(0, 0, 0, 0.10),
+    0 0 0 1px rgba(226, 232, 240, 0.6) !important;
+}
+
+[data-theme="dark"] .ant-drawer-content {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: -8px 0 32px -8px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(71, 85, 105, 0.5) !important;
+}
+
+/* ─── Header ─── */
+.ant-drawer-header {
+  padding: 20px 24px 16px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .ant-drawer-header {
+  border-bottom-color: #334155 !important;
+}
+
+.ant-drawer-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* ─── Header layout: title ซ้าย / close ขวา ─── */
+.ant-drawer-header-title {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* ─── Close button ─── */
+.ant-drawer-close {
+  margin: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  order: 2 !important;
+}
+
+.ant-drawer-close:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+  transform: rotate(90deg) !important;
+}
+
+[data-theme="dark"] .ant-drawer-close {
+  background: rgba(51, 65, 85, 0.8) !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .ant-drawer-close:hover {
+  background: #475569 !important;
+  color: #f8fafc !important;
+}
+
+/* ─── Body ─── */
+.ant-drawer-body {
+  padding: 24px !important;
+}
+
+/* ─── Footer ─── */
+.ant-drawer-footer {
+  padding: 16px 24px !important;
+  border-top: 1px solid #f1f5f9 !important;
+  background: transparent !important;
+}
+
+[data-theme="dark"] .ant-drawer-footer {
+  border-top-color: #334155 !important;
+}
