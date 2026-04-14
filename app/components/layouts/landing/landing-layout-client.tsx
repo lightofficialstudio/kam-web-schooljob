@@ -21,12 +21,21 @@ export function LandingLayoutClient({ children }: { children: ReactNode }) {
   const isDark = mode === "dark";
 
   const themeConfig = useMemo(() => buildLandingTheme(isDark), [isDark]);
-  const cssVars    = useMemo(() => buildCssVars(isDark), [isDark]);
+  const cssVars = useMemo(() => buildCssVars(isDark), [isDark]);
 
   return (
-    <ConfigProvider locale={thTH} theme={themeConfig} componentSize="middle" input={{ autoComplete: "off" }}>
+    <ConfigProvider
+      locale={thTH}
+      theme={themeConfig}
+      componentSize="middle"
+      input={{ autoComplete: "off" }}
+    >
       <App>
-        <Flex vertical className="ant-theme-root" style={{ ...cssVars, minHeight: "100vh" }}>
+        <Flex
+          vertical
+          className="ant-theme-root"
+          style={{ ...cssVars, minHeight: "100vh" }}
+        >
           <Layout style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <Navbar />
             <Layout.Content
@@ -34,7 +43,6 @@ export function LandingLayoutClient({ children }: { children: ReactNode }) {
                 flex: "1 0 auto",
                 width: "100%",
                 maxWidth: "100vw",
-                overflowX: "hidden",
                 paddingTop: 68, // offset for fixed Navbar
               }}
             >
