@@ -97,10 +97,12 @@ export const ApplicantDrawer = () => {
           </Flex>
         }
         placement="right"
-        width={600}
         open={isOpen}
         onClose={closeDrawer}
-        styles={{ body: { padding: "0" } }}
+        styles={{
+          body: { padding: "0" },
+          wrapper: { width: 600 },
+        }}
       >
         {/* Filter Tabs */}
         <Flex
