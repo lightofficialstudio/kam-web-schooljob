@@ -595,3 +595,22 @@ model ProfileView {
   @@index([viewedAt], name: "idx_profile_views_viewed_at")
   @@map("profile_views")
 }
+
+// ─── System Config ───────────────────────────────────────────────────────────
+
+// config_options — ตัวเลือก dropdown ที่ Admin จัดการได้ผ่านหลังบ้าน
+// group: "school_type" | "school_level" | ... (ขยายได้ในอนาคต)
+model ConfigOption {
+  id        String   @id @default(uuid())
+  group     String   // กลุ่ม เช่น "school_type", "school_level"
+  label     String   // ข้อความแสดงผล เช่น "โรงเรียนรัฐบาล"
+  value     String   // ค่าที่ใช้จริง เช่น "government"
+  sortOrder Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
+  isActive  Boolean  @default(true) @map("is_active") // ปิด/เปิดโดยไม่ต้องลบ
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([group, value], name: "unique_config_option")
+  @@index([group, isActive], name: "idx_config_options_group_active")
+  @@map("config_options")
+}

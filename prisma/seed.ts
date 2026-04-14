@@ -16,6 +16,7 @@ async function main() {
   console.log("🌱 Starting seed...");
 
   // ─── ล้างข้อมูลเก่าก่อน (development only) ───
+  await prisma.configOption.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.blog.deleteMany();
   await prisma.application.deleteMany();
@@ -422,6 +423,32 @@ async function main() {
   });
 
   console.log("✅ Created Blogs: 2 articles");
+
+  // ─── 9. ConfigOptions — ตัวเลือก dropdown ที่ Admin จัดการได้ ───
+  await prisma.configOption.createMany({
+    data: [
+      // ── ประเภทโรงเรียน ──
+      { group: "school_type", label: "โรงเรียนรัฐบาล",           value: "โรงเรียนรัฐบาล",           sortOrder: 1 },
+      { group: "school_type", label: "โรงเรียนเอกชน (สามัญ)",    value: "โรงเรียนเอกชน (สามัญ)",    sortOrder: 2 },
+      { group: "school_type", label: "โรงเรียนเอกชน (นานาชาติ)", value: "โรงเรียนเอกชน (นานาชาติ)", sortOrder: 3 },
+      { group: "school_type", label: "โรงเรียนสาธิต",            value: "โรงเรียนสาธิต",            sortOrder: 4 },
+      { group: "school_type", label: "โรงเรียน กศน.",            value: "โรงเรียน กศน.",            sortOrder: 5 },
+      { group: "school_type", label: "ศูนย์รวมการเรียนรู้",       value: "ศูนย์รวมการเรียนรู้",       sortOrder: 6 },
+      { group: "school_type", label: "โรงเรียนตำรวจตระเวนชายแดน", value: "โรงเรียนตำรวจตระเวนชายแดน", sortOrder: 7 },
+      { group: "school_type", label: "โรงเรียนสงเคราะห์",        value: "โรงเรียนสงเคราะห์",        sortOrder: 8 },
+
+      // ── ระดับชั้นที่เปิดสอน ──
+      { group: "school_level", label: "อนุบาล",          value: "อนุบาล",          sortOrder: 1 },
+      { group: "school_level", label: "ประถมศึกษาตอนต้น", value: "ประถมศึกษาตอนต้น", sortOrder: 2 },
+      { group: "school_level", label: "ประถมศึกษาตอนปลาย", value: "ประถมศึกษาตอนปลาย", sortOrder: 3 },
+      { group: "school_level", label: "มัธยมศึกษาตอนต้น",  value: "มัธยมศึกษาตอนต้น",  sortOrder: 4 },
+      { group: "school_level", label: "มัธยมศึกษาตอนปลาย", value: "มัธยมศึกษาตอนปลาย", sortOrder: 5 },
+      { group: "school_level", label: "ประกาศนียบัตรวิชาชีพ (ปวช.)", value: "ประกาศนียบัตรวิชาชีพ (ปวช.)", sortOrder: 6 },
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log("✅ Created ConfigOptions: school_type (8), school_level (6)");
   console.log("🎉 Seed completed successfully!");
 }
 

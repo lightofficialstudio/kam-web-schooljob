@@ -2,6 +2,7 @@
 
 import { useTheme } from "@/app/contexts/theme-context";
 import {
+  AppstoreOutlined,
   BgColorsOutlined,
   DashboardOutlined,
   FileTextOutlined,
@@ -50,6 +51,12 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
       icon: <FileTextOutlined />,
       label: "จัดการงาน",
       onClick: () => router.push("/pages/admin/jobs"),
+    },
+    {
+      key: "/pages/admin/config",
+      icon: <AppstoreOutlined />,
+      label: "ตัวเลือก Dropdown",
+      onClick: () => router.push("/pages/admin/config"),
     },
     {
       key: "/pages/admin/settings",
