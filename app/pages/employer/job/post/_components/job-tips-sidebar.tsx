@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import { EnvironmentOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Badge,
@@ -15,7 +16,6 @@ import {
 } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/app/stores/auth-store";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -59,7 +59,9 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
           setPlanInfo(res.data.data);
         }
       })
-      .catch((err) => console.error("❌ [JobTipsSidebar] ดึง plan ไม่สำเร็จ:", err))
+      .catch((err) =>
+        console.error("❌ [JobTipsSidebar] ดึง plan ไม่สำเร็จ:", err),
+      )
       .finally(() => setIsLoadingPlan(false));
   }, [user?.user_id]);
 
@@ -72,7 +74,46 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
   const progressStatus =
     usedPercent >= 100 ? "exception" : usedPercent >= 80 ? "active" : "normal";
 
-  const planDisplay = PLAN_DISPLAY[planInfo?.account_plan ?? "basic"] ?? PLAN_DISPLAY.basic;
+  const planDisplay =
+    PLAN_DISPLAY[planInfo?.account_plan ?? "basic"] ?? PLAN_DISPLAY.basic;
+
+  // ✨ Skeleton Loading สถานะบัญชี
+  if (isLoadingPlan && !planInfo) {
+    return (
+      <Flex vertical gap={24} style={{ position: "sticky", top: 120 }}>
+        <Card
+          variant="borderless"
+          style={{
+            borderRadius: 24,
+            padding: "24px",
+            border: `1px solid ${token.colorBorderSecondary}`,
+            background: token.colorBgContainer,
+          }}
+        >
+          <Flex vertical gap={16}>
+            <Skeleton.Input active size="small" style={{ width: "60%" }} />
+            <Skeleton.Button
+              active
+              block
+              style={{ height: 48, borderRadius: 12 }}
+            />
+            <Skeleton active paragraph={{ rows: 2 }} title={false} />
+          </Flex>
+        </Card>
+        <Card
+          variant="borderless"
+          style={{
+            borderRadius: 20,
+            padding: "20px",
+            border: `1px solid ${token.colorBorderSecondary}`,
+            background: token.colorBgContainer,
+          }}
+        >
+          <Skeleton active paragraph={{ rows: 4 }} title />
+        </Card>
+      </Flex>
+    );
+  }
 
   return (
     <Flex vertical gap={24} style={{ position: "sticky", top: 120 }}>
@@ -176,7 +217,9 @@ export const JobTipsSidebar = ({ isEdit = false }: JobTipsSidebarProps) => {
             {isLoadingPlan ? (
               <Flex align="center" gap={8}>
                 <Spin size="small" />
-                <Text type="secondary" style={{ fontSize: 12 }}>กำลังโหลด...</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  กำลังโหลด...
+                </Text>
               </Flex>
             ) : (
               <>
