@@ -31,23 +31,18 @@ import { useEffect, useState } from "react";
 
 const { Text } = Typography;
 
-// ─── Mock delegated schools (ไว้รอ DB — แสดงเฉพาะ ACTIVE) ───────────────────
-const MOCK_DELEGATED_SCHOOLS = [
-  {
-    id: "school-abc",
-    name: "โรงเรียนอนุบาลกรุงเทพ",
-    role: "Admin",
-    initial: "อก",
-    color: "#3B82F6",
-  },
-  {
-    id: "school-xyz",
-    name: "โรงเรียนมัธยมเชียงใหม่วิทยา",
-    role: "HR Manager",
-    initial: "มว",
-    color: "#10B981",
-  },
-];
+// ✨ รูปแบบข้อมูล delegated access จาก API
+interface DelegatedSchool {
+  id: string;
+  schoolProfile: {
+    id: string;
+    schoolName: string;
+    schoolType?: string | null;
+    province: string;
+    logoUrl?: string | null;
+  };
+  role: { name: string; color: string };
+}
 
 export default function Navbar() {
   const router = useRouter();
@@ -58,12 +53,27 @@ export default function Navbar() {
 
   // ✨ [ตรวจสอบ scroll position เพื่อเปลี่ยนเป็น Floating Pill Navbar]
   const [scrolled, setScrolled] = useState(false);
+  // ✨ [Delegated schools จาก DB]
+  const [delegatedSchools, setDelegatedSchools] = useState<DelegatedSchool[]>([]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ✨ ดึง delegated access เมื่อ login แล้วเป็น EMPLOYEE (ผู้รับมอบสิทธิ์)
+  useEffect(() => {
+    if (!user?.user_id) return;
+    fetch(`/api/v1/employer/organization/delegated?user_id=${user.user_id}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.status_code === 200 && Array.isArray(res.data)) {
+          setDelegatedSchools(res.data);
+        }
+      })
+      .catch(() => {/* ไม่แสดง error บน Navbar */});
+  }, [user?.user_id]);
 
   const userMenuItems = [
     {
@@ -97,7 +107,7 @@ export default function Navbar() {
         <Flex align="center" justify="space-between" gap={8}>
           <span>การเข้าถึงของผู้รับมอบสิทธิ์</span>
           <Badge
-            count={MOCK_DELEGATED_SCHOOLS.length}
+            count={delegatedSchools.length}
             size="small"
             color={token.colorPrimary}
           />
@@ -120,55 +130,49 @@ export default function Navbar() {
     },
   ];
 
-  // ─── Dropdown items สำหรับ "เข้าถึงในฐานะ" ──────────────────────────────
+  // ─── Dropdown items สำหรับ "เข้าถึงในฐานะ" — ดึงจาก DB จริง ──────────────
   const delegatedDropdownItems = [
     {
       key: "header",
       type: "group" as const,
       label: (
         <Flex align="center" gap={6}>
-          <SwapOutlined
-            style={{ color: token.colorTextSecondary, fontSize: 12 }}
-          />
+          <SwapOutlined style={{ color: token.colorTextSecondary, fontSize: 12 }} />
           <Text
             type="secondary"
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
+            style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}
           >
             เข้าถึงในฐานะ
           </Text>
         </Flex>
       ),
-      children: MOCK_DELEGATED_SCHOOLS.map((school) => ({
-        key: school.id,
+      children: delegatedSchools.map((item) => ({
+        key: item.id,
         label: (
           <Flex align="center" gap={10} style={{ padding: "2px 0" }}>
             <Avatar
               size={28}
+              src={item.schoolProfile.logoUrl || undefined}
               style={{
-                backgroundColor: school.color,
+                backgroundColor: item.role.color || token.colorPrimary,
                 fontSize: 10,
                 fontWeight: 700,
                 flexShrink: 0,
               }}
             >
-              {school.initial}
+              {!item.schoolProfile.logoUrl && item.schoolProfile.schoolName?.charAt(0)}
             </Avatar>
             <Flex vertical gap={1}>
               <Text style={{ fontSize: 13, fontWeight: 500 }}>
-                {school.name}
+                {item.schoolProfile.schoolName}
               </Text>
               <Text type="secondary" style={{ fontSize: 11 }}>
-                {school.role}
+                {item.role.name}
               </Text>
             </Flex>
           </Flex>
         ),
-        onClick: () => router.push(`/pages/employer/job/read`), // TODO: switch context to school.id
+        onClick: () => router.push(`/pages/employer/job/read`),
       })),
     },
     { type: "divider" as const },
@@ -391,7 +395,7 @@ export default function Navbar() {
               </Link>
 
               {/* ✨ [Delegated Access Dropdown — เข้าถึงในฐานะโรงเรียนอื่น] */}
-              {MOCK_DELEGATED_SCHOOLS.length > 0 && (
+              {delegatedSchools.length > 0 && (
                 <Dropdown
                   menu={{ items: delegatedDropdownItems }}
                   placement="bottom"
@@ -414,7 +418,7 @@ export default function Navbar() {
                       เข้าถึงในฐานะ
                     </Text>
                     <Badge
-                      count={MOCK_DELEGATED_SCHOOLS.length}
+                      count={delegatedSchools.length}
                       size="small"
                       color={token.colorPrimary}
                       offset={[0, 0]}
