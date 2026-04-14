@@ -171,6 +171,7 @@ export class AuthenticateService {
           id: profile?.id || "",
           createdAt: profile?.createdAt || new Date(),
           updatedAt: profile?.updatedAt || new Date(),
+          profileImageUrl: profile?.profileImageUrl || null,
         },
       };
     } catch (error) {

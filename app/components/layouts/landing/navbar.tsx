@@ -62,9 +62,9 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✨ ดึง delegated access เมื่อ login แล้วเป็น EMPLOYEE (ผู้รับมอบสิทธิ์)
+  // ✨ ดึง delegated access เฉพาะ EMPLOYEE — EMPLOYER เจ้าของไม่มี delegated
   useEffect(() => {
-    if (!user?.user_id) return;
+    if (!user?.user_id || user.role === "EMPLOYER") return;
     fetch(`/api/v1/employer/organization/delegated?user_id=${user.user_id}`)
       .then((r) => r.json())
       .then((res) => {
@@ -73,7 +73,7 @@ export default function Navbar() {
         }
       })
       .catch(() => {/* ไม่แสดง error บน Navbar */});
-  }, [user?.user_id]);
+  }, [user?.user_id, user?.role]);
 
   const userMenuItems = [
     {
@@ -100,22 +100,26 @@ export default function Navbar() {
         }
       },
     },
-    // ✨ [Delegated Access — แสดงเมื่อมีสิทธิ์ที่ได้รับมอบ]
-    {
-      key: "delegated-access",
-      label: (
-        <Flex align="center" justify="space-between" gap={8}>
-          <span>การเข้าถึงของผู้รับมอบสิทธิ์</span>
-          <Badge
-            count={delegatedSchools.length}
-            size="small"
-            color={token.colorPrimary}
-          />
-        </Flex>
-      ),
-      icon: <KeyOutlined />,
-      onClick: () => router.push("/pages/employer/delegated-access"),
-    },
+    // ✨ [Delegated Access — แสดงเฉพาะเมื่อมีสิทธิ์ที่ได้รับมอบจริง]
+    ...(delegatedSchools.length > 0
+      ? [
+          {
+            key: "delegated-access",
+            label: (
+              <Flex align="center" justify="space-between" gap={8}>
+                <span>การเข้าถึงของผู้รับมอบสิทธิ์</span>
+                <Badge
+                  count={delegatedSchools.length}
+                  size="small"
+                  color={token.colorPrimary}
+                />
+              </Flex>
+            ),
+            icon: <KeyOutlined />,
+            onClick: () => router.push("/pages/employer/delegated-access"),
+          },
+        ]
+      : []),
     { type: "divider" as const },
     {
       key: "logout",
@@ -479,15 +483,23 @@ export default function Navbar() {
                 }}
               >
                 <Flex align="center" gap={10} style={{ paddingRight: 8 }}>
-                  <Avatar size={32}>
-                    {user.full_name.charAt(0).toUpperCase()}
+                  <Avatar
+                    size={32}
+                    src={user.profile_image_url || undefined}
+                    style={{ backgroundColor: token.colorPrimary }}
+                  >
+                    {!user.profile_image_url && user.full_name.charAt(0).toUpperCase()}
                   </Avatar>
                   <Flex vertical gap={0}>
                     <Text strong style={{ fontSize: 13 }}>
                       {user.full_name}
                     </Text>
                     <Text type="secondary" style={{ fontSize: 11 }}>
-                      {user.role === "EMPLOYEE" ? "ครูผู้สอน" : "สถานศึกษา"}
+                      {user.role === "EMPLOYEE"
+                        ? "ครูผู้สอน"
+                        : user.role === "EMPLOYER"
+                          ? "สถานศึกษา"
+                          : "ผู้ดูแลระบบ"}
                     </Text>
                   </Flex>
                 </Flex>

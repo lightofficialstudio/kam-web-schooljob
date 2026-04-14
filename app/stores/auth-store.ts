@@ -7,6 +7,7 @@ export interface User {
   full_name: string;
   role: string;
   is_first_login?: boolean;
+  profile_image_url?: string;
 }
 
 interface AuthStore {

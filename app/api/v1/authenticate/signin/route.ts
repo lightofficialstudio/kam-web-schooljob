@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
           email: result.user?.email,
           role: result.profile?.role || "EMPLOYEE",
           full_name: result.profile?.fullName || "",
+          profile_image_url: result.profile?.profileImageUrl || null,
         },
       },
       { status: 200 },
