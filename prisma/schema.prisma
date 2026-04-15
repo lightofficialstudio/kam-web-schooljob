@@ -618,12 +618,23 @@ model ConfigOption {
   @@map("config_options")
 }
 
-// ── ตารางเก็บราคา Package แต่ละ Plan — Admin แก้ไขได้ผ่าน Dashboard ──
+// ── ตารางเก็บ Package Plan ทั้งหมด — Admin จัดการได้ครบจาก Dashboard ──
 model PackagePlan {
-  id        String   @id @default(uuid())
-  plan      String   @unique // "basic" | "premium" | "enterprise"
-  price     Int      @default(0) // ราคา บาท/เดือน
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id                     String   @id @default(uuid())
+  plan                   String   @unique // plan key เช่น "basic", "premium", "enterprise" หรือ custom
+  label                  String   @default("") // ชื่อแสดงผล เช่น "Basic", "Premium"
+  color                  String   @default("#8c8c8c") // สี Hex สำหรับ Tag/UI
+  price                  Int      @default(0) // ราคา บาท/เดือน (0 = ฟรี)
+  jobQuota               Int      @default(3) @map("job_quota") // จำนวนประกาศสูงสุด (999 = ไม่จำกัด)
+  features               String   @default("[]") @map("features") // JSON array ของ string feature list
+  quotaWarningThreshold  Int      @default(80) @map("quota_warning_threshold") // % เตือนก่อนเต็ม quota
+  badgeIcon              String   @default("default") @map("badge_icon") // "default" | "crown" | "thunder"
+  upgradeTarget          String?  @map("upgrade_target") // plan key ที่แนะนำให้ upgrade (null = สูงสุด)
+  sortOrder              Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
+  isActive               Boolean  @default(true) @map("is_active") // เปิด/ปิด plan
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
 
+  @@index([isActive, sortOrder])
   @@map("package_plans")
 }

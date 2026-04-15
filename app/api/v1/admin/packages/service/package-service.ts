@@ -2,10 +2,111 @@ import { prisma } from "@/lib/prisma";
 import {
   ListSchoolsByPlanInput,
   PACKAGE_DEFINITIONS,
+  PatchPlanInput,
   UpdateSchoolPlanInput,
+  UpsertPlanInput,
 } from "../validation/package-schema";
 
 export class AdminPackageService {
+  // ✨ ดึง config ของ plan จาก DB — fallback หา PACKAGE_DEFINITIONS ถ้ายังไม่มีใน DB
+  async getPlanConfig(planKey: string) {
+    const dbPlan = await prisma.packagePlan.findUnique({ where: { plan: planKey } });
+    if (dbPlan) {
+      return {
+        jobQuota: dbPlan.jobQuota,
+        label: dbPlan.label,
+        color: dbPlan.color,
+        price: dbPlan.price,
+      };
+    }
+    // ✨ fallback ไป PACKAGE_DEFINITIONS ถ้ายังไม่ได้ seed DB
+    const def = PACKAGE_DEFINITIONS[planKey];
+    return def
+      ? { jobQuota: def.jobQuota, label: def.label, color: def.color, price: def.price }
+      : { jobQuota: 3, label: planKey, color: "#8c8c8c", price: 0 };
+  }
+
+  // ✨ ดึง PackagePlan ทั้งหมดจาก DB (active เท่านั้น เรียงตาม sortOrder)
+  async listPlans(includeInactive = false) {
+    return prisma.packagePlan.findMany({
+      where: includeInactive ? undefined : { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { plan: "asc" }],
+    });
+  }
+
+  // ✨ สร้าง PackagePlan ใหม่ (Admin)
+  async createPlan(input: UpsertPlanInput) {
+    return prisma.packagePlan.create({
+      data: {
+        plan: input.plan,
+        label: input.label,
+        color: input.color,
+        price: input.price,
+        jobQuota: input.job_quota,
+        features: JSON.stringify(input.features),
+        quotaWarningThreshold: input.quota_warning_threshold ?? 80,
+        badgeIcon: input.badge_icon ?? "default",
+        upgradeTarget: input.upgrade_target ?? null,
+        sortOrder: input.sort_order ?? 0,
+        isActive: input.is_active ?? true,
+      },
+    });
+  }
+
+  // ✨ แก้ไข PackagePlan (PATCH — เฉพาะ field ที่ส่งมา)
+  async patchPlan(planKey: string, input: PatchPlanInput) {
+    const data: Record<string, unknown> = {};
+    if (input.label !== undefined) data.label = input.label;
+    if (input.color !== undefined) data.color = input.color;
+    if (input.price !== undefined) data.price = input.price;
+    if (input.job_quota !== undefined) data.jobQuota = input.job_quota;
+    if (input.features !== undefined) data.features = JSON.stringify(input.features);
+    if (input.quota_warning_threshold !== undefined) data.quotaWarningThreshold = input.quota_warning_threshold;
+    if (input.badge_icon !== undefined) data.badgeIcon = input.badge_icon;
+    if (input.upgrade_target !== undefined) data.upgradeTarget = input.upgrade_target;
+    if (input.sort_order !== undefined) data.sortOrder = input.sort_order;
+    if (input.is_active !== undefined) data.isActive = input.is_active;
+
+    return prisma.packagePlan.update({ where: { plan: planKey }, data });
+  }
+
+  // ✨ ลบ PackagePlan (ตรวจว่ายังมีโรงเรียนใช้อยู่ไหม)
+  async deletePlan(planKey: string) {
+    const schoolCount = await prisma.schoolProfile.count({
+      where: { accountPlan: planKey },
+    });
+    if (schoolCount > 0) {
+      throw new Error(`PLAN_IN_USE:${schoolCount}`);
+    }
+    return prisma.packagePlan.delete({ where: { plan: planKey } });
+  }
+
+  // ✨ Seed plan เริ่มต้นจาก PACKAGE_DEFINITIONS ถ้า DB ว่าง
+  async seedDefaultPlans() {
+    const existing = await prisma.packagePlan.count();
+    if (existing > 0) return { seeded: 0, message: "มี plan อยู่แล้ว" };
+
+    const entries = Object.entries(PACKAGE_DEFINITIONS);
+    await prisma.packagePlan.createMany({
+      data: entries.map(([key, def]) => ({
+        plan: key,
+        label: def.label,
+        color: def.color,
+        price: def.price,
+        jobQuota: def.jobQuota,
+        features: JSON.stringify(def.features),
+        quotaWarningThreshold: def.quotaWarningThreshold,
+        badgeIcon: def.badgeIcon,
+        upgradeTarget: def.upgradeTarget ?? null,
+        sortOrder: def.sortOrder,
+        isActive: def.isActive,
+      })),
+      skipDuplicates: true,
+    });
+
+    return { seeded: entries.length, message: `Seeded ${entries.length} plans` };
+  }
+
   // ✨ ดึงสถิติ Package ภาพรวมทุก plan
   async getSummary() {
     const rows = await prisma.schoolProfile.groupBy({
@@ -13,16 +114,9 @@ export class AdminPackageService {
       _count: { id: true },
     });
 
-    const summary = {
-      basic: 0,
-      premium: 0,
-      enterprise: 0,
-      total: 0,
-    };
-
+    const summary: Record<string, number> & { total: number } = { total: 0 };
     for (const r of rows) {
-      const plan = r.accountPlan as keyof typeof summary;
-      if (plan in summary) summary[plan] = r._count.id;
+      summary[r.accountPlan] = r._count.id;
       summary.total += r._count.id;
     }
 
@@ -40,7 +134,11 @@ export class AdminPackageService {
         OR: [
           { schoolName: { contains: keyword, mode: "insensitive" as const } },
           { province: { contains: keyword, mode: "insensitive" as const } },
-          { profile: { email: { contains: keyword, mode: "insensitive" as const } } },
+          {
+            profile: {
+              email: { contains: keyword, mode: "insensitive" as const },
+            },
+          },
         ],
       }),
     };
@@ -68,7 +166,6 @@ export class AdminPackageService {
               phoneNumber: true,
             },
           },
-          // ✨ นับจำนวน active jobs เพื่อแสดง quota usage
           jobs: {
             where: { status: "OPEN" },
             select: { id: true },
@@ -98,21 +195,30 @@ export class AdminPackageService {
       owner: {
         profileId: s.profile.id,
         email: s.profile.email,
-        name: [s.profile.firstName, s.profile.lastName].filter(Boolean).join(" ") || "—",
+        name:
+          [s.profile.firstName, s.profile.lastName].filter(Boolean).join(" ") ||
+          "—",
         phoneNumber: s.profile.phoneNumber ?? null,
       },
     }));
 
-    return { schools: formatted, total, page, page_size, total_pages: Math.ceil(total / page_size) };
+    return {
+      schools: formatted,
+      total,
+      page,
+      page_size,
+      total_pages: Math.ceil(total / page_size),
+    };
   }
 
   // ✨ อัปเดต Plan ของโรงเรียน (Admin กด manual หรือ Payment webhook เรียก)
   async updateSchoolPlan(input: UpdateSchoolPlanInput) {
     const { school_profile_id, plan, job_quota_max } = input;
 
-    // ✨ ถ้าไม่ได้ override quota → ใช้ค่าจาก PACKAGE_DEFINITIONS
-    const defaultQuota = PACKAGE_DEFINITIONS[plan].jobQuota;
-    const finalQuota = job_quota_max !== undefined ? job_quota_max : defaultQuota;
+    // ✨ ดึง quota จาก DB — fallback ไป PACKAGE_DEFINITIONS
+    const planConfig = await this.getPlanConfig(plan);
+    const finalQuota =
+      job_quota_max !== undefined ? job_quota_max : planConfig.jobQuota;
 
     const updated = await prisma.schoolProfile.update({
       where: { id: school_profile_id },

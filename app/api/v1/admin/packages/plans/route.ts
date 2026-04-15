@@ -1,20 +1,44 @@
-import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
-import { z } from "zod";
-import { PLAN_LIST } from "../validation/package-schema";
+import { adminPackageService } from "../service/package-service";
+import { upsertPlanSchema } from "../validation/package-schema";
 
-// ✨ GET /api/v1/admin/packages/plans — ดึงราคา Package ทั้งหมด
-export async function GET() {
+// ✨ GET /api/v1/admin/packages/plans — ดึง Package Plan ทั้งหมดจาก DB
+// Query: ?include_inactive=true → รวม plan ที่ปิดใช้งาน
+export async function GET(req: NextRequest) {
   try {
-    const plans = await prisma.packagePlan.findMany({
-      orderBy: { plan: "asc" },
-    });
+    const { searchParams } = new URL(req.url);
+    const includeInactive = searchParams.get("include_inactive") === "true";
+
+    // ✨ ?seed=true → seed ค่าเริ่มต้นจาก PACKAGE_DEFINITIONS (ใช้ครั้งแรก)
+    if (searchParams.get("seed") === "true") {
+      const result = await adminPackageService.seedDefaultPlans();
+      return Response.json({
+        status_code: 200,
+        message_th: result.message,
+        message_en: result.message,
+        data: result,
+      });
+    }
+
+    const plans = await adminPackageService.listPlans(includeInactive);
+
+    // ✨ parse features JSON string → array ก่อนส่งกลับ
+    const formatted = plans.map((p) => ({
+      ...p,
+      features: (() => {
+        try {
+          return JSON.parse(p.features);
+        } catch {
+          return [];
+        }
+      })(),
+    }));
 
     return Response.json({
       status_code: 200,
-      message_th: "ดึงราคา Package สำเร็จ",
-      message_en: "Fetched package plans successfully",
-      data: plans,
+      message_th: "ดึงรายการ Package Plan สำเร็จ",
+      message_en: "Package plans fetched successfully",
+      data: formatted,
     });
   } catch (error) {
     console.error("❌ [GET /api/v1/admin/packages/plans]", error);
@@ -30,16 +54,11 @@ export async function GET() {
   }
 }
 
-const updatePriceSchema = z.object({
-  plan: z.enum(PLAN_LIST),
-  price: z.number().int().min(0),
-});
-
-// ✨ PATCH /api/v1/admin/packages/plans — อัปเดตราคา Package (Admin เท่านั้น)
-export async function PATCH(req: NextRequest) {
+// ✨ POST /api/v1/admin/packages/plans — สร้าง Package Plan ใหม่ (Admin)
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const parsed = updatePriceSchema.safeParse(body);
+    const parsed = upsertPlanSchema.safeParse(body);
 
     if (!parsed.success) {
       return Response.json(
@@ -53,23 +72,30 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { plan, price } = parsed.data;
-
-    // ✨ upsert — สร้างถ้ายังไม่มี, แก้ไขถ้ามีแล้ว
-    const updated = await prisma.packagePlan.upsert({
-      where: { plan },
-      update: { price },
-      create: { plan, price },
-    });
-
-    return Response.json({
-      status_code: 200,
-      message_th: `อัปเดตราคา ${plan} สำเร็จ`,
-      message_en: "Package price updated successfully",
-      data: updated,
-    });
-  } catch (error) {
-    console.error("❌ [PATCH /api/v1/admin/packages/plans]", error);
+    const created = await adminPackageService.createPlan(parsed.data);
+    return Response.json(
+      {
+        status_code: 201,
+        message_th: `สร้าง Package Plan "${created.label}" สำเร็จ`,
+        message_en: "Package plan created successfully",
+        data: { ...created, features: JSON.parse(created.features) },
+      },
+      { status: 201 },
+    );
+  } catch (error: unknown) {
+    const err = error as { code?: string };
+    if (err?.code === "P2002") {
+      return Response.json(
+        {
+          status_code: 409,
+          message_th: "Plan key นี้มีอยู่แล้ว",
+          message_en: "Plan key already exists",
+          data: null,
+        },
+        { status: 409 },
+      );
+    }
+    console.error("❌ [POST /api/v1/admin/packages/plans]", error);
     return Response.json(
       {
         status_code: 500,

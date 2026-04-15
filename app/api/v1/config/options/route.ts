@@ -9,14 +9,25 @@ export async function GET(request: Request) {
 
     if (!group) {
       return Response.json(
-        { status_code: 400, message_th: "กรุณาระบุ group", message_en: "group is required", data: null },
+        {
+          status_code: 400,
+          message_th: "กรุณาระบุ group",
+          message_en: "group is required",
+          data: null,
+        },
         { status: 400 },
       );
     }
 
     const options = await prisma.configOption.findMany({
       where: { group, isActive: true },
-      select: { id: true, label: true, value: true, sortOrder: true },
+      select: {
+        id: true,
+        label: true,
+        value: true,
+        parentValue: true,
+        sortOrder: true,
+      },
       orderBy: { sortOrder: "asc" },
     });
 
@@ -29,7 +40,12 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("❌ [GET /api/v1/config/options]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาดภายในระบบ", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาดภายในระบบ",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }
