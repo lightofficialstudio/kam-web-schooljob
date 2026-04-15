@@ -1,5 +1,6 @@
 "use client";
 
+// ✨ Signin Form — Minimal + Modern + subtle animation
 import ResultModal from "@/app/components/layouts/modal/result-modal";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
@@ -10,20 +11,17 @@ import {
   Flex,
   Form,
   Input,
-  Space,
   Typography,
 } from "antd";
-
-// ใช้ค่าคงที่แทน PRIMARY เพื่อป้องกัน SSR/Client hydration mismatch
-const PRIMARY = "#11b6f5";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { requestSignin } from "../_api/signin-api";
 import { useSigninStore } from "../_state/signin-store";
 
+const PRIMARY = "#11b6f5";
+
 const { Title, Text } = Typography;
 
-// ฟอร์มเข้าสู่ระบบ — ใช้ Zustand สำหรับ loading/modal state
 export const SigninForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,58 +31,47 @@ export const SigninForm = () => {
 
   const handleModalConfirm = () => {
     if (modal.type !== "success") return;
-
     const { user } = useAuthStore.getState();
 
-    // ✨ ถ้ามี redirect param → ใช้ค่านั้นก่อนเสมอ (เช่น กดฝากประวัติแล้วถูกกลับมา signin)
     if (redirectUrl) {
-      const destination = decodeURIComponent(redirectUrl);
-      console.log(`🔐 [SIGNIN] Redirecting to redirect param: ${destination}`);
-      router.push(destination);
+      router.push(decodeURIComponent(redirectUrl));
       setTimeout(() => router.refresh(), 500);
       return;
     }
 
-    // ✨ Default redirect ตาม Role
     const ROLE_HOME: Record<string, string> = {
       EMPLOYEE: "/pages/employee/profile",
       EMPLOYER: "/pages/employer/profile",
       ADMIN: "/pages/admin",
     };
 
-    const destinationUrl = ROLE_HOME[user?.role ?? ""] ?? "/";
-
+    const dest = ROLE_HOME[user?.role ?? ""] ?? "/";
     if (user?.role === "EMPLOYER" && user.is_first_login) {
       useAuthStore.getState().setFirstLogin(false);
     }
-
-    console.log(`🔐 [SIGNIN] Redirecting to role home: ${destinationUrl}`);
-    router.push(destinationUrl);
+    router.push(dest);
     setTimeout(() => router.refresh(), 500);
   };
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: { email: string; password: string }) => {
     setLoading(true);
     try {
       const response = await requestSignin(values.email, values.password);
       const result = response.data;
-
-      // บันทึก user info ลง Zustand store
       setUser({
         user_id: result.data.user_id,
         email: result.data.email,
         full_name: result.data.full_name,
-        school_name: result.data.school_name || undefined, // ✨ ชื่อโรงเรียน — เฉพาะ EMPLOYER
+        school_name: result.data.school_name || undefined,
         role: result.data.role,
         is_first_login: result.data.is_first_login || false,
         profile_image_url: result.data.profile_image_url || undefined,
       });
-
       showModal("success", "เข้าสู่ระบบสำเร็จ", result.message_th || "เข้าสู่ระบบเรียบร้อยแล้ว");
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message =
-        err?.response?.data?.message_th ||
-        err?.message ||
+        (err as { response?: { data?: { message_th?: string } }; message?: string })?.response?.data?.message_th ||
+        (err as { message?: string })?.message ||
         "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
       showModal("error", "เกิดข้อผิดพลาด", message);
     } finally {
@@ -106,87 +93,137 @@ export const SigninForm = () => {
         width={420}
       />
 
-      <Col xs={24} md={14} style={{ padding: "48px 48px" }}>
-        <Flex vertical style={{ height: "100%" }} justify="center" gap={32}>
+      {/* ✨ Animation styles */}
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .signin-form-wrap {
+          animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .signin-input-row {
+          animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .signin-input-row:nth-child(1) { animation-delay: 0.08s; }
+        .signin-input-row:nth-child(2) { animation-delay: 0.14s; }
+        .signin-input-row:nth-child(3) { animation-delay: 0.20s; }
+        .signin-btn { animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) 0.26s both; }
+        .signin-footer { animation: fadeSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) 0.32s both; }
+      `}</style>
 
-          {/* Header */}
-          <Flex vertical gap={6}>
-            <Title level={3} style={{ margin: 0 }}>เข้าสู่ระบบ</Title>
+      <Col xs={24} md={14}>
+        <Flex
+          vertical
+          justify="center"
+          style={{ height: "100%", padding: "52px 52px" }}
+          gap={0}
+          className="signin-form-wrap"
+        >
+          {/* ✨ Header */}
+          <Flex vertical gap={6} style={{ marginBottom: 36 }}>
+            <Title level={3} style={{ margin: 0, fontWeight: 800, letterSpacing: "-0.5px" }}>
+              เข้าสู่ระบบ
+            </Title>
             <Text type="secondary" style={{ fontSize: 14 }}>
-              กรอกข้อมูลเพื่อเข้าสู่แดชบอร์ดของคุณ
+              กรอกอีเมลและรหัสผ่านเพื่อดำเนินการต่อ
             </Text>
           </Flex>
 
-          {/* Form */}
-          <Form layout="vertical" onFinish={onFinish} size="large">
-            <Form.Item
-              name="email"
-              label="อีเมล"
-              rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}
-            >
-              <Input
-                prefix={<MailOutlined style={{ color: PRIMARY }} />}
-                placeholder="example@email.com"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="password"
-              label="รหัสผ่าน"
-              rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}
-            >
-              <Input.Password
-                prefix={<LockOutlined style={{ color: PRIMARY }} />}
-                placeholder="รหัสผ่านของคุณ"
-              />
-            </Form.Item>
-
-            <Flex justify="flex-end" style={{ marginTop: -16, marginBottom: 12 }}>
-              <Link
-                href="/pages/forgot-password"
-                style={{ fontSize: 13, color: PRIMARY, fontWeight: 500 }}
+          {/* ✨ Form */}
+          <Form layout="vertical" onFinish={onFinish} size="large" requiredMark={false}>
+            <div className="signin-input-row">
+              <Form.Item
+                name="email"
+                label={<Text style={{ fontSize: 13, fontWeight: 600 }}>อีเมล</Text>}
+                rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}
+                style={{ marginBottom: 16 }}
               >
-                ลืมรหัสผ่าน?
-              </Link>
-            </Flex>
+                <Input
+                  prefix={<MailOutlined style={{ color: "#c0c0c0" }} />}
+                  placeholder="example@email.com"
+                  style={{ borderRadius: 10, height: 48, fontSize: 14 }}
+                />
+              </Form.Item>
+            </div>
 
-            <Form.Item style={{ marginBottom: 0, marginTop: 8 }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-                block
-                size="large"
-                style={{
-                  height: 52,
-                  borderRadius: 10,
-                  fontWeight: 700,
-                  fontSize: 15,
-                  boxShadow: `0 6px 20px ${PRIMARY}40`,
-                }}
+            <div className="signin-input-row">
+              <Form.Item
+                name="password"
+                label={<Text style={{ fontSize: 13, fontWeight: 600 }}>รหัสผ่าน</Text>}
+                rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}
+                style={{ marginBottom: 8 }}
               >
-                เข้าสู่ระบบ
-              </Button>
-            </Form.Item>
+                <Input.Password
+                  prefix={<LockOutlined style={{ color: "#c0c0c0" }} />}
+                  placeholder="••••••••"
+                  style={{ borderRadius: 10, height: 48, fontSize: 14 }}
+                />
+              </Form.Item>
+            </div>
+
+            {/* ✨ Forgot password */}
+            <div className="signin-input-row">
+              <Flex justify="flex-end" style={{ marginBottom: 24 }}>
+                <Link
+                  href="/pages/forgot-password"
+                  style={{ fontSize: 13, color: PRIMARY, fontWeight: 500 }}
+                >
+                  ลืมรหัสผ่าน?
+                </Link>
+              </Flex>
+            </div>
+
+            {/* ✨ Submit */}
+            <div className="signin-btn">
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  block
+                  size="large"
+                  style={{
+                    height: 50,
+                    borderRadius: 12,
+                    fontWeight: 700,
+                    fontSize: 15,
+                    background: PRIMARY,
+                    border: "none",
+                    boxShadow: `0 8px 24px ${PRIMARY}45`,
+                    letterSpacing: "0.3px",
+                    transition: "box-shadow 0.2s, transform 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 12px 28px ${PRIMARY}55`;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 24px ${PRIMARY}45`;
+                  }}
+                >
+                  {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+                </Button>
+              </Form.Item>
+            </div>
           </Form>
 
-          {/* Divider + Register */}
-          <Flex vertical gap={16}>
-            <Divider style={{ margin: 0 }}>
-              <Text type="secondary" style={{ fontSize: 12 }}>หรือ</Text>
+          {/* ✨ Footer */}
+          <div className="signin-footer" style={{ marginTop: 28 }}>
+            <Divider style={{ margin: "0 0 20px" }}>
+              <Text type="secondary" style={{ fontSize: 12, padding: "0 8px" }}>หรือ</Text>
             </Divider>
-            <Flex justify="center">
-              <Space size={6}>
-                <Text type="secondary" style={{ fontSize: 14 }}>ยังไม่มีบัญชี?</Text>
-                <Link
-                  href="/pages/signup"
-                  style={{ fontWeight: 700, color: PRIMARY, fontSize: 14 }}
-                >
-                  สมัครสมาชิกฟรี
-                </Link>
-              </Space>
+            <Flex justify="center" align="center" gap={6}>
+              <Text type="secondary" style={{ fontSize: 14 }}>ยังไม่มีบัญชี?</Text>
+              <Link
+                href="/pages/signup"
+                style={{ fontWeight: 700, color: PRIMARY, fontSize: 14 }}
+              >
+                สมัครสมาชิกฟรี →
+              </Link>
             </Flex>
-          </Flex>
+          </div>
 
         </Flex>
       </Col>

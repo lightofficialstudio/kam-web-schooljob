@@ -1,11 +1,17 @@
 "use client";
 
-// ✨ Branding Panel — ฝั่งซ้าย Minimal + Animated dots
+// ✨ Branding Panel — ฝั่งซ้าย Minimal + Animated orbs + icon-based features
+import {
+  BankOutlined,
+  CheckCircleOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Col, Flex, Typography } from "antd";
 
 const { Text } = Typography;
 
-// ✨ floating orb style
+// ✨ floating orb helper
 const orb = (size: number, top: string, left: string, delay: string, opacity: number): React.CSSProperties => ({
   position: "absolute",
   width: size,
@@ -14,16 +20,30 @@ const orb = (size: number, top: string, left: string, delay: string, opacity: nu
   background: "rgba(255,255,255,0.12)",
   top,
   left,
-  animation: `floatOrb 6s ease-in-out infinite`,
+  animation: "floatOrb 6s ease-in-out infinite",
   animationDelay: delay,
   opacity,
   pointerEvents: "none",
 });
 
-const STATS = [
-  { value: "2,400+", label: "ครูที่ลงทะเบียน" },
-  { value: "380+", label: "โรงเรียนพันธมิตร" },
-  { value: "94%", label: "อัตราการจับคู่สำเร็จ" },
+// ✨ Feature items — icon-based เท่านั้น ไม่มี hardcode ตัวเลข
+const FEATURES = [
+  {
+    icon: <SearchOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    text: "ค้นหางานตามวิชาเอกและพื้นที่",
+  },
+  {
+    icon: <BankOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    text: "สถานศึกษาคุณภาพทั่วประเทศ",
+  },
+  {
+    icon: <UserOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    text: "โปรไฟล์ครูพร้อมระบบสมัครงานในที่เดียว",
+  },
+  {
+    icon: <CheckCircleOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    text: "ติดตามสถานะใบสมัครแบบ real-time",
+  },
 ];
 
 export const SigninBrandingPanel = () => {
@@ -41,7 +61,6 @@ export const SigninBrandingPanel = () => {
         justifyContent: "space-between",
       }}
     >
-      {/* ✨ keyframe inject */}
       <style>{`
         @keyframes floatOrb {
           0%, 100% { transform: translateY(0px) scale(1); }
@@ -51,11 +70,6 @@ export const SigninBrandingPanel = () => {
           from { opacity: 0; transform: translateY(18px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes shimmer {
-          0% { opacity: 0.5; }
-          50% { opacity: 1; }
-          100% { opacity: 0.5; }
-        }
       `}</style>
 
       {/* ✨ Orbs */}
@@ -64,7 +78,7 @@ export const SigninBrandingPanel = () => {
       <div style={orb(90, "75%", "70%", "3s", 0.25)} />
       <div style={orb(60, "15%", "72%", "2s", 0.2)} />
 
-      {/* ✨ Top: Logo + Tagline */}
+      {/* ✨ Top: Logo + Headline */}
       <Flex vertical gap={28} style={{ position: "relative", zIndex: 1, animation: "fadeSlideUp 0.7s ease both" }}>
         {/* Logo mark */}
         <Flex align="center" gap={10}>
@@ -90,7 +104,7 @@ export const SigninBrandingPanel = () => {
         {/* Headline */}
         <Flex vertical gap={10}>
           <Text style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.25, display: "block" }}>
-            ยินดีต้อนรับ<br />กลับมา 👋
+            ยินดีต้อนรับ<br />กลับมา
           </Text>
           <Text style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, display: "block" }}>
             แพลตฟอร์มเชื่อมครูคุณภาพ<br />กับสถานศึกษาทั่วประเทศ
@@ -98,7 +112,7 @@ export const SigninBrandingPanel = () => {
         </Flex>
       </Flex>
 
-      {/* ✨ Bottom: Stats row */}
+      {/* ✨ Bottom: Feature list + footer */}
       <Flex
         vertical
         gap={20}
@@ -108,17 +122,27 @@ export const SigninBrandingPanel = () => {
           animation: "fadeSlideUp 0.7s ease 0.2s both",
         }}
       >
-        {/* Divider line */}
         <div style={{ height: 1, background: "rgba(255,255,255,0.18)", borderRadius: 1 }} />
 
-        <Flex justify="space-between">
-          {STATS.map((s) => (
-            <Flex vertical gap={2} key={s.label} align="center">
-              <Text style={{ color: "#fff", fontSize: 22, fontWeight: 800, display: "block", lineHeight: 1 }}>
-                {s.value}
-              </Text>
-              <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, display: "block", textAlign: "center" }}>
-                {s.label}
+        {/* ✨ Icon-based feature list */}
+        <Flex vertical gap={12}>
+          {FEATURES.map((f) => (
+            <Flex key={f.text} align="center" gap={10}>
+              <Flex
+                align="center"
+                justify="center"
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 8,
+                  background: "rgba(255,255,255,0.15)",
+                  flexShrink: 0,
+                }}
+              >
+                {f.icon}
+              </Flex>
+              <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.4 }}>
+                {f.text}
               </Text>
             </Flex>
           ))}
