@@ -8,6 +8,7 @@ import {
   EyeOutlined,
   SendOutlined,
 } from "@ant-design/icons";
+
 import {
   Avatar,
   Button,
@@ -97,14 +98,24 @@ function KanbanBlogCard({ blog }: { blog: AdminBlogItem }) {
           </Flex>
         )}
 
-        {/* ✨ Footer: author + actions */}
+        {/* ✨ Footer: viewCount + actions */}
         <Flex align="center" justify="space-between" style={{ paddingTop: 8, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
-          <Flex align="center" gap={6}>
-            <Avatar size={20} src={blog.author.imageUrl ?? undefined} style={{ background: token.colorPrimary, fontSize: 10 }}>
-              {!blog.author.imageUrl && blog.author.name.charAt(0)}
-            </Avatar>
-            <Text type="secondary" style={{ fontSize: 11 }} ellipsis>{blog.author.name}</Text>
-          </Flex>
+          {/* ✨ ยอดวิว */}
+          {blog.status === "PUBLISHED" ? (
+            <Flex align="center" gap={4}>
+              <EyeOutlined style={{ fontSize: 11, color: token.colorTextSecondary }} />
+              <Text type="secondary" style={{ fontSize: 11, fontWeight: 600 }}>
+                {(blog.viewCount ?? 0).toLocaleString()}
+              </Text>
+            </Flex>
+          ) : (
+            <Flex align="center" gap={6}>
+              <Avatar size={18} src={blog.author.imageUrl ?? undefined} style={{ background: token.colorPrimary, fontSize: 9 }}>
+                {!blog.author.imageUrl && blog.author.name.charAt(0)}
+              </Avatar>
+              <Text type="secondary" style={{ fontSize: 11 }} ellipsis>{blog.author.name}</Text>
+            </Flex>
+          )}
 
           <Flex align="center" gap={4}>
             {blog.status === "PUBLISHED" && (

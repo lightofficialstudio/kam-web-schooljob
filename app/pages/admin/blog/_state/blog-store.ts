@@ -24,6 +24,7 @@ export interface AdminBlogItem {
   createdAt: string;
   updatedAt: string;
   tags: string[];
+  viewCount: number;
   author: { id: string | null; name: string; imageUrl: string | null };
 }
 

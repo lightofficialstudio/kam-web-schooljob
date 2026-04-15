@@ -99,6 +99,20 @@ export function BlogTable() {
       width: 110,
     },
     {
+      title: "ยอดวิว",
+      key: "viewCount",
+      render: (_, b) => b.status === "PUBLISHED" ? (
+        <Flex align="center" gap={4}>
+          <EyeOutlined style={{ fontSize: 12, color: "#8c8c8c" }} />
+          <Text style={{ fontSize: 13, fontWeight: 600 }}>{(b.viewCount ?? 0).toLocaleString()}</Text>
+        </Flex>
+      ) : (
+        <Text type="secondary" style={{ fontSize: 12 }}>—</Text>
+      ),
+      width: 100,
+      sorter: (a, b) => (a.viewCount ?? 0) - (b.viewCount ?? 0),
+    },
+    {
       title: "วันที่",
       key: "date",
       render: (_, b) => (

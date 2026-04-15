@@ -23,21 +23,12 @@ export class AdminBlogService {
       prisma.blog.count({ where }),
       prisma.blog.findMany({
         where,
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          excerpt: true,
-          category: true,
-          coverImageUrl: true,
-          status: true,
-          publishedAt: true,
-          createdAt: true,
-          updatedAt: true,
-          tags: true,
+        // ✨ ใช้ include แทน select เพื่อให้ _count ทำงานได้
+        include: {
           author: {
             select: { id: true, firstName: true, lastName: true, profileImageUrl: true },
           },
+          _count: { select: { blogViews: true } },
         },
         orderBy: [{ updatedAt: "desc" }],
         skip,
@@ -57,6 +48,7 @@ export class AdminBlogService {
       createdAt: b.createdAt.toISOString(),
       updatedAt: b.updatedAt.toISOString(),
       tags: b.tags ? JSON.parse(b.tags) : [],
+      viewCount: b._count.blogViews,
       author: b.author
         ? {
             id: b.author.id,

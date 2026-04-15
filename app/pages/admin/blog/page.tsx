@@ -5,6 +5,8 @@ import { useAuthStore } from "@/app/stores/auth-store";
 import {
   AppstoreOutlined,
   BarsOutlined,
+  EditOutlined,
+  EyeOutlined,
   FilterOutlined,
   PlusOutlined,
   ProjectOutlined,
@@ -129,14 +131,26 @@ function BlogGridCard({ blog }: { blog: import("./_state/blog-store").AdminBlogI
         </Flex>
 
         <Flex align="center" justify="space-between" style={{ marginTop: "auto", paddingTop: 10, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
-          <Text type="secondary" style={{ fontSize: 11 }}>{blog.author.name}</Text>
+          {/* ✨ ยอดวิว — แสดงเฉพาะ PUBLISHED */}
+          {blog.status === "PUBLISHED" ? (
+            <Flex align="center" gap={4}>
+              <EyeOutlined style={{ fontSize: 12, color: token.colorTextSecondary }} />
+              <Text type="secondary" style={{ fontSize: 12, fontWeight: 600 }}>
+                {(blog.viewCount ?? 0).toLocaleString()}
+              </Text>
+            </Flex>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 11 }}>{blog.author.name}</Text>
+          )}
           <Flex align="center" gap={4}>
             {blog.status === "PUBLISHED" && (
               <Tooltip title="ดูบทความ">
-                <Button size="small" type="text" href={`/pages/blog/${blog.id}`} target="_blank">👁</Button>
+                <Button size="small" type="text" icon={<EyeOutlined />} href={`/pages/blog/${blog.id}`} target="_blank" />
               </Tooltip>
             )}
-            <Button size="small" type="text" onClick={() => openEdit(blog)}>✏️</Button>
+            <Tooltip title="แก้ไข">
+              <Button size="small" type="text" icon={<EditOutlined />} onClick={() => openEdit(blog)} />
+            </Tooltip>
             <Tooltip title={blog.status === "DRAFT" ? "เผยแพร่ทันที" : "ย้ายกลับ Draft"}>
               <Button
                 size="small"
