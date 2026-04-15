@@ -9,7 +9,7 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
+  PackageOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -47,22 +47,22 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
       onClick: () => router.push("/pages/admin/user-management"),
     },
     {
-      key: "/pages/admin/jobs",
+      key: "/pages/admin/blog",
       icon: <FileTextOutlined />,
-      label: "จัดการงาน",
-      onClick: () => router.push("/pages/admin/jobs"),
+      label: "จัดการบทความ",
+      onClick: () => router.push("/pages/admin/blog"),
+    },
+    {
+      key: "/pages/admin/package-management",
+      icon: <PackageOutlined />,
+      label: "จัดการแพ็กเกจ",
+      onClick: () => router.push("/pages/admin/package-management"),
     },
     {
       key: "/pages/admin/config",
       icon: <AppstoreOutlined />,
       label: "ตัวเลือก Dropdown",
       onClick: () => router.push("/pages/admin/config"),
-    },
-    {
-      key: "/pages/admin/settings",
-      icon: <SettingOutlined />,
-      label: "การตั้งค่า",
-      onClick: () => router.push("/pages/admin/settings"),
     },
   ];
 
