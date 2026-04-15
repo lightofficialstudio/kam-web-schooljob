@@ -44,8 +44,8 @@ import {
   theme,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useUserManagementStore } from "../_state/user-management-store";
 import type { UserDetail } from "../_api/user-management-api";
+import { useUserManagementStore } from "../_state/user-management-store";
 
 // ✨ Application row type
 type AppRow = UserDetail["recentApplications"][number];
@@ -134,9 +134,12 @@ export function UserDetailDrawer() {
       title: "ลบ User นี้ถาวร?",
       content: (
         <Flex vertical gap={8}>
-          <Text>ลบ <Text strong>{d.email}</Text> ออกจากระบบทั้งหมด</Text>
+          <Text>
+            ลบ <Text strong>{d.email}</Text> ออกจากระบบทั้งหมด
+          </Text>
           <Text type="danger" style={{ fontSize: 12 }}>
-            ⚠️ ลบทั้ง Supabase Auth + Prisma Profile และ data ทั้งหมด — ไม่สามารถย้อนกลับได้
+            ⚠️ ลบทั้ง Supabase Auth + Prisma Profile และ data ทั้งหมด —
+            ไม่สามารถย้อนกลับได้
           </Text>
         </Flex>
       ),
@@ -167,7 +170,11 @@ export function UserDetailDrawer() {
       title: "โรงเรียน",
       dataIndex: "schoolName",
       key: "schoolName",
-      render: (v) => <Text type="secondary" style={{ fontSize: 12 }}>{v}</Text>,
+      render: (v) => (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {v}
+        </Text>
+      ),
     },
     {
       title: "สถานะ",
@@ -195,7 +202,11 @@ export function UserDetailDrawer() {
       dataIndex: "appliedAt",
       key: "appliedAt",
       width: 130,
-      render: (v) => <Text type="secondary" style={{ fontSize: 11 }}>{formatThai(v)}</Text>,
+      render: (v) => (
+        <Text type="secondary" style={{ fontSize: 11 }}>
+          {formatThai(v)}
+        </Text>
+      ),
     },
   ];
 
@@ -213,7 +224,9 @@ export function UserDetailDrawer() {
       key: "status",
       width: 90,
       render: (v) => (
-        <Tag color={v === "OPEN" ? "success" : v === "DRAFT" ? "default" : "error"}>
+        <Tag
+          color={v === "OPEN" ? "success" : v === "DRAFT" ? "default" : "error"}
+        >
           {v === "OPEN" ? "รับสมัคร" : v === "DRAFT" ? "Draft" : "ปิดแล้ว"}
         </Tag>
       ),
@@ -223,14 +236,20 @@ export function UserDetailDrawer() {
       dataIndex: "_count",
       key: "_count",
       width: 80,
-      render: (v) => <Text style={{ fontSize: 12 }}>{v?.applications ?? 0} คน</Text>,
+      render: (v) => (
+        <Text style={{ fontSize: 12 }}>{v?.applications ?? 0} คน</Text>
+      ),
     },
     {
       title: "สร้างเมื่อ",
       dataIndex: "createdAt",
       key: "createdAt",
       width: 120,
-      render: (v) => <Text type="secondary" style={{ fontSize: 11 }}>{formatThai(v)}</Text>,
+      render: (v) => (
+        <Text type="secondary" style={{ fontSize: 11 }}>
+          {formatThai(v)}
+        </Text>
+      ),
     },
   ];
 
@@ -263,12 +282,22 @@ export function UserDetailDrawer() {
                   }
                   style={{ margin: 0, fontSize: 11 }}
                 >
-                  {d.profile?.role === "ADMIN" ? "ผู้ดูแล" : d.profile?.role === "EMPLOYER" ? "โรงเรียน" : "ครู"}
+                  {d.profile?.role === "ADMIN"
+                    ? "ผู้ดูแล"
+                    : d.profile?.role === "EMPLOYER"
+                      ? "โรงเรียน"
+                      : "ครู"}
                 </Tag>
                 {d.isEmailVerified ? (
-                  <Badge status="success" text={<Text style={{ fontSize: 11 }}>ยืนยันแล้ว</Text>} />
+                  <Badge
+                    status="success"
+                    text={<Text style={{ fontSize: 11 }}>ยืนยันแล้ว</Text>}
+                  />
                 ) : (
-                  <Badge status="warning" text={<Text style={{ fontSize: 11 }}>ยังไม่ยืนยัน</Text>} />
+                  <Badge
+                    status="warning"
+                    text={<Text style={{ fontSize: 11 }}>ยังไม่ยืนยัน</Text>}
+                  />
                 )}
                 {d.isBanned && (
                   <Tag color="red" style={{ margin: 0, fontSize: 11 }}>
@@ -343,13 +372,15 @@ export function UserDetailDrawer() {
         <Text type="secondary">ไม่พบข้อมูล</Text>
       ) : (
         <Flex vertical gap={20}>
-
           {/* ─── Stats Cards ─── */}
           <Row gutter={[12, 12]}>
             {[
               {
                 label: d.profile?.role === "EMPLOYER" ? "ประกาศงาน" : "ใบสมัคร",
-                value: d.profile?.role === "EMPLOYER" ? d.stats.jobCount : d.stats.applicationCount,
+                value:
+                  d.profile?.role === "EMPLOYER"
+                    ? d.stats.jobCount
+                    : d.stats.applicationCount,
                 icon: <FileTextOutlined />,
                 color: token.colorPrimary,
               },
@@ -367,7 +398,9 @@ export function UserDetailDrawer() {
               },
               {
                 label: "เข้าสู่ระบบล่าสุด",
-                value: d.lastSignInAt ? formatThai(d.lastSignInAt) : "ยังไม่เคย",
+                value: d.lastSignInAt
+                  ? formatThai(d.lastSignInAt)
+                  : "ยังไม่เคย",
                 icon: <ClockCircleOutlined />,
                 color: token.colorTextSecondary,
                 isText: true,
@@ -387,16 +420,30 @@ export function UserDetailDrawer() {
                 >
                   <Text style={{ color: s.color, fontSize: 18 }}>{s.icon}</Text>
                   {s.isText ? (
-                    <Text style={{ fontSize: 10, textAlign: "center", color: token.colorTextSecondary }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        textAlign: "center",
+                        color: token.colorTextSecondary,
+                      }}
+                    >
                       {s.value}
                     </Text>
                   ) : (
                     <Statistic
                       value={s.value as number}
-                      styles={{ content: { fontSize: 22, fontWeight: 700, color: s.color } }}
+                      styles={{
+                        content: {
+                          fontSize: 22,
+                          fontWeight: 700,
+                          color: s.color,
+                        },
+                      }}
                     />
                   )}
-                  <Text type="secondary" style={{ fontSize: 11 }}>{s.label}</Text>
+                  <Text type="secondary" style={{ fontSize: 11 }}>
+                    {s.label}
+                  </Text>
                 </Flex>
               </Col>
             ))}
@@ -416,9 +463,17 @@ export function UserDetailDrawer() {
               contentStyle={{ fontSize: 12 }}
             >
               <Descriptions.Item label="User ID" span={2}>
-                <Text code style={{ fontSize: 11 }}>{d.id}</Text>
+                <Text code style={{ fontSize: 11 }}>
+                  {d.id}
+                </Text>
               </Descriptions.Item>
-              <Descriptions.Item label={<><MailOutlined /> อีเมล</>}>
+              <Descriptions.Item
+                label={
+                  <>
+                    <MailOutlined /> อีเมล
+                  </>
+                }
+              >
                 {d.email}
               </Descriptions.Item>
               <Descriptions.Item label="ยืนยันอีเมล">
@@ -427,25 +482,48 @@ export function UserDetailDrawer() {
                     <CheckCircleOutlined /> {formatThai(d.emailConfirmedAt)}
                   </Text>
                 ) : (
-                  <Text type="warning"><CloseCircleOutlined /> ยังไม่ยืนยัน</Text>
+                  <Text type="warning">
+                    <CloseCircleOutlined /> ยังไม่ยืนยัน
+                  </Text>
                 )}
               </Descriptions.Item>
-              <Descriptions.Item label={<><PhoneOutlined /> โทรศัพท์</>}>
+              <Descriptions.Item
+                label={
+                  <>
+                    <PhoneOutlined /> โทรศัพท์
+                  </>
+                }
+              >
                 {d.phone ?? "—"}
               </Descriptions.Item>
-              <Descriptions.Item label={<><GlobalOutlined /> Provider</>}>
+              <Descriptions.Item
+                label={
+                  <>
+                    <GlobalOutlined /> Provider
+                  </>
+                }
+              >
                 <Tag>{d.provider}</Tag>
-                {d.providers.length > 1 && d.providers.map((p) => <Tag key={p}>{p}</Tag>)}
+                {d.providers.length > 1 &&
+                  d.providers.map((p) => <Tag key={p}>{p}</Tag>)}
               </Descriptions.Item>
               <Descriptions.Item label="สถานะ">
                 {d.isBanned ? (
-                  <Tag color="red"><StopOutlined /> แบน</Tag>
+                  <Tag color="red">
+                    <StopOutlined /> แบน
+                  </Tag>
                 ) : (
-                  <Tag color="green"><CheckCircleOutlined /> ปกติ</Tag>
+                  <Tag color="green">
+                    <CheckCircleOutlined /> ปกติ
+                  </Tag>
                 )}
               </Descriptions.Item>
-              <Descriptions.Item label="สมัครเมื่อ">{formatThai(d.createdAt)}</Descriptions.Item>
-              <Descriptions.Item label="เข้าสู่ระบบล่าสุด">{formatThai(d.lastSignInAt)}</Descriptions.Item>
+              <Descriptions.Item label="สมัครเมื่อ">
+                {formatThai(d.createdAt)}
+              </Descriptions.Item>
+              <Descriptions.Item label="เข้าสู่ระบบล่าสุด">
+                {formatThai(d.lastSignInAt)}
+              </Descriptions.Item>
             </Descriptions>
           </div>
 
@@ -466,18 +544,30 @@ export function UserDetailDrawer() {
                 <Descriptions.Item label="ชื่อ-นามสกุล">
                   {d.profile.fullName || <Text type="secondary">—</Text>}
                 </Descriptions.Item>
-                <Descriptions.Item label="เพศ">{d.profile.gender ?? "—"}</Descriptions.Item>
-                <Descriptions.Item label="โทรศัพท์">{d.profile.phoneNumber ?? "—"}</Descriptions.Item>
-                <Descriptions.Item label="สัญชาติ">{d.profile.nationality ?? "—"}</Descriptions.Item>
+                <Descriptions.Item label="เพศ">
+                  {d.profile.gender ?? "—"}
+                </Descriptions.Item>
+                <Descriptions.Item label="โทรศัพท์">
+                  {d.profile.phoneNumber ?? "—"}
+                </Descriptions.Item>
+                <Descriptions.Item label="สัญชาติ">
+                  {d.profile.nationality ?? "—"}
+                </Descriptions.Item>
                 <Descriptions.Item label="การมองเห็น Profile">
                   <Tag>{d.profile.profileVisibility ?? "—"}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="สถานะใบอนุญาต">
-                  {d.profile.licenseStatus ? <Tag>{d.profile.licenseStatus}</Tag> : "—"}
+                  {d.profile.licenseStatus ? (
+                    <Tag>{d.profile.licenseStatus}</Tag>
+                  ) : (
+                    "—"
+                  )}
                 </Descriptions.Item>
                 {d.profile.role === "EMPLOYEE" && (
                   <>
-                    <Descriptions.Item label="ประสบการณ์สอน">{d.profile.teachingExperience ?? "—"}</Descriptions.Item>
+                    <Descriptions.Item label="ประสบการณ์สอน">
+                      {d.profile.teachingExperience ?? "—"}
+                    </Descriptions.Item>
                     <Descriptions.Item label="ย้ายได้">
                       {d.profile.canRelocate ? (
                         <Text style={{ color: "#52c41a" }}>ได้</Text>
@@ -487,22 +577,40 @@ export function UserDetailDrawer() {
                     </Descriptions.Item>
                     <Descriptions.Item label="วิชาที่เชี่ยวชาญ" span={2}>
                       {d.profile.specializations.length > 0
-                        ? d.profile.specializations.map((s) => <Tag key={s} style={{ marginBottom: 2 }}>{s}</Tag>)
+                        ? d.profile.specializations.map((s) => (
+                            <Tag key={s} style={{ marginBottom: 2 }}>
+                              {s}
+                            </Tag>
+                          ))
                         : "—"}
                     </Descriptions.Item>
                     <Descriptions.Item label="ระดับชั้นที่สอนได้" span={2}>
                       {d.profile.gradeCanTeaches.length > 0
-                        ? d.profile.gradeCanTeaches.map((g) => <Tag key={g} style={{ marginBottom: 2 }}>{g}</Tag>)
+                        ? d.profile.gradeCanTeaches.map((g) => (
+                            <Tag key={g} style={{ marginBottom: 2 }}>
+                              {g}
+                            </Tag>
+                          ))
                         : "—"}
                     </Descriptions.Item>
                     <Descriptions.Item label="จังหวัดที่ต้องการ" span={2}>
                       {d.profile.preferredProvinces.length > 0
-                        ? d.profile.preferredProvinces.map((p) => <Tag key={p} style={{ marginBottom: 2 }}>{p}</Tag>)
+                        ? d.profile.preferredProvinces.map((p) => (
+                            <Tag key={p} style={{ marginBottom: 2 }}>
+                              {p}
+                            </Tag>
+                          ))
                         : "—"}
                     </Descriptions.Item>
-                    <Descriptions.Item label="โรงเรียนล่าสุด" span={2}>{d.profile.recentSchool ?? "—"}</Descriptions.Item>
-                    <Descriptions.Item label="ประวัติการทำงาน">{d.profile.workExperienceCount} รายการ</Descriptions.Item>
-                    <Descriptions.Item label="ประวัติการศึกษา">{d.profile.educationCount} รายการ</Descriptions.Item>
+                    <Descriptions.Item label="โรงเรียนล่าสุด" span={2}>
+                      {d.profile.recentSchool ?? "—"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="ประวัติการทำงาน">
+                      {d.profile.workExperienceCount} รายการ
+                    </Descriptions.Item>
+                    <Descriptions.Item label="ประวัติการศึกษา">
+                      {d.profile.educationCount} รายการ
+                    </Descriptions.Item>
                   </>
                 )}
               </Descriptions>
@@ -519,9 +627,12 @@ export function UserDetailDrawer() {
                 border: `1px solid ${token.colorWarningBorder}`,
               }}
             >
-              <ExclamationCircleOutlined style={{ color: token.colorWarning }} />
+              <ExclamationCircleOutlined
+                style={{ color: token.colorWarning }}
+              />
               <Text style={{ color: token.colorWarning }}>
-                User นี้ยังไม่มี Prisma Profile (สมัครแต่ยังไม่ได้ตั้งค่าโปรไฟล์)
+                User นี้ยังไม่มี Prisma Profile
+                (สมัครแต่ยังไม่ได้ตั้งค่าโปรไฟล์)
               </Text>
             </Flex>
           )}
@@ -532,7 +643,15 @@ export function UserDetailDrawer() {
               <Flex align="center" gap={8} style={{ marginBottom: 10 }}>
                 <BankOutlined style={{ color: token.colorPrimary }} />
                 <Text strong>ข้อมูลโรงเรียน</Text>
-                <Tag color={d.schoolProfile.accountPlan === "enterprise" ? "purple" : d.schoolProfile.accountPlan === "premium" ? "processing" : "default"}>
+                <Tag
+                  color={
+                    d.schoolProfile.accountPlan === "enterprise"
+                      ? "purple"
+                      : d.schoolProfile.accountPlan === "premium"
+                        ? "processing"
+                        : "default"
+                  }
+                >
                   {d.schoolProfile.accountPlan?.toUpperCase()}
                 </Tag>
               </Flex>
@@ -543,23 +662,39 @@ export function UserDetailDrawer() {
                 labelStyle={{ fontWeight: 600, fontSize: 12, width: 140 }}
                 contentStyle={{ fontSize: 12 }}
               >
-                <Descriptions.Item label="ชื่อโรงเรียน" span={2}>{d.schoolProfile.schoolName}</Descriptions.Item>
-                <Descriptions.Item label="จังหวัด">{d.schoolProfile.province}</Descriptions.Item>
-                <Descriptions.Item label="Job Quota">
-                  {d.stats.jobCount} / {d.schoolProfile.jobQuotaMax >= 999 ? "∞" : d.schoolProfile.jobQuotaMax}
+                <Descriptions.Item label="ชื่อโรงเรียน" span={2}>
+                  {d.schoolProfile.schoolName}
                 </Descriptions.Item>
-                <Descriptions.Item label="สมาชิก Active">{d.stats.orgMemberCount} คน</Descriptions.Item>
+                <Descriptions.Item label="จังหวัด">
+                  {d.schoolProfile.province}
+                </Descriptions.Item>
+                <Descriptions.Item label="Job Quota">
+                  {d.stats.jobCount} /{" "}
+                  {d.schoolProfile.jobQuotaMax >= 999
+                    ? "∞"
+                    : d.schoolProfile.jobQuotaMax}
+                </Descriptions.Item>
+                <Descriptions.Item label="สมาชิก Active">
+                  {d.stats.orgMemberCount} คน
+                </Descriptions.Item>
               </Descriptions>
 
               {/* ─── ประกาศงานล่าสุด ─── */}
               {d.schoolProfile.recentJobs.length > 0 && (
                 <div style={{ marginTop: 12 }}>
-                  <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 6 }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 12, display: "block", marginBottom: 6 }}
+                  >
                     ประกาศงานล่าสุด
                   </Text>
                   <Table
                     dataSource={d.schoolProfile.recentJobs}
-                    columns={jobColumns as ColumnsType<typeof d.schoolProfile.recentJobs[0]>}
+                    columns={
+                      jobColumns as ColumnsType<
+                        (typeof d.schoolProfile.recentJobs)[0]
+                      >
+                    }
                     rowKey="id"
                     size="small"
                     pagination={false}
@@ -571,12 +706,18 @@ export function UserDetailDrawer() {
               {/* ─── Org Members ─── */}
               {d.schoolProfile.orgMembers.length > 0 && (
                 <div style={{ marginTop: 12 }}>
-                  <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 6 }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 12, display: "block", marginBottom: 6 }}
+                  >
                     สมาชิกองค์กร ({d.schoolProfile.orgMembers.length} คน)
                   </Text>
                   <Flex vertical gap={4}>
                     {d.schoolProfile.orgMembers.map((m, i) => (
-                      <Flex key={i} align="center" justify="space-between"
+                      <Flex
+                        key={i}
+                        align="center"
+                        justify="space-between"
                         style={{
                           padding: "6px 10px",
                           borderRadius: 6,
@@ -584,10 +725,19 @@ export function UserDetailDrawer() {
                           border: `1px solid ${token.colorBorderSecondary}`,
                         }}
                       >
-                        <Text style={{ fontSize: 12 }}>{m.name || m.email}</Text>
+                        <Text style={{ fontSize: 12 }}>
+                          {m.name || m.email}
+                        </Text>
                         <Flex gap={6}>
-                          <Tag style={{ margin: 0, fontSize: 10 }}>{m.role}</Tag>
-                          <Badge status="success" text={<Text style={{ fontSize: 10 }}>{m.status}</Text>} />
+                          <Tag style={{ margin: 0, fontSize: 10 }}>
+                            {m.role}
+                          </Tag>
+                          <Badge
+                            status="success"
+                            text={
+                              <Text style={{ fontSize: 10 }}>{m.status}</Text>
+                            }
+                          />
                         </Flex>
                       </Flex>
                     ))}
@@ -602,11 +752,15 @@ export function UserDetailDrawer() {
             <div>
               <Flex align="center" gap={8} style={{ marginBottom: 10 }}>
                 <FileTextOutlined style={{ color: token.colorPrimary }} />
-                <Text strong>ใบสมัครงานล่าสุด ({d.recentApplications.length} รายการ)</Text>
+                <Text strong>
+                  ใบสมัครงานล่าสุด ({d.recentApplications.length} รายการ)
+                </Text>
               </Flex>
               <Table
                 dataSource={d.recentApplications}
-                columns={appColumns as ColumnsType<typeof d.recentApplications[0]>}
+                columns={
+                  appColumns as ColumnsType<(typeof d.recentApplications)[0]>
+                }
                 rowKey="id"
                 size="small"
                 pagination={{ pageSize: 5, size: "small" }}
@@ -619,7 +773,9 @@ export function UserDetailDrawer() {
           <div>
             <Flex align="center" gap={8} style={{ marginBottom: 12 }}>
               <ClockCircleOutlined style={{ color: token.colorPrimary }} />
-              <Text strong>Activity Timeline ({d.auditTimeline.length} รายการ)</Text>
+              <Text strong>
+                Activity Timeline ({d.auditTimeline.length} รายการ)
+              </Text>
             </Flex>
             <div
               style={{
@@ -634,15 +790,22 @@ export function UserDetailDrawer() {
                   color: auditColor[item.type] ?? "gray",
                   dot: auditIcon[item.type],
                   label: (
-                    <Text type="secondary" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 11, whiteSpace: "nowrap" }}
+                    >
                       {formatThai(item.timestamp)}
                     </Text>
                   ),
                   children: (
                     <Flex vertical gap={2}>
-                      <Text strong style={{ fontSize: 13 }}>{item.event}</Text>
+                      <Text strong style={{ fontSize: 13 }}>
+                        {item.event}
+                      </Text>
                       {item.detail && (
-                        <Text type="secondary" style={{ fontSize: 12 }}>{item.detail}</Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {item.detail}
+                        </Text>
                       )}
                     </Flex>
                   ),
@@ -655,7 +818,9 @@ export function UserDetailDrawer() {
           <div>
             <Flex align="center" gap={8} style={{ marginBottom: 8 }}>
               <CrownOutlined style={{ color: token.colorTextTertiary }} />
-              <Text type="secondary" style={{ fontSize: 12 }}>Supabase user_metadata (raw)</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Supabase user_metadata (raw)
+              </Text>
             </Flex>
             <pre
               style={{
