@@ -6,10 +6,10 @@ import {
   BgColorsOutlined,
   DashboardOutlined,
   FileTextOutlined,
+  GiftOutlined,
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  PackageOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -54,7 +54,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
     },
     {
       key: "/pages/admin/package-management",
-      icon: <PackageOutlined />,
+      icon: <GiftOutlined />,
       label: "จัดการแพ็กเกจ",
       onClick: () => router.push("/pages/admin/package-management"),
     },
