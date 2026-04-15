@@ -2,12 +2,33 @@
 
 import { create } from "zustand";
 import {
+  requestCreatePlan,
+  requestDeletePlan,
   requestGetPackagePlans,
   requestListSchools,
   requestPackageSummary,
-  requestUpdatePackagePrice,
+  requestPatchPlan,
+  requestSeedPlans,
   requestUpdateSchoolPlan,
 } from "../_api/package-api";
+
+// ✨ ข้อมูล Package Plan ที่โหลดจาก DB
+export interface PackagePlanItem {
+  id: string;
+  plan: string;
+  label: string;
+  color: string;
+  price: number;
+  jobQuota: number;
+  features: string[];
+  quotaWarningThreshold: number;
+  badgeIcon: "default" | "crown" | "thunder";
+  upgradeTarget: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface SchoolPackageItem {
   id: string;
@@ -15,7 +36,7 @@ export interface SchoolPackageItem {
   schoolType: string | null;
   province: string;
   logoUrl: string | null;
-  accountPlan: "basic" | "premium" | "enterprise";
+  accountPlan: string;
   jobQuotaMax: number;
   activeJobCount: number;
   quotaUsagePercent: number;
@@ -30,52 +51,122 @@ export interface SchoolPackageItem {
 }
 
 export interface PackageSummary {
-  basic: number;
-  premium: number;
-  enterprise: number;
   total: number;
+  [planKey: string]: number;
 }
 
-// ✨ ราคา Package ที่อ่านจาก DB — keyed by plan name
-export type PackagePrices = Record<string, number>;
+// ✨ Form data สำหรับสร้าง/แก้ไข Plan
+export interface PlanFormData {
+  plan: string;
+  label: string;
+  color: string;
+  price: number;
+  job_quota: number;
+  features: string[];
+  quota_warning_threshold: number;
+  badge_icon: "default" | "crown" | "thunder";
+  upgrade_target: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
 
 interface PackageStore {
+  // ─── Plan ───
+  plans: PackagePlanItem[];
+  isLoadingPlans: boolean;
+  isSavingPlan: boolean;
+  isDeletingPlan: string | null; // plan key ที่กำลัง delete
+  fetchPlans: (includeInactive?: boolean) => Promise<void>;
+  seedPlans: () => Promise<void>;
+  createPlan: (data: PlanFormData) => Promise<void>;
+  patchPlan: (planKey: string, data: Partial<PlanFormData>) => Promise<void>;
+  deletePlan: (planKey: string) => Promise<void>;
+
+  // ─── โรงเรียน ───
   schools: SchoolPackageItem[];
   total: number;
   summary: PackageSummary;
   isLoading: boolean;
-  isUpdating: string | null; // school id ที่กำลัง update
-  filterPlan: "basic" | "premium" | "enterprise" | "all";
+  isUpdating: string | null;
+  filterPlan: string;
   filterKeyword: string;
   page: number;
-  // ราคา Package จาก DB
-  packagePrices: PackagePrices;
-  isUpdatingPrice: boolean;
-  setFilterPlan: (p: "basic" | "premium" | "enterprise" | "all") => void;
+  setFilterPlan: (p: string) => void;
   setFilterKeyword: (k: string) => void;
   setPage: (p: number) => void;
   fetchSummary: () => Promise<void>;
   fetchSchools: () => Promise<void>;
-  updatePlan: (
-    schoolId: string,
-    plan: "basic" | "premium" | "enterprise",
-    jobQuotaMax?: number,
-  ) => Promise<void>;
-  fetchPackagePrices: () => Promise<void>;
-  updatePackagePrice: (plan: string, price: number) => Promise<void>;
+  updatePlan: (schoolId: string, plan: string, jobQuotaMax?: number) => Promise<void>;
 }
 
 export const usePackageStore = create<PackageStore>((set, get) => ({
+  // ─── Plan state ───
+  plans: [],
+  isLoadingPlans: false,
+  isSavingPlan: false,
+  isDeletingPlan: null,
+
+  // ✨ โหลด plans จาก DB
+  fetchPlans: async (includeInactive = true) => {
+    set({ isLoadingPlans: true });
+    try {
+      const res = await requestGetPackagePlans(includeInactive);
+      if (res.data.status_code === 200) {
+        set({ plans: res.data.data });
+      }
+    } finally {
+      set({ isLoadingPlans: false });
+    }
+  },
+
+  // ✨ Seed ค่าเริ่มต้น (ใช้ครั้งแรก)
+  seedPlans: async () => {
+    await requestSeedPlans();
+    await get().fetchPlans();
+  },
+
+  // ✨ สร้าง plan ใหม่
+  createPlan: async (data) => {
+    set({ isSavingPlan: true });
+    try {
+      await requestCreatePlan(data);
+      await get().fetchPlans();
+    } finally {
+      set({ isSavingPlan: false });
+    }
+  },
+
+  // ✨ แก้ไข plan
+  patchPlan: async (planKey, data) => {
+    set({ isSavingPlan: true });
+    try {
+      await requestPatchPlan(planKey, data);
+      await get().fetchPlans();
+    } finally {
+      set({ isSavingPlan: false });
+    }
+  },
+
+  // ✨ ลบ plan
+  deletePlan: async (planKey) => {
+    set({ isDeletingPlan: planKey });
+    try {
+      await requestDeletePlan(planKey);
+      set((s) => ({ plans: s.plans.filter((p) => p.plan !== planKey) }));
+    } finally {
+      set({ isDeletingPlan: null });
+    }
+  },
+
+  // ─── โรงเรียน state ───
   schools: [],
   total: 0,
-  summary: { basic: 0, premium: 0, enterprise: 0, total: 0 },
+  summary: { total: 0 },
   isLoading: false,
   isUpdating: null,
   filterPlan: "all",
   filterKeyword: "",
   page: 1,
-  packagePrices: {},
-  isUpdatingPrice: false,
 
   setFilterPlan: (p) => set({ filterPlan: p, page: 1 }),
   setFilterKeyword: (k) => set({ filterKeyword: k, page: 1 }),
@@ -110,7 +201,7 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
     }
   },
 
-  // ✨ อัปเดต plan แล้ว refresh ข้อมูลทันที (Admin กด หรือ Payment Gateway trigger)
+  // ✨ อัปเดต plan แล้ว refresh ข้อมูลทันที
   updatePlan: async (schoolId, plan, jobQuotaMax) => {
     set({ isUpdating: schoolId });
     try {
@@ -119,47 +210,16 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
         plan,
         job_quota_max: jobQuotaMax,
       });
-      // ✨ อัปเดต local state ทันที ไม่ต้อง refetch ทั้งหมด
       set((s) => ({
         schools: s.schools.map((sc) =>
           sc.id === schoolId
-            ? {
-                ...sc,
-                accountPlan: plan,
-                jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax,
-              }
+            ? { ...sc, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax }
             : sc,
         ),
       }));
-      // ✨ refresh summary
       await get().fetchSummary();
     } finally {
       set({ isUpdating: null });
-    }
-  },
-
-  // ✨ ดึงราคา Package จาก DB
-  fetchPackagePrices: async () => {
-    try {
-      const res = await requestGetPackagePlans();
-      if (res.data.status_code === 200) {
-        const prices: PackagePrices = {};
-        for (const p of res.data.data) prices[p.plan] = p.price;
-        set({ packagePrices: prices });
-      }
-    } catch {
-      /* silent */
-    }
-  },
-
-  // ✨ อัปเดตราคา Package แล้ว sync local state ทันที
-  updatePackagePrice: async (plan, price) => {
-    set({ isUpdatingPrice: true });
-    try {
-      await requestUpdatePackagePrice({ plan, price });
-      set((s) => ({ packagePrices: { ...s.packagePrices, [plan]: price } }));
-    } finally {
-      set({ isUpdatingPrice: false });
     }
   },
 }));

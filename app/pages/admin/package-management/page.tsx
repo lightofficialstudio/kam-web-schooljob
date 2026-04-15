@@ -1,18 +1,17 @@
 "use client";
 
-// ✨ หน้าจัดการ Package สำหรับ ADMIN — ดู/เปลี่ยน plan โรงเรียน, แก้ไขราคา, รองรับ Payment Gateway
-import {
-  PACKAGE_DEFINITIONS,
-  PlanType,
-} from "@/app/api/v1/admin/packages/validation/package-schema";
+// ✨ หน้าจัดการ Package สำหรับ ADMIN — CRUD Plan + เปลี่ยน Plan โรงเรียน (Dynamic ทั้งหมดจาก DB)
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   CrownOutlined,
+  DatabaseOutlined,
+  DeleteOutlined,
   EditOutlined,
   FilterOutlined,
   LinkOutlined,
   MailOutlined,
   PhoneOutlined,
+  PlusOutlined,
   SearchOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
@@ -22,12 +21,9 @@ import {
   Button,
   Card,
   Col,
+  Empty,
   Flex,
-  Form,
-  Input,
-  InputNumber,
   message,
-  Modal,
   Pagination,
   Progress,
   Row,
@@ -43,8 +39,15 @@ import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { DeletePlanModal, PlanFormModal } from "./_components/plan-form-modal";
 import { PlanChangeModal } from "./_components/plan-change-modal";
-import { SchoolPackageItem, usePackageStore } from "./_state/package-store";
+import {
+  PackagePlanItem,
+  PlanFormData,
+  SchoolPackageItem,
+  usePackageStore,
+} from "./_state/package-store";
+import Input from "antd/es/input/Input";
 
 const { Title, Text } = Typography;
 
@@ -58,25 +61,34 @@ const formatThaiDate = (iso?: string | null) => {
   });
 };
 
-// ✨ Plan Tag Component
-const PlanTag: React.FC<{ plan: string }> = ({ plan }) => {
-  const def = PACKAGE_DEFINITIONS[plan as PlanType];
-  if (!def) return <Tag>{plan}</Tag>;
+// ✨ Plan Tag Component — ใช้ config จาก DB (dynamic)
+const PlanTag: React.FC<{ plan: string; planDef?: PackagePlanItem }> = ({
+  plan,
+  planDef,
+}) => {
+  if (!planDef)
+    return (
+      <Tag style={{ fontFamily: "monospace", fontSize: 11 }}>{plan}</Tag>
+    );
   return (
     <Tag
-      color={def.color}
       style={{
         fontWeight: 700,
         fontSize: 12,
         borderRadius: 6,
         padding: "2px 10px",
-        border: `1.5px solid ${def.color}`,
-        background: `${def.color}18`,
-        color: def.color,
+        border: `1.5px solid ${planDef.color}`,
+        background: `${planDef.color}18`,
+        color: planDef.color,
       }}
     >
-      {plan === "enterprise" && <CrownOutlined style={{ marginRight: 4 }} />}
-      {def.label}
+      {planDef.badgeIcon === "crown" && (
+        <CrownOutlined style={{ marginRight: 4 }} />
+      )}
+      {planDef.badgeIcon === "thunder" && (
+        <ThunderboltOutlined style={{ marginRight: 4 }} />
+      )}
+      {planDef.label}
     </Tag>
   );
 };
@@ -87,6 +99,15 @@ export default function PackageManagementPage() {
   const { user, isAuthenticated } = useAuthStore();
 
   const {
+    plans,
+    isLoadingPlans,
+    isSavingPlan,
+    isDeletingPlan,
+    fetchPlans,
+    seedPlans,
+    createPlan,
+    patchPlan,
+    deletePlan,
     schools,
     total,
     summary,
@@ -101,22 +122,22 @@ export default function PackageManagementPage() {
     fetchSummary,
     fetchSchools,
     updatePlan,
-    packagePrices,
-    isUpdatingPrice,
-    fetchPackagePrices,
-    updatePackagePrice,
   } = usePackageStore();
 
   const [isMounted, setIsMounted] = useState(false);
   const [searchInput, setSearchInput] = useState(filterKeyword);
-  // ✨ Modal state (เปลี่ยน plan)
-  const [modalSchool, setModalSchool] = useState<SchoolPackageItem | null>(
-    null,
-  );
-  const [modalTargetPlan, setModalTargetPlan] = useState<PlanType | null>(null);
-  // ✨ Modal state (แก้ไขราคา)
-  const [priceModalPlan, setPriceModalPlan] = useState<PlanType | null>(null);
-  const [priceForm] = Form.useForm();
+
+  // ─── Plan Form Modal state ───
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+  const [planModalMode, setPlanModalMode] = useState<"create" | "edit">("create");
+  const [editingPlan, setEditingPlan] = useState<PackagePlanItem | null>(null);
+
+  // ─── Delete Plan Modal state ───
+  const [deletingPlanItem, setDeletingPlanItem] = useState<PackagePlanItem | null>(null);
+
+  // ─── Plan Change Modal state (เปลี่ยน plan ของโรงเรียน) ───
+  const [modalSchool, setModalSchool] = useState<SchoolPackageItem | null>(null);
+  const [modalTargetPlan, setModalTargetPlan] = useState<PackagePlanItem | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -137,7 +158,7 @@ export default function PackageManagementPage() {
     if (!isMounted || user?.role !== "ADMIN") return;
     fetchSummary();
     fetchSchools();
-    fetchPackagePrices();
+    fetchPlans(true);
   }, [isMounted]);
 
   // ✨ refetch เมื่อ filter เปลี่ยน
@@ -152,18 +173,67 @@ export default function PackageManagementPage() {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  const openPlanModal = (school: SchoolPackageItem, plan: PlanType) => {
-    if (plan === school.accountPlan) return;
+  // ✨ หา planDef จาก plans array (dynamic)
+  const getPlanDef = (planKey: string) =>
+    plans.find((p) => p.plan === planKey) ?? null;
+
+  // ─── Plan Form handlers ───
+  const openCreatePlan = () => {
+    setPlanModalMode("create");
+    setEditingPlan(null);
+    setPlanModalOpen(true);
+  };
+
+  const openEditPlan = (plan: PackagePlanItem) => {
+    setPlanModalMode("edit");
+    setEditingPlan(plan);
+    setPlanModalOpen(true);
+  };
+
+  const handlePlanSubmit = async (data: PlanFormData) => {
+    try {
+      if (planModalMode === "create") {
+        await createPlan(data);
+        message.success(`สร้าง Package Plan "${data.label}" สำเร็จ`);
+      } else if (editingPlan) {
+        const { plan: _key, ...patchData } = data;
+        await patchPlan(editingPlan.plan, patchData);
+        message.success(`อัปเดต Package Plan "${data.label}" สำเร็จ`);
+      }
+      setPlanModalOpen(false);
+      fetchSummary();
+    } catch {
+      message.error("บันทึก Package Plan ไม่สำเร็จ");
+    }
+  };
+
+  const handleDeletePlan = async () => {
+    if (!deletingPlanItem) return;
+    try {
+      await deletePlan(deletingPlanItem.plan);
+      message.success(`ลบ Package Plan "${deletingPlanItem.label}" สำเร็จ`);
+      setDeletingPlanItem(null);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message_th?: string } } };
+      message.error(
+        e?.response?.data?.message_th ?? "ลบ Package Plan ไม่สำเร็จ",
+      );
+    }
+  };
+
+  // ─── Plan Change (โรงเรียน) handlers ───
+  const openPlanModal = (school: SchoolPackageItem, targetPlanItem: PackagePlanItem) => {
+    if (targetPlanItem.plan === school.accountPlan) return;
     setModalSchool(school);
-    setModalTargetPlan(plan);
+    setModalTargetPlan(targetPlanItem);
   };
 
   const handleConfirmPlan = async (jobQuotaMax: number) => {
     if (!modalSchool || !modalTargetPlan) return;
     try {
-      await updatePlan(modalSchool.id, modalTargetPlan, jobQuotaMax);
+      await updatePlan(modalSchool.id, modalTargetPlan.plan, jobQuotaMax);
       message.success(
-        `เปลี่ยน Package ของ "${modalSchool.schoolName}" เป็น ${PACKAGE_DEFINITIONS[modalTargetPlan].label} สำเร็จ`,
+        `เปลี่ยน Package ของ "${modalSchool.schoolName}" เป็น ${modalTargetPlan.label} สำเร็จ`,
       );
     } catch {
       message.error("เปลี่ยน Package ไม่สำเร็จ");
@@ -173,33 +243,9 @@ export default function PackageManagementPage() {
     }
   };
 
-  // ✨ เปิด Modal แก้ไขราคา
-  const openPriceModal = (plan: PlanType) => {
-    setPriceModalPlan(plan);
-    priceForm.setFieldsValue({
-      price: packagePrices[plan] ?? PACKAGE_DEFINITIONS[plan].price,
-    });
-  };
-
-  // ✨ ยืนยันการแก้ไขราคา
-  const handleConfirmPrice = async () => {
-    if (!priceModalPlan) return;
-    try {
-      const { price } = await priceForm.validateFields();
-      await updatePackagePrice(priceModalPlan, price);
-      message.success(
-        `อัปเดตราคา ${PACKAGE_DEFINITIONS[priceModalPlan].label} สำเร็จ`,
-      );
-      setPriceModalPlan(null);
-    } catch (err) {
-      if ((err as { errorFields?: unknown })?.errorFields) return;
-      message.error("อัปเดตราคาไม่สำเร็จ");
-    }
-  };
-
   if (!isMounted) return null;
 
-  // ─── Stats Cards ───────────────────────────────────────────────
+  // ─── Summary Stats Cards (dynamic จาก plans + summary) ───
   const statsCards = [
     {
       key: "all",
@@ -207,27 +253,23 @@ export default function PackageManagementPage() {
       value: summary.total,
       color: token.colorPrimary,
     },
-    {
-      key: "basic",
-      label: "Basic",
-      value: summary.basic,
-      color: PACKAGE_DEFINITIONS.basic.color,
-    },
-    {
-      key: "premium",
-      label: "Premium",
-      value: summary.premium,
-      color: PACKAGE_DEFINITIONS.premium.color,
-    },
-    {
-      key: "enterprise",
-      label: "Enterprise",
-      value: summary.enterprise,
-      color: PACKAGE_DEFINITIONS.enterprise.color,
-    },
+    ...plans
+      .filter((p) => p.isActive)
+      .map((p) => ({
+        key: p.plan,
+        label: p.label,
+        value: summary[p.plan] ?? 0,
+        color: p.color,
+      })),
   ];
 
-  // ─── Table Columns ──────────────────────────────────────────────
+  // ─── Filter Options (dynamic จาก plans) ───
+  const planFilterOptions = [
+    { value: "all", label: "ทุก Package" },
+    ...plans.map((p) => ({ value: p.plan, label: p.label })),
+  ];
+
+  // ─── Table Columns ───
   const columns: ColumnsType<SchoolPackageItem> = [
     {
       title: "โรงเรียน",
@@ -267,9 +309,7 @@ export default function PackageManagementPage() {
         <Flex vertical gap={2}>
           <Text style={{ fontSize: 13 }}>{r.owner.name}</Text>
           <Flex align="center" gap={4}>
-            <MailOutlined
-              style={{ fontSize: 11, color: token.colorTextTertiary }}
-            />
+            <MailOutlined style={{ fontSize: 11, color: token.colorTextTertiary }} />
             <Text type="secondary" style={{ fontSize: 11 }}>
               {r.owner.email}
             </Text>
@@ -292,13 +332,9 @@ export default function PackageManagementPage() {
       key: "plan",
       width: 140,
       align: "center",
-      render: (_, r) => <PlanTag plan={r.accountPlan} />,
-      filters: [
-        { text: "Basic", value: "basic" },
-        { text: "Premium", value: "premium" },
-        { text: "Enterprise", value: "enterprise" },
-      ],
-      onFilter: (value, r) => r.accountPlan === value,
+      render: (_, r) => (
+        <PlanTag plan={r.accountPlan} planDef={getPlanDef(r.accountPlan) ?? undefined} />
+      ),
     },
     {
       title: "Job Quota",
@@ -308,8 +344,8 @@ export default function PackageManagementPage() {
         <Flex vertical gap={4}>
           <Flex align="center" justify="space-between">
             <Text style={{ fontSize: 12 }}>
-              {r.activeJobCount} / {r.jobQuotaMax === 999 ? "∞" : r.jobQuotaMax}{" "}
-              งาน
+              {r.activeJobCount} /{" "}
+              {r.jobQuotaMax >= 999 ? "∞" : r.jobQuotaMax} งาน
             </Text>
             <Text type="secondary" style={{ fontSize: 11 }}>
               {r.quotaUsagePercent}%
@@ -333,42 +369,45 @@ export default function PackageManagementPage() {
     {
       title: "เปลี่ยน Package",
       key: "change",
-      width: 260,
+      width: 40 + plans.filter((p) => p.isActive).length * 80,
       render: (_, r) => (
-        <Flex gap={6} align="center">
-          {(["basic", "premium", "enterprise"] as PlanType[]).map((plan) => {
-            const def = PACKAGE_DEFINITIONS[plan];
-            const isCurrent = r.accountPlan === plan;
-            const isLoading = isUpdating === r.id;
-            return (
-              <Tooltip
-                key={plan}
-                title={
-                  isCurrent ? "Package ปัจจุบัน" : `เปลี่ยนเป็น ${def.label}`
-                }
-              >
-                <Button
-                  size="small"
-                  type={isCurrent ? "primary" : "default"}
-                  disabled={isCurrent || isLoading}
-                  loading={isLoading && modalTargetPlan === plan}
-                  onClick={() => openPlanModal(r, plan)}
-                  style={{
-                    borderColor: def.color,
-                    color: isCurrent ? "white" : def.color,
-                    background: isCurrent ? def.color : "transparent",
-                    fontWeight: 600,
-                    fontSize: 11,
-                    borderRadius: 6,
-                    height: 28,
-                    padding: "0 10px",
-                  }}
+        <Flex gap={6} align="center" wrap="wrap">
+          {plans
+            .filter((p) => p.isActive)
+            .map((planItem) => {
+              const isCurrent = r.accountPlan === planItem.plan;
+              const loading = isUpdating === r.id;
+              return (
+                <Tooltip
+                  key={planItem.plan}
+                  title={
+                    isCurrent
+                      ? "Package ปัจจุบัน"
+                      : `เปลี่ยนเป็น ${planItem.label}`
+                  }
                 >
-                  {def.label}
-                </Button>
-              </Tooltip>
-            );
-          })}
+                  <Button
+                    size="small"
+                    type={isCurrent ? "primary" : "default"}
+                    disabled={isCurrent || loading}
+                    loading={loading && modalTargetPlan?.plan === planItem.plan}
+                    onClick={() => openPlanModal(r, planItem)}
+                    style={{
+                      borderColor: planItem.color,
+                      color: isCurrent ? "white" : planItem.color,
+                      background: isCurrent ? planItem.color : "transparent",
+                      fontWeight: 600,
+                      fontSize: 11,
+                      borderRadius: 6,
+                      height: 28,
+                      padding: "0 10px",
+                    }}
+                  >
+                    {planItem.label}
+                  </Button>
+                </Tooltip>
+              );
+            })}
         </Flex>
       ),
     },
@@ -430,7 +469,6 @@ export default function PackageManagementPage() {
             pointerEvents: "none",
           }}
         />
-
         <div
           style={{
             maxWidth: 1280,
@@ -452,7 +490,9 @@ export default function PackageManagementPage() {
                   </Link>
                 ),
               },
-              { title: <span style={{ color: "white" }}>จัดการ Package</span> },
+              {
+                title: <span style={{ color: "white" }}>จัดการ Package</span>,
+              },
             ]}
           />
           <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>
@@ -461,8 +501,8 @@ export default function PackageManagementPage() {
                 จัดการ Package
               </Title>
               <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
-                กำหนด Plan และ Job Quota ให้สถานศึกษา — รองรับ Payment Gateway
-                อัตโนมัติ
+                สร้าง/แก้ไข Plan และจัดการ Job Quota ให้สถานศึกษา — Dynamic
+                ทั้งหมดโดย Admin
               </Text>
             </Flex>
             {/* ✨ Payment Gateway Hook Banner */}
@@ -505,7 +545,7 @@ export default function PackageManagementPage() {
           position: "relative",
         }}
       >
-        {/* ─── Summary Stats ─── */}
+        {/* ─── Summary Stats (dynamic) ─── */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {statsCards.map((s) => (
             <Col xs={12} sm={6} key={s.key}>
@@ -521,10 +561,7 @@ export default function PackageManagementPage() {
                       : `2px solid transparent`,
                   transition: "all 0.2s",
                 }}
-                onClick={() => {
-                  if (s.key !== "all") setFilterPlan(s.key as any);
-                  else setFilterPlan("all");
-                }}
+                onClick={() => setFilterPlan(s.key)}
               >
                 <Flex vertical align="center" gap={6}>
                   <Text type="secondary" style={{ fontSize: 12 }}>
@@ -545,90 +582,170 @@ export default function PackageManagementPage() {
           ))}
         </Row>
 
-        {/* ─── Package Definition Cards ─── */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          {(["basic", "premium", "enterprise"] as PlanType[]).map((plan) => {
-            const def = PACKAGE_DEFINITIONS[plan];
-            // ✨ ใช้ราคาจาก DB ถ้ามี — fallback ไปค่าใน definition
-            const livePrice = packagePrices[plan] ?? def.price;
-            return (
-              <Col xs={24} sm={8} key={plan}>
-                <Card
-                  variant="borderless"
-                  style={{
-                    borderRadius: 16,
-                    boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-                    borderTop: `4px solid ${def.color}`,
-                  }}
+        {/* ─── Package Plan Cards (CRUD) ─── */}
+        <Card
+          variant="borderless"
+          style={{
+            borderRadius: 16,
+            marginBottom: 24,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          }}
+          title={
+            <Flex align="center" justify="space-between">
+              <Flex align="center" gap={8}>
+                <DatabaseOutlined style={{ color: token.colorPrimary }} />
+                <Text strong>Package Plans ({plans.length})</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  — จัดการจาก Admin ได้เลย ไม่ต้องผ่าน Developer
+                </Text>
+              </Flex>
+              <Flex gap={8}>
+                {plans.length === 0 && !isLoadingPlans && (
+                  <Button size="small" onClick={seedPlans}>
+                    Seed ค่าเริ่มต้น
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={openCreatePlan}
                 >
-                  <Flex vertical gap={12}>
-                    <Flex align="center" justify="space-between">
-                      <Tag
-                        color={def.color}
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 13,
-                          borderRadius: 6,
-                        }}
-                      >
-                        {def.label}
-                      </Tag>
+                  สร้าง Plan ใหม่
+                </Button>
+              </Flex>
+            </Flex>
+          }
+        >
+          {isLoadingPlans ? (
+            <Skeleton active paragraph={{ rows: 3 }} />
+          ) : plans.length === 0 ? (
+            <Empty
+              description="ยังไม่มี Package Plan — กด Seed ค่าเริ่มต้น หรือ สร้างใหม่"
+              style={{ padding: "32px 0" }}
+            />
+          ) : (
+            <Row gutter={[16, 16]}>
+              {plans.map((plan) => (
+                <Col xs={24} sm={12} md={8} key={plan.plan}>
+                  <Card
+                    size="small"
+                    variant="borderless"
+                    style={{
+                      borderRadius: 12,
+                      borderTop: `4px solid ${plan.color}`,
+                      opacity: plan.isActive ? 1 : 0.55,
+                      background: token.colorBgContainer,
+                      boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+                    }}
+                    extra={
+                      <Flex gap={4}>
+                        <Tooltip title="แก้ไข Plan">
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => openEditPlan(plan)}
+                            style={{ color: plan.color }}
+                          />
+                        </Tooltip>
+                        <Tooltip title="ลบ Plan">
+                          <Button
+                            type="text"
+                            size="small"
+                            danger
+                            icon={<DeleteOutlined />}
+                            loading={isDeletingPlan === plan.plan}
+                            onClick={() => setDeletingPlanItem(plan)}
+                          />
+                        </Tooltip>
+                      </Flex>
+                    }
+                    title={
                       <Flex align="center" gap={8}>
-                        <Text strong style={{ fontSize: 18, color: def.color }}>
-                          {livePrice === 0
-                            ? "ฟรี"
-                            : `฿${livePrice.toLocaleString()}`}
-                          {livePrice > 0 && (
-                            <Text
-                              type="secondary"
-                              style={{ fontSize: 11, fontWeight: 400 }}
-                            >
-                              /เดือน
-                            </Text>
+                        <Tag
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 12,
+                            border: `1.5px solid ${plan.color}`,
+                            color: plan.color,
+                            background: `${plan.color}18`,
+                          }}
+                        >
+                          {plan.badgeIcon === "crown" && (
+                            <CrownOutlined style={{ marginRight: 4 }} />
                           )}
-                        </Text>
-                        {/* ✨ ปุ่มแก้ไขราคา */}
-                        {plan !== "basic" && (
-                          <Tooltip title="แก้ไขราคา">
-                            <Button
-                              type="text"
-                              size="small"
-                              icon={<EditOutlined />}
-                              onClick={() => openPriceModal(plan)}
-                              style={{ color: def.color }}
-                            />
-                          </Tooltip>
+                          {plan.badgeIcon === "thunder" && (
+                            <ThunderboltOutlined style={{ marginRight: 4 }} />
+                          )}
+                          {plan.label}
+                        </Tag>
+                        {!plan.isActive && (
+                          <Tag color="default" style={{ fontSize: 10 }}>
+                            ปิดใช้งาน
+                          </Tag>
                         )}
                       </Flex>
+                    }
+                  >
+                    <Flex vertical gap={8}>
+                      {/* ─── ราคา + Quota ─── */}
+                      <Flex justify="space-between">
+                        <Text strong style={{ color: plan.color, fontSize: 16 }}>
+                          {plan.price === 0
+                            ? "ฟรี"
+                            : `฿${plan.price.toLocaleString()}/เดือน`}
+                        </Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          Quota:{" "}
+                          {plan.jobQuota >= 999
+                            ? "ไม่จำกัด"
+                            : `${plan.jobQuota} งาน`}
+                        </Text>
+                      </Flex>
+
+                      {/* ─── Features ─── */}
+                      <Flex vertical gap={3}>
+                        {plan.features.slice(0, 4).map((f) => (
+                          <Flex key={f} align="center" gap={6}>
+                            <div
+                              style={{
+                                width: 5,
+                                height: 5,
+                                borderRadius: "50%",
+                                background: plan.color,
+                                flexShrink: 0,
+                              }}
+                            />
+                            <Text style={{ fontSize: 11 }}>{f}</Text>
+                          </Flex>
+                        ))}
+                        {plan.features.length > 4 && (
+                          <Text type="secondary" style={{ fontSize: 10 }}>
+                            +{plan.features.length - 4} รายการ
+                          </Text>
+                        )}
+                      </Flex>
+
+                      {/* ─── Meta ─── */}
+                      <Flex justify="space-between">
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 10, fontFamily: "monospace" }}
+                        >
+                          key: {plan.plan}
+                        </Text>
+                        <Text type="secondary" style={{ fontSize: 10 }}>
+                          เตือนที่ {plan.quotaWarningThreshold}%
+                        </Text>
+                      </Flex>
                     </Flex>
-                    <Flex vertical gap={4}>
-                      {def.features.map((f) => (
-                        <Flex key={f} align="center" gap={6}>
-                          <div
-                            style={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: "50%",
-                              background: def.color,
-                              flexShrink: 0,
-                            }}
-                          />
-                          <Text style={{ fontSize: 12 }}>{f}</Text>
-                        </Flex>
-                      ))}
-                    </Flex>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      Job Quota:{" "}
-                      {def.jobQuota === 999
-                        ? "ไม่จำกัด"
-                        : `${def.jobQuota} ประกาศ`}
-                    </Text>
-                  </Flex>
-                </Card>
-              </Col>
-            );
-          })}
-        </Row>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </Card>
 
         {/* ─── Filter Bar ─── */}
         <Card
@@ -654,13 +771,8 @@ export default function PackageManagementPage() {
             <Select
               value={filterPlan}
               onChange={setFilterPlan}
-              style={{ width: 160 }}
-              options={[
-                { value: "all", label: "ทุก Package" },
-                { value: "basic", label: "Basic" },
-                { value: "premium", label: "Premium" },
-                { value: "enterprise", label: "Enterprise" },
-              ]}
+              style={{ width: 180 }}
+              options={planFilterOptions}
             />
             <Text type="secondary" style={{ fontSize: 13, marginLeft: "auto" }}>
               พบ {total} โรงเรียน
@@ -671,7 +783,10 @@ export default function PackageManagementPage() {
         {/* ─── Table ─── */}
         <Card
           variant="borderless"
-          style={{ borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+          style={{
+            borderRadius: 16,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          }}
         >
           {isLoading ? (
             <Skeleton active paragraph={{ rows: 8 }} />
@@ -681,7 +796,7 @@ export default function PackageManagementPage() {
               columns={columns}
               rowKey="id"
               pagination={false}
-              scroll={{ x: 1180 }}
+              scroll={{ x: 1200 }}
               size="middle"
               locale={{ emptyText: "ไม่พบข้อมูลโรงเรียน" }}
               rowClassName={(r) =>
@@ -704,10 +819,33 @@ export default function PackageManagementPage() {
         </Card>
       </div>
 
-      {/* ─── Plan Change Modal ─── */}
+      {/* ─── Plan Form Modal (สร้าง/แก้ไข Plan) ─── */}
+      <PlanFormModal
+        open={planModalOpen}
+        mode={planModalMode}
+        editingPlan={editingPlan}
+        plans={plans}
+        isSaving={isSavingPlan}
+        onSubmit={handlePlanSubmit}
+        onCancel={() => setPlanModalOpen(false)}
+      />
+
+      {/* ─── Delete Plan Modal ─── */}
+      <DeletePlanModal
+        open={!!deletingPlanItem}
+        plan={deletingPlanItem}
+        isDeleting={isDeletingPlan === deletingPlanItem?.plan}
+        onConfirm={handleDeletePlan}
+        onCancel={() => setDeletingPlanItem(null)}
+      />
+
+      {/* ─── Plan Change Modal (เปลี่ยน plan ให้โรงเรียน) ─── */}
       <PlanChangeModal
         school={modalSchool}
         targetPlan={modalTargetPlan}
+        currentPlanDef={
+          modalSchool ? getPlanDef(modalSchool.accountPlan) : null
+        }
         open={!!modalSchool && !!modalTargetPlan}
         isUpdating={isUpdating === modalSchool?.id}
         onConfirm={handleConfirmPlan}
@@ -716,50 +854,6 @@ export default function PackageManagementPage() {
           setModalTargetPlan(null);
         }}
       />
-
-      {/* ─── Price Edit Modal ─── */}
-      <Modal
-        open={!!priceModalPlan}
-        title={
-          priceModalPlan ? (
-            <Flex align="center" gap={8}>
-              <EditOutlined
-                style={{ color: PACKAGE_DEFINITIONS[priceModalPlan].color }}
-              />
-              <span>แก้ไขราคา {PACKAGE_DEFINITIONS[priceModalPlan].label}</span>
-            </Flex>
-          ) : null
-        }
-        okText="บันทึก"
-        cancelText="ยกเลิก"
-        onOk={handleConfirmPrice}
-        onCancel={() => {
-          setPriceModalPlan(null);
-          priceForm.resetFields();
-        }}
-        confirmLoading={isUpdatingPrice}
-        width={400}
-      >
-        <Form form={priceForm} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="price"
-            label="ราคา (บาท/เดือน)"
-            rules={[
-              { required: true, message: "กรุณาระบุราคา" },
-              { type: "number", min: 1, message: "ราคาต้องมากกว่า 0" },
-            ]}
-          >
-            <InputNumber
-              min={1}
-              step={10}
-              style={{ width: "100%" }}
-              formatter={(v) => `฿ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(v) => Number(v!.replace(/฿\s?|(,*)/g, ""))}
-              placeholder="เช่น 1990"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 }
