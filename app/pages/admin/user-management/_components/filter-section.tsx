@@ -1,40 +1,90 @@
 "use client";
 
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
+// ✨ Filter Section — ค้นหา, กรอง role/สถานะ, refresh, export CSV
 import {
-  PlusOutlined,
+  DownloadOutlined,
+  FilterOutlined,
   ReloadOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Col, Flex, Input, Row, theme } from "antd";
-import Link from "next/link";
+import { Button, Card, Flex, Input, Select, Space, Tooltip, message, theme } from "antd";
 import { useUserManagementStore } from "../_state/user-management-store";
+import { UserRecord } from "../_api/user-management-api";
 
-// ✨ [Filter Section — ช่องค้นหาและปุ่มควบคุม]
+// ✨ Export CSV จาก UserRecord array
+const exportCsv = (users: UserRecord[], filename = "users.csv") => {
+  const headers = [
+    "ID", "Email", "ชื่อ-นามสกุล", "Role", "โรงเรียน", "Plan",
+    "ยืนยันอีเมล", "แบน", "Provider", "เข้าสู่ระบบล่าสุด", "สมัครเมื่อ",
+    "ใบสมัคร/งาน", "บทความ", "จังหวัด",
+  ];
+
+  const rows = users.map((u) => [
+    u.id,
+    u.email,
+    u.fullName ?? "",
+    u.role,
+    u.schoolName ?? "",
+    u.accountPlan ?? "",
+    u.isEmailVerified ? "ใช่" : "ไม่ใช่",
+    u.isBanned ? "แบน" : "ปกติ",
+    u.provider,
+    u.lastSignInAt ?? "",
+    u.createdAt,
+    u.role === "EMPLOYER" ? u.jobCount : u.applicationCount,
+    u.blogCount,
+    u.province ?? "",
+  ]);
+
+  const csv =
+    [headers, ...rows]
+      .map((row) =>
+        row.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\n");
+
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export function FilterSection() {
   const { token } = theme.useToken();
-  const { openNotification } = useNotificationModalStore();
-  const searchText = useUserManagementStore((s) => s.searchText);
-  const isLoading = useUserManagementStore((s) => s.isLoading);
-  const setSearchText = useUserManagementStore((s) => s.setSearchText);
-  const fetchUsers = useUserManagementStore((s) => s.fetchUsers);
+  const {
+    filterRole,
+    filterStatus,
+    filterKeyword,
+    users,
+    selectedRowKeys,
+    isLoading,
+    setFilterRole,
+    setFilterStatus,
+    setFilterKeyword,
+    fetchUsers,
+  } = useUserManagementStore();
 
-  // โหลดข้อมูลใหม่และแจ้งเตือนผลลัพธ์
   const handleRefresh = async () => {
-    const result = await fetchUsers();
-    if (result.success) {
-      openNotification({
-        type: "success",
-        mainTitle: "โหลดข้อมูลสำเร็จ",
-        subTitle: `โหลดผู้ใช้ ${result.total} คน เสร็จสิ้น`,
-      });
-    } else {
-      openNotification({
-        type: "error",
-        mainTitle: "เกิดข้อผิดพลาด",
-        subTitle: result.message ?? "ล้มเหลวในการดึงข้อมูลผู้ใช้",
-      });
+    await fetchUsers();
+    message.success("โหลดข้อมูลสำเร็จ");
+  };
+
+  const handleExportAll = () => {
+    exportCsv(users, "users_all.csv");
+    message.success(`Export ${users.length} รายการสำเร็จ`);
+  };
+
+  const handleExportSelected = () => {
+    const selected = users.filter((u) => selectedRowKeys.includes(u.id));
+    if (selected.length === 0) {
+      message.warning("ยังไม่ได้เลือก User");
+      return;
     }
+    exportCsv(selected, "users_selected.csv");
+    message.success(`Export ${selected.length} รายการสำเร็จ`);
   };
 
   return (
@@ -44,36 +94,69 @@ export function FilterSection() {
         border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
       }}
+      styles={{ body: { padding: "14px 20px" } }}
     >
-      <Row gutter={[16, 16]} align="middle">
-        <Col xs={24} sm={12}>
-          <Input
-            placeholder="ค้นหาจากอีเมล ชื่อ หรือบทบาท..."
-            prefix={
-              <SearchOutlined style={{ color: token.colorTextDescription }} />
-            }
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-          />
-        </Col>
-        <Col xs={24} sm={12}>
-          <Flex justify="flex-end" gap={8}>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleRefresh}
-              loading={isLoading}
-            >
-              รีเฟรช
+      <Flex align="center" gap={10} wrap="wrap">
+        <FilterOutlined style={{ color: token.colorTextTertiary }} />
+        {/* ─── ค้นหา ─── */}
+        <Input
+          placeholder="ค้นหา อีเมล, ชื่อ, โรงเรียน..."
+          prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />}
+          value={filterKeyword}
+          onChange={(e) => setFilterKeyword(e.target.value)}
+          allowClear
+          style={{ width: 260, borderRadius: 8 }}
+        />
+
+        {/* ─── Filter Role ─── */}
+        <Select
+          value={filterRole}
+          onChange={setFilterRole}
+          style={{ width: 140 }}
+          options={[
+            { value: "all", label: "ทุก Role" },
+            { value: "EMPLOYEE", label: "ครู" },
+            { value: "EMPLOYER", label: "โรงเรียน" },
+            { value: "ADMIN", label: "ผู้ดูแล" },
+          ]}
+        />
+
+        {/* ─── Filter Status ─── */}
+        <Select
+          value={filterStatus}
+          onChange={setFilterStatus}
+          style={{ width: 160 }}
+          options={[
+            { value: "all", label: "ทุกสถานะ" },
+            { value: "active", label: "✅ Active" },
+            { value: "unverified", label: "⚠️ ยังไม่ยืนยัน" },
+            { value: "banned", label: "🚫 ถูกแบน" },
+            { value: "no_profile", label: "❓ ไม่มี Profile" },
+          ]}
+        />
+
+        {/* ─── Actions ─── */}
+        <Space style={{ marginLeft: "auto" }}>
+          <Tooltip title="Export CSV ทั้งหมด">
+            <Button icon={<DownloadOutlined />} onClick={handleExportAll} size="small">
+              Export CSV
             </Button>
-            <Link href="/pages/admin/users/new">
-              <Button type="primary" icon={<PlusOutlined />}>
-                เพิ่มผู้ใช้ใหม่
-              </Button>
-            </Link>
-          </Flex>
-        </Col>
-      </Row>
+          </Tooltip>
+          {selectedRowKeys.length > 0 && (
+            <Button size="small" onClick={handleExportSelected}>
+              Export ที่เลือก ({selectedRowKeys.length})
+            </Button>
+          )}
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={handleRefresh}
+            loading={isLoading}
+            size="small"
+          >
+            รีเฟรช
+          </Button>
+        </Space>
+      </Flex>
     </Card>
   );
 }

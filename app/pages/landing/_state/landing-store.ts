@@ -5,7 +5,7 @@ import { CascaderNode, fetchJobCategories } from "../_api/landing-api";
 export interface SearchParams {
   keyword: string;
   category: string[][];
-  location: string | null;
+  location: string[] | null; // ✨ เปลี่ยนเป็น array สำหรับ Cascader [province, district]
   employmentType: string | null;
   license: string | null;
   salaryRange: string | null;

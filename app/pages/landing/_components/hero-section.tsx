@@ -9,11 +9,9 @@ import {
   Cascader,
   Col,
   Divider,
-  Flex,
   Input,
   Row,
   Select,
-  Tag,
   Typography,
 } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
@@ -27,6 +25,20 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+// ─── ✨ Province Data Types ──────────────────────────────────────────────
+interface Province {
+  id: number;
+  name_th: string;
+}
+interface District {
+  id: number;
+  name_th: string;
+  province_id: number;
+}
+
+const BASE_GEO =
+  "https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -61,6 +73,8 @@ export default function HeroSection() {
   const isDark = mode === "dark";
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [geoOptions, setGeoOptions] = useState<any[]>([]);
+  const [isLoadingGeo, setIsLoadingGeo] = useState(false);
 
   const {
     searchParams,
@@ -72,9 +86,42 @@ export default function HeroSection() {
     fetchJobCategories: loadCategories,
   } = useLandingStore();
 
-  // ✨ โหลดหมวดหมู่งานจาก Admin Config เมื่อ Component mount
+  // ✨ โหลดข้อมูลจังหวัด + อำเภอ และ หมวดหมู่งาน
   useEffect(() => {
     loadCategories();
+
+    const fetchGeoData = async () => {
+      setIsLoadingGeo(true);
+      try {
+        const [pRes, dRes] = await Promise.all([
+          fetch(`${BASE_GEO}/province.json`).then((r) => r.json()),
+          fetch(`${BASE_GEO}/district.json`).then((r) => r.json()),
+        ]);
+
+        const provinces = pRes as Province[];
+        const districts = dRes as District[];
+
+        // แปลงเป็น format ของ Cascader
+        const options = provinces.map((p) => ({
+          label: p.name_th,
+          value: p.name_th, // เก็บเป็นชื่อไทยเพื่อความง่ายในการค้นหา
+          children: districts
+            .filter((d) => d.province_id === p.id)
+            .map((d) => ({
+              label: d.name_th,
+              value: d.name_th,
+            })),
+        }));
+
+        setGeoOptions(options);
+      } catch (err) {
+        console.error("❌ fetchGeoData:", err);
+      } finally {
+        setIsLoadingGeo(false);
+      }
+    };
+
+    fetchGeoData();
   }, [loadCategories]);
 
   // นำทางไปยังหน้า Job พร้อม Query String
@@ -86,7 +133,7 @@ export default function HeroSection() {
     <section
       className={cn(
         "relative min-h-screen flex flex-col justify-center items-center pt-32 pb-20 px-4 md:px-8 text-center overflow-hidden transition-all duration-700",
-        isDark ? "bg-[#0a0f1e]" : "bg-[#f8fbff]"
+        isDark ? "bg-[#0a0f1e]" : "bg-[#f8fbff]",
       )}
     >
       {/* ── Background Patterns — Enhanced ── */}
@@ -127,7 +174,12 @@ export default function HeroSection() {
           y: [0, 40, 0],
           opacity: [0.1, 0.2, 0.1],
         }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
         className="absolute -bottom-48 -right-24 w-[600px] h-[600px] rounded-full blur-[150px] pointer-events-none"
         style={{
           background: isDark
@@ -147,8 +199,12 @@ export default function HeroSection() {
           <div
             className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full font-medium text-[13px] tracking-wide shadow-sm backdrop-blur-sm border transition-all"
             style={{
-              backgroundColor: isDark ? "rgba(17,182,245,0.1)" : "rgba(17,182,245,0.08)",
-              borderColor: isDark ? "rgba(17,182,245,0.2)" : "rgba(17,182,245,0.15)",
+              backgroundColor: isDark
+                ? "rgba(17,182,245,0.1)"
+                : "rgba(17,182,245,0.08)",
+              borderColor: isDark
+                ? "rgba(17,182,245,0.2)"
+                : "rgba(17,182,245,0.15)",
               color: token.colorPrimary,
             }}
           >
@@ -175,8 +231,8 @@ export default function HeroSection() {
                 transition={{ duration: 1, delay: 0.8, ease: "circOut" }}
                 className="absolute bottom-[10%] left-0 w-full h-[30%] bg-[#11b6f5]/15 -skew-x-12 origin-left -z-0"
               />
-            </span>
-            {" "}ให้ไกลกว่าเดิม
+            </span>{" "}
+            ให้ไกลกว่าเดิม
           </Title>
         </motion.div>
 
@@ -186,7 +242,8 @@ export default function HeroSection() {
             className="text-lg md:text-xl max-w-[720px] mx-auto mt-8 mb-12 leading-relaxed font-normal opacity-70"
             style={{ color: isDark ? "#cbd5e1" : "#475569" }}
           >
-            ศูนย์รวมโอกาสทางวิชาชีพที่ใหญ่ที่สุด เชื่อมโยงบุคลากรทางการศึกษาคุณภาพ
+            ศูนย์รวมโอกาสทางวิชาชีพที่ใหญ่ที่สุด
+            เชื่อมโยงบุคลากรทางการศึกษาคุณภาพ
             กับโรงเรียนและสถาบันชั้นนำทั่วประเทศ สมัครฟรี เริ่มต้นได้ทันที
           </Paragraph>
         </motion.div>
@@ -195,28 +252,31 @@ export default function HeroSection() {
         <motion.div
           variants={fadeInUp}
           className={cn(
-            "w-full max-w-[1000px] mx-auto rounded-[32px] p-2 md:p-3 backdrop-blur-2xl transition-all duration-500 border overflow-hidden",
+            "w-full max-w-[1020px] mx-auto rounded-[32px] p-2 md:p-3 backdrop-blur-2xl transition-all duration-500 border overflow-hidden",
             isDark
               ? "bg-[#1e293b]/60 border-white/10 shadow-[0_32px_128px_-16px_rgba(0,0,0,0.6)]"
-              : "bg-white/70 border-white/80 shadow-[0_32px_128px_-16px_rgba(17,182,245,0.15)]"
+              : "bg-white/70 border-white/80 shadow-[0_32px_128px_-16px_rgba(17,182,245,0.15)]",
           )}
         >
           {/* Inner Content Area */}
           <div className="p-6 md:p-8">
-            <Row gutter={[24, 24]} align="bottom">
+            <Row gutter={[20, 20]} align="bottom">
               {/* 🔍 Keyword Search */}
               <Col xs={24} lg={10}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-50 px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
                     ตำแหน่งงานหรือสถาบัน
                   </span>
                   <Input
-                    prefix={<Search size={18} className="text-[#11b6f5] mr-1" />}
+                    prefix={
+                      <Search size={18} className="text-[#11b6f5] mr-1" />
+                    }
                     placeholder="ครูคณิตศาสตร์, โรงเรียนนานาชาติ..."
                     value={searchParams.keyword}
                     onChange={(e) => setSearchParam("keyword", e.target.value)}
-                    className="h-14 rounded-2xl text-[16px] border-none bg-gray-100/50 dark:bg-black/20 hover:bg-gray-200/50 dark:hover:bg-black/30 transition-all w-full focus:shadow-none"
+                    className="h-14 rounded-2xl text-[16px] border border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-black/20 hover:border-[#11b6f5] focus:border-[#11b6f5] transition-all w-full focus:shadow-none"
                     onPressEnter={handleSearch}
+                    size="large"
                   />
                 </div>
               </Col>
@@ -224,7 +284,7 @@ export default function HeroSection() {
               {/* 🏫 Categories */}
               <Col xs={24} sm={12} lg={7}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-50 px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
                     วิชาเอก / สายงาน
                   </span>
                   <Cascader
@@ -232,39 +292,46 @@ export default function HeroSection() {
                     loading={isLoadingCategories}
                     multiple
                     maxTagCount={1}
+                    showSearch
                     value={searchParams.category}
-                    onChange={(value) => setSearchParam("category", value as string[][])}
+                    onChange={(value) =>
+                      setSearchParam("category", value as string[][])
+                    }
                     placeholder="เลือกสายงานที่สนใจ"
-                    className="w-full h-14 custom-cascader"
+                    style={{ width: "100%" }}
+                    className="h-14 custom-cascader !border-gray-300 dark:!border-gray-600 rounded-2xl"
+                    popupClassName="min-w-[280px]"
                     size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}
-                    suffixIcon={<Briefcase size={18} className="text-[#11b6f5]" />}
+                    suffixIcon={
+                      <Briefcase size={18} className="text-[#11b6f5]" />
+                    }
                   />
                 </div>
               </Col>
 
-              {/* 📍 Location */}
+              {/* 📍 Location — ✨ New Province/District Cascader */}
               <Col xs={24} sm={12} lg={7}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-50 px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
                     พื้นที่ปฏิบัติงาน
                   </span>
-                  <Select
-                    placeholder="เลือกจังหวัด"
-                    className="w-full h-14"
-                    variant="borderless"
-                    style={{ background: isDark ? "rgba(0,0,0,0.2)" : "rgba(243,244,246,0.5)", borderRadius: "1rem" }}
+                  <Cascader
+                    options={geoOptions}
+                    loading={isLoadingGeo}
+                    showSearch
+                    placeholder="เลือกจังหวัด / เขต"
+                    style={{ width: "100%" }}
+                    className="h-14 custom-cascader !border-gray-300 dark:!border-gray-600 rounded-2xl"
+                    popupClassName="min-w-[200px]"
                     size="large"
-                    allowClear
-                    value={searchParams.location}
-                    onChange={(value) => setSearchParam("location", value)}
+                    value={searchParams.location as string[] | undefined}
+                    onChange={(value) =>
+                      setSearchParam("location", value as string[])
+                    }
+                    expandTrigger="hover"
                     suffixIcon={<MapPin size={18} className="text-[#11b6f5]" />}
-                  >
-                    <Option value="bkk">กรุงเทพมหานคร</Option>
-                    <Option value="center">ภาคกลาง</Option>
-                    <Option value="north">ภาคเหนือ</Option>
-                    <Option value="east">ภาคตะวันออก</Option>
-                  </Select>
+                  />
                 </div>
               </Col>
             </Row>
@@ -282,11 +349,12 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="รูปแบบการจ้างงาน"
-                        className="w-full h-12 rounded-xl bg-gray-50/50 dark:bg-black/10"
-                        variant="borderless"
+                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
                         allowClear
                         value={searchParams.employmentType}
-                        onChange={(value) => setSearchParam("employmentType", value)}
+                        onChange={(value) =>
+                          setSearchParam("employmentType", value)
+                        }
                       >
                         <Option value="fulltime">Full-time</Option>
                         <Option value="parttime">Part-time</Option>
@@ -296,8 +364,7 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ใบประกอบวิชาชีพ"
-                        className="w-full h-12 rounded-xl bg-gray-50/50 dark:bg-black/10"
-                        variant="borderless"
+                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
                         allowClear
                         value={searchParams.license}
                         onChange={(value) => setSearchParam("license", value)}
@@ -310,11 +377,12 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ช่วงเงินเดือน"
-                        className="w-full h-12 rounded-xl bg-gray-50/50 dark:bg-black/10"
-                        variant="borderless"
+                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
                         allowClear
                         value={searchParams.salaryRange}
-                        onChange={(value) => setSearchParam("salaryRange", value)}
+                        onChange={(value) =>
+                          setSearchParam("salaryRange", value)
+                        }
                       >
                         <Option value="0-15000">ต่ำกว่า 15,000</Option>
                         <Option value="15000-25000">15,000 – 25,000</Option>
@@ -325,8 +393,7 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ประกาศเมื่อ"
-                        className="w-full h-12 rounded-xl bg-gray-50/50 dark:bg-black/10"
-                        variant="borderless"
+                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
                         allowClear
                         value={searchParams.postedAt}
                         onChange={(value) => setSearchParam("postedAt", value)}
@@ -343,21 +410,28 @@ export default function HeroSection() {
             </AnimatePresence>
 
             {/* Action Bar — Centered & Balanced */}
-            <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-2">
                 <Button
                   type="text"
                   onClick={() => setShowAdvanced((v) => !v)}
                   className={cn(
-                    "h-11 rounded-xl font-semibold transition-all px-4 flex items-center gap-2",
-                    showAdvanced ? "text-[#11b6f5] bg-[#11b6f5]/10" : "text-gray-500 hover:text-[#11b6f5]"
+                    "h-11 rounded-xl font-bold transition-all px-5 flex items-center gap-2 border border-transparent",
+                    showAdvanced
+                      ? "text-[#11b6f5] bg-[#11b6f5]/10 border-[#11b6f5]/20"
+                      : "text-gray-500 hover:text-[#11b6f5] hover:bg-gray-50 dark:hover:bg-white/5",
                   )}
                 >
                   <ChevronDown
                     size={18}
-                    className={cn("transition-transform duration-500", showAdvanced && "rotate-180")}
+                    className={cn(
+                      "transition-transform duration-500",
+                      showAdvanced && "rotate-180",
+                    )}
                   />
-                  <span>{showAdvanced ? "ซ่อนตัวกรอง" : "การค้นหาขั้นสูง"}</span>
+                  <span>
+                    {showAdvanced ? "ซ่อนตัวกรอง" : "การค้นหาขั้นสูง"}
+                  </span>
                 </Button>
 
                 {showAdvanced && (
@@ -377,7 +451,7 @@ export default function HeroSection() {
                 size="large"
                 icon={<Search size={22} />}
                 onClick={handleSearch}
-                className="h-14 w-full md:w-[280px] rounded-2xl font-bold text-lg shadow-[0_12px_24px_-8px_rgba(17,182,245,0.4)] hover:shadow-[0_16px_32px_-8px_rgba(17,182,245,0.5)] active:scale-[0.98] transition-all bg-gradient-to-r from-[#0d8fd4] to-[#11b6f5] border-none flex items-center justify-center gap-3"
+                className="h-14 w-full md:w-[320px] rounded-2xl font-bold text-lg shadow-[0_20px_40px_-12px_rgba(17,182,245,0.4)] hover:shadow-[0_24px_48px_-12px_rgba(17,182,245,0.5)] active:scale-[0.98] transition-all bg-gradient-to-r from-[#0d8fd4] to-[#11b6f5] border-none flex items-center justify-center gap-3"
               >
                 ค้นหาตำแหน่งงาน
               </Button>
@@ -390,7 +464,9 @@ export default function HeroSection() {
           variants={fadeInUp}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 opacity-70"
         >
-          <span className="text-[13px] font-medium tracking-wide">ตำแหน่งงานยอดนิยม:</span>
+          <span className="text-[13px] font-medium tracking-wide">
+            ตำแหน่งงานยอดนิยม:
+          </span>
           <div className="flex flex-wrap justify-center gap-2.5">
             {POPULAR_TAGS.map((tag) => (
               <motion.button
@@ -401,7 +477,7 @@ export default function HeroSection() {
                   "px-3.5 py-1.5 rounded-lg text-[13px] border transition-all",
                   isDark
                     ? "bg-white/5 border-white/10 text-gray-400 hover:border-[#11b6f5]/50 hover:text-[#11b6f5]"
-                    : "bg-white border-gray-200 text-gray-500 hover:border-[#11b6f5] hover:text-[#11b6f5] shadow-sm"
+                    : "bg-white border-gray-200 text-gray-500 hover:border-[#11b6f5] hover:text-[#11b6f5] shadow-sm",
                 )}
               >
                 {tag}

@@ -151,15 +151,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Select Styling]
       Select: {
         colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
-        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
+        colorBorder: mode === "dark" ? "#475569" : "#cbd5e1", // เพิ่มความเข้มของ border
         colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
-        colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
-        controlHeight: 40,
-        borderRadius: 8,
+        colorTextPlaceholder: mode === "dark" ? "#94A3B8" : "#94A3B8", // ปรับสี placeholder ให้เข้มขึ้น
+        controlHeight: 44, // ความสูงปกติ
+        controlHeightLG: 56, // ปรับให้เท่ากับ h-14 (56px) สำหรับช่องค้นหา
+        borderRadius: 12,
+        borderRadiusLG: 16,
         optionSelectedBg:
           mode === "dark" ? "rgba(17,182,245,0.15)" : "rgba(17,182,245,0.08)",
         optionActiveBg:
           mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+      },
+
+      // ✨ [Cascader Styling]
+      Cascader: {
+        controlHeight: 56, // ปรับให้เท่ากับ h-14 (56px)
+        controlHeightLG: 56,
+        borderRadius: 16,
+        borderRadiusLG: 16,
+        colorBorder: mode === "dark" ? "#475569" : "#cbd5e1",
+        colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
       },
 
       // ✨ [DatePicker / TimePicker Styling - รองรับ Dark Mode]
