@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client";
 import * as dotenv from "dotenv";
 import path from "path";
 
@@ -50,12 +50,14 @@ async function main() {
       gender: "ชาย",
       dateOfBirth: new Date("1995-05-15"),
       nationality: "ไทย",
-      profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=thanawat",
+      profileImageUrl:
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=thanawat",
       role: "EMPLOYEE",
       profileVisibility: "public",
       teachingExperience: "5-10 ปี",
       recentSchool: "โรงเรียนนานาชาติเซนต์แมรี่",
-      specialActivities: "ครูผู้เชี่ยวชาญด้านการสอนภาษาอังกฤษและเทคโนโลยีการศึกษา",
+      specialActivities:
+        "ครูผู้เชี่ยวชาญด้านการสอนภาษาอังกฤษและเทคโนโลยีการศึกษา",
       canRelocate: true,
       licenseStatus: "has_license",
     },
@@ -135,7 +137,11 @@ async function main() {
   await prisma.language.createMany({
     data: [
       { profileId: employee1.id, languageName: "ไทย", proficiency: "native" },
-      { profileId: employee1.id, languageName: "อังกฤษ", proficiency: "fluent" },
+      {
+        profileId: employee1.id,
+        languageName: "อังกฤษ",
+        proficiency: "fluent",
+      },
     ],
   });
 
@@ -178,7 +184,8 @@ async function main() {
       gender: "หญิง",
       dateOfBirth: new Date("2000-08-22"),
       nationality: "ไทย",
-      profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=supaporn",
+      profileImageUrl:
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=supaporn",
       role: "EMPLOYEE",
       profileVisibility: "apply_only",
       teachingExperience: "น้อยกว่า 1 ปี",
@@ -207,7 +214,13 @@ async function main() {
       { profileId: employee2.id, province: "สมุทรปราการ" },
     ],
   });
-  await prisma.language.create({ data: { profileId: employee2.id, languageName: "ไทย", proficiency: "native" } });
+  await prisma.language.create({
+    data: {
+      profileId: employee2.id,
+      languageName: "ไทย",
+      proficiency: "native",
+    },
+  });
   await prisma.skill.createMany({
     data: [
       { profileId: employee2.id, skillName: "GeoGebra" },
@@ -228,11 +241,13 @@ async function main() {
       gender: "หญิง",
       dateOfBirth: new Date("1992-03-10"),
       nationality: "ไทย",
-      profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=maneerat",
+      profileImageUrl:
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=maneerat",
       role: "EMPLOYEE",
       profileVisibility: "public",
       teachingExperience: "3-5 ปี",
-      specialActivities: "ครูปฐมวัยที่มีใจรักเด็กและเชื่อในพลังของการเล่นเพื่อการเรียนรู้",
+      specialActivities:
+        "ครูปฐมวัยที่มีใจรักเด็กและเชื่อในพลังของการเล่นเพื่อการเรียนรู้",
       canRelocate: false,
       licenseStatus: "not_required",
     },
@@ -244,14 +259,22 @@ async function main() {
       { profileId: employee3.id, subject: "Play-based Learning" },
     ],
   });
-  await prisma.gradeCanTeach.create({ data: { profileId: employee3.id, grade: "อนุบาล" } });
+  await prisma.gradeCanTeach.create({
+    data: { profileId: employee3.id, grade: "อนุบาล" },
+  });
   await prisma.preferredProvince.createMany({
     data: [
       { profileId: employee3.id, province: "กรุงเทพมหานคร" },
       { profileId: employee3.id, province: "นนทบุรี" },
     ],
   });
-  await prisma.language.create({ data: { profileId: employee3.id, languageName: "ไทย", proficiency: "native" } });
+  await prisma.language.create({
+    data: {
+      profileId: employee3.id,
+      languageName: "ไทย",
+      proficiency: "native",
+    },
+  });
   await prisma.skill.createMany({
     data: [
       { profileId: employee3.id, skillName: "Canva" },
@@ -284,7 +307,8 @@ async function main() {
       address: "50 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900",
       website: "https://satit.ku.ac.th",
       phone: "02-942-8900",
-      description: "โรงเรียนสาธิตชั้นนำที่เปิดสอนตั้งแต่ระดับอนุบาลถึงมัธยมปลาย",
+      description:
+        "โรงเรียนสาธิตชั้นนำที่เปิดสอนตั้งแต่ระดับอนุบาลถึงมัธยมปลาย",
       vision: "ผลิตนักเรียนที่มีความรู้ คุณธรรม และทักษะแห่งศตวรรษที่ 21",
       studentCount: 3200,
       teacherCount: 180,
@@ -305,7 +329,8 @@ async function main() {
     data: {
       schoolProfileId: school1.id,
       title: "ครูสอนภาษาอังกฤษ",
-      description: "รับสมัครครูสอนภาษาอังกฤษระดับมัธยมศึกษา ผู้สมัครต้องมีประสบการณ์อย่างน้อย 2 ปี",
+      description:
+        "รับสมัครครูสอนภาษาอังกฤษระดับมัธยมศึกษา ผู้สมัครต้องมีประสบการณ์อย่างน้อย 2 ปี",
       jobType: "Full-time",
       province: "กรุงเทพมหานคร",
       district: "จตุจักร",
@@ -342,7 +367,8 @@ async function main() {
     data: {
       schoolProfileId: school1.id,
       title: "ครูปฐมวัย",
-      description: "รับสมัครครูปฐมวัยที่มีใจรักเด็กและมีความสามารถในการจัดกิจกรรมเสริมพัฒนาการ",
+      description:
+        "รับสมัครครูปฐมวัยที่มีใจรักเด็กและมีความสามารถในการจัดกิจกรรมเสริมพัฒนาการ",
       jobType: "Full-time",
       province: "กรุงเทพมหานคร",
       district: "จตุจักร",
@@ -356,7 +382,9 @@ async function main() {
     },
   });
 
-  await prisma.jobSubject.create({ data: { jobId: job2.id, subject: "การศึกษาปฐมวัย" } });
+  await prisma.jobSubject.create({
+    data: { jobId: job2.id, subject: "การศึกษาปฐมวัย" },
+  });
   await prisma.jobGrade.create({ data: { jobId: job2.id, grade: "อนุบาล" } });
   await prisma.jobBenefit.createMany({
     data: [
@@ -428,27 +456,503 @@ async function main() {
   await prisma.configOption.createMany({
     data: [
       // ── ประเภทโรงเรียน ──
-      { group: "school_type", label: "โรงเรียนรัฐบาล",           value: "โรงเรียนรัฐบาล",           sortOrder: 1 },
-      { group: "school_type", label: "โรงเรียนเอกชน (สามัญ)",    value: "โรงเรียนเอกชน (สามัญ)",    sortOrder: 2 },
-      { group: "school_type", label: "โรงเรียนเอกชน (นานาชาติ)", value: "โรงเรียนเอกชน (นานาชาติ)", sortOrder: 3 },
-      { group: "school_type", label: "โรงเรียนสาธิต",            value: "โรงเรียนสาธิต",            sortOrder: 4 },
-      { group: "school_type", label: "โรงเรียน กศน.",            value: "โรงเรียน กศน.",            sortOrder: 5 },
-      { group: "school_type", label: "ศูนย์รวมการเรียนรู้",       value: "ศูนย์รวมการเรียนรู้",       sortOrder: 6 },
-      { group: "school_type", label: "โรงเรียนตำรวจตระเวนชายแดน", value: "โรงเรียนตำรวจตระเวนชายแดน", sortOrder: 7 },
-      { group: "school_type", label: "โรงเรียนสงเคราะห์",        value: "โรงเรียนสงเคราะห์",        sortOrder: 8 },
+      {
+        group: "school_type",
+        label: "โรงเรียนรัฐบาล",
+        value: "โรงเรียนรัฐบาล",
+        sortOrder: 1,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียนเอกชน (สามัญ)",
+        value: "โรงเรียนเอกชน (สามัญ)",
+        sortOrder: 2,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียนเอกชน (นานาชาติ)",
+        value: "โรงเรียนเอกชน (นานาชาติ)",
+        sortOrder: 3,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียนสาธิต",
+        value: "โรงเรียนสาธิต",
+        sortOrder: 4,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียน กศน.",
+        value: "โรงเรียน กศน.",
+        sortOrder: 5,
+      },
+      {
+        group: "school_type",
+        label: "ศูนย์รวมการเรียนรู้",
+        value: "ศูนย์รวมการเรียนรู้",
+        sortOrder: 6,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียนตำรวจตระเวนชายแดน",
+        value: "โรงเรียนตำรวจตระเวนชายแดน",
+        sortOrder: 7,
+      },
+      {
+        group: "school_type",
+        label: "โรงเรียนสงเคราะห์",
+        value: "โรงเรียนสงเคราะห์",
+        sortOrder: 8,
+      },
 
       // ── ระดับชั้นที่เปิดสอน ──
-      { group: "school_level", label: "อนุบาล",          value: "อนุบาล",          sortOrder: 1 },
-      { group: "school_level", label: "ประถมศึกษาตอนต้น", value: "ประถมศึกษาตอนต้น", sortOrder: 2 },
-      { group: "school_level", label: "ประถมศึกษาตอนปลาย", value: "ประถมศึกษาตอนปลาย", sortOrder: 3 },
-      { group: "school_level", label: "มัธยมศึกษาตอนต้น",  value: "มัธยมศึกษาตอนต้น",  sortOrder: 4 },
-      { group: "school_level", label: "มัธยมศึกษาตอนปลาย", value: "มัธยมศึกษาตอนปลาย", sortOrder: 5 },
-      { group: "school_level", label: "ประกาศนียบัตรวิชาชีพ (ปวช.)", value: "ประกาศนียบัตรวิชาชีพ (ปวช.)", sortOrder: 6 },
+      { group: "school_level", label: "อนุบาล", value: "อนุบาล", sortOrder: 1 },
+      {
+        group: "school_level",
+        label: "ประถมศึกษาตอนต้น",
+        value: "ประถมศึกษาตอนต้น",
+        sortOrder: 2,
+      },
+      {
+        group: "school_level",
+        label: "ประถมศึกษาตอนปลาย",
+        value: "ประถมศึกษาตอนปลาย",
+        sortOrder: 3,
+      },
+      {
+        group: "school_level",
+        label: "มัธยมศึกษาตอนต้น",
+        value: "มัธยมศึกษาตอนต้น",
+        sortOrder: 4,
+      },
+      {
+        group: "school_level",
+        label: "มัธยมศึกษาตอนปลาย",
+        value: "มัธยมศึกษาตอนปลาย",
+        sortOrder: 5,
+      },
+      {
+        group: "school_level",
+        label: "ประกาศนียบัตรวิชาชีพ (ปวช.)",
+        value: "ประกาศนียบัตรวิชาชีพ (ปวช.)",
+        sortOrder: 6,
+      },
     ],
     skipDuplicates: true,
   });
 
   console.log("✅ Created ConfigOptions: school_type (8), school_level (6)");
+
+  // ─── 10. ConfigOptions — หมวดหมู่งาน (job_category) สำหรับ Cascader ───
+  // ✨ แทรก parent (root) ก่อน แล้วค่อยแทรก children พร้อม parentValue
+  const jobCategoryParents = [
+    { value: "general_subject", label: "กลุ่มวิชาสามัญ", sortOrder: 1 },
+    { value: "arts_music", label: "กลุ่มศิลปะและดนตรี", sortOrder: 2 },
+    { value: "pe_activities", label: "กลุ่มพละและกิจกรรม", sortOrder: 3 },
+    { value: "technology", label: "กลุ่มเทคโนโลยี", sortOrder: 4 },
+    { value: "early_childhood", label: "กลุ่มการศึกษาปฐมวัย", sortOrder: 5 },
+    { value: "special_curriculum", label: "กลุ่มหลักสูตรพิเศษ", sortOrder: 6 },
+    { value: "support_staff", label: "กลุ่มงานสนับสนุนการศึกษา", sortOrder: 7 },
+    { value: "intern_parttime", label: "กลุ่มฝึกงานและพิเศษ", sortOrder: 8 },
+    { value: "other", label: "ตำแหน่งอื่น ๆ", sortOrder: 9 },
+  ];
+
+  await prisma.configOption.createMany({
+    data: jobCategoryParents.map((p) => ({
+      group: "job_category",
+      ...p,
+      parentValue: null,
+    })),
+    skipDuplicates: true,
+  });
+
+  const jobCategoryChildren = [
+    // ── กลุ่มวิชาสามัญ ──
+    {
+      parentValue: "general_subject",
+      value: "thai_teacher",
+      label: "ครูภาษาไทย",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "general_subject",
+      value: "math_teacher",
+      label: "ครูคณิตศาสตร์",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "general_subject",
+      value: "science_teacher",
+      label: "ครูวิทยาศาสตร์",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "general_subject",
+      value: "physics_teacher",
+      label: "ครูฟิสิกส์",
+      sortOrder: 4,
+    },
+    {
+      parentValue: "general_subject",
+      value: "chemistry_teacher",
+      label: "ครูเคมี",
+      sortOrder: 5,
+    },
+    {
+      parentValue: "general_subject",
+      value: "biology_teacher",
+      label: "ครูชีววิทยา",
+      sortOrder: 6,
+    },
+    {
+      parentValue: "general_subject",
+      value: "english_teacher",
+      label: "ครูภาษาอังกฤษ",
+      sortOrder: 7,
+    },
+    {
+      parentValue: "general_subject",
+      value: "chinese_teacher",
+      label: "ครูภาษาจีน",
+      sortOrder: 8,
+    },
+    {
+      parentValue: "general_subject",
+      value: "japanese_teacher",
+      label: "ครูภาษาญี่ปุ่น",
+      sortOrder: 9,
+    },
+    {
+      parentValue: "general_subject",
+      value: "social_teacher",
+      label: "ครูสังคมศึกษา",
+      sortOrder: 10,
+    },
+    {
+      parentValue: "general_subject",
+      value: "primary_teacher",
+      label: "ครูประถมศึกษา",
+      sortOrder: 11,
+    },
+    {
+      parentValue: "general_subject",
+      value: "homeroom_teacher",
+      label: "ครูประจำชั้น",
+      sortOrder: 12,
+    },
+    {
+      parentValue: "general_subject",
+      value: "career_teacher",
+      label: "ครูการงานอาชีพ / คหกรรม",
+      sortOrder: 13,
+    },
+    {
+      parentValue: "general_subject",
+      value: "integrated_teacher",
+      label: "ครูบูรณาการ",
+      sortOrder: 14,
+    },
+
+    // ── กลุ่มศิลปะและดนตรี ──
+    {
+      parentValue: "arts_music",
+      value: "art_teacher",
+      label: "ครูศิลปะ",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "arts_music",
+      value: "thai_music_teacher",
+      label: "ครูดนตรีไทย",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "arts_music",
+      value: "music_teacher",
+      label: "ครูดนตรีสากล",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "arts_music",
+      value: "drama_teacher",
+      label: "ครูการแสดง",
+      sortOrder: 4,
+    },
+    {
+      parentValue: "arts_music",
+      value: "instrument_teacher",
+      label: "ครูสอนดนตรี",
+      sortOrder: 5,
+    },
+    {
+      parentValue: "arts_music",
+      value: "dance_classical",
+      label: "ครูนาฏศิลป์",
+      sortOrder: 6,
+    },
+    {
+      parentValue: "arts_music",
+      value: "dance_teacher",
+      label: "ครูสอนเต้น",
+      sortOrder: 7,
+    },
+    {
+      parentValue: "arts_music",
+      value: "vocal_teacher",
+      label: "ครูสอนร้องเพลง",
+      sortOrder: 8,
+    },
+    {
+      parentValue: "arts_music",
+      value: "band_teacher",
+      label: "ครูวงโยธวาทิต/วงดุริยางค์",
+      sortOrder: 9,
+    },
+
+    // ── กลุ่มพละและกิจกรรม ──
+    {
+      parentValue: "pe_activities",
+      value: "pe_teacher",
+      label: "ครูพลศึกษา/สุขศึกษา",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "pe_activities",
+      value: "sport_teacher",
+      label: "ครูสอนกีฬา",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "pe_activities",
+      value: "swim_teacher",
+      label: "ครูสอนว่ายน้ำ",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "pe_activities",
+      value: "scout_teacher",
+      label: "ครูลูกเสือ",
+      sortOrder: 4,
+    },
+
+    // ── กลุ่มเทคโนโลยี ──
+    {
+      parentValue: "technology",
+      value: "computer_teacher",
+      label: "ครูคอมพิวเตอร์",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "technology",
+      value: "coding_teacher",
+      label: "ครูสอนเขียนโปรแกรม",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "technology",
+      value: "robot_teacher",
+      label: "ครูสอนโรบอท",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "technology",
+      value: "it_teacher",
+      label: "ครูเทคโนโลยีสารสนเทศ",
+      sortOrder: 4,
+    },
+
+    // ── กลุ่มการศึกษาปฐมวัย ──
+    {
+      parentValue: "early_childhood",
+      value: "preschool_teacher",
+      label: "ครูปฐมวัย",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "early_childhood",
+      value: "kindergarten_teacher",
+      label: "ครูอนุบาล",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "early_childhood",
+      value: "kinder_assistant",
+      label: "ครูพี่เลี้ยงอนุบาล",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "early_childhood",
+      value: "child_care",
+      label: "ครูพี่เลี้ยงเด็ก",
+      sortOrder: 4,
+    },
+
+    // ── กลุ่มหลักสูตรพิเศษ ──
+    {
+      parentValue: "special_curriculum",
+      value: "special_ed_teacher",
+      label: "ครูการศึกษาพิเศษ",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "special_curriculum",
+      value: "shadow_teacher",
+      label: "ครูประกบเด็กพิเศษ",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "special_curriculum",
+      value: "stem_teacher",
+      label: "ครู STEM",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "special_curriculum",
+      value: "ep_teacher",
+      label: "ครู English Program",
+      sortOrder: 4,
+    },
+    {
+      parentValue: "special_curriculum",
+      value: "inter_teacher",
+      label: "ครูหลักสูตรนานาชาติ",
+      sortOrder: 5,
+    },
+    {
+      parentValue: "special_curriculum",
+      value: "montessori_teacher",
+      label: "ครู Montessori",
+      sortOrder: 6,
+    },
+
+    // ── กลุ่มงานสนับสนุนการศึกษา ──
+    {
+      parentValue: "support_staff",
+      value: "librarian",
+      label: "ครูบรรณารักษ์",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "support_staff",
+      value: "counselor",
+      label: "ครูแนะแนว",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "support_staff",
+      value: "admin_teacher",
+      label: "ครูธุรการ",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "support_staff",
+      value: "school_admin",
+      label: "เจ้าหน้าที่ธุรการโรงเรียน",
+      sortOrder: 4,
+    },
+    {
+      parentValue: "support_staff",
+      value: "pr_officer",
+      label: "เจ้าหน้าที่ประชาสัมพันธ์",
+      sortOrder: 5,
+    },
+    {
+      parentValue: "support_staff",
+      value: "marketing_officer",
+      label: "เจ้าหน้าที่การตลาดโรงเรียน",
+      sortOrder: 6,
+    },
+    {
+      parentValue: "support_staff",
+      value: "foreign_coord",
+      label: "ครูประสานงานครูต่างชาติ",
+      sortOrder: 7,
+    },
+    {
+      parentValue: "support_staff",
+      value: "nurse_teacher",
+      label: "ครูพยาบาล",
+      sortOrder: 8,
+    },
+    {
+      parentValue: "support_staff",
+      value: "registrar",
+      label: "เจ้าหน้าที่ทะเบียนวัดผล",
+      sortOrder: 9,
+    },
+    {
+      parentValue: "support_staff",
+      value: "academic_dept",
+      label: "ฝ่ายวิชาการ",
+      sortOrder: 10,
+    },
+    {
+      parentValue: "support_staff",
+      value: "school_director",
+      label: "ผู้บริหาร/ผู้อำนวยการโรงเรียน",
+      sortOrder: 11,
+    },
+    {
+      parentValue: "support_staff",
+      value: "psychologist",
+      label: "นักจิตวิทยา",
+      sortOrder: 12,
+    },
+    {
+      parentValue: "support_staff",
+      value: "hr_officer",
+      label: "เจ้าหน้าที่ HR/ฝ่ายบุคคล",
+      sortOrder: 13,
+    },
+    {
+      parentValue: "support_staff",
+      value: "procurement",
+      label: "เจ้าหน้าที่จัดซื้อ",
+      sortOrder: 14,
+    },
+    {
+      parentValue: "support_staff",
+      value: "secretary",
+      label: "เลขานุการ",
+      sortOrder: 15,
+    },
+
+    // ── กลุ่มฝึกงานและพิเศษ ──
+    {
+      parentValue: "intern_parttime",
+      value: "intern",
+      label: "นักศึกษาฝึกงาน",
+      sortOrder: 1,
+    },
+    {
+      parentValue: "intern_parttime",
+      value: "student_teacher",
+      label: "ครูฝึกสอน",
+      sortOrder: 2,
+    },
+    {
+      parentValue: "intern_parttime",
+      value: "parttime_teacher",
+      label: "ครูพาร์ทไทม์",
+      sortOrder: 3,
+    },
+    {
+      parentValue: "intern_parttime",
+      value: "assistant_teacher",
+      label: "ครูผู้ช่วย",
+      sortOrder: 4,
+    },
+  ];
+
+  await prisma.configOption.createMany({
+    data: jobCategoryChildren.map((c) => ({ group: "job_category", ...c })),
+    skipDuplicates: true,
+  });
+
+  const totalChildren = jobCategoryChildren.length;
+  console.log(
+    `✅ Created ConfigOptions: job_category — ${jobCategoryParents.length} parents, ${totalChildren} children`,
+  );
   console.log("🎉 Seed completed successfully!");
 }
 

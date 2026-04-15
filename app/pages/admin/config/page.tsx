@@ -18,17 +18,18 @@ import {
   Modal,
   Popconfirm,
   Row,
+  Select,
   Switch,
   Table,
-  Tag,
   Tabs,
+  Tag,
   Typography,
-  theme,
   message,
+  theme,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useConfigStore } from "./_state/config-store";
 import { ConfigOption } from "./_api/config-api";
+import { useConfigStore } from "./_state/config-store";
 
 const { Title, Text } = Typography;
 
@@ -36,13 +37,22 @@ const { Title, Text } = Typography;
 const GROUP_LABELS: Record<string, string> = {
   school_type: "ประเภทโรงเรียน",
   school_level: "ระดับชั้นที่เปิดสอน",
+  job_category: "หมวดหมู่งาน (ตำแหน่งงาน)",
 };
 
 // ✨ [Orchestrator] หน้าจัดการ Config Options สำหรับ Admin
 export default function AdminConfigPage() {
   const { token } = theme.useToken();
-  const { options, isLoading, isSaving, fetchOptions, addOption, toggleActive, removeOption, updateLabel } =
-    useConfigStore();
+  const {
+    options,
+    isLoading,
+    isSaving,
+    fetchOptions,
+    addOption,
+    toggleActive,
+    removeOption,
+    updateLabel,
+  } = useConfigStore();
   const [messageApi, contextHolder] = message.useMessage();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -60,11 +70,18 @@ export default function AdminConfigPage() {
   const filteredOptions = options.filter((o) => o.group === activeGroup);
 
   // ✨ สร้าง Tab items จาก group ที่มีใน options + group ที่รู้จัก
-  const allGroups = [...new Set([...Object.keys(GROUP_LABELS), ...options.map((o) => o.group)])];
+  const allGroups = [
+    ...new Set([...Object.keys(GROUP_LABELS), ...options.map((o) => o.group)]),
+  ];
   const tabItems = allGroups.map((g) => ({
     key: g,
     label: GROUP_LABELS[g] ?? g,
   }));
+
+  // ✨ ดึง root-level options ของ group ปัจจุบัน สำหรับใช้เป็นตัวเลือก parent
+  const parentOptions = options.filter(
+    (o) => o.group === activeGroup && o.parentValue === null && o.isActive,
+  );
 
   const handleAdd = async () => {
     try {
@@ -73,6 +90,7 @@ export default function AdminConfigPage() {
         group: activeGroup,
         label: values.label,
         value: values.value,
+        parent_value: values.parent_value ?? null,
         sort_order: values.sort_order ?? 0,
       });
       messageApi.success("เพิ่มตัวเลือกสำเร็จ");
@@ -86,7 +104,10 @@ export default function AdminConfigPage() {
 
   const handleEdit = (option: ConfigOption) => {
     setEditingOption(option);
-    editForm.setFieldsValue({ label: option.label, sort_order: option.sortOrder });
+    editForm.setFieldsValue({
+      label: option.label,
+      sort_order: option.sortOrder,
+    });
     setIsEditModalOpen(true);
   };
 
@@ -126,7 +147,11 @@ export default function AdminConfigPage() {
       render: (label: string, record: ConfigOption) => (
         <Flex align="center" gap={8}>
           <Text>{label}</Text>
-          {!record.isActive && <Tag color="default" style={{ fontSize: 11 }}>ปิดใช้งาน</Tag>}
+          {!record.isActive && (
+            <Tag color="default" style={{ fontSize: 11 }}>
+              ปิดใช้งาน
+            </Tag>
+          )}
         </Flex>
       ),
     },
@@ -134,8 +159,27 @@ export default function AdminConfigPage() {
       title: "Value (ค่าที่ใช้ใน DB)",
       dataIndex: "value",
       render: (value: string) => (
-        <Text type="secondary" style={{ fontFamily: "monospace", fontSize: 13 }}>{value}</Text>
+        <Text
+          type="secondary"
+          style={{ fontFamily: "monospace", fontSize: 13 }}
+        >
+          {value}
+        </Text>
       ),
+    },
+    {
+      title: "Parent",
+      dataIndex: "parentValue",
+      render: (parentValue: string | null) =>
+        parentValue ? (
+          <Tag style={{ fontFamily: "monospace", fontSize: 11 }}>
+            {parentValue}
+          </Tag>
+        ) : (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            —
+          </Text>
+        ),
     },
     {
       title: "สถานะ",
@@ -195,10 +239,14 @@ export default function AdminConfigPage() {
                 justifyContent: "center",
               }}
             >
-              <SettingOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
+              <SettingOutlined
+                style={{ color: token.colorPrimary, fontSize: 18 }}
+              />
             </div>
             <Flex vertical gap={0}>
-              <Title level={4} style={{ margin: 0 }}>จัดการตัวเลือก Dropdown</Title>
+              <Title level={4} style={{ margin: 0 }}>
+                จัดการตัวเลือก Dropdown
+              </Title>
               <Text type="secondary" style={{ fontSize: 13 }}>
                 ประเภทโรงเรียน, ระดับชั้น และอื่นๆ ที่แสดงในฟอร์มลงทะเบียน
               </Text>
@@ -220,7 +268,9 @@ export default function AdminConfigPage() {
         <Row gutter={[16, 16]}>
           {allGroups.map((g) => {
             const count = options.filter((o) => o.group === g).length;
-            const activeCount = options.filter((o) => o.group === g && o.isActive).length;
+            const activeCount = options.filter(
+              (o) => o.group === g && o.isActive,
+            ).length;
             return (
               <Col key={g} xs={24} sm={12} md={8}>
                 <Card
@@ -229,16 +279,26 @@ export default function AdminConfigPage() {
                     border: `1px solid ${token.colorBorderSecondary}`,
                     borderRadius: 12,
                     cursor: "pointer",
-                    borderColor: activeGroup === g ? token.colorPrimary : token.colorBorderSecondary,
+                    borderColor:
+                      activeGroup === g
+                        ? token.colorPrimary
+                        : token.colorBorderSecondary,
                   }}
                   onClick={() => setActiveGroup(g)}
                 >
                   <Flex justify="space-between" align="center">
                     <Flex vertical gap={2}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>{GROUP_LABELS[g] ?? g}</Text>
-                      <Text strong style={{ fontSize: 20 }}>{count}</Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {GROUP_LABELS[g] ?? g}
+                      </Text>
+                      <Text strong style={{ fontSize: 20 }}>
+                        {count}
+                      </Text>
                     </Flex>
-                    <Badge count={activeCount} style={{ backgroundColor: token.colorSuccess }} />
+                    <Badge
+                      count={activeCount}
+                      style={{ backgroundColor: token.colorSuccess }}
+                    />
                   </Flex>
                 </Card>
               </Col>
@@ -249,7 +309,10 @@ export default function AdminConfigPage() {
         {/* Table */}
         <Card
           variant="borderless"
-          style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 16 }}
+          style={{
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: 16,
+          }}
         >
           <Tabs
             activeKey={activeGroup}
@@ -291,10 +354,27 @@ export default function AdminConfigPage() {
             name="value"
             label="Value (ค่าที่ใช้ใน DB)"
             rules={[{ required: true, message: "กรุณาระบุ value" }]}
-            extra="ควรเหมือน label หรือเป็น snake_case เช่น government_school"
+            extra="snake_case เช่น academic, math, english"
           >
-            <Input placeholder="เช่น โรงเรียนรัฐบาล" />
+            <Input placeholder="เช่น academic" />
           </Form.Item>
+          {/* ✨ แสดง parent selector เฉพาะ group ที่รองรับ hierarchy */}
+          {parentOptions.length > 0 && (
+            <Form.Item
+              name="parent_value"
+              label="หมวดหมู่หลัก (Parent)"
+              extra="เว้นว่างถ้าเป็นหมวดหมู่หลัก"
+            >
+              <Select
+                allowClear
+                placeholder="(ไม่เลือก = เป็นหมวดหมู่หลัก)"
+                options={parentOptions.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                }))}
+              />
+            </Form.Item>
+          )}
           <Form.Item name="sort_order" label="ลำดับการแสดงผล" initialValue={0}>
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>

@@ -17,7 +17,12 @@ export async function GET() {
   } catch (error) {
     console.error("❌ [GET /api/v1/admin/config]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาด", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาด",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }
@@ -27,6 +32,7 @@ const createSchema = z.object({
   group: z.string().min(1),
   label: z.string().min(1),
   value: z.string().min(1),
+  parent_value: z.string().optional().nullable(),
   sort_order: z.number().int().optional().default(0),
 });
 
@@ -38,33 +44,61 @@ export async function POST(request: Request) {
 
     if (!parsed.success) {
       return Response.json(
-        { status_code: 400, message_th: "ข้อมูลไม่ถูกต้อง", message_en: "Invalid input", data: parsed.error.flatten() },
+        {
+          status_code: 400,
+          message_th: "ข้อมูลไม่ถูกต้อง",
+          message_en: "Invalid input",
+          data: parsed.error.flatten(),
+        },
         { status: 400 },
       );
     }
 
-    const { group, label, value, sort_order } = parsed.data;
+    const { group, label, value, parent_value, sort_order } = parsed.data;
 
-    const existing = await prisma.configOption.findFirst({ where: { group, value } });
+    const existing = await prisma.configOption.findFirst({
+      where: { group, value },
+    });
     if (existing) {
       return Response.json(
-        { status_code: 409, message_th: "มีตัวเลือกนี้อยู่แล้ว", message_en: "Option already exists", data: null },
+        {
+          status_code: 409,
+          message_th: "มีตัวเลือกนี้อยู่แล้ว",
+          message_en: "Option already exists",
+          data: null,
+        },
         { status: 409 },
       );
     }
 
     const option = await prisma.configOption.create({
-      data: { group, label, value, sortOrder: sort_order },
+      data: {
+        group,
+        label,
+        value,
+        parentValue: parent_value ?? null,
+        sortOrder: sort_order,
+      },
     });
 
     return Response.json(
-      { status_code: 201, message_th: "สร้างสำเร็จ", message_en: "Created successfully", data: option },
+      {
+        status_code: 201,
+        message_th: "สร้างสำเร็จ",
+        message_en: "Created successfully",
+        data: option,
+      },
       { status: 201 },
     );
   } catch (error) {
     console.error("❌ [POST /api/v1/admin/config]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาด", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาด",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }
@@ -85,7 +119,12 @@ export async function PATCH(request: Request) {
 
     if (!parsed.success) {
       return Response.json(
-        { status_code: 400, message_th: "ข้อมูลไม่ถูกต้อง", message_en: "Invalid input", data: parsed.error.flatten() },
+        {
+          status_code: 400,
+          message_th: "ข้อมูลไม่ถูกต้อง",
+          message_en: "Invalid input",
+          data: parsed.error.flatten(),
+        },
         { status: 400 },
       );
     }
@@ -110,7 +149,12 @@ export async function PATCH(request: Request) {
   } catch (error) {
     console.error("❌ [PATCH /api/v1/admin/config]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาด", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาด",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }
@@ -124,7 +168,12 @@ export async function DELETE(request: Request) {
 
     if (!id) {
       return Response.json(
-        { status_code: 400, message_th: "กรุณาระบุ id", message_en: "id is required", data: null },
+        {
+          status_code: 400,
+          message_th: "กรุณาระบุ id",
+          message_en: "id is required",
+          data: null,
+        },
         { status: 400 },
       );
     }
@@ -140,7 +189,12 @@ export async function DELETE(request: Request) {
   } catch (error) {
     console.error("❌ [DELETE /api/v1/admin/config]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาด", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาด",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }

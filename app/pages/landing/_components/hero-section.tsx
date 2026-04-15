@@ -23,45 +23,17 @@ import {
   Typography,
 } from "antd";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
-const JOB_CATEGORIES = [
-  {
-    value: "academic",
-    label: "การสอน / วิชาการ",
-    children: [
-      { value: "math", label: "ครูคณิตศาสตร์" },
-      { value: "english", label: "ครูภาษาอังกฤษ" },
-      { value: "thai", label: "ครูภาษาไทย" },
-      { value: "science", label: "ครูวิทยาศาสตร์" },
-      { value: "early-childhood", label: "ครูปฐมวัย" },
-    ],
-  },
-  {
-    value: "support",
-    label: "ธุรการ / สนับสนุน",
-    children: [
-      { value: "admin", label: "ธุรการโรงเรียน" },
-      { value: "hr", label: "ฝ่ายบุคคล (HR)" },
-      { value: "finance", label: "การเงิน / บัญชี" },
-      { value: "it-support", label: "IT Support" },
-    ],
-  },
-  {
-    value: "construction",
-    label: "งานก่อสร้างสถาปัตยกรรม",
-    children: [
-      { value: "const-tech", label: "งานช่างก่อสร้าง/อาคาร" },
-      { value: "proj-mgmt", label: "งานบริหารโครงการ" },
-      { value: "arch", label: "งานสถาปนิก" },
-    ],
-  },
+const POPULAR_TAGS = [
+  "ครูภาษาอังกฤษ",
+  "ครูคณิตศาสตร์",
+  "ธุรการโรงเรียน",
+  "ครูปฐมวัย",
 ];
-
-const POPULAR_TAGS = ["ครูภาษาอังกฤษ", "ครูคณิตศาสตร์", "ธุรการโรงเรียน", "ครูปฐมวัย"];
 
 // Hero Section พร้อม Search Bar สำหรับ Landing Page
 export default function HeroSection() {
@@ -72,8 +44,20 @@ export default function HeroSection() {
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const { searchParams, setSearchParam, resetSearchParams, buildQueryString } =
-    useLandingStore();
+  const {
+    searchParams,
+    setSearchParam,
+    resetSearchParams,
+    buildQueryString,
+    jobCategories,
+    isLoadingCategories,
+    fetchJobCategories: loadCategories,
+  } = useLandingStore();
+
+  // ✨ โหลดหมวดหมู่งานจาก Admin Config เมื่อ Component mount
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   // นำทางไปยังหน้า Job พร้อม Query String
   const handleSearch = () => {
@@ -95,9 +79,7 @@ export default function HeroSection() {
         textAlign: "center",
         position: "relative",
         overflow: "hidden",
-        background: isDark
-          ? "#0a0f1e"
-          : "#f8fbff",
+        background: isDark ? "#0a0f1e" : "#f8fbff",
       }}
     >
       {/* ── Grid / Dot pattern overlay ── */}
@@ -110,8 +92,10 @@ export default function HeroSection() {
             : "radial-gradient(circle, rgba(17,182,245,0.15) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
           pointerEvents: "none",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%)",
         }}
       />
 
@@ -179,7 +163,14 @@ export default function HeroSection() {
         }}
       />
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "1100px", width: "100%" }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          maxWidth: "1100px",
+          width: "100%",
+        }}
+      >
         {/* Badge pill */}
         <Flex justify="center" style={{ marginBottom: 12 }}>
           <Tag
@@ -208,7 +199,9 @@ export default function HeroSection() {
           }}
         >
           ศูนย์รวมงานสายการศึกษา{" "}
-          <span style={{ color: token.colorPrimary }}>จากโรงเรียนทั่วประเทศ</span>
+          <span style={{ color: token.colorPrimary }}>
+            จากโรงเรียนทั่วประเทศ
+          </span>
         </Title>
 
         <Paragraph
@@ -242,11 +235,16 @@ export default function HeroSection() {
             {/* ช่องค้นหาคีย์เวิร์ด */}
             <Col xs={24} lg={9}>
               <Flex vertical gap={6}>
-                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                <Text
+                  strong
+                  style={{ fontSize: 13, color: token.colorTextDescription }}
+                >
                   ค้นหางานที่สนใจ
                 </Text>
                 <Input
-                  prefix={<SearchOutlined style={{ color: token.colorPrimary }} />}
+                  prefix={
+                    <SearchOutlined style={{ color: token.colorPrimary }} />
+                  }
                   placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
                   value={searchParams.keyword}
                   onChange={(e) => setSearchParam("keyword", e.target.value)}
@@ -260,23 +258,33 @@ export default function HeroSection() {
             {/* ตัวเลือกหมวดหมู่งาน */}
             <Col xs={24} lg={8}>
               <Flex vertical gap={6}>
-                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                <Text
+                  strong
+                  style={{ fontSize: 13, color: token.colorTextDescription }}
+                >
                   ตำแหน่งงาน
                 </Text>
                 <Cascader
-                  options={JOB_CATEGORIES}
+                  options={jobCategories}
+                  loading={isLoadingCategories}
                   multiple
                   maxTagCount={1}
                   value={searchParams.category}
-                  onChange={(value) => setSearchParam("category", value as string[][])}
+                  onChange={(value) =>
+                    setSearchParam("category", value as string[][])
+                  }
                   maxTagPlaceholder={(omitted) => (
-                    <Tag color="processing" style={{ borderRadius: 6 }}>+{omitted.length}</Tag>
+                    <Tag color="processing" style={{ borderRadius: 6 }}>
+                      +{omitted.length}
+                    </Tag>
                   )}
                   placeholder="เลือกตำแหน่งที่สนใจ"
                   style={{ width: "100%" }}
                   size="large"
                   showCheckedStrategy={Cascader.SHOW_CHILD}
-                  suffixIcon={<SolutionOutlined style={{ color: token.colorPrimary }} />}
+                  suffixIcon={
+                    <SolutionOutlined style={{ color: token.colorPrimary }} />
+                  }
                   expandTrigger="click"
                 />
               </Flex>
@@ -285,7 +293,10 @@ export default function HeroSection() {
             {/* ตัวเลือกสถานที่ */}
             <Col xs={24} lg={7}>
               <Flex vertical gap={6}>
-                <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                <Text
+                  strong
+                  style={{ fontSize: 13, color: token.colorTextDescription }}
+                >
                   สถานที่
                 </Text>
                 <Select
@@ -295,7 +306,9 @@ export default function HeroSection() {
                   allowClear
                   value={searchParams.location}
                   onChange={(value) => setSearchParam("location", value)}
-                  suffixIcon={<GlobalOutlined style={{ color: token.colorPrimary }} />}
+                  suffixIcon={
+                    <GlobalOutlined style={{ color: token.colorPrimary }} />
+                  }
                 >
                   <Option value="bkk">กรุงเทพมหานคร</Option>
                   <Option value="center">ภาคกลาง</Option>
@@ -311,7 +324,8 @@ export default function HeroSection() {
             style={{
               maxHeight: showAdvanced ? "300px" : "0px",
               overflow: "hidden",
-              transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
+              transition:
+                "max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
               opacity: showAdvanced ? 1 : 0,
             }}
           >
@@ -389,9 +403,15 @@ export default function HeroSection() {
                 fontWeight: 600,
                 fontSize: 14,
                 border: `1px solid ${token.colorBorderSecondary}`,
-                color: showAdvanced ? token.colorPrimary : token.colorTextSecondary,
-                borderColor: showAdvanced ? token.colorPrimary : token.colorBorderSecondary,
-                backgroundColor: showAdvanced ? `${token.colorPrimary}10` : "transparent",
+                color: showAdvanced
+                  ? token.colorPrimary
+                  : token.colorTextSecondary,
+                borderColor: showAdvanced
+                  ? token.colorPrimary
+                  : token.colorBorderSecondary,
+                backgroundColor: showAdvanced
+                  ? `${token.colorPrimary}10`
+                  : "transparent",
                 flexShrink: 0,
                 transition: "all 0.25s ease",
               }}
@@ -413,8 +433,14 @@ export default function HeroSection() {
             {showAdvanced && (
               <Button
                 type="text"
-                style={{ height: 48, color: token.colorTextDescription, flexShrink: 0 }}
-                onClick={() => { resetSearchParams(); }}
+                style={{
+                  height: 48,
+                  color: token.colorTextDescription,
+                  flexShrink: 0,
+                }}
+                onClick={() => {
+                  resetSearchParams();
+                }}
               >
                 รีเซ็ต
               </Button>

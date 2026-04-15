@@ -12,7 +12,13 @@ interface ConfigStore {
   isLoading: boolean;
   isSaving: boolean;
   fetchOptions: () => Promise<void>;
-  addOption: (payload: { group: string; label: string; value: string; sort_order?: number }) => Promise<void>;
+  addOption: (payload: {
+    group: string;
+    label: string;
+    value: string;
+    parent_value?: string | null;
+    sort_order?: number;
+  }) => Promise<void>;
   toggleActive: (id: string, isActive: boolean) => Promise<void>;
   removeOption: (id: string) => Promise<void>;
   updateLabel: (id: string, label: string, sortOrder: number) => Promise<void>;
@@ -55,7 +61,9 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
     try {
       await updateConfigOption({ id, is_active: isActive });
       set((state) => ({
-        options: state.options.map((o) => (o.id === id ? { ...o, isActive } : o)),
+        options: state.options.map((o) =>
+          o.id === id ? { ...o, isActive } : o,
+        ),
       }));
     } finally {
       set({ isSaving: false });

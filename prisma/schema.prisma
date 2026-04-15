@@ -116,9 +116,9 @@ model Profile {
   profileViewsGiven    ProfileView[]  @relation("ProfileViewViewer")
 
   // Relations — Org/RBAC (สมาชิกที่ตนเองเป็น + คำเชิญที่ตนส่ง)
-  orgMemberships  OrgMember[] @relation("OrgMemberProfile")
-  orgInvitedByMe  OrgMember[] @relation("OrgMemberInviter")
-  orgInvitesSent  OrgInvite[] @relation("OrgInviteInviter")
+  orgMemberships OrgMember[] @relation("OrgMemberProfile")
+  orgInvitedByMe OrgMember[] @relation("OrgMemberInviter")
+  orgInvitesSent OrgInvite[] @relation("OrgInviteInviter")
 
   @@index([role], name: "idx_profiles_role")
   @@index([userId], name: "idx_profiles_user_id")
@@ -295,10 +295,10 @@ model SchoolProfile {
   logoUrl       String?  @map("logo_url")
   coverImageUrl String?  @map("cover_image_url")
   foundedYear   Int?     @map("founded_year") // ปีที่ก่อตั้ง (พ.ศ.)
-  curriculum    String?  // หลักสูตร เช่น British, IB, Thai
-  levels        String?  // ระดับชั้น เก็บเป็น JSON string เช่น ["อนุบาล","ประถม"]
+  curriculum    String? // หลักสูตร เช่น British, IB, Thai
+  levels        String? // ระดับชั้น เก็บเป็น JSON string เช่น ["อนุบาล","ประถม"]
   accountPlan   String   @default("basic") @map("account_plan") // แผนบัญชี: basic, premium, enterprise (จัดการโดย Admin)
-  jobQuotaMax   Int      @default(3) @map("job_quota_max")      // จำนวนประกาศสูงสุดที่ลงได้ (จัดการโดย Admin)
+  jobQuotaMax   Int      @default(3) @map("job_quota_max") // จำนวนประกาศสูงสุดที่ลงได้ (จัดการโดย Admin)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
@@ -340,9 +340,9 @@ model Job {
   licenseRequired    LicenseRequired @default(not_required) @map("license_required")
   positionsAvailable Int             @default(1) @map("positions_available") // จำนวนที่รับสมัคร
   educationLevel     String?         @map("education_level") // ปริญญาตรีขึ้นไป, ปริญญาโท ฯลฯ
-  experience         String?         // ประสบการณ์สอนที่ต้องการ เช่น 1-3 ปี
-  qualifications     String?         // คุณสมบัติเพิ่มเติม (free text)
-  gender             String?         // เพศ: ไม่จำกัด, ชาย, หญิง
+  experience         String? // ประสบการณ์สอนที่ต้องการ เช่น 1-3 ปี
+  qualifications     String? // คุณสมบัติเพิ่มเติม (free text)
+  gender             String? // เพศ: ไม่จำกัด, ชาย, หญิง
   status             JobStatus       @default(DRAFT)
   deadline           DateTime? // วันหมดรับสมัคร
   createdAt          DateTime        @default(now()) @map("created_at")
@@ -487,25 +487,25 @@ model JobView {
 
 // สถานะสมาชิกองค์กร
 enum OrgMemberStatus {
-  ACTIVE   // ใช้งานปกติ
-  PENDING  // รอยืนยันอีเมล
+  ACTIVE // ใช้งานปกติ
+  PENDING // รอยืนยันอีเมล
   INACTIVE // ถูก deactivate
 }
 
 // สถานะคำเชิญ
 enum InviteStatus {
-  PENDING  // รอการตอบรับ
+  PENDING // รอการตอบรับ
   ACCEPTED // ยอมรับแล้ว
-  EXPIRED  // หมดอายุ
-  REVOKED  // ถูกยกเลิก
+  EXPIRED // หมดอายุ
+  REVOKED // ถูกยกเลิก
 }
 
 // 3.22 org_roles — บทบาทที่กำหนดเองในองค์กร (RBAC)
 model OrgRole {
   id          String   @id @default(uuid())
   orgId       String   @map("org_id") // schoolProfileId
-  name        String   // เช่น "HR Manager"
-  slug        String   // เช่น "hr_manager"
+  name        String // เช่น "HR Manager"
+  slug        String // เช่น "hr_manager"
   description String?
   color       String   @default("#94A3B8") // hex color
   iconKey     String   @default("user") @map("icon_key") // key ของ Ant Design icon
@@ -524,9 +524,9 @@ model OrgRole {
 
 // 3.23 org_role_permissions — สิทธิ์ของแต่ละ Role (resource:action)
 model OrgRolePermission {
-  id             String @id @default(uuid())
-  roleId         String @map("role_id")
-  permissionKey  String @map("permission_key") // เช่น "jobs:create", "applicants:view"
+  id            String @id @default(uuid())
+  roleId        String @map("role_id")
+  permissionKey String @map("permission_key") // เช่น "jobs:create", "applicants:view"
 
   role OrgRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
@@ -562,7 +562,7 @@ model OrgMember {
 model OrgInvite {
   id        String       @id @default(uuid())
   orgId     String       @map("org_id") // schoolProfileId
-  email     String       // อีเมลผู้รับเชิญ
+  email     String // อีเมลผู้รับเชิญ
   roleId    String       @map("role_id")
   token     String       @unique // random UUID token สำหรับลิงก์เชิญ
   status    InviteStatus @default(PENDING)
@@ -603,14 +603,15 @@ model ProfileView {
 // config_options — ตัวเลือก dropdown ที่ Admin จัดการได้ผ่านหลังบ้าน
 // group: "school_type" | "school_level" | ... (ขยายได้ในอนาคต)
 model ConfigOption {
-  id        String   @id @default(uuid())
-  group     String   // กลุ่ม เช่น "school_type", "school_level"
-  label     String   // ข้อความแสดงผล เช่น "โรงเรียนรัฐบาล"
-  value     String   // ค่าที่ใช้จริง เช่น "government"
-  sortOrder Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
-  isActive  Boolean  @default(true) @map("is_active") // ปิด/เปิดโดยไม่ต้องลบ
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  group       String // กลุ่ม เช่น "school_type", "job_category"
+  label       String // ข้อความแสดงผล เช่น "การสอน / วิชาการ"
+  value       String // ค่าที่ใช้จริง เช่น "academic"
+  parentValue String?  @map("parent_value") // ค่า parent สำหรับ hierarchy เช่น "academic" (null = root)
+  sortOrder   Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
+  isActive    Boolean  @default(true) @map("is_active") // ปิด/เปิดโดยไม่ต้องลบ
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@unique([group, value], name: "unique_config_option")
   @@index([group, isActive], name: "idx_config_options_group_active")

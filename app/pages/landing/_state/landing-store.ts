@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { CascaderNode, fetchJobCategories } from "../_api/landing-api";
 
 // ประเภทของ Search Parameters
 export interface SearchParams {
@@ -13,10 +14,15 @@ export interface SearchParams {
 
 interface LandingStore {
   searchParams: SearchParams;
+  // หมวดหมู่งานสำหรับ Cascader — โหลดจาก Admin Config
+  jobCategories: CascaderNode[];
+  isLoadingCategories: boolean;
+  // ดึงหมวดหมู่งาน
+  fetchJobCategories: () => Promise<void>;
   // อัปเดต search param ทีละ field
   setSearchParam: <K extends keyof SearchParams>(
     key: K,
-    value: SearchParams[K]
+    value: SearchParams[K],
   ) => void;
   // รีเซ็ตทุก field กลับค่าเริ่มต้น
   resetSearchParams: () => void;
@@ -36,6 +42,21 @@ const DEFAULT_PARAMS: SearchParams = {
 
 export const useLandingStore = create<LandingStore>((set, get) => ({
   searchParams: { ...DEFAULT_PARAMS },
+  jobCategories: [],
+  isLoadingCategories: false,
+
+  // ✨ ดึงหมวดหมู่งานจาก API แล้วแปลงเป็น CascaderNode tree
+  fetchJobCategories: async () => {
+    set({ isLoadingCategories: true });
+    try {
+      const categories = await fetchJobCategories();
+      set({ jobCategories: categories });
+    } catch (err) {
+      console.error("❌ fetchJobCategories:", err);
+    } finally {
+      set({ isLoadingCategories: false });
+    }
+  },
 
   setSearchParam: (key, value) =>
     set((state) => ({

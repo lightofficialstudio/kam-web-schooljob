@@ -5,6 +5,7 @@ export interface ConfigOption {
   group: string;
   label: string;
   value: string;
+  parentValue: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -18,7 +19,9 @@ interface ApiResponse<T> {
 
 // ✨ ดึง ConfigOptions ทั้งหมด (Admin)
 export const fetchAllConfigOptions = async (): Promise<ConfigOption[]> => {
-  const { data } = await axios.get<ApiResponse<ConfigOption[]>>("/api/v1/admin/config");
+  const { data } = await axios.get<ApiResponse<ConfigOption[]>>(
+    "/api/v1/admin/config",
+  );
   return data.data ?? [];
 };
 
@@ -27,9 +30,13 @@ export const createConfigOption = async (payload: {
   group: string;
   label: string;
   value: string;
+  parent_value?: string | null;
   sort_order?: number;
 }) => {
-  const { data } = await axios.post<ApiResponse<ConfigOption>>("/api/v1/admin/config", payload);
+  const { data } = await axios.post<ApiResponse<ConfigOption>>(
+    "/api/v1/admin/config",
+    payload,
+  );
   return data.data;
 };
 
@@ -40,7 +47,10 @@ export const updateConfigOption = async (payload: {
   sort_order?: number;
   is_active?: boolean;
 }) => {
-  const { data } = await axios.patch<ApiResponse<ConfigOption>>("/api/v1/admin/config", payload);
+  const { data } = await axios.patch<ApiResponse<ConfigOption>>(
+    "/api/v1/admin/config",
+    payload,
+  );
   return data.data;
 };
 
