@@ -16,7 +16,7 @@ import {
   Skeleton,
   Tag,
 } from "antd";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Briefcase, ChevronRight, MapPin, Wallet, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -62,7 +62,7 @@ export default function LatestJobsSection() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -73,7 +73,7 @@ export default function LatestJobsSection() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 30, opacity: 0, scale: 0.95 },
     visible: {
       y: 0,
@@ -83,14 +83,14 @@ export default function LatestJobsSection() {
         type: "spring",
         stiffness: 100,
         damping: 20,
-      },
+      } as any,
     },
   };
 
-  // ✨ Dynamic Colors based on Theme
+  // ✨ โทนสีตามธีม
   const sectionBgClass = isDark 
     ? "bg-[#020617]" 
-    : "bg-gradient-to-b from-slate-50 to-white";
+    : "bg-linear-to-b from-slate-50 to-white";
   
   const gridPatternClass = isDark 
     ? "bg-[radial-gradient(#1e293b_1px,transparent_1px)]" 
@@ -102,20 +102,20 @@ export default function LatestJobsSection() {
 
   return (
     <section className={"relative py-32 overflow-hidden transition-colors duration-700 " + sectionBgClass}>
-      {/* ✨ Background decorative elements */}
+      {/* ✨ องค์ประกอบตกแต่งพื้นหลัง */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className={"absolute inset-0 opacity-[0.2] dark:opacity-[0.15] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)] " + gridPatternClass} />
+        <div className={"absolute inset-0 opacity-[0.2] dark:opacity-[0.15] bg-size-[32px_32px] mask-[radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)] " + gridPatternClass} />
         
-        {/* Animated Glows */}
+        {/* แสงสว่างแอนิเมชัน */}
         <motion.div 
           animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 -left-24 w-[32rem] h-[32rem] bg-blue-600/20 rounded-full blur-[120px]" 
+          className="absolute -top-24 -left-24 w-lg h-128 bg-blue-600/20 rounded-full blur-[120px]" 
         />
         <motion.div 
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.05, 0.1, 0.05] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/2 -right-24 w-[28rem] h-[28rem] bg-indigo-600/15 rounded-full blur-[100px]" 
+          className="absolute top-1/2 -right-24 w-md h-112 bg-indigo-600/15 rounded-full blur-[100px]" 
         />
       </div>
 
@@ -131,20 +131,20 @@ export default function LatestJobsSection() {
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20">
               <Sparkles className="text-blue-500 dark:text-blue-400 w-4 h-4" />
               <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em]">
-                Latest Opportunities
+                โอกาสทางการศึกษาล่าสุด
               </span>
             </div>
             
             <div className="space-y-2">
               <h2 className={"text-4xl md:text-6xl font-black tracking-tight leading-[1.1] transition-colors " + titleColorClass}>
                 ค้นหางาน <span className="relative">
-                  <span className="relative z-10 bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">ที่ใช่</span>
+                  <span className="relative z-10 bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">ที่ใช่</span>
                   <motion.span 
                     initial={{ width: 0 }}
                     whileInView={{ width: "100%" }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.5, duration: 0.8 }}
-                    className="absolute bottom-2 left-0 h-3 bg-blue-500/10 -z-0 rounded-full"
+                    className="absolute bottom-2 left-0 h-3 bg-blue-500/10 z-0 rounded-full"
                   />
                 </span> สำหรับคุณ
               </h2>
@@ -164,7 +164,7 @@ export default function LatestJobsSection() {
               <Button
                 type="primary"
                 size="large"
-                className="group !h-14 !px-10 !rounded-2xl !bg-slate-900 dark:!bg-white !text-white dark:!text-slate-900 !border-none hover:!scale-105 active:!scale-95 shadow-xl transition-all duration-300 flex items-center gap-3 font-bold"
+                className="group h-14! px-10! rounded-2xl! bg-slate-900! dark:bg-white! text-white! dark:text-slate-900! border-none! hover:scale-105! active:scale-95! shadow-xl transition-all duration-300 flex items-center gap-3 font-bold"
               >
                 ดูประกาศงานทั้งหมด 
                 <ArrowRightOutlined className="transition-transform group-hover:translate-x-1.5" />
@@ -196,7 +196,7 @@ export default function LatestJobsSection() {
                   <Card key={i} className={"backdrop-blur-sm " + cardBorderClass}>
                     <div className="flex flex-col gap-6">
                       <div className="flex justify-between items-center">
-                        <Skeleton.Avatar active shape="square" size={64} className="!rounded-2xl" />
+                        <Skeleton.Avatar active shape="square" size={64} className="rounded-2xl!" />
                         <Skeleton.Button active shape="round" size="small" className="w-16" />
                       </div>
                       <Skeleton active paragraph={{ rows: 3 }} />
@@ -226,7 +226,7 @@ export default function LatestJobsSection() {
                         className={"h-full relative overflow-hidden transition-all duration-500 border backdrop-blur-md " + cardBorderClass + " group-hover:border-blue-500/30 group-hover:shadow-[0_32px_64px_-16px_rgba(30,58,138,0.12)] " + (isDark ? "dark:group-hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)]" : "")}
                         styles={{ body: { padding: 0 } }}
                       >
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-20 -mt-20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-blue-500/10 to-transparent rounded-full -mr-20 -mt-20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                         
                         <div className="p-8 relative z-10 flex flex-col h-full">
                           <div className="flex justify-between items-start mb-8">
@@ -242,7 +242,7 @@ export default function LatestJobsSection() {
                             
                             {job.isNew && (
                               <Badge
-                                count="NEW"
+                                count="ใหม่"
                                 style={{
                                   backgroundColor: isDark ? "#3b82f6" : "#2563eb",
                                   borderRadius: "10px",
@@ -259,9 +259,9 @@ export default function LatestJobsSection() {
                             )}
                           </div>
 
-                          <div className="flex-grow space-y-4">
+                          <div className="grow space-y-4">
                             <div className="space-y-2">
-                              <h3 className={"text-xl font-bold leading-tight transition-colors line-clamp-2 min-h-[56px] tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 " + titleColorClass}>
+                              <h3 className={"text-xl font-bold leading-tight transition-colors line-clamp-2 min-h-14 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 " + titleColorClass}>
                                 {job.title}
                               </h3>
                               <p className={"text-sm font-semibold line-clamp-1 flex items-center gap-2 transition-colors " + descColorClass}>
@@ -270,11 +270,11 @@ export default function LatestJobsSection() {
                               </p>
                             </div>
 
-                            <div className="pt-2 flex flex-wrap gap-2 min-h-[32px]">
+                            <div className="pt-2 flex flex-wrap gap-2 min-h-8">
                               {(job.tags || []).slice(0, 2).map((tag) => (
                                 <Tag
                                   key={tag}
-                                  className="!border-none !rounded-xl !bg-slate-100 dark:!bg-slate-800/80 !text-slate-600 dark:!text-slate-300 font-bold px-3 py-1 text-[11px] transition-colors group-hover:!bg-blue-500/10 group-hover:!text-blue-600"
+                                  className="border-none! rounded-xl! bg-slate-100! dark:bg-slate-800/80! text-slate-600! dark:text-slate-300! font-bold px-3 py-1 text-[11px] transition-colors group-hover:bg-blue-500/10! group-hover:text-blue-600!"
                                 >
                                   {tag}
                                 </Tag>
@@ -285,14 +285,14 @@ export default function LatestJobsSection() {
                           <div className={"mt-8 pt-8 border-t flex flex-col gap-5 " + (isDark ? "border-slate-800/60" : "border-slate-100")}>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Location</span>
+                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">ที่อยู่</span>
                                 <div className={"flex items-center gap-1.5 font-bold text-xs transition-colors " + (isDark ? "text-slate-300" : "text-slate-700")}>
                                   <MapPin size={14} className="text-blue-500" />
                                   <span className="truncate">{job.location}</span>
                                 </div>
                               </div>
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Salary</span>
+                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">เงินเดือน</span>
                                 <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">
                                   <Wallet size={14} />
                                   {job.salary}

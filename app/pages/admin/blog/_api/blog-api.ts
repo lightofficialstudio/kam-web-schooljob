@@ -44,3 +44,22 @@ export const requestAdminUpdateBlog = (data: {
 // ✨ ลบบทความ
 export const requestAdminDeleteBlog = (id: string) =>
   axios.delete(`${BASE}/delete`, { params: { id } });
+
+// ─── AI Blog Assistant ───
+
+export type AiAction =
+  | "generate_title"
+  | "generate_excerpt"
+  | "generate_content"
+  | "suggest_tags"
+  | "seo_score";
+
+export const requestAiBlogAssist = (payload: {
+  action: AiAction;
+  topic?: string;
+  title?: string;
+  content?: string;
+  outline?: string;
+  category?: string;
+  target_audience?: string;
+}) => axios.post<{ status_code: number; data: unknown }>(`${BASE}/ai`, payload);

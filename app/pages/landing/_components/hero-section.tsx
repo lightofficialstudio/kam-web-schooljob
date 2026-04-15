@@ -22,11 +22,16 @@ import {
   RefreshCcw,
   Search,
   Sparkles,
+  Star,
+  Zap,
+  BookOpen,
+  GraduationCap,
+  Target
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// ─── ✨ Province Data Types ──────────────────────────────────────────────
+// ─── ✨ ข้อมูลจังหวัด ──────────────────────────────────────────────
 interface Province {
   id: number;
   name_th: string;
@@ -50,7 +55,7 @@ const POPULAR_TAGS = [
   "ครูปฐมวัย",
 ];
 
-// ✨ Animation Variants
+// ✨ แอนิเมชันพื้นฐาน
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -65,7 +70,30 @@ const staggerContainer = {
   },
 };
 
-// Hero Section พร้อม Search Bar สำหรับ Landing Page
+// ✨ องค์ประกอบตกแต่งแบบล่องลอย (Floating Elements)
+const FloatingIcon = ({ icon: Icon, delay = 0, x = "0%", y = "0%", size = 24, color = "#11b6f5" }: any) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{ 
+      opacity: [0.2, 0.5, 0.2],
+      y: ["-20px", "20px", "-20px"],
+      x: ["-10px", "10px", "-10px"],
+      rotate: [0, 10, -10, 0],
+      scale: 1
+    }}
+    transition={{ 
+      duration: 8 + delay, 
+      repeat: Infinity, 
+      ease: "easeInOut",
+      delay: delay 
+    }}
+    className="absolute pointer-events-none hidden lg:block"
+    style={{ left: x, top: y }}
+  >
+    <Icon size={size} style={{ color }} opacity={0.6} />
+  </motion.div>
+);
+
 export default function HeroSection() {
   const router = useRouter();
   const { mode } = useTheme();
@@ -86,10 +114,8 @@ export default function HeroSection() {
     fetchJobCategories: loadCategories,
   } = useLandingStore();
 
-  // ✨ โหลดข้อมูลจังหวัด + อำเภอ และ หมวดหมู่งาน
   useEffect(() => {
     loadCategories();
-
     const fetchGeoData = async () => {
       setIsLoadingGeo(true);
       try {
@@ -97,14 +123,11 @@ export default function HeroSection() {
           fetch(`${BASE_GEO}/province.json`).then((r) => r.json()),
           fetch(`${BASE_GEO}/district.json`).then((r) => r.json()),
         ]);
-
         const provinces = pRes as Province[];
         const districts = dRes as District[];
-
-        // แปลงเป็น format ของ Cascader
         const options = provinces.map((p) => ({
           label: p.name_th,
-          value: p.name_th, // เก็บเป็นชื่อไทยเพื่อความง่ายในการค้นหา
+          value: p.name_th,
           children: districts
             .filter((d) => d.province_id === p.id)
             .map((d) => ({
@@ -112,7 +135,6 @@ export default function HeroSection() {
               value: d.name_th,
             })),
         }));
-
         setGeoOptions(options);
       } catch (err) {
         console.error("❌ fetchGeoData:", err);
@@ -120,11 +142,9 @@ export default function HeroSection() {
         setIsLoadingGeo(false);
       }
     };
-
     fetchGeoData();
   }, [loadCategories]);
 
-  // นำทางไปยังหน้า Job พร้อม Query String
   const handleSearch = () => {
     router.push(`/pages/job?${buildQueryString()}`);
   };
@@ -133,10 +153,21 @@ export default function HeroSection() {
     <section
       className={cn(
         "relative min-h-screen flex flex-col justify-center items-center pt-32 pb-20 px-4 md:px-8 text-center overflow-hidden transition-all duration-700",
-        isDark ? "bg-[#0a0f1e]" : "bg-[#f8fbff]",
+        isDark ? "bg-[#020617]" : "bg-[#f8fbff]",
       )}
     >
-      {/* ── Background Patterns — Enhanced ── */}
+      {/* ── ✨ องค์ประกอบล่องลอยแบบ Minimal ── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <FloatingIcon icon={Sparkles} x="10%" y="20%" size={32} delay={0} />
+        <FloatingIcon icon={BookOpen} x="85%" y="15%" size={28} delay={2} color="#0d8fd4" />
+        <FloatingIcon icon={GraduationCap} x="15%" y="70%" size={40} delay={4} color="#5dd5fb" />
+        <FloatingIcon icon={Star} x="80%" y="75%" size={24} delay={1} />
+        <FloatingIcon icon={Zap} x="50%" y="10%" size={20} delay={3} color="#11b6f5" />
+        <FloatingIcon icon={Briefcase} x="5%" y="45%" size={26} delay={5} />
+        <FloatingIcon icon={Target} x="92%" y="40%" size={30} delay={2.5} color="#0d8fd4" />
+      </div>
+
+      {/* ── พื้นหลังตกแต่ง ── */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
         style={{
@@ -145,16 +176,7 @@ export default function HeroSection() {
         }}
       />
 
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: isDark
-            ? "radial-gradient(circle at center, transparent 0%, #0a0f1e 90%)"
-            : "radial-gradient(circle at center, transparent 0%, #f8fbff 90%)",
-        }}
-      />
-
-      {/* ── Ambient Glows — Refined Sizes ── */}
+      {/* ── แสงฟุ้งแอนิเมชัน ── */}
       <motion.div
         animate={{
           x: [0, 30, 0],
@@ -162,7 +184,7 @@ export default function HeroSection() {
           opacity: [0.15, 0.25, 0.15],
         }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-24 -left-24 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
+        className="absolute -top-24 -left-24 w-125 h-125 rounded-full blur-[120px] pointer-events-none"
         style={{
           background: "radial-gradient(circle, #11b6f5 0%, transparent 70%)",
         }}
@@ -180,7 +202,7 @@ export default function HeroSection() {
           ease: "easeInOut",
           delay: 2,
         }}
-        className="absolute -bottom-48 -right-24 w-[600px] h-[600px] rounded-full blur-[150px] pointer-events-none"
+        className="absolute -bottom-48 -right-24 w-150 h-150 rounded-full blur-[150px] pointer-events-none"
         style={{
           background: isDark
             ? "radial-gradient(circle, #6366f1 0%, transparent 70%)"
@@ -192,20 +214,16 @@ export default function HeroSection() {
         initial="initial"
         animate="animate"
         variants={staggerContainer}
-        className="relative z-10 max-w-[1280px] w-full flex flex-col items-center"
+        className="relative z-10 max-w-7xl w-full flex flex-col items-center"
       >
-        {/* ✨ Badge — Modern Compact Style */}
+        {/* ✨ Badge — แพลตฟอร์มอันดับ 1 */}
         <motion.div variants={fadeInUp} className="mb-6">
           <div
             className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full font-medium text-[13px] tracking-wide shadow-sm backdrop-blur-sm border transition-all"
             style={{
-              backgroundColor: isDark
-                ? "rgba(17,182,245,0.1)"
-                : "rgba(17,182,245,0.08)",
-              borderColor: isDark
-                ? "rgba(17,182,245,0.2)"
-                : "rgba(17,182,245,0.15)",
-              color: token.colorPrimary,
+              backgroundColor: isDark ? "rgba(17,182,245,0.1)" : "rgba(17,182,245,0.08)",
+              borderColor: isDark ? "rgba(17,182,245,0.2)" : "rgba(17,182,245,0.15)",
+              color: "#11b6f5",
             }}
           >
             <Sparkles size={16} className="text-[#11b6f5] animate-pulse" />
@@ -213,64 +231,59 @@ export default function HeroSection() {
           </div>
         </motion.div>
 
-        {/* ✨ Hero Headline — Dynamic Typography */}
+        {/* ✨ Hero Headline */}
         <motion.div variants={fadeInUp} className="max-w-4xl px-4">
           <Title
             level={1}
-            className="text-[clamp(40px,6vw,72px)] font-extrabold mb-6 leading-[1.05] tracking-tight !m-0"
+            className="text-[clamp(40px,6vw,72px)] font-extrabold mb-6 leading-[1.05] tracking-tight m-0!"
             style={{ color: isDark ? "#fff" : "#0f172a" }}
           >
             ยกระดับ{" "}
-            <span className="relative">
-              <span className="relative z-10 bg-gradient-to-r from-[#0d8fd4] via-[#11b6f5] to-[#5dd5fb] bg-clip-text text-transparent italic px-2">
+            <span className="relative inline-block">
+              <span className="relative z-10 bg-linear-to-r from-[#0d8fd4] via-[#11b6f5] to-[#5dd5fb] bg-clip-text text-transparent italic px-2">
                 วิชาชีพครู
               </span>
               <motion.span
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 1, delay: 0.8, ease: "circOut" }}
-                className="absolute bottom-[10%] left-0 w-full h-[30%] bg-[#11b6f5]/15 -skew-x-12 origin-left -z-0"
+                className="absolute bottom-[10%] left-0 w-full h-[30%] bg-[#11b6f5]/15 -skew-x-12 origin-left z-0"
               />
             </span>{" "}
             ให้ไกลกว่าเดิม
           </Title>
         </motion.div>
 
-        {/* ✨ Description — Better Readability */}
+        {/* ✨ Description */}
         <motion.div variants={fadeInUp}>
           <Paragraph
-            className="text-lg md:text-xl max-w-[720px] mx-auto mt-8 mb-12 leading-relaxed font-normal opacity-70"
+            className="text-lg md:text-xl max-w-180 mx-auto mt-8 mb-12 leading-relaxed font-medium opacity-70"
             style={{ color: isDark ? "#cbd5e1" : "#475569" }}
           >
-            ศูนย์รวมโอกาสทางวิชาชีพที่ใหญ่ที่สุด
-            เชื่อมโยงบุคลากรทางการศึกษาคุณภาพ
+            ศูนย์รวมโอกาสทางวิชาชีพที่ใหญ่ที่สุด เชื่อมโยงบุคลากรทางการศึกษาคุณภาพ
             กับโรงเรียนและสถาบันชั้นนำทั่วประเทศ สมัครฟรี เริ่มต้นได้ทันที
           </Paragraph>
         </motion.div>
 
-        {/* ✨ Search Card — Master Layout */}
+        {/* ✨ Search Card — ส่วนค้นหาหลัก */}
         <motion.div
           variants={fadeInUp}
           className={cn(
-            "w-full max-w-[1020px] mx-auto rounded-[32px] p-2 md:p-3 backdrop-blur-2xl transition-all duration-500 border overflow-hidden",
+            "w-full max-w-255 mx-auto rounded-4xl p-2 md:p-3 backdrop-blur-2xl transition-all duration-500 border overflow-hidden",
             isDark
               ? "bg-[#1e293b]/60 border-white/10 shadow-[0_32px_128px_-16px_rgba(0,0,0,0.6)]"
               : "bg-white/70 border-white/80 shadow-[0_32px_128px_-16px_rgba(17,182,245,0.15)]",
           )}
         >
-          {/* Inner Content Area */}
           <div className="p-6 md:p-8">
             <Row gutter={[20, 20]} align="bottom">
-              {/* 🔍 Keyword Search */}
               <Col xs={24} lg={10}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
-                    ตำแหน่งงานหรือสถาบัน
+                  <span className="text-[11px] font-bold uppercase tracking-widest opacity-60 px-1 dark:text-blue-300 text-blue-600">
+                    ตำแหน่งงานหรือสถานศึกษา
                   </span>
                   <Input
-                    prefix={
-                      <Search size={18} className="text-[#11b6f5] mr-1" />
-                    }
+                    prefix={<Search size={18} className="text-[#11b6f5] mr-1" />}
                     placeholder="ครูคณิตศาสตร์, โรงเรียนนานาชาติ..."
                     value={searchParams.keyword}
                     onChange={(e) => setSearchParam("keyword", e.target.value)}
@@ -281,10 +294,9 @@ export default function HeroSection() {
                 </div>
               </Col>
 
-              {/* 🏫 Categories */}
               <Col xs={24} sm={12} lg={7}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
+                  <span className="text-[11px] font-bold uppercase tracking-widest opacity-60 px-1 dark:text-blue-300 text-blue-600">
                     วิชาเอก / สายงาน
                   </span>
                   <Cascader
@@ -294,26 +306,21 @@ export default function HeroSection() {
                     maxTagCount={1}
                     showSearch
                     value={searchParams.category}
-                    onChange={(value) =>
-                      setSearchParam("category", value as string[][])
-                    }
+                    onChange={(value) => setSearchParam("category", value as string[][])}
                     placeholder="เลือกสายงานที่สนใจ"
                     style={{ width: "100%" }}
-                    className="h-14 custom-cascader !border-gray-300 dark:!border-gray-600 rounded-2xl"
+                    className="h-14 custom-cascader border-gray-300! dark:border-gray-600! rounded-2xl"
                     popupClassName="min-w-[280px]"
                     size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}
-                    suffixIcon={
-                      <Briefcase size={18} className="text-[#11b6f5]" />
-                    }
+                    suffixIcon={<Briefcase size={18} className="text-[#11b6f5]" />}
                   />
                 </div>
               </Col>
 
-              {/* 📍 Location — ✨ New Province/District Cascader */}
               <Col xs={24} sm={12} lg={7}>
                 <div className="flex flex-col gap-2.5 items-start">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-60 px-1 dark:text-blue-300 text-blue-600">
+                  <span className="text-[11px] font-bold uppercase tracking-widest opacity-60 px-1 dark:text-blue-300 text-blue-600">
                     พื้นที่ปฏิบัติงาน
                   </span>
                   <Cascader
@@ -322,13 +329,11 @@ export default function HeroSection() {
                     showSearch
                     placeholder="เลือกจังหวัด / เขต"
                     style={{ width: "100%" }}
-                    className="h-14 custom-cascader !border-gray-300 dark:!border-gray-600 rounded-2xl"
+                    className="h-14 custom-cascader border-gray-300! dark:border-gray-600! rounded-2xl"
                     popupClassName="min-w-[200px]"
                     size="large"
                     value={searchParams.location as string[] | undefined}
-                    onChange={(value) =>
-                      setSearchParam("location", value as string[])
-                    }
+                    onChange={(value) => setSearchParam("location", value as string[])}
                     expandTrigger="hover"
                     suffixIcon={<MapPin size={18} className="text-[#11b6f5]" />}
                   />
@@ -349,12 +354,10 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="รูปแบบการจ้างงาน"
-                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
+                        className="w-full h-12 rounded-xl"
                         allowClear
                         value={searchParams.employmentType}
-                        onChange={(value) =>
-                          setSearchParam("employmentType", value)
-                        }
+                        onChange={(value) => setSearchParam("employmentType", value)}
                       >
                         <Option value="fulltime">Full-time</Option>
                         <Option value="parttime">Part-time</Option>
@@ -364,7 +367,7 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ใบประกอบวิชาชีพ"
-                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
+                        className="w-full h-12 rounded-xl"
                         allowClear
                         value={searchParams.license}
                         onChange={(value) => setSearchParam("license", value)}
@@ -377,12 +380,10 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ช่วงเงินเดือน"
-                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
+                        className="w-full h-12 rounded-xl"
                         allowClear
                         value={searchParams.salaryRange}
-                        onChange={(value) =>
-                          setSearchParam("salaryRange", value)
-                        }
+                        onChange={(value) => setSearchParam("salaryRange", value)}
                       >
                         <Option value="0-15000">ต่ำกว่า 15,000</Option>
                         <Option value="15000-25000">15,000 – 25,000</Option>
@@ -393,7 +394,7 @@ export default function HeroSection() {
                     <Col xs={24} sm={12} md={6}>
                       <Select
                         placeholder="ประกาศเมื่อ"
-                        className="w-full h-12 rounded-xl !border-gray-300 dark:!border-gray-600"
+                        className="w-full h-12 rounded-xl"
                         allowClear
                         value={searchParams.postedAt}
                         onChange={(value) => setSearchParam("postedAt", value)}
@@ -409,7 +410,6 @@ export default function HeroSection() {
               )}
             </AnimatePresence>
 
-            {/* Action Bar — Centered & Balanced */}
             <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-2">
                 <Button
@@ -417,41 +417,29 @@ export default function HeroSection() {
                   onClick={() => setShowAdvanced((v) => !v)}
                   className={cn(
                     "h-11 rounded-xl font-bold transition-all px-5 flex items-center gap-2 border border-transparent",
-                    showAdvanced
-                      ? "text-[#11b6f5] bg-[#11b6f5]/10 border-[#11b6f5]/20"
-                      : "text-gray-500 hover:text-[#11b6f5] hover:bg-gray-50 dark:hover:bg-white/5",
+                    showAdvanced ? "text-[#11b6f5] bg-[#11b6f5]/10 border-[#11b6f5]/20" : "text-gray-500 hover:text-[#11b6f5]"
                   )}
                 >
-                  <ChevronDown
-                    size={18}
-                    className={cn(
-                      "transition-transform duration-500",
-                      showAdvanced && "rotate-180",
-                    )}
-                  />
-                  <span>
-                    {showAdvanced ? "ซ่อนตัวกรอง" : "การค้นหาขั้นสูง"}
-                  </span>
+                  <ChevronDown size={18} className={cn("transition-transform duration-500", showAdvanced && "rotate-180")} />
+                  <span>{showAdvanced ? "ซ่อนตัวกรอง" : "การค้นหาขั้นสูง"}</span>
                 </Button>
-
                 {showAdvanced && (
                   <Button
                     type="text"
                     icon={<RefreshCcw size={16} />}
-                    className="h-11 rounded-xl text-red-500/80 hover:text-red-500 hover:bg-red-50 flex items-center gap-2"
+                    className="h-11 rounded-xl text-red-500 hover:bg-red-50 flex items-center gap-2"
                     onClick={resetSearchParams}
                   >
                     <span>รีเซ็ต</span>
                   </Button>
                 )}
               </div>
-
               <Button
                 type="primary"
                 size="large"
                 icon={<Search size={22} />}
                 onClick={handleSearch}
-                className="h-14 w-full md:w-[320px] rounded-2xl font-bold text-lg shadow-[0_20px_40px_-12px_rgba(17,182,245,0.4)] hover:shadow-[0_24px_48px_-12px_rgba(17,182,245,0.5)] active:scale-[0.98] transition-all bg-gradient-to-r from-[#0d8fd4] to-[#11b6f5] border-none flex items-center justify-center gap-3"
+                className="h-14 w-full md:w-[320px] rounded-2xl font-bold text-lg shadow-[0_20px_40px_-12px_rgba(17,182,245,0.4)] hover:shadow-[0_24px_48px_-12px_rgba(17,182,245,0.5)] active:scale-[0.98] transition-all bg-linear-to-r from-[#0d8fd4] to-[#11b6f5] border-none flex items-center justify-center gap-3"
               >
                 ค้นหาตำแหน่งงาน
               </Button>
@@ -459,14 +447,9 @@ export default function HeroSection() {
           </div>
         </motion.div>
 
-        {/* ✨ Footer Tags — Minimalist Style */}
-        <motion.div
-          variants={fadeInUp}
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 opacity-70"
-        >
-          <span className="text-[13px] font-medium tracking-wide">
-            ตำแหน่งงานยอดนิยม:
-          </span>
+        {/* ✨ Footer Tags */}
+        <motion.div variants={fadeInUp} className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 opacity-70">
+          <span className="text-[13px] font-medium tracking-wide">ตำแหน่งงานยอดนิยม:</span>
           <div className="flex flex-wrap justify-center gap-2.5">
             {POPULAR_TAGS.map((tag) => (
               <motion.button
@@ -475,9 +458,7 @@ export default function HeroSection() {
                 whileTap={{ scale: 0.95 }}
                 className={cn(
                   "px-3.5 py-1.5 rounded-lg text-[13px] border transition-all",
-                  isDark
-                    ? "bg-white/5 border-white/10 text-gray-400 hover:border-[#11b6f5]/50 hover:text-[#11b6f5]"
-                    : "bg-white border-gray-200 text-gray-500 hover:border-[#11b6f5] hover:text-[#11b6f5] shadow-sm",
+                  isDark ? "bg-white/5 border-white/10 text-gray-400 hover:text-[#11b6f5]" : "bg-white border-gray-200 text-gray-500 hover:border-[#11b6f5] hover:text-[#11b6f5] shadow-sm"
                 )}
               >
                 {tag}
