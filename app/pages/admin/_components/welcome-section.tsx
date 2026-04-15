@@ -38,7 +38,7 @@ export function WelcomeSection() {
   return (
     <Card
       style={{
-        background: `linear-gradient(135deg, ${token.colorPrimary} 0%, #6366f1 100%)`,
+        background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
         border: "none",
         borderRadius: token.borderRadiusLG,
         overflow: "hidden",

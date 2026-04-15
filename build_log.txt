@@ -1,0 +1,8 @@
+$ next build
+▲ Next.js 16.2.3 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+error: script "build" exited with code 130

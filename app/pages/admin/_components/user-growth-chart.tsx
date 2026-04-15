@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, Flex, Typography, theme } from "antd";
+// ✨ User Growth Chart — Area chart ดึง growthChart จาก live data
+import { Card, Flex, Skeleton, Typography, theme } from "antd";
 import {
   Area,
   AreaChart,
@@ -10,23 +11,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useDashboardStore } from "../_state/dashboard-store";
 
 const { Text } = Typography;
-
-// ข้อมูล mock การเติบโตของ users รายเดือน
-const monthlyGrowthData = [
-  { month: "ต.ค.", users: 0, schools: 0, teachers: 0 },
-  { month: "พ.ย.", users: 0, schools: 0, teachers: 0 },
-  { month: "ธ.ค.", users: 0, schools: 0, teachers: 0 },
-  { month: "ม.ค.", users: 1, schools: 0, teachers: 1 },
-  { month: "ก.พ.", users: 1, schools: 0, teachers: 1 },
-  { month: "มี.ค.", users: 2, schools: 0, teachers: 1 },
-  { month: "เม.ย.", users: 2, schools: 0, teachers: 1 },
-];
 
 // ✨ [User Growth Chart — Area chart แสดงการเติบโตของ users]
 export function UserGrowthChart() {
   const { token } = theme.useToken();
+  const { data, isLoading } = useDashboardStore();
+  const chartData = data?.growthChart ?? [];
 
   return (
     <Card
@@ -35,7 +28,7 @@ export function UserGrowthChart() {
           <Flex vertical gap={2}>
             <Text strong>การเติบโตของผู้ใช้</Text>
             <Text type="secondary" style={{ fontSize: 12, fontWeight: 400 }}>
-              จำนวนผู้ใช้สะสมรายเดือน (ย้อนหลัง 7 เดือน)
+              จำนวนผู้ใช้ใหม่รายเดือน (ย้อนหลัง 6 เดือน)
             </Text>
           </Flex>
         </Flex>
@@ -46,9 +39,12 @@ export function UserGrowthChart() {
         borderRadius: token.borderRadiusLG,
       }}
     >
+      {isLoading ? (
+        <Skeleton.Input active style={{ width: "100%", height: 260 }} />
+      ) : (
       <ResponsiveContainer width="100%" height={260}>
         <AreaChart
-          data={monthlyGrowthData}
+          data={chartData}
           margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
         >
           <defs>
@@ -126,8 +122,9 @@ export function UserGrowthChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      )}
 
-      {/* Legend */}
+      {/* ✨ Legend */}
       <Flex gap={20} justify="center" style={{ marginTop: 8 }}>
         {[
           { color: token.colorPrimary, label: "ผู้ใช้ทั้งหมด" },

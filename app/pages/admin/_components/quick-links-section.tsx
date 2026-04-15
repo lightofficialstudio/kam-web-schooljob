@@ -17,9 +17,9 @@ const links = [
   { icon: <TeamOutlined />, label: "จัดการผู้ใช้", href: "/pages/admin/user-management", colorKey: "colorPrimary" as const },
   { icon: <BookOutlined />, label: "จัดการงาน", href: "/pages/job", colorKey: "colorSuccess" as const },
   { icon: <ApiOutlined />, label: "API Docs", href: "/api/v1/authenticate/docs", colorKey: "colorInfo" as const },
-  { icon: <SettingOutlined />, label: "ตั้งค่าระบบ", href: "#", colorKey: "colorWarning" as const },
-  { icon: <RocketOutlined />, label: "Deploy", href: "#", colorKey: "colorError" as const },
-  { icon: <ThunderboltOutlined />, label: "Diagnostics", href: "#", colorKey: "colorPurple" as const },
+  { icon: <SettingOutlined />, label: "จัดการแพ็กเกจ", href: "/pages/admin/package-management", colorKey: "colorWarning" as const },
+  { icon: <RocketOutlined />, label: "จัดการบล็อก", href: "/pages/admin/blog", colorKey: "colorError" as const },
+  { icon: <ThunderboltOutlined />, label: "จัดการผู้ใช้", href: "/pages/admin/user-management", colorKey: "colorPurple" as const },
 ];
 
 // ✨ [Quick Links Section]

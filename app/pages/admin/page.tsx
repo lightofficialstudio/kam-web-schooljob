@@ -1,27 +1,40 @@
 "use client";
 
+// ✨ Admin Dashboard — Orchestrator ประกอบ Components จัด Layout + ดึง live data เมื่อ mount
 import { Col, Row } from "antd";
-import { ActivityTableSection } from "./_components/activity-table-section";
+import { useEffect } from "react";
+import { PendingActionsCard } from "./_components/pending-actions-card";
 import { QuickLinksSection } from "./_components/quick-links-section";
+import { RecentSignupsCard } from "./_components/recent-signups-card";
 import { RoleDistributionChart } from "./_components/role-distribution-chart";
 import { StatsSection } from "./_components/stats-section";
 import { SystemHealthSection } from "./_components/system-health-section";
 import { SystemInfoSection } from "./_components/system-info-section";
 import { UserGrowthChart } from "./_components/user-growth-chart";
 import { WelcomeSection } from "./_components/welcome-section";
+import { useDashboardStore } from "./_state/dashboard-store";
 
-// ✨ [Orchestrator — ประกอบ Components และจัด Layout เท่านั้น]
 export default function AdminPage() {
+  const { fetchDashboard } = useDashboardStore();
+
+  // ✨ ดึง live data เมื่อเปิดหน้า Dashboard
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
+
   return (
     <Row gutter={[16, 16]}>
+      {/* ✨ Welcome Banner */}
       <Col xs={24}>
         <WelcomeSection />
       </Col>
+
+      {/* ✨ KPI Stats Cards */}
       <Col xs={24}>
         <StatsSection />
       </Col>
 
-      {/* Charts Row */}
+      {/* ✨ Charts Row */}
       <Col xs={24} lg={14}>
         <UserGrowthChart />
       </Col>
@@ -29,7 +42,15 @@ export default function AdminPage() {
         <RoleDistributionChart />
       </Col>
 
-      {/* System Status Row */}
+      {/* ✨ Pending Actions + Recent Signups */}
+      <Col xs={24} lg={10}>
+        <PendingActionsCard />
+      </Col>
+      <Col xs={24} lg={14}>
+        <RecentSignupsCard />
+      </Col>
+
+      {/* ✨ System Status Row */}
       <Col xs={24} lg={12}>
         <SystemHealthSection />
       </Col>
@@ -37,11 +58,8 @@ export default function AdminPage() {
         <SystemInfoSection />
       </Col>
 
-      {/* Activity + Quick Links */}
-      <Col xs={24} lg={16}>
-        <ActivityTableSection />
-      </Col>
-      <Col xs={24} lg={8}>
+      {/* ✨ Quick Links */}
+      <Col xs={24}>
         <QuickLinksSection />
       </Col>
     </Row>
