@@ -20,3 +20,16 @@ export const requestUpdateSchoolPlan = (data: {
   plan: "basic" | "premium" | "enterprise";
   job_quota_max?: number;
 }) => axios.put(`${BASE}/update`, data);
+
+// ✨ ดึงราคา Package ทั้งหมดจาก DB
+export const requestGetPackagePlans = () =>
+  axios.get<{
+    status_code: number;
+    data: { id: string; plan: string; price: number; updatedAt: string }[];
+  }>(`${BASE}/plans`);
+
+// ✨ อัปเดตราคา Package (Admin เท่านั้น)
+export const requestUpdatePackagePrice = (data: {
+  plan: string;
+  price: number;
+}) => axios.patch(`${BASE}/plans`, data);

@@ -2,8 +2,10 @@
 
 import { create } from "zustand";
 import {
+  requestGetPackagePlans,
   requestListSchools,
   requestPackageSummary,
+  requestUpdatePackagePrice,
   requestUpdateSchoolPlan,
 } from "../_api/package-api";
 
@@ -34,6 +36,9 @@ export interface PackageSummary {
   total: number;
 }
 
+// ✨ ราคา Package ที่อ่านจาก DB — keyed by plan name
+export type PackagePrices = Record<string, number>;
+
 interface PackageStore {
   schools: SchoolPackageItem[];
   total: number;
@@ -43,12 +48,21 @@ interface PackageStore {
   filterPlan: "basic" | "premium" | "enterprise" | "all";
   filterKeyword: string;
   page: number;
+  // ราคา Package จาก DB
+  packagePrices: PackagePrices;
+  isUpdatingPrice: boolean;
   setFilterPlan: (p: "basic" | "premium" | "enterprise" | "all") => void;
   setFilterKeyword: (k: string) => void;
   setPage: (p: number) => void;
   fetchSummary: () => Promise<void>;
   fetchSchools: () => Promise<void>;
-  updatePlan: (schoolId: string, plan: "basic" | "premium" | "enterprise", jobQuotaMax?: number) => Promise<void>;
+  updatePlan: (
+    schoolId: string,
+    plan: "basic" | "premium" | "enterprise",
+    jobQuotaMax?: number,
+  ) => Promise<void>;
+  fetchPackagePrices: () => Promise<void>;
+  updatePackagePrice: (plan: string, price: number) => Promise<void>;
 }
 
 export const usePackageStore = create<PackageStore>((set, get) => ({
@@ -60,6 +74,8 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
   filterPlan: "all",
   filterKeyword: "",
   page: 1,
+  packagePrices: {},
+  isUpdatingPrice: false,
 
   setFilterPlan: (p) => set({ filterPlan: p, page: 1 }),
   setFilterKeyword: (k) => set({ filterKeyword: k, page: 1 }),
@@ -70,7 +86,9 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
     try {
       const res = await requestPackageSummary();
       if (res.data.status_code === 200) set({ summary: res.data.data });
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   },
 
   // ✨ ดึงรายการโรงเรียนตาม filter
@@ -96,12 +114,20 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
   updatePlan: async (schoolId, plan, jobQuotaMax) => {
     set({ isUpdating: schoolId });
     try {
-      await requestUpdateSchoolPlan({ school_profile_id: schoolId, plan, job_quota_max: jobQuotaMax });
+      await requestUpdateSchoolPlan({
+        school_profile_id: schoolId,
+        plan,
+        job_quota_max: jobQuotaMax,
+      });
       // ✨ อัปเดต local state ทันที ไม่ต้อง refetch ทั้งหมด
       set((s) => ({
         schools: s.schools.map((sc) =>
           sc.id === schoolId
-            ? { ...sc, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax }
+            ? {
+                ...sc,
+                accountPlan: plan,
+                jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax,
+              }
             : sc,
         ),
       }));
@@ -109,6 +135,31 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
       await get().fetchSummary();
     } finally {
       set({ isUpdating: null });
+    }
+  },
+
+  // ✨ ดึงราคา Package จาก DB
+  fetchPackagePrices: async () => {
+    try {
+      const res = await requestGetPackagePlans();
+      if (res.data.status_code === 200) {
+        const prices: PackagePrices = {};
+        for (const p of res.data.data) prices[p.plan] = p.price;
+        set({ packagePrices: prices });
+      }
+    } catch {
+      /* silent */
+    }
+  },
+
+  // ✨ อัปเดตราคา Package แล้ว sync local state ทันที
+  updatePackagePrice: async (plan, price) => {
+    set({ isUpdatingPrice: true });
+    try {
+      await requestUpdatePackagePrice({ plan, price });
+      set((s) => ({ packagePrices: { ...s.packagePrices, [plan]: price } }));
+    } finally {
+      set({ isUpdatingPrice: false });
     }
   },
 }));

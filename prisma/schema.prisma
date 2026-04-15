@@ -617,3 +617,13 @@ model ConfigOption {
   @@index([group, isActive], name: "idx_config_options_group_active")
   @@map("config_options")
 }
+
+// ── ตารางเก็บราคา Package แต่ละ Plan — Admin แก้ไขได้ผ่าน Dashboard ──
+model PackagePlan {
+  id        String   @id @default(uuid())
+  plan      String   @unique // "basic" | "premium" | "enterprise"
+  price     Int      @default(0) // ราคา บาท/เดือน
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("package_plans")
+}

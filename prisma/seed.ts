@@ -953,6 +953,19 @@ async function main() {
   console.log(
     `✅ Created ConfigOptions: job_category — ${jobCategoryParents.length} parents, ${totalChildren} children`,
   );
+
+  // ─── 11. PackagePlan — ราคาตั้งต้น (Admin แก้ไขได้ผ่าน Dashboard) ───
+  await prisma.packagePlan.deleteMany();
+  await prisma.packagePlan.createMany({
+    data: [
+      { plan: "basic", price: 0 },
+      { plan: "premium", price: 1990 },
+      { plan: "enterprise", price: 4990 },
+    ],
+  });
+  console.log(
+    "✅ Created PackagePlans: basic(0), premium(1990), enterprise(4990)",
+  );
   console.log("🎉 Seed completed successfully!");
 }
 
