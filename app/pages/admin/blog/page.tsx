@@ -31,6 +31,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BlogAnalyticsSection } from "./_components/blog-analytics-section";
 import { BlogEditorDrawer } from "./_components/blog-editor-drawer";
 import { BlogKanban } from "./_components/blog-kanban";
 import { BlogStatsBar } from "./_components/blog-stats-bar";
@@ -163,7 +164,7 @@ export default function AdminBlogPage() {
     filterStatus, filterKeyword, filterCategory,
     viewMode,
     setFilterStatus, setFilterKeyword, setFilterCategory, setViewMode,
-    openCreate, fetchBlogs,
+    openCreate, fetchBlogs, fetchStatsOverview,
   } = useAdminBlogStore();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -178,10 +179,11 @@ export default function AdminBlogPage() {
     if (user.role !== "ADMIN") router.replace("/");
   }, [isMounted, isAuthenticated, user?.role]);
 
-  // ✨ โหลดบทความ
+  // ✨ โหลดบทความ + สถิติ
   useEffect(() => {
     if (!isMounted || user?.role !== "ADMIN") return;
     fetchBlogs();
+    fetchStatsOverview();
   }, [isMounted, filterStatus, filterKeyword, filterCategory]);
 
   // ✨ debounce search
@@ -277,6 +279,11 @@ export default function AdminBlogPage() {
         {/* ─── Stats Bar ─── */}
         <div style={{ marginBottom: 20 }}>
           <BlogStatsBar />
+        </div>
+
+        {/* ─── Analytics Section ─── */}
+        <div style={{ marginBottom: 20 }}>
+          <BlogAnalyticsSection />
         </div>
 
         {/* ─── Filter + View Controls ─── */}

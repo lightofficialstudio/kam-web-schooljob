@@ -112,6 +112,7 @@ model Profile {
   blogs                Blog[]
   notifications        Notification[]
   jobViews             JobView[]      @relation("JobViewViewer")
+  blogViews            BlogView[]     @relation("BlogViewViewer")
   profileViewsReceived ProfileView[]  @relation("ProfileViewTarget")
   profileViewsGiven    ProfileView[]  @relation("ProfileViewViewer")
 
@@ -437,11 +438,32 @@ model Blog {
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
-  author Profile? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  author    Profile?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  blogViews BlogView[]
 
   @@index([status], name: "idx_blogs_status")
   @@index([slug], name: "idx_blogs_slug")
   @@map("blogs")
+}
+
+// 3.18b blog_views — ติดตามการเข้าชมบทความ
+model BlogView {
+  id         String    @id @default(uuid())
+  blogId     String    @map("blog_id")
+  viewerId   String?   @map("viewer_id") // NULL = anonymous
+  viewerRole UserRole? @map("viewer_role") // snapshot role ณ เวลาที่ดู
+  viewedAt   DateTime  @default(now()) @map("viewed_at")
+  sessionId  String?   @map("session_id") // browser session (dedup anonymous)
+  referrer   String?   // หน้าที่มาจาก (เช่น /pages/blog, google)
+  country    String?   // ประเทศ (optional, จาก header)
+
+  blog   Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  viewer Profile? @relation("BlogViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
+
+  @@index([blogId], name: "idx_blog_views_blog_id")
+  @@index([viewerId], name: "idx_blog_views_viewer_id")
+  @@index([viewedAt], name: "idx_blog_views_viewed_at")
+  @@map("blog_views")
 }
 
 // 3.19 notifications — การแจ้งเตือน

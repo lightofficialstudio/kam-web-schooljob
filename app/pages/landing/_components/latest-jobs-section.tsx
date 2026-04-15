@@ -1,13 +1,8 @@
 "use client";
 
 import { useTheme } from "@/app/contexts/theme-context";
+import { ArrowRightOutlined, CalendarOutlined } from "@ant-design/icons";
 import {
-  ArrowRightOutlined,
-  CalendarOutlined,
-  ThunderboltFilled,
-} from "@ant-design/icons";
-import {
-  theme as antTheme,
   Avatar,
   Badge,
   Button,
@@ -16,8 +11,14 @@ import {
   Skeleton,
   Tag,
 } from "antd";
-import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Briefcase, ChevronRight, MapPin, Wallet, Sparkles } from "lucide-react";
+import { AnimatePresence, motion, Variants } from "framer-motion";
+import {
+  Briefcase,
+  ChevronRight,
+  MapPin,
+  Sparkles,
+  Wallet,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchLatestJobs } from "../_api/landing-api";
@@ -88,34 +89,84 @@ export default function LatestJobsSection() {
   };
 
   // ✨ โทนสีตามธีม
-  const sectionBgClass = isDark 
-    ? "bg-[#020617]" 
+  const sectionBgClass = isDark
+    ? "bg-[#020617]"
     : "bg-linear-to-b from-slate-50 to-white";
-  
-  const gridPatternClass = isDark 
-    ? "bg-[radial-gradient(#1e293b_1px,transparent_1px)]" 
+
+  const gridPatternClass = isDark
+    ? "bg-[radial-gradient(#1e293b_1px,transparent_1px)]"
     : "bg-[radial-gradient(#cbd5e1_1px,transparent_1px)]";
 
   const titleColorClass = isDark ? "text-white" : "text-slate-900";
   const descColorClass = isDark ? "text-slate-400" : "text-slate-600";
   const cardBorderClass = isDark ? "border-slate-800/60" : "border-slate-200";
 
+  // ✨ องค์ประกอบตกแต่งแบบล่องลอย (Minimal Floating)
+  const FloatingParticle = ({
+    size = 4,
+    delay = 0,
+    x = "0%",
+    y = "0%",
+    color = "#3b82f6",
+  }: any) => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{
+        opacity: [0.1, 0.3, 0.1],
+        y: ["-40px", "40px", "-40px"],
+        x: ["-20px", "20px", "-20px"],
+        scale: [1, 1.2, 1],
+      }}
+      transition={{
+        duration: 10 + delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: delay,
+      }}
+      className="absolute pointer-events-none hidden lg:block rounded-full blur-[2px]"
+      style={{
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        backgroundColor: color,
+      }}
+    />
+  );
+
   return (
-    <section className={"relative py-32 overflow-hidden transition-colors duration-700 " + sectionBgClass}>
+    <section
+      className={
+        "relative py-32 overflow-hidden transition-colors duration-700 " +
+        sectionBgClass
+      }
+    >
       {/* ✨ องค์ประกอบตกแต่งพื้นหลัง */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className={"absolute inset-0 opacity-[0.2] dark:opacity-[0.15] bg-size-[32px_32px] mask-[radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)] " + gridPatternClass} />
-        
+        <div
+          className={
+            "absolute inset-0 opacity-[0.2] dark:opacity-[0.15] bg-size-[32px_32px] mask-[radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)] " +
+            gridPatternClass
+          }
+        />
+
+        {/* Floating Particles */}
+        <FloatingParticle size={6} x="5%" y="15%" delay={0} color="#3b82f6" />
+        <FloatingParticle size={8} x="85%" y="10%" delay={2} color="#6366f1" />
+        <FloatingParticle size={12} x="15%" y="75%" delay={4} color="#0ea5e9" />
+        <FloatingParticle size={5} x="90%" y="80%" delay={1} color="#3b82f6" />
+        <FloatingParticle size={4} x="50%" y="5%" delay={3} color="#818cf8" />
+
         {/* แสงสว่างแอนิเมชัน */}
-        <motion.div 
+        <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 -left-24 w-lg h-128 bg-blue-600/20 rounded-full blur-[120px]" 
+          className="absolute -top-24 -left-24 w-lg h-128 bg-blue-600/20 rounded-full blur-[120px]"
         />
-        <motion.div 
+        <motion.div
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.05, 0.1, 0.05] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/2 -right-24 w-md h-112 bg-indigo-600/15 rounded-full blur-[100px]" 
+          className="absolute top-1/2 -right-24 w-md h-112 bg-indigo-600/15 rounded-full blur-[100px]"
         />
       </div>
 
@@ -134,22 +185,37 @@ export default function LatestJobsSection() {
                 โอกาสทางการศึกษาล่าสุด
               </span>
             </div>
-            
+
             <div className="space-y-2">
-              <h2 className={"text-4xl md:text-6xl font-black tracking-tight leading-[1.1] transition-colors " + titleColorClass}>
-                ค้นหางาน <span className="relative">
-                  <span className="relative z-10 bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">ที่ใช่</span>
-                  <motion.span 
+              <h2
+                className={
+                  "text-4xl md:text-6xl font-black tracking-tight leading-[1.1] transition-colors " +
+                  titleColorClass
+                }
+              >
+                ค้นหางาน{" "}
+                <span className="relative">
+                  <span className="relative z-10 bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+                    ที่ใช่
+                  </span>
+                  <motion.span
                     initial={{ width: 0 }}
                     whileInView={{ width: "100%" }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.5, duration: 0.8 }}
                     className="absolute bottom-2 left-0 h-3 bg-blue-500/10 z-0 rounded-full"
                   />
-                </span> สำหรับคุณ
+                </span>{" "}
+                สำหรับคุณ
               </h2>
-              <p className={"text-lg md:text-xl max-w-2xl font-medium leading-relaxed transition-colors " + descColorClass}>
-                เชื่อมต่อโรงเรียนชั้นนำกับบุคลากรคุณภาพ พร้อมสวัสดิการและสภาพแวดล้อมที่ส่งเสริมการเติบโต
+              <p
+                className={
+                  "text-lg md:text-xl max-w-2xl font-medium leading-relaxed transition-colors " +
+                  descColorClass
+                }
+              >
+                เชื่อมต่อโรงเรียนชั้นนำกับบุคลากรคุณภาพ
+                พร้อมสวัสดิการและสภาพแวดล้อมที่ส่งเสริมการเติบโต
               </p>
             </div>
           </motion.div>
@@ -166,7 +232,7 @@ export default function LatestJobsSection() {
                 size="large"
                 className="group h-14! px-10! rounded-2xl! bg-slate-900! dark:bg-white! text-white! dark:text-slate-900! border-none! hover:scale-105! active:scale-95! shadow-xl transition-all duration-300 flex items-center gap-3 font-bold"
               >
-                ดูประกาศงานทั้งหมด 
+                ดูประกาศงานทั้งหมด
                 <ArrowRightOutlined className="transition-transform group-hover:translate-x-1.5" />
               </Button>
             </Link>
@@ -185,7 +251,7 @@ export default function LatestJobsSection() {
         >
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <motion.div 
+              <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -193,11 +259,24 @@ export default function LatestJobsSection() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
               >
                 {[...Array(8)].map((_, i) => (
-                  <Card key={i} className={"backdrop-blur-sm " + cardBorderClass}>
+                  <Card
+                    key={i}
+                    className={"backdrop-blur-sm " + cardBorderClass}
+                  >
                     <div className="flex flex-col gap-6">
                       <div className="flex justify-between items-center">
-                        <Skeleton.Avatar active shape="square" size={64} className="rounded-2xl!" />
-                        <Skeleton.Button active shape="round" size="small" className="w-16" />
+                        <Skeleton.Avatar
+                          active
+                          shape="square"
+                          size={64}
+                          className="rounded-2xl!"
+                        />
+                        <Skeleton.Button
+                          active
+                          shape="round"
+                          size="small"
+                          className="w-16"
+                        />
                       </div>
                       <Skeleton active paragraph={{ rows: 3 }} />
                     </div>
@@ -214,20 +293,32 @@ export default function LatestJobsSection() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
               >
                 {jobs.map((job) => (
-                  <motion.div 
-                    key={job.id} 
-                    variants={itemVariants} 
+                  <motion.div
+                    key={job.id}
+                    variants={itemVariants}
                     whileHover={{ y: -12 }}
                     className="group"
                   >
                     <Link href={"/pages/job?job_id=" + job.id}>
                       <Card
                         hoverable
-                        className={"h-full relative overflow-hidden transition-all duration-500 border backdrop-blur-md " + cardBorderClass + " group-hover:border-blue-500/30 group-hover:shadow-[0_32px_64px_-16px_rgba(30,58,138,0.12)] " + (isDark ? "dark:group-hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)]" : "")}
+                        className={
+                          "h-full relative overflow-hidden transition-all duration-500 border backdrop-blur-md " +
+                          cardBorderClass +
+                          " group-hover:border-blue-500/30 group-hover:shadow-[0_32px_64px_-16px_rgba(30,58,138,0.12)] " +
+                          (isDark
+                            ? "dark:group-hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.5)]"
+                            : "group-hover:shadow-[0_48px_80px_-20px_rgba(59,130,246,0.15)]")
+                        }
                         styles={{ body: { padding: 0 } }}
                       >
+                        {/* Smooth Gradient Shine Effect */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                          <div className="absolute inset-0 bg-linear-to-tr from-blue-500/5 via-indigo-500/5 to-transparent blur-3xl animate-pulse" />
+                        </div>
+
                         <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-blue-500/10 to-transparent rounded-full -mr-20 -mt-20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                        
+
                         <div className="p-8 relative z-10 flex flex-col h-full">
                           <div className="flex justify-between items-start mb-8">
                             <div className="relative">
@@ -239,12 +330,14 @@ export default function LatestJobsSection() {
                                 className="relative ring-1 ring-slate-200 dark:ring-slate-700 rounded-[20px] bg-slate-50 dark:bg-slate-800 text-blue-500 transition-transform duration-500 group-hover:scale-105"
                               />
                             </div>
-                            
+
                             {job.isNew && (
                               <Badge
                                 count="ใหม่"
                                 style={{
-                                  backgroundColor: isDark ? "#3b82f6" : "#2563eb",
+                                  backgroundColor: isDark
+                                    ? "#3b82f6"
+                                    : "#2563eb",
                                   borderRadius: "10px",
                                   fontWeight: "800",
                                   padding: "0 10px",
@@ -253,7 +346,8 @@ export default function LatestJobsSection() {
                                   letterSpacing: "0.05em",
                                   lineHeight: "22px",
                                   border: "none",
-                                  boxShadow: "0 8px 16px -4px rgba(37, 99, 235, 0.4)",
+                                  boxShadow:
+                                    "0 8px 16px -4px rgba(37, 99, 235, 0.4)",
                                 }}
                               />
                             )}
@@ -261,10 +355,20 @@ export default function LatestJobsSection() {
 
                           <div className="grow space-y-4">
                             <div className="space-y-2">
-                              <h3 className={"text-xl font-bold leading-tight transition-colors line-clamp-2 min-h-14 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 " + titleColorClass}>
+                              <h3
+                                className={
+                                  "text-xl font-bold leading-tight transition-colors line-clamp-2 min-h-14 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 " +
+                                  titleColorClass
+                                }
+                              >
                                 {job.title}
                               </h3>
-                              <p className={"text-sm font-semibold line-clamp-1 flex items-center gap-2 transition-colors " + descColorClass}>
+                              <p
+                                className={
+                                  "text-sm font-semibold line-clamp-1 flex items-center gap-2 transition-colors " +
+                                  descColorClass
+                                }
+                              >
                                 <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                                 {job.school}
                               </p>
@@ -282,30 +386,53 @@ export default function LatestJobsSection() {
                             </div>
                           </div>
 
-                          <div className={"mt-8 pt-8 border-t flex flex-col gap-5 " + (isDark ? "border-slate-800/60" : "border-slate-100")}>
+                          <div
+                            className={
+                              "mt-8 pt-8 border-t flex flex-col gap-5 " +
+                              (isDark
+                                ? "border-slate-800/60"
+                                : "border-slate-100")
+                            }
+                          >
                             <div className="grid grid-cols-2 gap-4">
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">ที่อยู่</span>
-                                <div className={"flex items-center gap-1.5 font-bold text-xs transition-colors " + (isDark ? "text-slate-300" : "text-slate-700")}>
+                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+                                  ที่อยู่
+                                </span>
+                                <div
+                                  className={
+                                    "flex items-center gap-1.5 font-bold text-xs transition-colors " +
+                                    (isDark
+                                      ? "text-slate-300"
+                                      : "text-slate-700")
+                                  }
+                                >
                                   <MapPin size={14} className="text-blue-500" />
-                                  <span className="truncate">{job.location}</span>
+                                  <span className="truncate">
+                                    {job.location}
+                                  </span>
                                 </div>
                               </div>
                               <div className="flex flex-col gap-1">
-                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">เงินเดือน</span>
+                                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+                                  เงินเดือน
+                                </span>
                                 <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">
                                   <Wallet size={14} />
                                   {job.salary}
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold group-hover:text-slate-500 transition-colors">
                                 <CalendarOutlined className="text-blue-500/70" />
                                 {formatRelativeDate(job.postedAt)}
                               </div>
-                              <motion.div whileHover={{ x: 4 }} className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                              <motion.div
+                                whileHover={{ x: 4 }}
+                                className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold text-xs"
+                              >
                                 รายละเอียด <ChevronRight size={16} />
                               </motion.div>
                             </div>
@@ -327,8 +454,19 @@ export default function LatestJobsSection() {
           transition={{ delay: 0.8 }}
           className="mt-20 text-center"
         >
-          <p className={"text-sm font-medium transition-colors " + descColorClass}>
-            มีงานใหม่เพิ่มเข้ามาทุกวัน — <Link href="/pages/signup" className="text-blue-500 hover:underline font-bold">สมัครสมาชิก</Link> เพื่อรับการแจ้งเตือนงานที่ตรงใจคุณ
+          <p
+            className={
+              "text-sm font-medium transition-colors " + descColorClass
+            }
+          >
+            มีงานใหม่เพิ่มเข้ามาทุกวัน —{" "}
+            <Link
+              href="/pages/signup"
+              className="text-blue-500 hover:underline font-bold"
+            >
+              สมัครสมาชิก
+            </Link>{" "}
+            เพื่อรับการแจ้งเตือนงานที่ตรงใจคุณ
           </p>
         </motion.div>
       </div>

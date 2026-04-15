@@ -3,11 +3,13 @@
 import { create } from "zustand";
 import {
   AiAction,
+  BlogStatsOverview,
   requestAdminCreateBlog,
   requestAdminDeleteBlog,
   requestAdminListBlogs,
   requestAdminUpdateBlog,
   requestAiBlogAssist,
+  requestBlogStatsOverview,
 } from "../_api/blog-api";
 
 export interface AdminBlogItem {
@@ -52,6 +54,9 @@ interface BlogStore {
   // ✨ AI state
   isAiLoading: boolean;
   aiSeoScore: SeoScore | null;
+  // ✨ analytics state
+  statsOverview: BlogStatsOverview | null;
+  isStatsLoading: boolean;
   // ✨ actions
   setFilterStatus: (s: "DRAFT" | "PUBLISHED" | "all") => void;
   setFilterKeyword: (k: string) => void;
@@ -75,6 +80,8 @@ interface BlogStore {
   }) => Promise<void>;
   deleteBlog: (id: string) => Promise<void>;
   quickPublish: (id: string, currentStatus: "DRAFT" | "PUBLISHED") => Promise<void>;
+  // ✨ analytics actions
+  fetchStatsOverview: () => Promise<void>;
   // ✨ AI actions
   aiAssist: (payload: {
     action: AiAction;
@@ -100,6 +107,8 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   isDrawerOpen: false,
   isAiLoading: false,
   aiSeoScore: null,
+  statsOverview: null,
+  isStatsLoading: false,
 
   setFilterStatus: (s) => set({ filterStatus: s, page: 1 }),
   setFilterKeyword: (k) => set({ filterKeyword: k, page: 1 }),
@@ -164,6 +173,19 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
           : b,
       ),
     }));
+  },
+
+  // ✨ ดึง analytics overview
+  fetchStatsOverview: async () => {
+    set({ isStatsLoading: true });
+    try {
+      const res = await requestBlogStatsOverview();
+      if (res.data.status_code === 200) {
+        set({ statsOverview: res.data.data });
+      }
+    } finally {
+      set({ isStatsLoading: false });
+    }
   },
 
   // ✨ เรียก AI Blog Assistant

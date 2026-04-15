@@ -1,107 +1,131 @@
 "use client";
 
-import {
-  BankOutlined,
-  BookOutlined,
-  SearchOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { Card, Col, Flex, Space, Typography } from "antd";
+// ✨ Branding Panel — ฝั่งซ้าย Minimal + Animated dots
+import { Col, Flex, Typography } from "antd";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const PERSONAS = [
-  {
-    icon: <UserOutlined style={{ fontSize: 22, color: "#11b6f5" }} />,
-    role: "ครูผู้สอน",
-    desc: "ค้นหางานตามวิชาเอก สมัครง่าย ติดตามสถานะได้ทันที",
-    feature: <SearchOutlined style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }} />,
-    bg: "rgba(255,255,255,0.12)",
-  },
-  {
-    icon: <BankOutlined style={{ fontSize: 22, color: "#11b6f5" }} />,
-    role: "สถานศึกษา",
-    desc: "ลงประกาศรับสมัครครูฟรี พร้อมระบบคัดกรองอัตโนมัติ",
-    feature: <BookOutlined style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }} />,
-    bg: "rgba(255,255,255,0.08)",
-  },
+// ✨ floating orb style
+const orb = (size: number, top: string, left: string, delay: string, opacity: number): React.CSSProperties => ({
+  position: "absolute",
+  width: size,
+  height: size,
+  borderRadius: "50%",
+  background: "rgba(255,255,255,0.12)",
+  top,
+  left,
+  animation: `floatOrb 6s ease-in-out infinite`,
+  animationDelay: delay,
+  opacity,
+  pointerEvents: "none",
+});
+
+const STATS = [
+  { value: "2,400+", label: "ครูที่ลงทะเบียน" },
+  { value: "380+", label: "โรงเรียนพันธมิตร" },
+  { value: "94%", label: "อัตราการจับคู่สำเร็จ" },
 ];
 
-
-// แผงด้านซ้าย — แสดง persona และสถิติแพลตฟอร์ม
 export const SigninBrandingPanel = () => {
   return (
     <Col
       xs={0}
       md={10}
       style={{
-        background: "linear-gradient(160deg, #11b6f5 0%, #0878a8 100%)",
-        padding: "48px 36px",
+        background: "linear-gradient(150deg, #0a85c2 0%, #11b6f5 60%, #38c5f7 100%)",
+        padding: "52px 40px",
         position: "relative",
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}
     >
-      {/* วงกลมประดับ */}
-      <div style={{ position: "absolute", top: -80, right: -80, width: 240, height: 240, borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
-      <div style={{ position: "absolute", bottom: 60, left: -60, width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
+      {/* ✨ keyframe inject */}
+      <style>{`
+        @keyframes floatOrb {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-14px) scale(1.04); }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0% { opacity: 0.5; }
+          50% { opacity: 1; }
+          100% { opacity: 0.5; }
+        }
+      `}</style>
 
-      <Flex vertical justify="space-between" style={{ height: "100%", position: "relative", zIndex: 1 }} gap={36}>
+      {/* ✨ Orbs */}
+      <div style={orb(220, "-80px", "-80px", "0s", 0.5)} />
+      <div style={orb(140, "55%", "-50px", "1.5s", 0.3)} />
+      <div style={orb(90, "75%", "70%", "3s", 0.25)} />
+      <div style={orb(60, "15%", "72%", "2s", 0.2)} />
 
-        {/* Logo + Headline */}
-        <Flex vertical gap={20}>
-          <Flex align="center" gap={10}>
-            <Flex align="center" justify="center" style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <Text strong style={{ fontSize: 18, color: "#fff" }}>S</Text>
-            </Flex>
-            <Text strong style={{ fontSize: 15, color: "rgba(255,255,255,0.9)", letterSpacing: 1 }}>
-              SCHOOL BOARD
-            </Text>
-          </Flex>
-
-          <Flex vertical gap={8}>
-            <Title level={2} style={{ margin: 0, color: "#fff", lineHeight: 1.3 }}>
-              ยินดีต้อนรับ <br /> กลับมา!
-            </Title>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.7 }}>
-              แพลตฟอร์มที่เชื่อมต่อครูคุณภาพ <br />
-              กับสถานศึกษาชั้นนำทั่วประเทศ
-            </Text>
-          </Flex>
+      {/* ✨ Top: Logo + Tagline */}
+      <Flex vertical gap={28} style={{ position: "relative", zIndex: 1, animation: "fadeSlideUp 0.7s ease both" }}>
+        {/* Logo mark */}
+        <Flex align="center" gap={10}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: "rgba(255,255,255,0.22)",
+              border: "1.5px solid rgba(255,255,255,0.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text strong style={{ color: "#fff", fontSize: 16, lineHeight: 1 }}>S</Text>
+          </div>
+          <Text style={{ color: "rgba(255,255,255,0.92)", fontWeight: 700, fontSize: 13, letterSpacing: "1.5px" }}>
+            SCHOOLJOB
+          </Text>
         </Flex>
 
-        {/* Persona Cards */}
-        <Flex vertical gap={12}>
-          <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, letterSpacing: 1, textTransform: "uppercase" }}>
-            สำหรับ
+        {/* Headline */}
+        <Flex vertical gap={10}>
+          <Text style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.25, display: "block" }}>
+            ยินดีต้อนรับ<br />กลับมา 👋
           </Text>
-          {PERSONAS.map((p) => (
-            <Card
-              key={p.role}
-              variant="borderless"
-              style={{
-                background: p.bg,
-                borderRadius: 12,
-                border: "1px solid rgba(255,255,255,0.15)",
-                backdropFilter: "blur(8px)",
-              }}
-              styles={{ body: { padding: "14px 16px" } }}
-            >
-              <Space size={12} align="start">
-                <Flex align="center" justify="center" style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.9)", flexShrink: 0 }}>
-                  {p.icon}
-                </Flex>
-                <Flex vertical gap={2}>
-                  <Text strong style={{ color: "#fff", fontSize: 14 }}>{p.role}</Text>
-                  <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, lineHeight: 1.5 }}>{p.desc}</Text>
-                </Flex>
-              </Space>
-            </Card>
+          <Text style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, display: "block" }}>
+            แพลตฟอร์มเชื่อมครูคุณภาพ<br />กับสถานศึกษาทั่วประเทศ
+          </Text>
+        </Flex>
+      </Flex>
+
+      {/* ✨ Bottom: Stats row */}
+      <Flex
+        vertical
+        gap={20}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          animation: "fadeSlideUp 0.7s ease 0.2s both",
+        }}
+      >
+        {/* Divider line */}
+        <div style={{ height: 1, background: "rgba(255,255,255,0.18)", borderRadius: 1 }} />
+
+        <Flex justify="space-between">
+          {STATS.map((s) => (
+            <Flex vertical gap={2} key={s.label} align="center">
+              <Text style={{ color: "#fff", fontSize: 22, fontWeight: 800, display: "block", lineHeight: 1 }}>
+                {s.value}
+              </Text>
+              <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 11, display: "block", textAlign: "center" }}>
+                {s.label}
+              </Text>
+            </Flex>
           ))}
         </Flex>
 
-        {/* Footer */}
-        <Text style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
-          © 2025 School Board
+        <Text style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>
+          © 2025 School Board · All rights reserved
         </Text>
       </Flex>
     </Col>

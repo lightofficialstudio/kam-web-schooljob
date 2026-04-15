@@ -45,6 +45,32 @@ export const requestAdminUpdateBlog = (data: {
 export const requestAdminDeleteBlog = (id: string) =>
   axios.delete(`${BASE}/delete`, { params: { id } });
 
+// ─── Analytics ───
+
+export interface BlogStatsOverview {
+  totalViews: number;
+  views7d: number;
+  views30d: number;
+  dailyChart: { day: string; views: number }[];
+  topBlogs: { blogId: string; title: string; views: number }[];
+  byCategory: { category: string; views: number }[];
+}
+
+export interface BlogStatsSingle {
+  blogId: string;
+  totalViews: number;
+  views7d: number;
+  views30d: number;
+  dailyChart: { day: string; views: number }[];
+  topReferrers: { referrer: string; count: number }[];
+}
+
+export const requestBlogStatsOverview = () =>
+  axios.get<{ status_code: number; data: BlogStatsOverview }>(`${BASE}/stats`);
+
+export const requestBlogStatsSingle = (blogId: string) =>
+  axios.get<{ status_code: number; data: BlogStatsSingle }>(`${BASE}/stats`, { params: { blog_id: blogId } });
+
 // ─── AI Blog Assistant ───
 
 export type AiAction =

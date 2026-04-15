@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { NextRequest } from "next/server";
 
-// ✨ GET /api/v1/blogs/[blog_id] — ดึงบทความตาม ID หรือ slug
+// ✨ GET /api/v1/blogs/[blog_id] — ดึงบทความ + บันทึก view ทุกครั้งที่เปิดอ่าน
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ blog_id: string }> },
 ) {
   try {
@@ -32,6 +33,19 @@ export async function GET(
         { status: 404 },
       );
     }
+
+    // ✨ บันทึก BlogView (fire-and-forget — ไม่รอผล ไม่ block response)
+    const sessionId = request.headers.get("x-session-id") ?? undefined;
+    const referrer = request.headers.get("referer") ?? undefined;
+
+    prisma.blogView.create({
+      data: {
+        blogId: blog.id,
+        viewerId: null, // ไม่รู้ viewer ณ ตอนนี้ (public route ไม่มี auth)
+        sessionId,
+        referrer: referrer?.slice(0, 255),
+      },
+    }).catch(() => {}); // ✨ ไม่ให้ tracking พัง response หลัก
 
     // ✨ ดึงบทความที่เกี่ยวข้อง (category เดียวกัน ยกเว้นตัวเอง)
     const related = await prisma.blog.findMany({
