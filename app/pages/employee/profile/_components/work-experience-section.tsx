@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 import {
   CheckCircleFilled,
@@ -87,7 +88,10 @@ export const WorkExperienceSection: React.FC = () => {
     addWorkExperience,
     updateWorkExperience,
     removeWorkExperience,
+    saveProfile,
+    isSaving,
   } = useProfileStore();
+  const { user } = useAuthStore();
   const { openNotification } = useNotificationModalStore();
 
   const workExperiences = profile.workExperiences || [];
@@ -140,22 +144,25 @@ export const WorkExperienceSection: React.FC = () => {
       };
 
       if (editingIndex !== null) {
-        updateWorkExperience(editingIndex, entry);
-        openNotification({
-          type: "success",
-          mainTitle: "อัปเดตข้อมูลสำเร็จ",
-          description: "ข้อมูลประสบการณ์ทำงานถูกบันทึกเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
-        });
+        // ✨ เก็บ id เดิมไว้เพื่อให้ backend รู้ว่า update record ไหน
+        const existingId = profile.workExperiences?.[editingIndex]?.id;
+        updateWorkExperience(editingIndex, { ...entry, id: existingId });
       } else {
         addWorkExperience(entry);
-        openNotification({
-          type: "success",
-          mainTitle: "เพิ่มข้อมูลสำเร็จ",
-          description: "ข้อมูลประสบการณ์ทำงานใหม่ถูกเพิ่มเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
-        });
       }
+
+      // ✨ บันทึกลง DB ทันที — saveProfile อ่านค่าจาก store ที่อัปเดตแล้ว
+      if (user?.user_id) {
+        await saveProfile(user.user_id);
+      }
+
+      openNotification({
+        type: "success",
+        mainTitle:
+          editingIndex !== null ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มข้อมูลสำเร็จ",
+        description: "ข้อมูลประสบการณ์ทำงานถูกบันทึกลงฐานข้อมูลเรียบร้อยแล้ว",
+        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
+      });
 
       form.resetFields();
       setIsAddingNew(false);
@@ -183,12 +190,16 @@ export const WorkExperienceSection: React.FC = () => {
       okText: "ลบ",
       cancelText: "ยกเลิก",
       okButtonProps: { danger: true },
-      onOk() {
+      async onOk() {
         removeWorkExperience(index);
+        // ✨ บันทึกลง DB ทันทีหลังลบรายการ
+        if (user?.user_id) {
+          await saveProfile(user.user_id);
+        }
         openNotification({
           type: "success",
           mainTitle: "ลบข้อมูลสำเร็จ",
-          description: "ข้อมูลประสบการณ์ทำงานถูกลบเรียบร้อยแล้ว",
+          description: "ข้อมูลประสบการณ์ทำงานถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว",
           icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       },
@@ -362,6 +373,7 @@ export const WorkExperienceSection: React.FC = () => {
                   type="primary"
                   onClick={handleSave}
                   size="large"
+                  loading={isSaving}
                   style={{ minWidth: 100 }}
                 >
                   บันทึก
