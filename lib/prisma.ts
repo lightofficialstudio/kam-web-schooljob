@@ -2,24 +2,21 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 /**
- * 🗄️ Prisma Client Instance with PostgreSQL Adapter for Prisma v7
+ * 🗄️ Prisma Client Singleton — ใช้ global เพื่อป้องกัน connection leak ทั้ง dev และ production
+ * จำกัด pool ที่ 2 เพื่อรองรับ Supabase PgBouncer Session mode
  */
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-console.log("🔧 Initializing Prisma with connection:", {
-  url: process.env.DATABASE_URL?.substring(0, 50) + "...",
-  directUrl: process.env.DIRECT_URL?.substring(0, 50) + "...",
-});
 
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     adapter: new PrismaPg({
       connectionString: process.env.DATABASE_URL,
+      // ✅ จำกัด connection pool — สำคัญมากสำหรับ Supabase PgBouncer Session mode
+      max: 2,
     }),
     log: ["error", "warn"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-console.log("✅ Prisma client initialized successfully");
+// ✅ ใช้ singleton ทั้ง dev และ production ป้องกัน connection exhaust
+globalForPrisma.prisma = prisma;
