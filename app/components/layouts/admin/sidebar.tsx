@@ -3,6 +3,7 @@
 import { useTheme } from "@/app/contexts/theme-context";
 import {
   AppstoreOutlined,
+  BellOutlined,
   BgColorsOutlined,
   DashboardOutlined,
   FileTextOutlined,
@@ -81,6 +82,13 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
           label: "ตัวเลือก Dropdown",
           icon: <AppstoreOutlined />,
           href: "/pages/admin/config",
+        },
+        {
+          type: "leaf",
+          key: "/pages/admin/announcement",
+          label: "Announcement",
+          icon: <BellOutlined />,
+          href: "/pages/admin/announcement",
         },
       ],
     },

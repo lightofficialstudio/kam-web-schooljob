@@ -1,0 +1,161 @@
+"use client";
+
+// ✨ Admin Announcement — Broadcast ข้อความถึง Users + ดูประวัติ
+import { ModalComponent } from "@/app/components/modal/modal.component";
+import { useAuthStore } from "@/app/stores/auth-store";
+import {
+  BellOutlined,
+  HistoryOutlined,
+  SendOutlined,
+} from "@ant-design/icons";
+import {
+  Breadcrumb,
+  Col,
+  Row,
+  Tabs,
+  Typography,
+  theme,
+} from "antd";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { BroadcastComposer } from "./_components/broadcast-composer";
+import { AnnouncementHistory } from "./_components/announcement-history";
+import { useAnnouncementStore } from "./_state/announcement-store";
+
+const { Title, Text } = Typography;
+
+export default function AnnouncementPage() {
+  const { token } = theme.useToken();
+  const { user } = useAuthStore();
+  const adminUserId = user?.id ?? "";
+
+  const {
+    isSending,
+    broadcast,
+    resetForm,
+    fetchHistory,
+  } = useAnnouncementStore();
+
+  const [activeTab, setActiveTab] = useState("compose");
+  const [modal, setModal] = useState<{
+    open: boolean;
+    type: "success" | "error";
+    title: string;
+    description?: string;
+  }>({ open: false, type: "success", title: "" });
+
+  // ✨ โหลดประวัติเมื่อสลับ tab
+  useEffect(() => {
+    if (activeTab === "history" && adminUserId) {
+      fetchHistory(adminUserId, 1);
+    }
+  }, [activeTab, adminUserId, fetchHistory]);
+
+  const handleSend = useCallback(async () => {
+    const result = await broadcast(adminUserId);
+    if (result.ok) {
+      setModal({
+        open: true,
+        type: "success",
+        title: "ส่ง Announcement สำเร็จ",
+        description: `ส่ง Notification ถึง ${result.sentCount.toLocaleString()} ผู้ใช้งานเรียบร้อยแล้ว`,
+      });
+      resetForm();
+    } else {
+      setModal({
+        open: true,
+        type: "error",
+        title: "ส่ง Announcement ไม่สำเร็จ",
+        description: result.error,
+      });
+    }
+  }, [broadcast, adminUserId, resetForm]);
+
+  return (
+    <>
+      <Row gutter={[0, 24]}>
+        {/* ── Breadcrumb ── */}
+        <Col xs={24}>
+          <Breadcrumb
+            items={[
+              { title: <Link href="/pages/admin">Admin</Link> },
+              { title: "Announcement" },
+            ]}
+          />
+        </Col>
+
+        {/* ── Header ── */}
+        <Col xs={24}>
+          <div
+            style={{
+              padding: "24px 28px",
+              borderRadius: 16,
+              background: "linear-gradient(135deg, #0d47a1 0%, #0a4a8a 50%, #11b6f5 100%)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            {/* ✨ decoration circles */}
+            <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: -30, right: 80, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
+
+            <div style={{ position: "relative" }}>
+              <BellOutlined style={{ fontSize: 28, color: "rgba(255,255,255,0.9)", marginBottom: 10, display: "block" }} />
+              <Title level={3} style={{ margin: 0, color: "#fff", lineHeight: 1.3 }}>
+                Announcement & Broadcast
+              </Title>
+              <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, marginTop: 4, display: "block" }}>
+                ส่ง In-app Notification ถึงผู้ใช้งาน — เลือก Target เป็น ครู / โรงเรียน / ทุกคน
+              </Text>
+            </div>
+          </div>
+        </Col>
+
+        {/* ── Tabs: Compose | History ── */}
+        <Col xs={24}>
+          <Tabs
+            activeKey={activeTab}
+            onChange={setActiveTab}
+            size="large"
+            items={[
+              {
+                key: "compose",
+                label: (
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <SendOutlined />
+                    สร้าง Announcement
+                  </span>
+                ),
+                children: (
+                  <BroadcastComposer onSend={handleSend} isSending={isSending} />
+                ),
+              },
+              {
+                key: "history",
+                label: (
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <HistoryOutlined />
+                    ประวัติที่ส่ง
+                  </span>
+                ),
+                children: (
+                  <AnnouncementHistory adminUserId={adminUserId} />
+                ),
+              },
+            ]}
+          />
+        </Col>
+      </Row>
+
+      {/* ── Result Modal ── */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        onClose={() => setModal((m) => ({ ...m, open: false }))}
+        onConfirm={() => setModal((m) => ({ ...m, open: false }))}
+      />
+    </>
+  );
+}

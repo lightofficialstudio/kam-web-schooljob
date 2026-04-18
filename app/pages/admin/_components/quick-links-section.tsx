@@ -2,6 +2,7 @@
 
 import {
   ApiOutlined,
+  BellOutlined,
   BookOutlined,
   RocketOutlined,
   SettingOutlined,
@@ -55,6 +56,13 @@ const links = [
     label: "จัดการประกาศงาน",
     href: "/pages/admin/job-management/read",
     colorKey: "colorPrimary" as const,
+  },
+  {
+    key: "announcement",
+    icon: <BellOutlined />,
+    label: "Announcement",
+    href: "/pages/admin/announcement",
+    colorKey: "colorInfo" as const,
   },
 ];
 
