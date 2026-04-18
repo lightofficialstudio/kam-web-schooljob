@@ -33,6 +33,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAdminBlogStore } from "../_state/blog-store";
 import { AiAssistantPanel } from "./ai-assistant-panel";
+import { SeoCheckerPanel } from "./seo-checker-panel";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -192,6 +193,11 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
     setUploadedUrl("");
     form.setFieldValue("cover_image_url", "");
   };
+
+  // ✨ watch form values แบบ real-time เพื่อส่งให้ SEO Checker
+  const watchedTitle = Form.useWatch("title", form) as string | undefined;
+  const watchedExcerpt = Form.useWatch("excerpt", form) as string | undefined;
+  const watchedSlug = Form.useWatch("slug", form) as string | undefined;
 
   // ✨ AI callbacks — ใส่ค่าที่ AI generate ลงใน form ทันที
   const handleApplyTitle = (title: string) =>
@@ -561,6 +567,14 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
             currentTitle={getCurrentValues().title}
             currentContent={getCurrentValues().content}
             currentCategory={getCurrentValues().category}
+          />
+
+          {/* ─── SEO Checker — แสดงใต้ AI Assistant ─── */}
+          <Divider style={{ margin: "20px 0 16px" }} />
+          <SeoCheckerPanel
+            title={watchedTitle}
+            excerpt={watchedExcerpt}
+            slug={watchedSlug}
           />
         </Col>
       </Row>
