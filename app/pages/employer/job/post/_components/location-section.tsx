@@ -1,5 +1,6 @@
 "use client";
 
+import { District, Province, SubDistrict, loadAll } from "@/app/lib/geo";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { EnvironmentOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
@@ -19,49 +20,9 @@ import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useJobPostStore } from "../_stores/job-post-store";
 
-// ─── Types จาก GitHub Raw API ─────────────────────────────────────────────
-export interface Province {
-  id: number;
-  name_th: string;
-  name_en: string;
-}
-export interface District {
-  id: number;
-  name_th: string;
-  name_en: string;
-  province_id: number;
-}
-export interface SubDistrict {
-  id: number;
-  name_th: string;
-  name_en: string;
-  district_id: number;
-  zip_code: number;
-}
-
-const BASE =
-  "https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest";
-
-// ─── Fetch helper (cache ใน module scope เพื่อไม่ fetch ซ้ำ) ───────────────
-let _provinces: Province[] | null = null;
-let _districts: District[] | null = null;
-let _subDistricts: SubDistrict[] | null = null;
-
-export const loadAll = async () => {
-  const [p, d, s] = await Promise.all([
-    _provinces ?? fetch(`${BASE}/province.json`).then((r) => r.json()),
-    _districts ?? fetch(`${BASE}/district.json`).then((r) => r.json()),
-    _subDistricts ?? fetch(`${BASE}/sub_district.json`).then((r) => r.json()),
-  ]);
-  _provinces = p;
-  _districts = d;
-  _subDistricts = s;
-  return {
-    provinces: p as Province[],
-    districts: d as District[],
-    subDistricts: s as SubDistrict[],
-  };
-};
+// ✨ Re-export เพื่อ backward-compat กับ code ที่ยังคง import จากไฟล์นี้
+export { loadAll };
+export type { District, Province, SubDistrict };
 
 // ─── Component ────────────────────────────────────────────────────────────
 export const LocationSection = () => {

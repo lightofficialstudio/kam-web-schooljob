@@ -198,14 +198,15 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             }}
           >
             <Descriptions.Item label={<EnvironmentOutlined />}>
-              {[profile.district, profile.location].filter(Boolean).length > 0 ? (
+              {[profile.district, profile.location].filter(Boolean).length >
+              0 ? (
                 <Text>
                   {[profile.district, profile.location]
                     .filter(Boolean)
                     .join(", ")}
                 </Text>
               ) : (
-                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+                <Text className="text-red-500 font-bold">-</Text>
               )}
             </Descriptions.Item>
             {profile.website ? (
@@ -220,21 +221,21 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
               </Descriptions.Item>
             ) : (
               <Descriptions.Item label={<GlobalOutlined />}>
-                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+                <Text className="text-red-500 font-bold">-</Text>
               </Descriptions.Item>
             )}
             <Descriptions.Item label={<MailOutlined />}>
               {profile.email ? (
                 <Text copyable>{profile.email}</Text>
               ) : (
-                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+                <Text className="text-red-500 font-bold">-</Text>
               )}
             </Descriptions.Item>
             <Descriptions.Item label={<PhoneOutlined />}>
               {profile.phone ? (
                 <Text>{profile.phone}</Text>
               ) : (
-                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+                <Text className="text-red-500 font-bold">-</Text>
               )}
             </Descriptions.Item>
           </Descriptions>
@@ -253,19 +254,29 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             block
             type="primary"
             size="large"
-            icon={<EditOutlined />}
+            icon={<EditOutlined className="animate-bounce" />}
             onClick={onEditClick}
             style={{
-              marginTop: 8,
-              height: 48,
-              borderRadius: 10,
-              background: "#001e45",
-              fontWeight: 700,
+              marginTop: 12,
+              height: 56,
+              borderRadius: 16,
+              background: "linear-gradient(135deg, #001e45 0%, #0a4a8a 100%)",
+              fontWeight: 900,
               fontSize: 16,
+              boxShadow: "0 10px 25px -5px rgba(0,30,69,0.3)",
+              border: "none",
             }}
+            className="hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             แก้ไขข้อมูลโรงเรียน
           </Button>
+
+          {/* ✨ เชิญชวนให้กรอกข้อมูลให้ครบ */}
+          <div className="mt-2 text-center py-2 px-3 rounded-lg bg-blue-50/50 border border-blue-100/50">
+            <Text className="text-blue-600 font-medium text-[12px]">
+              ✨ เติมข้อมูลให้ครบ เพื่อโปรไฟล์ที่น่าเชื่อถือ
+            </Text>
+          </div>
         </Flex>
       </Card>
 

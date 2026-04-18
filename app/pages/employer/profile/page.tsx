@@ -62,14 +62,20 @@ export default function EmployerProfilePage() {
 
   const handleEditClick = () => setIsDrawerOpen(true);
 
-  // บันทึกโปรไฟล์ผ่าน store → API แล้วแสดง success modal
+  // ✨ บันทึกโปรไฟล์ผ่าน store → API แล้วแสดง success modal
+  // merge กับ profile เดิมก่อนเสมอ — ป้องกัน logoUrl/coverImageUrl หาย
   const handleSave = async (values: SchoolProfile) => {
     if (!user?.user_id) return;
-    await saveProfile(values, user.user_id);
-    // ✨ sync school_name ใน auth store ทันที — navbar อัปเดตโดยไม่ต้อง re-login
-    if (values.name) updateUser({ school_name: values.name });
-    setIsDrawerOpen(false);
-    setIsSuccessModalOpen(true);
+    const mergedValues: SchoolProfile = { ...profile, ...values };
+    try {
+      await saveProfile(mergedValues, user.user_id);
+      // ✨ sync school_name ใน auth store ทันที — navbar อัปเดตโดยไม่ต้อง re-login
+      if (mergedValues.name) updateUser({ school_name: mergedValues.name });
+      setIsDrawerOpen(false);
+      setIsSuccessModalOpen(true);
+    } catch {
+      // saveProfile จัดการ error ใน state แล้ว — ไม่ต้องทำอะไรเพิ่ม
+    }
   };
 
   // รอ hydration

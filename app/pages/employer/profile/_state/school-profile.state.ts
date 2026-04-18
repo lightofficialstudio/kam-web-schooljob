@@ -12,26 +12,26 @@ export interface SchoolProfile {
   id?: string;
   name: string;
   type: string;
-  location: string;            // province
-  district?: string;           // อำเภอ/เขต
+  location: string; // province
+  district?: string; // อำเภอ/เขต
   address: string;
   website?: string;
   email: string;
   phone: string;
-  established?: string;        // foundedYear (พ.ศ.)
-  teacherCount?: number;       // จำนวนครู
-  studentCount?: number;       // จำนวนนักเรียน
-  affiliation?: string;        // สังกัด เช่น สพฐ., สช.
+  established?: string; // foundedYear (พ.ศ.)
+  teacherCount?: number; // จำนวนครู
+  studentCount?: number; // จำนวนนักเรียน
+  affiliation?: string; // สังกัด เช่น สพฐ., สช.
   description?: string;
   vision?: string;
-  curriculum?: string;         // หลักสูตร — persist ลง DB แล้ว
-  levels?: string[];           // ระดับชั้น — persist ลง DB แล้ว
+  curriculum?: string; // หลักสูตร — persist ลง DB แล้ว
+  levels?: string[]; // ระดับชั้น — persist ลง DB แล้ว
   benefits?: string[];
   gallery?: string[];
   logoUrl?: string;
   coverImageUrl?: string;
-  accountPlan?: string;        // read-only — จัดการโดย Admin
-  jobQuotaMax?: number;        // read-only — จัดการโดย Admin
+  accountPlan?: string; // read-only — จัดการโดย Admin
+  jobQuotaMax?: number; // read-only — จัดการโดย Admin
 }
 
 interface SchoolProfileState {
@@ -85,7 +85,7 @@ export const useSchoolProfileState = create<SchoolProfileState>((set, get) => ({
     }
   },
 
-  // ✨ บันทึกโปรไฟล์ผ่าน API แล้ว update state ทันที
+  // ✨ บันทึกโปรไฟล์ผ่าน API แล้ว update state ทันที — throw เมื่อ API fail
   saveProfile: async (data: SchoolProfile, userId: string) => {
     set({ isSaving: true });
     try {
@@ -93,8 +93,7 @@ export const useSchoolProfileState = create<SchoolProfileState>((set, get) => ({
       set({ profile: data });
     } catch (err) {
       console.error("❌ [SchoolProfileState] saveProfile error:", err);
-      // Fallback: อัปเดต local state เสมอแม้ API จะ fail
-      set({ profile: data });
+      throw err; // re-throw ให้ handleSave จัดการ — ไม่ปิด drawer ถ้า save ไม่สำเร็จ
     } finally {
       set({ isSaving: false });
     }

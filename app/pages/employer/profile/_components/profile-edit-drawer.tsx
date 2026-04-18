@@ -1,5 +1,6 @@
 "use client";
 
+import { District, Province, loadAll } from "@/app/lib/geo";
 import { EditOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -15,9 +16,10 @@ import {
   Space,
   Spin,
   Typography,
+  theme as antTheme,
 } from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   SchoolProfile,
   useSchoolProfileState as useSchoolProfileStore,
@@ -44,20 +46,31 @@ const AFFILIATION_OPTIONS = [
 ];
 
 interface ProfileEditDrawerProps {
-  onSave: (values: SchoolProfile) => void;
+  // ✨ async เพื่อรอ API บันทึกเสร็จก่อนปิด drawer
+  onSave: (values: SchoolProfile) => Promise<void>;
 }
 
 export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
   onSave,
 }) => {
-  const { isDrawerOpen, setIsDrawerOpen, profile } = useSchoolProfileStore();
+  const { isDrawerOpen, setIsDrawerOpen, profile, isSaving } =
+    useSchoolProfileStore();
+  const { token } = antTheme.useToken();
   const [form] = Form.useForm();
 
   const [schoolTypes, setSchoolTypes] = useState<ConfigOption[]>([]);
   const [schoolLevels, setSchoolLevels] = useState<ConfigOption[]>([]);
-  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  // ✨ เริ่มต้นเป็น true เสมอ — ป้องกัน Form mount ก่อนข้อมูล config โหลดเสร็จ
+  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
-  // ✨ โหลดตัวเลือกจาก Config API ครั้งแรก
+  // ✨ ข้อมูลจังหวัด/อำเภอ
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(
+    null,
+  );
+
+  // ✨ โหลดตัวเลือก config + ข้อมูลจังหวัด/อำเภอ พร้อมกันใน useEffect เดียว
   useEffect(() => {
     setIsLoadingOptions(true);
     Promise.all([
@@ -67,40 +80,66 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       axios.get<{ status_code: number; data: ConfigOption[] }>(
         "/api/v1/config/options?group=school_level",
       ),
+      loadAll(),
     ])
-      .then(([typeRes, levelRes]) => {
+      .then(([typeRes, levelRes, geoData]) => {
         if (typeRes.data.status_code === 200) setSchoolTypes(typeRes.data.data);
         if (levelRes.data.status_code === 200)
           setSchoolLevels(levelRes.data.data);
+        setProvinces(geoData.provinces);
+        setDistricts(geoData.districts);
       })
       .catch((err) => console.error("❌ โหลด config options ไม่สำเร็จ:", err))
       .finally(() => setIsLoadingOptions(false));
   }, []);
 
-  // ✨ ซิงค์ข้อมูลจาก store เข้า form ทุกครั้งที่เปิด Drawer
+  // ✨ filter อำเภอตามจังหวัดที่เลือก
+  const filteredDistricts = useMemo(
+    () =>
+      selectedProvinceId
+        ? districts.filter((d) => d.province_id === selectedProvinceId)
+        : [],
+    [districts, selectedProvinceId],
+  );
+
+  // ✨ ซิงค์ข้อมูลจาก store เข้า form
+  // รอให้ทั้ง drawer เปิด AND config โหลดเสร็จก่อน (ป้องกัน Form ยังไม่ mount)
   React.useEffect(() => {
-    if (isDrawerOpen) {
+    if (isDrawerOpen && !isLoadingOptions) {
       form.setFieldsValue({
         ...profile,
-        // แปลง teacherCount/studentCount เป็น number สำหรับ InputNumber
         teacherCount: profile.teacherCount ?? undefined,
         studentCount: profile.studentCount ?? undefined,
-        // established เป็น string ของปี พ.ศ.
         established: profile.established ?? undefined,
       });
+      // ✨ ตั้งค่า selectedProvinceId จากชื่อจังหวัดที่เก็บไว้
+      if (profile.location && provinces.length > 0) {
+        const matched = provinces.find((p) => p.name_th === profile.location);
+        if (matched) setSelectedProvinceId(matched.id);
+      }
     }
-  }, [isDrawerOpen, profile, form]);
+  }, [isDrawerOpen, isLoadingOptions, profile, form, provinces]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleFinish = (values: SchoolProfile) => {
-    onSave(values);
+  // ✨ จัดการเปลี่ยนจังหวัด — reset อำเภอ
+  const handleProvinceChange = (_: string, option: unknown) => {
+    const opt = option as { data: Province };
+    setSelectedProvinceId(opt.data.id);
+    form.setFieldsValue({ district: undefined });
+  };
+
+  // ✨ handleFinish รับ values จาก form แล้วส่งต่อให้ page.tsx จัดการ API
+  const handleFinish = async (values: SchoolProfile) => {
+    await onSave(values);
   };
 
   return (
     <Drawer
       title={
         <Space>
-          <EditOutlined className="text-blue-600" />
-          <span className="font-bold text-slate-700 text-lg">
+          <EditOutlined style={{ color: token.colorPrimary }} />
+          <span
+            style={{ fontWeight: 700, fontSize: 18, color: token.colorText }}
+          >
             แก้ไขข้อมูลโรงเรียน
           </span>
         </Space>
@@ -112,17 +151,17 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       className="!rounded-l-[32px] overflow-hidden"
       styles={{
         header: {
-          borderBottom: "1px solid #f1f5f9",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
           padding: "24px 32px",
         },
         body: {
           padding: "32px",
-          background: "#fff",
+          background: token.colorBgContainer,
         },
         footer: {
-          borderTop: "1px solid #f1f5f9",
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
           padding: "20px 32px",
-          background: "rgba(255, 255, 255, 0.8)",
+          background: token.colorBgContainer,
           backdropFilter: "blur(8px)",
         },
       }}
@@ -130,15 +169,17 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
         <Flex justify="end" gap={12}>
           <Button
             size="large"
-            className="!rounded-xl !px-8 hover:!bg-slate-50 !border-slate-200 !text-slate-500 font-medium transition-all"
+            style={{ borderRadius: 100 }}
             onClick={() => setIsDrawerOpen(false)}
+            disabled={isSaving}
           >
             ยกเลิก
           </Button>
           <Button
             type="primary"
             size="large"
-            className="!rounded-xl !px-10 !bg-[#001e45] hover:!bg-[#0a4a8a] !border-none font-bold shadow-lg shadow-blue-900/10 transition-all hover:scale-[1.02] active:scale-95"
+            style={{ borderRadius: 100, fontWeight: 700 }}
+            loading={isSaving}
             onClick={() => form.submit()}
           >
             บันทึกข้อมูล
@@ -207,14 +248,51 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
               <Form.Item
                 name="location"
                 label="จังหวัด"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: "กรุณาเลือกจังหวัด" }]}
               >
-                <Input placeholder="เช่น กรุงเทพมหานคร" />
+                {/* ✨ dropdown จังหวัดจาก GitHub API */}
+                <Select
+                  showSearch
+                  placeholder="เลือกจังหวัด"
+                  optionFilterProp="label"
+                  onChange={handleProvinceChange}
+                  filterOption={(input, option) =>
+                    ((option?.label as string) ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={provinces.map((p) => ({
+                    value: p.name_th,
+                    label: p.name_th,
+                    data: p,
+                  }))}
+                  notFoundContent="ไม่พบจังหวัด"
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="district" label="อำเภอ / เขต">
-                <Input placeholder="เช่น เขตจตุจักร" />
+                {/* ✨ dropdown อำเภอ cascading จากจังหวัดที่เลือก */}
+                <Select
+                  showSearch
+                  placeholder={
+                    selectedProvinceId ? "เลือกอำเภอ/เขต" : "เลือกจังหวัดก่อน"
+                  }
+                  disabled={!selectedProvinceId}
+                  optionFilterProp="label"
+                  allowClear
+                  filterOption={(input, option) =>
+                    ((option?.label as string) ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  options={filteredDistricts.map((d) => ({
+                    value: d.name_th,
+                    label: d.name_th,
+                    data: d,
+                  }))}
+                  notFoundContent="ไม่พบอำเภอ/เขต"
+                />
               </Form.Item>
             </Col>
           </Row>
