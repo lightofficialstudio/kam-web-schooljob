@@ -5,6 +5,8 @@ import { create } from "zustand";
 import {
   AiAction,
   BlogStatsOverview,
+  requestAdminBulkDeleteBlogs,
+  requestAdminBulkUpdateBlogs,
   requestAdminCreateBlog,
   requestAdminDeleteBlog,
   requestAdminListBlogs,
@@ -59,6 +61,13 @@ interface BlogStore {
   // ✨ analytics state
   statsOverview: BlogStatsOverview | null;
   isStatsLoading: boolean;
+  // ✨ bulk selection state
+  selectedIds: string[];
+  setSelectedIds: (ids: string[]) => void;
+  clearSelection: () => void;
+  bulkPublish: () => Promise<void>;
+  bulkDraft: () => Promise<void>;
+  bulkDelete: () => Promise<void>;
   // ✨ actions
   setFilterStatus: (s: "DRAFT" | "PUBLISHED" | "all") => void;
   setFilterKeyword: (k: string) => void;
@@ -136,6 +145,9 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   aiSeoScore: null,
   statsOverview: null,
   isStatsLoading: false,
+  selectedIds: [],
+  setSelectedIds: (ids) => set({ selectedIds: ids }),
+  clearSelection: () => set({ selectedIds: [] }),
   modal: {
     open: false,
     type: "success" as ModalType,
@@ -167,6 +179,78 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   openCreate: () => set({ editingBlog: null, isDrawerOpen: true }),
   openEdit: (blog) => set({ editingBlog: blog, isDrawerOpen: true }),
   closeDrawer: () => set({ isDrawerOpen: false, editingBlog: null }),
+
+  // ✨ Bulk Publish — เปลี่ยนทุก selected เป็น PUBLISHED
+  bulkPublish: async () => {
+    const { selectedIds, fetchBlogs, clearSelection, showModal } = get();
+    if (!selectedIds.length) return;
+    try {
+      await requestAdminBulkUpdateBlogs({
+        ids: selectedIds,
+        status: "PUBLISHED",
+      });
+      clearSelection();
+      await fetchBlogs();
+      showModal({
+        type: "success",
+        title: "เผยแพร่สำเร็จ",
+        description: `เผยแพร่ ${selectedIds.length} บทความแล้ว`,
+      });
+    } catch (err) {
+      showModal({
+        type: "error",
+        title: "เผยแพร่ไม่สำเร็จ",
+        description: err instanceof Error ? err.message : "เกิดข้อผิดพลาด",
+        errorDetails: err,
+      });
+    }
+  },
+
+  // ✨ Bulk Draft — เปลี่ยนทุก selected กลับเป็น DRAFT
+  bulkDraft: async () => {
+    const { selectedIds, fetchBlogs, clearSelection, showModal } = get();
+    if (!selectedIds.length) return;
+    try {
+      await requestAdminBulkUpdateBlogs({ ids: selectedIds, status: "DRAFT" });
+      clearSelection();
+      await fetchBlogs();
+      showModal({
+        type: "success",
+        title: "ย้ายกลับ Draft สำเร็จ",
+        description: `ย้าย ${selectedIds.length} บทความเป็น Draft แล้ว`,
+      });
+    } catch (err) {
+      showModal({
+        type: "error",
+        title: "เปลี่ยนสถานะไม่สำเร็จ",
+        description: err instanceof Error ? err.message : "เกิดข้อผิดพลาด",
+        errorDetails: err,
+      });
+    }
+  },
+
+  // ✨ Bulk Delete — ลบทุก selected พร้อมกัน
+  bulkDelete: async () => {
+    const { selectedIds, fetchBlogs, clearSelection, showModal } = get();
+    if (!selectedIds.length) return;
+    try {
+      await requestAdminBulkDeleteBlogs(selectedIds);
+      clearSelection();
+      await fetchBlogs();
+      showModal({
+        type: "success",
+        title: "ลบสำเร็จ",
+        description: `ลบ ${selectedIds.length} บทความแล้ว`,
+      });
+    } catch (err) {
+      showModal({
+        type: "error",
+        title: "ลบไม่สำเร็จ",
+        description: err instanceof Error ? err.message : "เกิดข้อผิดพลาด",
+        errorDetails: err,
+      });
+    }
+  },
 
   // ✨ ดึงรายการบทความตาม filter ปัจจุบัน
   fetchBlogs: async () => {

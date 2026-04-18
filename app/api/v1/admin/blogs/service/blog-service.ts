@@ -188,6 +188,27 @@ export class AdminBlogService {
   async deleteBlog(id: string) {
     await prisma.blog.delete({ where: { id } });
   }
+
+  // ✨ Bulk Update Status — เปลี่ยนสถานะหลายบทความใน transaction เดียว
+  async bulkUpdateStatus(ids: string[], status: "DRAFT" | "PUBLISHED") {
+    await prisma.blog.updateMany({
+      where: { id: { in: ids } },
+      data: {
+        status,
+        ...(status === "PUBLISHED"
+          ? { publishedAt: new Date() }
+          : { publishedAt: null }),
+      },
+    });
+  }
+
+  // ✨ Bulk Delete — ลบหลายบทความพร้อมกันใน transaction เดียว
+  async bulkDeleteBlogs(ids: string[]) {
+    await prisma.$transaction([
+      prisma.blogView.deleteMany({ where: { blogId: { in: ids } } }),
+      prisma.blog.deleteMany({ where: { id: { in: ids } } }),
+    ]);
+  }
 }
 
 export const adminBlogService = new AdminBlogService();

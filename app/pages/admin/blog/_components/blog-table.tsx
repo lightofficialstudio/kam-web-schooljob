@@ -1,7 +1,15 @@
 "use client";
 
 // ✨ Blog Table — ตารางรายการบทความพร้อม bulk actions + quick-publish
-import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  ClearOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  EyeOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 import {
   Avatar,
   Button,
@@ -27,6 +35,154 @@ const fmtDate = (iso?: string | null) => {
     year: "numeric",
   });
 };
+
+// ✨ Export CSV helper — แปลง blog array ที่เลือกเป็น CSV แล้ว download
+const exportCsv = (blogs: AdminBlogItem[], selectedIds: string[]) => {
+  const rows = blogs.filter((b) => selectedIds.includes(b.id));
+  const header = [
+    "ID",
+    "ชื่อบทความ",
+    "Slug",
+    "หมวดหมู่",
+    "สถานะ",
+    "ยอดวิว",
+    "Tags",
+    "ผู้เขียน",
+    "วันที่สร้าง",
+  ];
+  const lines = rows.map((b) =>
+    [
+      b.id,
+      `"${b.title.replace(/"/g, '""')}"`,
+      b.slug,
+      b.category ?? "",
+      b.status,
+      b.viewCount ?? 0,
+      `"${(b.tags ?? []).join(", ")}"`,
+      `"${b.author.name}"`,
+      new Date(b.createdAt).toLocaleDateString("th-TH"),
+    ].join(","),
+  );
+  const csv = "\uFEFF" + [header.join(","), ...lines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `blogs_export_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// ✨ BulkActionBar — แถบ action ลอยที่แสดงเมื่อ select บทความ
+function BulkActionBar({
+  count,
+  onPublish,
+  onDraft,
+  onDelete,
+  onExport,
+  onClear,
+}: {
+  count: number;
+  onPublish: () => void;
+  onDraft: () => void;
+  onDelete: () => void;
+  onExport: () => void;
+  onClear: () => void;
+}) {
+  if (count === 0) return null;
+  return (
+    <div
+      className="animate-[fadeInDown_0.2s_ease-out]"
+      style={{
+        marginBottom: 12,
+        padding: "10px 16px",
+        borderRadius: 12,
+        background:
+          "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 55%, #5dd5fb 100%)",
+        boxShadow: "0 4px 16px rgba(17,182,245,0.3)",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        flexWrap: "wrap" as const,
+      }}
+    >
+      <Text strong style={{ color: "#fff", fontSize: 13, minWidth: 100 }}>
+        เลือกแล้ว {count} บทความ
+      </Text>
+      <Flex gap={6} wrap="wrap">
+        <Button
+          size="small"
+          icon={<CheckOutlined />}
+          onClick={onPublish}
+          style={{
+            background: "rgba(255,255,255,0.2)",
+            border: "1px solid rgba(255,255,255,0.4)",
+            color: "#fff",
+            borderRadius: 20,
+            fontWeight: 500,
+          }}
+        >
+          เผยแพร่ทั้งหมด
+        </Button>
+        <Button
+          size="small"
+          icon={<MinusCircleOutlined />}
+          onClick={onDraft}
+          style={{
+            background: "rgba(255,255,255,0.2)",
+            border: "1px solid rgba(255,255,255,0.4)",
+            color: "#fff",
+            borderRadius: 20,
+            fontWeight: 500,
+          }}
+        >
+          ย้ายเป็น Draft
+        </Button>
+        <Button
+          size="small"
+          icon={<DownloadOutlined />}
+          onClick={onExport}
+          style={{
+            background: "rgba(255,255,255,0.2)",
+            border: "1px solid rgba(255,255,255,0.4)",
+            color: "#fff",
+            borderRadius: 20,
+            fontWeight: 500,
+          }}
+        >
+          Export CSV
+        </Button>
+        <Button
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={onDelete}
+          style={{
+            background: "rgba(239,68,68,0.8)",
+            border: "1px solid rgba(239,68,68,0.9)",
+            color: "#fff",
+            borderRadius: 20,
+            fontWeight: 500,
+          }}
+        >
+          ลบที่เลือก
+        </Button>
+      </Flex>
+      <Button
+        size="small"
+        type="text"
+        icon={<ClearOutlined />}
+        onClick={onClear}
+        style={{
+          marginLeft: "auto",
+          color: "rgba(255,255,255,0.8)",
+          borderRadius: 20,
+        }}
+      >
+        ยกเลิก
+      </Button>
+    </div>
+  );
+}
 
 export function BlogTable() {
   const { token } = theme.useToken();
@@ -226,27 +382,43 @@ export function BlogTable() {
   }
 
   return (
-    <Table
-      columns={columns}
-      dataSource={blogs}
-      rowKey="id"
-      pagination={{
-        current: page,
-        total,
-        pageSize: 20,
-        onChange: setPage,
-        showSizeChanger: false,
-        showTotal: (t) => `ทั้งหมด ${t} บทความ`,
-        style: { marginTop: 16 },
-      }}
-      scroll={{ x: 900 }}
-      size="middle"
-      rowClassName={() => "blog-table-row"}
-      onRow={(b) => ({
-        onDoubleClick: () => openEdit(b),
-        style: { cursor: "pointer" },
-      })}
-      style={{ background: "transparent" }}
-    />
+    <>
+      {/* ✨ แถบ Bulk Actions — แสดงเมื่อ select อย่างน้อย 1 รายการ */}
+      <BulkActionBar
+        count={selectedIds.length}
+        onPublish={bulkPublish}
+        onDraft={bulkDraft}
+        onDelete={handleBulkDelete}
+        onExport={() => exportCsv(blogs, selectedIds)}
+        onClear={clearSelection}
+      />
+      <Table
+        columns={columns}
+        dataSource={blogs}
+        rowKey="id"
+        pagination={{
+          current: page,
+          total,
+          pageSize: 20,
+          onChange: setPage,
+          showSizeChanger: false,
+          showTotal: (t) => `ทั้งหมด ${t} บทความ`,
+          style: { marginTop: 16 },
+        }}
+        rowSelection={{
+          selectedRowKeys: selectedIds,
+          onChange: (keys) => setSelectedIds(keys as string[]),
+          preserveSelectedRowKeys: true,
+        }}
+        scroll={{ x: 900 }}
+        size="middle"
+        rowClassName={() => "blog-table-row"}
+        onRow={(b) => ({
+          onDoubleClick: () => openEdit(b),
+          style: { cursor: "pointer" },
+        })}
+        style={{ background: "transparent" }}
+      />
+    </>
   );
 }

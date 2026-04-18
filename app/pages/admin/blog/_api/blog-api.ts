@@ -45,6 +45,16 @@ export const requestAdminUpdateBlog = (data: {
 export const requestAdminDeleteBlog = (id: string) =>
   axios.delete(`${BASE}/delete`, { params: { id } });
 
+// ✨ Bulk Actions — เปลี่ยนสถานะหลายบทความพร้อมกัน
+export const requestAdminBulkUpdateBlogs = (data: {
+  ids: string[];
+  status: "DRAFT" | "PUBLISHED";
+}) => axios.put(`${BASE}/bulk-update`, data);
+
+// ✨ Bulk Delete — ลบหลายบทความพร้อมกัน
+export const requestAdminBulkDeleteBlogs = (ids: string[]) =>
+  axios.delete(`${BASE}/bulk-delete`, { data: { ids } });
+
 // ─── Analytics ───
 
 export interface BlogStatsOverview {
@@ -69,7 +79,9 @@ export const requestBlogStatsOverview = () =>
   axios.get<{ status_code: number; data: BlogStatsOverview }>(`${BASE}/stats`);
 
 export const requestBlogStatsSingle = (blogId: string) =>
-  axios.get<{ status_code: number; data: BlogStatsSingle }>(`${BASE}/stats`, { params: { blog_id: blogId } });
+  axios.get<{ status_code: number; data: BlogStatsSingle }>(`${BASE}/stats`, {
+    params: { blog_id: blogId },
+  });
 
 // ─── AI Blog Assistant ───
 
