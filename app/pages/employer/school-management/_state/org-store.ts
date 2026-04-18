@@ -2,12 +2,12 @@ import { create } from "zustand";
 import {
   fetchCreateRole,
   fetchDeleteRole,
-  fetchInviteMember,
   fetchOrgMembers,
   fetchOrgRoles,
   fetchPendingInvites,
   fetchRemoveMember,
   fetchRevokeInvite,
+  fetchSendInvite,
   fetchUpdateMemberRole,
   fetchUpdateRole,
   fetchUpdateRolePermissions,
@@ -120,8 +120,8 @@ export const useOrgStore = create<OrgState>((set, get) => ({
   },
 
   inviteMember: async (userId, email, roleId) => {
-    await fetchInviteMember(userId, { email, role_id: roleId });
-    // refresh invites
+    // ✨ เรียก POST /invites ซึ่งจะสร้าง invite + ส่ง email จริง
+    await fetchSendInvite(userId, { email, role_id: roleId });
     await get().fetchInvites(userId);
   },
 

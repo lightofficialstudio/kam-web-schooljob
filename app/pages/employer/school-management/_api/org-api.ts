@@ -1,25 +1,17 @@
 // ─── API layer สำหรับ Organization / RBAC ────────────────────────────────────
 
+import axios from "axios";
+
 const BASE = "/api/v1/employer/organization";
 
-interface ApiResponse<T> {
-  status_code: number;
-  message_th: string;
-  message_en: string;
-  data: T;
-}
-
-async function request<T>(
-  url: string,
-  options: RequestInit = {},
-): Promise<T> {
-  const res = await fetch(url, {
+// ✨ helper สำหรับเรียก API ทุก endpoint
+async function request<T>(url: string, options: Parameters<typeof axios.request>[0] = {}): Promise<T> {
+  const res = await axios.request<{ status_code: number; message_th: string; message_en: string; data: T }>({
+    url,
     headers: { "Content-Type": "application/json" },
     ...options,
   });
-  const json: ApiResponse<T> = await res.json();
-  if (!res.ok) throw new Error(json.message_en ?? "API_ERROR");
-  return json.data;
+  return res.data.data;
 }
 
 // ─── Members ─────────────────────────────────────────────────────────────────
@@ -27,45 +19,44 @@ async function request<T>(
 export const fetchOrgMembers = (userId: string) =>
   request(`${BASE}/members?user_id=${userId}`);
 
-export const fetchInviteMember = (
-  userId: string,
-  body: { email: string; role_id: string },
-) =>
-  request(`${BASE}/members?user_id=${userId}`, {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-
 export const fetchUpdateMemberRole = (
   userId: string,
   body: { member_id: string; role_id: string },
 ) =>
   request(`${BASE}/members?user_id=${userId}`, {
     method: "PATCH",
-    body: JSON.stringify(body),
+    data: body,
   });
 
 export const fetchRemoveMember = (userId: string, memberId: string) =>
-  request(
-    `${BASE}/members?user_id=${userId}&member_id=${memberId}`,
-    { method: "DELETE" },
-  );
+  request(`${BASE}/members?user_id=${userId}&member_id=${memberId}`, {
+    method: "DELETE",
+  });
 
 // ─── Invites ─────────────────────────────────────────────────────────────────
 
 export const fetchPendingInvites = (userId: string) =>
   request(`${BASE}/invites?user_id=${userId}`);
 
+// ✨ ส่งคำเชิญ + ส่งอีเมลจริง
+export const fetchSendInvite = (
+  userId: string,
+  body: { email: string; role_id: string },
+) =>
+  request(`${BASE}/invites?user_id=${userId}`, {
+    method: "POST",
+    data: body,
+  });
+
 export const fetchRevokeInvite = (userId: string, inviteId: string) =>
-  request(
-    `${BASE}/invites?user_id=${userId}&invite_id=${inviteId}`,
-    { method: "DELETE" },
-  );
+  request(`${BASE}/invites?user_id=${userId}&invite_id=${inviteId}`, {
+    method: "DELETE",
+  });
 
 export const fetchAcceptInvite = (userId: string, token: string) =>
   request(`${BASE}/invites/accept?user_id=${userId}`, {
     method: "POST",
-    body: JSON.stringify({ token }),
+    data: { token },
   });
 
 // ─── Roles ────────────────────────────────────────────────────────────────────
@@ -79,7 +70,7 @@ export const fetchCreateRole = (
 ) =>
   request(`${BASE}/roles?user_id=${userId}`, {
     method: "POST",
-    body: JSON.stringify(body),
+    data: body,
   });
 
 export const fetchUpdateRole = (
@@ -89,7 +80,7 @@ export const fetchUpdateRole = (
 ) =>
   request(`${BASE}/roles?user_id=${userId}&role_id=${roleId}`, {
     method: "PATCH",
-    body: JSON.stringify(body),
+    data: body,
   });
 
 export const fetchDeleteRole = (userId: string, roleId: string) =>
@@ -102,13 +93,10 @@ export const fetchUpdateRolePermissions = (
   roleId: string,
   permissions: string[],
 ) =>
-  request(
-    `${BASE}/roles/permissions?user_id=${userId}&role_id=${roleId}`,
-    {
-      method: "PUT",
-      body: JSON.stringify({ permissions }),
-    },
-  );
+  request(`${BASE}/roles/permissions?user_id=${userId}&role_id=${roleId}`, {
+    method: "PUT",
+    data: { permissions },
+  });
 
 // ─── Delegated Access ────────────────────────────────────────────────────────
 
