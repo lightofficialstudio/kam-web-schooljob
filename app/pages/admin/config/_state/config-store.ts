@@ -8,6 +8,22 @@ import {
   updateConfigOption,
 } from "../_api/config-api";
 
+// ✨ Metadata ของแต่ละ Group — label ภาษาไทย + หน้าที่มีผลกระทบ
+export const GROUP_META: Record<string, { label: string; usedIn: string[] }> = {
+  school_type: {
+    label: "ประเภทโรงเรียน",
+    usedIn: ["/pages/employer/profile", "/pages/job (filter)"],
+  },
+  school_level: {
+    label: "ระดับชั้นที่เปิดสอน",
+    usedIn: ["/pages/employer/profile"],
+  },
+  job_category: {
+    label: "หมวดหมู่งาน (ตำแหน่งงาน)",
+    usedIn: ["/pages/landing", "/pages/job (filter)"],
+  },
+};
+
 // ✨ Modal state สำหรับรายงานสถานะ Success / Error / Warning
 interface ModalState {
   open: boolean;
@@ -24,6 +40,18 @@ interface ConfigStore {
   options: ConfigOption[];
   isLoading: boolean;
   isSaving: boolean;
+  // ✨ UI state — active tab + modal visibility
+  activeGroup: string;
+  isAddModalOpen: boolean;
+  defaultParentValue: string | null;
+  isEditModalOpen: boolean;
+  editingOption: ConfigOption | null;
+  // ✨ actions
+  setActiveGroup: (g: string) => void;
+  openAddModal: (parentValue?: string) => void;
+  closeAddModal: () => void;
+  openEditModal: (option: ConfigOption) => void;
+  closeEditModal: () => void;
   modal: ModalState;
   showModal: (opts: Omit<ModalState, "open">) => void;
   hideModal: () => void;
@@ -46,6 +74,24 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
   options: [],
   isLoading: false,
   isSaving: false,
+  activeGroup: "school_type",
+  isAddModalOpen: false,
+  defaultParentValue: null,
+  isEditModalOpen: false,
+  editingOption: null,
+
+  // ✨ เปลี่ยน active group tab
+  setActiveGroup: (g) => set({ activeGroup: g }),
+
+  // ✨ เปิด modal เพิ่มตัวเลือก (pre-fill parent ถ้ามี)
+  openAddModal: (parentValue) =>
+    set({ isAddModalOpen: true, defaultParentValue: parentValue ?? null }),
+  closeAddModal: () => set({ isAddModalOpen: false, defaultParentValue: null }),
+
+  // ✨ เปิด modal แก้ไขตัวเลือก
+  openEditModal: (option) =>
+    set({ isEditModalOpen: true, editingOption: option }),
+  closeEditModal: () => set({ isEditModalOpen: false, editingOption: null }),
   modal: DEFAULT_MODAL,
 
   // ✨ เปิด modal พร้อมตั้งค่า
