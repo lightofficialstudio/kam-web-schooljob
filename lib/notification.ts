@@ -8,6 +8,7 @@ export type NotificationType =
   | "invite_sent"             // EMPLOYEE ได้รับคำเชิญเข้าองค์กร
   | "invite_accepted"         // EMPLOYER สมาชิกยอมรับคำเชิญ
   | "job_posted"              // EMPLOYEE มีงานใหม่ตรงสาขา (reserved)
+  | "admin_action"            // ADMIN กระทำกับ Post/User/Blog (audit trail)
   | "system"                  // ทุก role — ประกาศจากระบบ
 
 // ─── สร้าง Notification ────────────────────────────────────────────────────────

@@ -1,16 +1,15 @@
 "use client";
 
-// ✨ Blog Stats Bar — KPI cards + category breakdown
+// ✨ Blog Stats Bar — KPI cards โดยใช้ SummaryCard กลาง
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   FileAddOutlined,
   RiseOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Flex, Row, Skeleton, Statistic, Typography, theme } from "antd";
+import { Col, Row, theme } from "antd";
+import { SummaryCard } from "@/app/components/card/summary-card.component";
 import { useAdminBlogStore } from "../_state/blog-store";
-
-const { Text } = Typography;
 
 export function BlogStatsBar() {
   const { token } = theme.useToken();
@@ -24,71 +23,54 @@ export function BlogStatsBar() {
   blogs.forEach((b) => { if (b.category) categoryCount[b.category] = (categoryCount[b.category] ?? 0) + 1; });
   const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0];
 
-  const cards = [
-    {
-      label: "บทความทั้งหมด",
-      value: total,
-      icon: <FileAddOutlined />,
-      color: token.colorPrimary,
-      sub: `แสดงผล ${blogs.length} รายการ`,
-    },
-    {
-      label: "เผยแพร่แล้ว",
-      value: published,
-      icon: <CheckCircleOutlined />,
-      color: "#52c41a",
-      sub: total > 0 ? `${Math.round((published / Math.max(blogs.length, 1)) * 100)}% ของทั้งหมด` : "—",
-    },
-    {
-      label: "ฉบับร่าง",
-      value: draft,
-      icon: <ClockCircleOutlined />,
-      color: "#fa8c16",
-      sub: draft > 0 ? "รอการเผยแพร่" : "ไม่มี draft",
-    },
-    {
-      label: "หมวดหมู่ยอดนิยม",
-      value: topCategory ? topCategory[1] : 0,
-      icon: <RiseOutlined />,
-      color: "#722ed1",
-      sub: topCategory ? topCategory[0] : "ยังไม่มีข้อมูล",
-    },
-  ];
-
   return (
     <Row gutter={[14, 14]}>
-      {cards.map((c) => (
-        <Col xs={12} sm={6} key={c.label}>
-          <Card
-            variant="borderless"
-            style={{
-              borderRadius: 14,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-              borderTop: `3px solid ${c.color}`,
-            }}
-            styles={{ body: { padding: "14px 18px" } }}
-          >
-            {isLoading ? (
-              <Flex vertical gap={6}>
-                <Skeleton.Input active size="small" style={{ width: 80, height: 12 }} />
-                <Skeleton.Input active size="large" style={{ width: 60, height: 28 }} />
-              </Flex>
-            ) : (
-              <Flex vertical gap={3}>
-                <Flex align="center" gap={6}>
-                  <Text style={{ color: c.color, fontSize: 14 }}>{c.icon}</Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{c.label}</Text>
-                </Flex>
-                <Statistic
-                  value={c.value}
-                  styles={{ content: { fontSize: 24, fontWeight: 700, color: c.color } }}
-                />
-                <Text type="secondary" style={{ fontSize: 11 }} ellipsis>{c.sub}</Text>
-              </Flex>
-            )}
-          </Card>
-        </Col>
-      ))}
+      <Col xs={12} sm={6}>
+        <SummaryCard
+          title="บทความทั้งหมด"
+          value={total}
+          unit="บทความ"
+          subtitle={`แสดงผล ${blogs.length} รายการ`}
+          icon={<FileAddOutlined />}
+          color={token.colorPrimary}
+          isLoading={isLoading}
+        />
+      </Col>
+      <Col xs={12} sm={6}>
+        <SummaryCard
+          title="เผยแพร่แล้ว"
+          value={published}
+          unit="บทความ"
+          subtitle={total > 0 ? `${Math.round((published / Math.max(blogs.length, 1)) * 100)}% ของทั้งหมด` : "—"}
+          icon={<CheckCircleOutlined />}
+          color="#52c41a"
+          isLoading={isLoading}
+          trend={published > 0 ? { value: `${published}`, direction: "up" } : undefined}
+        />
+      </Col>
+      <Col xs={12} sm={6}>
+        <SummaryCard
+          title="ฉบับร่าง"
+          value={draft}
+          unit="บทความ"
+          subtitle={draft > 0 ? "รอการเผยแพร่" : "ไม่มี draft"}
+          icon={<ClockCircleOutlined />}
+          color="#fa8c16"
+          isLoading={isLoading}
+          trend={draft > 0 ? { value: `${draft}`, direction: "neutral" } : undefined}
+        />
+      </Col>
+      <Col xs={12} sm={6}>
+        <SummaryCard
+          title="หมวดหมู่ยอดนิยม"
+          value={topCategory ? topCategory[1] : 0}
+          unit="บทความ"
+          subtitle={topCategory ? topCategory[0] : "ยังไม่มีข้อมูล"}
+          icon={<RiseOutlined />}
+          color="#722ed1"
+          isLoading={isLoading}
+        />
+      </Col>
     </Row>
   );
 }

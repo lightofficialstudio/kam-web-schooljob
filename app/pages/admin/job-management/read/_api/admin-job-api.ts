@@ -94,7 +94,7 @@ export const fetchDeleteJob = async (adminUserId: string, jobId: string, note?: 
   return data;
 };
 
-// ✨ ดึง Audit Logs
+// ✨ ดึง Audit Logs (รวมระบบ หรือ per-post ถ้าใส่ targetId)
 export const fetchAuditLogs = async (params: {
   adminUserId?: string;
   targetType?: string;
@@ -120,4 +120,9 @@ export const fetchAuditLogs = async (params: {
     pageSize: number;
     totalPages: number;
   };
+};
+
+// ✨ ดึง Audit Logs เฉพาะ Post นั้น ๆ (per-post timeline)
+export const fetchAuditLogsByJob = async (jobId: string, page = 1) => {
+  return fetchAuditLogs({ targetType: "job", targetId: jobId, page, pageSize: 50 });
 };

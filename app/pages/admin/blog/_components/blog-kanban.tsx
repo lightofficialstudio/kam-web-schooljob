@@ -15,7 +15,6 @@ import {
   Card,
   Empty,
   Flex,
-  Modal,
   Skeleton,
   Switch,
   Tag,
@@ -30,21 +29,27 @@ const { Text, Title } = Typography;
 // ✨ แปลงวันที่
 const fmtDate = (iso?: string | null) => {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 };
 
 // ✨ Blog card ใน kanban column
 function KanbanBlogCard({ blog }: { blog: AdminBlogItem }) {
   const { token } = theme.useToken();
-  const { openEdit, deleteBlog, quickPublish } = useAdminBlogStore();
+  const { openEdit, deleteBlog, quickPublish, showModal } = useAdminBlogStore();
 
+  // ✨ ใช้ store modal type="delete" แทน Modal.confirm ของ antd
   const handleDelete = () => {
-    Modal.confirm({
-      title: "ยืนยันการลบบทความ",
-      content: <Text>ต้องการลบ <Text strong>&ldquo;{blog.title}&rdquo;</Text> ใช่หรือไม่?</Text>,
-      okText: "ลบ", okButtonProps: { danger: true },
-      cancelText: "ยกเลิก",
-      onOk: () => deleteBlog(blog.id),
+    showModal({
+      type: "delete",
+      title: `ลบบทความ “${blog.title}”?`,
+      description: `บทความนี้จะถูกลบออกจากระบบถาวร ไม่สามารถย้อนกลับได้`,
+      confirmLabel: "ลบถาวร",
+      cancelLabel: "ยกเลิก",
+      onConfirm: () => deleteBlog(blog.id),
     });
   };
 
@@ -75,16 +80,29 @@ function KanbanBlogCard({ blog }: { blog: AdminBlogItem }) {
 
         {/* ✨ Category + date */}
         <Flex align="center" justify="space-between">
-          {blog.category
-            ? <Tag color="processing" style={{ fontSize: 11, borderRadius: 6, margin: 0 }}>{blog.category}</Tag>
-            : <span />}
+          {blog.category ? (
+            <Tag
+              color="processing"
+              style={{ fontSize: 11, borderRadius: 6, margin: 0 }}
+            >
+              {blog.category}
+            </Tag>
+          ) : (
+            <span />
+          )}
           <Text type="secondary" style={{ fontSize: 11 }}>
-            {blog.status === "PUBLISHED" ? fmtDate(blog.publishedAt) : `แก้ไข ${fmtDate(blog.updatedAt)}`}
+            {blog.status === "PUBLISHED"
+              ? fmtDate(blog.publishedAt)
+              : `แก้ไข ${fmtDate(blog.updatedAt)}`}
           </Text>
         </Flex>
 
         {/* ✨ Title */}
-        <Text strong style={{ fontSize: 13, lineHeight: 1.4 }} ellipsis={{ tooltip: blog.title }}>
+        <Text
+          strong
+          style={{ fontSize: 13, lineHeight: 1.4 }}
+          ellipsis={{ tooltip: blog.title }}
+        >
           {blog.title}
         </Text>
 
@@ -92,44 +110,86 @@ function KanbanBlogCard({ blog }: { blog: AdminBlogItem }) {
         {blog.tags.length > 0 && (
           <Flex gap={4} wrap="wrap">
             {blog.tags.slice(0, 3).map((t) => (
-              <Tag key={t} style={{ fontSize: 10, borderRadius: 6, margin: 0 }}>{t}</Tag>
+              <Tag key={t} style={{ fontSize: 10, borderRadius: 6, margin: 0 }}>
+                {t}
+              </Tag>
             ))}
-            {blog.tags.length > 3 && <Text type="secondary" style={{ fontSize: 11 }}>+{blog.tags.length - 3}</Text>}
+            {blog.tags.length > 3 && (
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                +{blog.tags.length - 3}
+              </Text>
+            )}
           </Flex>
         )}
 
         {/* ✨ Footer: viewCount + actions */}
-        <Flex align="center" justify="space-between" style={{ paddingTop: 8, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
+        <Flex
+          align="center"
+          justify="space-between"
+          style={{
+            paddingTop: 8,
+            borderTop: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           {/* ✨ ยอดวิว */}
           {blog.status === "PUBLISHED" ? (
             <Flex align="center" gap={4}>
-              <EyeOutlined style={{ fontSize: 11, color: token.colorTextSecondary }} />
+              <EyeOutlined
+                style={{ fontSize: 11, color: token.colorTextSecondary }}
+              />
               <Text type="secondary" style={{ fontSize: 11, fontWeight: 600 }}>
                 {(blog.viewCount ?? 0).toLocaleString()}
               </Text>
             </Flex>
           ) : (
             <Flex align="center" gap={6}>
-              <Avatar size={18} src={blog.author.imageUrl ?? undefined} style={{ background: token.colorPrimary, fontSize: 9 }}>
+              <Avatar
+                size={18}
+                src={blog.author.imageUrl ?? undefined}
+                style={{ background: token.colorPrimary, fontSize: 9 }}
+              >
                 {!blog.author.imageUrl && blog.author.name.charAt(0)}
               </Avatar>
-              <Text type="secondary" style={{ fontSize: 11 }} ellipsis>{blog.author.name}</Text>
+              <Text type="secondary" style={{ fontSize: 11 }} ellipsis>
+                {blog.author.name}
+              </Text>
             </Flex>
           )}
 
           <Flex align="center" gap={4}>
             {blog.status === "PUBLISHED" && (
               <Tooltip title="ดูบทความ">
-                <Button size="small" type="text" icon={<EyeOutlined />} href={`/pages/blog/${blog.id}`} target="_blank" />
+                <Button
+                  size="small"
+                  type="text"
+                  icon={<EyeOutlined />}
+                  href={`/pages/blog/${blog.id}`}
+                  target="_blank"
+                />
               </Tooltip>
             )}
             <Tooltip title="แก้ไข">
-              <Button size="small" type="text" icon={<EditOutlined />} onClick={() => openEdit(blog)} />
+              <Button
+                size="small"
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => openEdit(blog)}
+              />
             </Tooltip>
             <Tooltip title="ลบ">
-              <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={handleDelete} />
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleDelete}
+              />
             </Tooltip>
-            <Tooltip title={blog.status === "DRAFT" ? "เผยแพร่ทันที" : "ย้ายกลับ Draft"}>
+            <Tooltip
+              title={
+                blog.status === "DRAFT" ? "เผยแพร่ทันที" : "ย้ายกลับ Draft"
+              }
+            >
               <Switch
                 size="small"
                 checked={blog.status === "PUBLISHED"}
@@ -175,15 +235,41 @@ function KanbanColumn({
       }}
     >
       <Flex align="center" gap={8} style={{ marginBottom: 14 }}>
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: color }} />
-        <Text strong style={{ fontSize: 14 }}>{title}</Text>
-        <Tag style={{ marginLeft: "auto", borderRadius: 20, fontSize: 12, background: color + "20", borderColor: color, color }}>
+        <div
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: color,
+          }}
+        />
+        <Text strong style={{ fontSize: 14 }}>
+          {title}
+        </Text>
+        <Tag
+          style={{
+            marginLeft: "auto",
+            borderRadius: 20,
+            fontSize: 12,
+            background: color + "20",
+            borderColor: color,
+            color,
+          }}
+        >
           {count}
         </Tag>
       </Flex>
 
       {blogs.length === 0 ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary" style={{ fontSize: 12 }}>ไม่มีบทความ</Text>} style={{ padding: "20px 0" }} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ไม่มีบทความ
+            </Text>
+          }
+          style={{ padding: "20px 0" }}
+        />
       ) : (
         blogs.map((b) => <KanbanBlogCard key={b.id} blog={b} />)
       )}
@@ -202,7 +288,11 @@ export function BlogKanban() {
         {[0, 1].map((i) => (
           <div key={i} style={{ flex: 1, minWidth: 300 }}>
             {[0, 1, 2].map((j) => (
-              <Card key={j} variant="borderless" style={{ borderRadius: 12, marginBottom: 10 }}>
+              <Card
+                key={j}
+                variant="borderless"
+                style={{ borderRadius: 12, marginBottom: 10 }}
+              >
                 <Skeleton active paragraph={{ rows: 3 }} />
               </Card>
             ))}
@@ -213,9 +303,23 @@ export function BlogKanban() {
   }
 
   return (
-    <Flex gap={16} align="flex-start" style={{ overflowX: "auto", paddingBottom: 8 }}>
-      <KanbanColumn title="ฉบับร่าง (Draft)" blogs={draft} color="#fa8c16" count={draft.length} />
-      <KanbanColumn title="เผยแพร่แล้ว" blogs={published} color="#52c41a" count={published.length} />
+    <Flex
+      gap={16}
+      align="flex-start"
+      style={{ overflowX: "auto", paddingBottom: 8 }}
+    >
+      <KanbanColumn
+        title="ฉบับร่าง (Draft)"
+        blogs={draft}
+        color="#fa8c16"
+        count={draft.length}
+      />
+      <KanbanColumn
+        title="เผยแพร่แล้ว"
+        blogs={published}
+        color="#52c41a"
+        count={published.length}
+      />
     </Flex>
   );
 }

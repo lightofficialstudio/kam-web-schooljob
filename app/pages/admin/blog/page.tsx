@@ -628,7 +628,10 @@ export default function AdminBlogPage() {
         description={modal.description}
         errorDetails={modal.errorDetails}
         loading={modal.loading}
+        confirmLabel={modal.confirmLabel}
+        cancelLabel={modal.cancelLabel}
         onClose={hideModal}
+        onConfirm={modal.onConfirm}
       />
     </div>
   );

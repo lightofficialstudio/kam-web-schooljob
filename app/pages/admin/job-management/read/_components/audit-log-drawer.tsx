@@ -1,16 +1,32 @@
 "use client";
 
 import { AuditOutlined } from "@ant-design/icons";
-import { Avatar, Drawer, Empty, Flex, List, Pagination, Spin, Tag, Typography } from "antd";
+import {
+  Avatar, Drawer, Empty, Flex, List, Pagination,
+  Select, Spin, Tag, Typography,
+} from "antd";
 import dayjs from "dayjs";
 import { useAdminJobStore } from "../_state/admin-job-store";
 
 const { Text } = Typography;
 
+const ACTION_OPTIONS = [
+  { label: "ทุก action",        value: "" },
+  { label: "สร้างประกาศงาน",   value: "CREATE_JOB" },
+  { label: "เปลี่ยนสถานะ",     value: "UPDATE_JOB_STATUS" },
+  { label: "ลบประกาศงาน",       value: "DELETE_JOB" },
+];
+
 const ACTION_COLOR: Record<string, string> = {
-  CREATE_JOB:          "green",
-  UPDATE_JOB_STATUS:   "blue",
-  DELETE_JOB:          "red",
+  CREATE_JOB:        "green",
+  UPDATE_JOB_STATUS: "blue",
+  DELETE_JOB:        "red",
+};
+
+const ACTION_TH: Record<string, string> = {
+  CREATE_JOB:        "สร้างประกาศ",
+  UPDATE_JOB_STATUS: "เปลี่ยนสถานะ",
+  DELETE_JOB:        "ลบประกาศ",
 };
 
 interface AuditLogDrawerProps {
@@ -21,8 +37,14 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
   const {
     auditDrawerOpen, closeAuditDrawer,
     auditLogs, auditTotal, auditPage, auditTotalPages,
+    auditFilterAction, setAuditFilterAction,
     isLoadingAudit, fetchAuditLogs,
   } = useAdminJobStore();
+
+  const handleFilterChange = (val: string) => {
+    setAuditFilterAction(val);
+    fetchAuditLogs(adminUserId, 1, val);
+  };
 
   return (
     <Drawer
@@ -31,11 +53,27 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
       title={
         <Flex gap={8} align="center">
           <AuditOutlined />
-          <span>Audit Log — ประกาศงาน</span>
+          <span>Audit Log รวม — ประกาศงาน</span>
+          {auditTotal > 0 && (
+            <Tag color="blue" style={{ marginLeft: 4, fontSize: 11 }}>
+              {auditTotal} รายการ
+            </Tag>
+          )}
         </Flex>
       }
-      width={480}
+      width={500}
     >
+      {/* filter */}
+      <Flex justify="flex-end" style={{ marginBottom: 16 }}>
+        <Select
+          style={{ width: 180 }}
+          value={auditFilterAction}
+          options={ACTION_OPTIONS}
+          onChange={handleFilterChange}
+          size="small"
+        />
+      </Flex>
+
       {isLoadingAudit ? (
         <Flex justify="center" style={{ paddingTop: 40 }}>
           <Spin />
@@ -49,11 +87,7 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
             renderItem={(log) => (
               <List.Item style={{ padding: "10px 0" }}>
                 <Flex gap={12} align="flex-start" style={{ width: "100%" }}>
-                  <Avatar
-                    src={log.admin.profileImageUrl}
-                    size={36}
-                    style={{ flexShrink: 0 }}
-                  >
+                  <Avatar src={log.admin.profileImageUrl} size={36} style={{ flexShrink: 0 }}>
                     {log.admin.firstName?.[0] ?? "A"}
                   </Avatar>
                   <Flex vertical gap={4} style={{ flex: 1, minWidth: 0 }}>
@@ -61,12 +95,15 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
                       <Text strong style={{ fontSize: 12 }}>
                         {[log.admin.firstName, log.admin.lastName].filter(Boolean).join(" ") || log.admin.email}
                       </Text>
-                      <Tag color={ACTION_COLOR[log.action] ?? "default"} style={{ fontSize: 10 }}>
-                        {log.action}
+                      <Tag
+                        color={ACTION_COLOR[log.action] ?? "default"}
+                        style={{ fontSize: 10, margin: 0 }}
+                      >
+                        {ACTION_TH[log.action] ?? log.action}
                       </Tag>
                     </Flex>
                     {log.targetLabel && (
-                      <Text style={{ fontSize: 12 }} type="secondary" ellipsis>
+                      <Text style={{ fontSize: 12 }} ellipsis={{ tooltip: log.targetLabel }}>
                         {log.targetLabel}
                       </Text>
                     )}
@@ -76,13 +113,14 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
                       </Text>
                     )}
                     <Text style={{ fontSize: 10 }} type="secondary">
-                      {dayjs(log.createdAt).format("D MMM YYYY HH:mm")}
+                      {dayjs(log.createdAt).format("D MMM YYYY HH:mm:ss")}
                     </Text>
                   </Flex>
                 </Flex>
               </List.Item>
             )}
           />
+
           {auditTotalPages > 1 && (
             <Flex justify="center">
               <Pagination

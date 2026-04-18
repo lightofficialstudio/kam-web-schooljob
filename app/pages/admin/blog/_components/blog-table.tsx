@@ -1,16 +1,11 @@
 "use client";
 
 // ✨ Blog Table — ตารางรายการบทความพร้อม bulk actions + quick-publish
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  SendOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Button,
-  Modal,
+  Flex,
   Skeleton,
   Switch,
   Table,
@@ -26,20 +21,36 @@ const { Text } = Typography;
 
 const fmtDate = (iso?: string | null) => {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 };
 
 export function BlogTable() {
   const { token } = theme.useToken();
-  const { blogs, total, isLoading, page, setPage, openEdit, deleteBlog, quickPublish } = useAdminBlogStore();
+  const {
+    blogs,
+    total,
+    isLoading,
+    page,
+    setPage,
+    openEdit,
+    deleteBlog,
+    quickPublish,
+    showModal,
+  } = useAdminBlogStore();
 
+  // ✨ เปิด confirm modal ก่อนลบ — ใช้ type="delete" เพื่อป้องกันการลบผิดพลาด
   const handleDelete = (blog: AdminBlogItem) => {
-    Modal.confirm({
-      title: "ยืนยันการลบบทความ",
-      content: <Text>ต้องการลบ <Text strong>&ldquo;{blog.title}&rdquo;</Text> ใช่หรือไม่?</Text>,
-      okText: "ลบ", okButtonProps: { danger: true },
-      cancelText: "ยกเลิก",
-      onOk: () => deleteBlog(blog.id),
+    showModal({
+      type: "delete",
+      title: `ลบบทความ “${blog.title}”?`,
+      description: `บทความนี้จะถูกลบออกจากระบบถาวร ไม่สามารถย้อนกลับได้`,
+      confirmLabel: "ลบถาวร",
+      cancelLabel: "ยกเลิก",
+      onConfirm: () => deleteBlog(blog.id),
     });
   };
 
@@ -52,25 +63,38 @@ export function BlogTable() {
           {b.coverImageUrl ? (
             <div
               style={{
-                width: 48, height: 36, borderRadius: 6, flexShrink: 0,
+                width: 48,
+                height: 36,
+                borderRadius: 6,
+                flexShrink: 0,
                 backgroundImage: `url(${b.coverImageUrl})`,
-                backgroundSize: "cover", backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
             />
           ) : (
             <div
               style={{
-                width: 48, height: 36, borderRadius: 6, flexShrink: 0,
+                width: 48,
+                height: 36,
+                borderRadius: 6,
+                flexShrink: 0,
                 background: token.colorPrimaryBg,
-                display: "flex", alignItems: "center", justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Text style={{ color: token.colorPrimary, fontSize: 16 }}>✍</Text>
             </div>
           )}
           <div>
-            <Text strong style={{ fontSize: 13, display: "block" }} ellipsis>{b.title}</Text>
-            <Text type="secondary" style={{ fontSize: 11 }}>/blog/{b.slug}</Text>
+            <Text strong style={{ fontSize: 13, display: "block" }} ellipsis>
+              {b.title}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              /blog/{b.slug}
+            </Text>
           </div>
         </div>
       ),
@@ -80,7 +104,14 @@ export function BlogTable() {
       title: "หมวดหมู่",
       dataIndex: "category",
       key: "category",
-      render: (cat: string) => cat ? <Tag color="processing" style={{ borderRadius: 6, fontSize: 11 }}>{cat}</Tag> : <Text type="secondary">—</Text>,
+      render: (cat: string) =>
+        cat ? (
+          <Tag color="processing" style={{ borderRadius: 6, fontSize: 11 }}>
+            {cat}
+          </Tag>
+        ) : (
+          <Text type="secondary">—</Text>
+        ),
       width: 140,
     },
     {
@@ -101,14 +132,19 @@ export function BlogTable() {
     {
       title: "ยอดวิว",
       key: "viewCount",
-      render: (_, b) => b.status === "PUBLISHED" ? (
-        <Flex align="center" gap={4}>
-          <EyeOutlined style={{ fontSize: 12, color: "#8c8c8c" }} />
-          <Text style={{ fontSize: 13, fontWeight: 600 }}>{(b.viewCount ?? 0).toLocaleString()}</Text>
-        </Flex>
-      ) : (
-        <Text type="secondary" style={{ fontSize: 12 }}>—</Text>
-      ),
+      render: (_, b) =>
+        b.status === "PUBLISHED" ? (
+          <Flex align="center" gap={4}>
+            <EyeOutlined style={{ fontSize: 12, color: "#8c8c8c" }} />
+            <Text style={{ fontSize: 13, fontWeight: 600 }}>
+              {(b.viewCount ?? 0).toLocaleString()}
+            </Text>
+          </Flex>
+        ) : (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            —
+          </Text>
+        ),
       width: 100,
       sorter: (a, b) => (a.viewCount ?? 0) - (b.viewCount ?? 0),
     },
@@ -117,21 +153,30 @@ export function BlogTable() {
       key: "date",
       render: (_, b) => (
         <Text type="secondary" style={{ fontSize: 12 }}>
-          {b.status === "PUBLISHED" ? fmtDate(b.publishedAt) : `แก้ไข ${fmtDate(b.updatedAt)}`}
+          {b.status === "PUBLISHED"
+            ? fmtDate(b.publishedAt)
+            : `แก้ไข ${fmtDate(b.updatedAt)}`}
         </Text>
       ),
       width: 130,
-      sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      sorter: (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
     },
     {
       title: "ผู้เขียน",
       key: "author",
       render: (_, b) => (
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <Avatar size={22} src={b.author.imageUrl ?? undefined} style={{ background: token.colorPrimary, fontSize: 10 }}>
+          <Avatar
+            size={22}
+            src={b.author.imageUrl ?? undefined}
+            style={{ background: token.colorPrimary, fontSize: 10 }}
+          >
             {!b.author.imageUrl && b.author.name.charAt(0)}
           </Avatar>
-          <Text style={{ fontSize: 12 }} ellipsis>{b.author.name}</Text>
+          <Text style={{ fontSize: 12 }} ellipsis>
+            {b.author.name}
+          </Text>
         </div>
       ),
       width: 130,
@@ -143,14 +188,31 @@ export function BlogTable() {
         <div style={{ display: "flex", gap: 2 }}>
           {b.status === "PUBLISHED" && (
             <Tooltip title="ดูบทความ">
-              <Button size="small" type="text" icon={<EyeOutlined />} href={`/pages/blog/${b.id}`} target="_blank" />
+              <Button
+                size="small"
+                type="text"
+                icon={<EyeOutlined />}
+                href={`/pages/blog/${b.id}`}
+                target="_blank"
+              />
             </Tooltip>
           )}
           <Tooltip title="แก้ไข">
-            <Button size="small" type="text" icon={<EditOutlined />} onClick={() => openEdit(b)} />
+            <Button
+              size="small"
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => openEdit(b)}
+            />
           </Tooltip>
           <Tooltip title="ลบ">
-            <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(b)} />
+            <Button
+              size="small"
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(b)}
+            />
           </Tooltip>
         </div>
       ),
@@ -180,7 +242,10 @@ export function BlogTable() {
       scroll={{ x: 900 }}
       size="middle"
       rowClassName={() => "blog-table-row"}
-      onRow={(b) => ({ onDoubleClick: () => openEdit(b), style: { cursor: "pointer" } })}
+      onRow={(b) => ({
+        onDoubleClick: () => openEdit(b),
+        style: { cursor: "pointer" },
+      })}
       style={{ background: "transparent" }}
     />
   );

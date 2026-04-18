@@ -95,12 +95,18 @@ interface BlogStore {
     description: string;
     errorDetails?: unknown;
     loading: boolean;
+    onConfirm?: () => void | Promise<void>;
+    confirmLabel?: string;
+    cancelLabel?: string;
   };
   showModal: (opts: {
     type: ModalType;
     title: string;
     description?: string;
     errorDetails?: unknown;
+    onConfirm?: () => void | Promise<void>;
+    confirmLabel?: string;
+    cancelLabel?: string;
   }) => void;
   hideModal: () => void;
   // ✨ AI actions
@@ -145,6 +151,9 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
         title: opts.title,
         description: opts.description ?? "",
         errorDetails: opts.errorDetails,
+        onConfirm: opts.onConfirm,
+        confirmLabel: opts.confirmLabel,
+        cancelLabel: opts.cancelLabel,
         loading: false,
       },
     }),

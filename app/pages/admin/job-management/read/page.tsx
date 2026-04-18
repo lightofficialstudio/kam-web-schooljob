@@ -19,7 +19,7 @@ export default function AdminJobManagementPage() {
   const { user } = useAuthStore();
 
   const {
-    jobs, total, totalPages, page, pageSize, isLoading,
+    jobs, total, page, pageSize, isLoading,
     fetchJobs, setPage,
     openDrawer, openAuditDrawer, fetchAuditLogs,
     updateStatus, deleteJob,
@@ -107,7 +107,7 @@ export default function AdminJobManagementPage() {
       />
 
       {/* Drawers */}
-      <JobDetailDrawer adminUserId={adminUserId} onUpdateStatus={handleUpdateStatus} />
+      <JobDetailDrawer onUpdateStatus={handleUpdateStatus} />
       <AuditLogDrawer adminUserId={adminUserId} />
     </Flex>
   );

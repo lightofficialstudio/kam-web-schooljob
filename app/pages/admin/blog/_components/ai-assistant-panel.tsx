@@ -24,7 +24,6 @@ import {
   Tag,
   Tooltip,
   Typography,
-  message,
   theme,
 } from "antd";
 import { useState } from "react";
@@ -139,7 +138,7 @@ export function AiAssistantPanel({
   currentCategory,
 }: AiAssistantPanelProps) {
   const { token } = theme.useToken();
-  const { aiAssist, isAiLoading, aiSeoScore } = useAdminBlogStore();
+  const { aiAssist, isAiLoading, aiSeoScore, showModal } = useAdminBlogStore();
 
   const [activeTab, setActiveTab] = useState<
     "title" | "excerpt" | "content" | "tags" | "seo"
@@ -155,7 +154,13 @@ export function AiAssistantPanel({
   const handleGenerate = async () => {
     if (activeTab === "title") {
       if (!topic.trim()) {
-        message.warning("กรุณาระบุหัวข้อก่อน");
+        showModal({
+          type: "confirm",
+          title: "กรุณาระบุหัวข้อก่อน",
+          description:
+            "กรอกคำหัวข้อบทความที่ต้องการให้ AI ช่วยสร้างชื่อบทความก่อน",
+          confirmLabel: "ตกลง",
+        });
         return;
       }
       const result = (await aiAssist({
@@ -172,7 +177,13 @@ export function AiAssistantPanel({
       }
     } else if (activeTab === "excerpt") {
       if (!currentTitle) {
-        message.warning("กรุณาใส่ชื่อบทความในฟอร์มก่อน");
+        showModal({
+          type: "confirm",
+          title: "กรุณาใส่ชื่อบทความในฟอร์มก่อน",
+          description:
+            "กรอกชื่อบทความในฟอร์มก่อน เพื่อให้ AI สร้างสรุปย่อได้ตรงเป้าหมายมากขึ้น",
+          confirmLabel: "ตกลง",
+        });
         return;
       }
       const result = (await aiAssist({
@@ -184,7 +195,13 @@ export function AiAssistantPanel({
       if (result?.excerpt) setGeneratedExcerpt(result.excerpt);
     } else if (activeTab === "content") {
       if (!currentTitle && !topic) {
-        message.warning("กรุณาระบุหัวข้อหรือชื่อบทความก่อน");
+        showModal({
+          type: "confirm",
+          title: "กรุณาระบุหัวข้อหรือชื่อบทความก่อน",
+          description:
+            'กรอกชื่อบทความในฟอร์ม หรือระบุหัวข้อในช่อง "ระบุหัวข้อที่ต้องการ" บนแผงนี้ เพื่อให้ AI เขียนเนื้อหาได้ประสิทธิภาพมากกว่า',
+          confirmLabel: "ตกลง",
+        });
         return;
       }
       const result = (await aiAssist({
@@ -196,7 +213,13 @@ export function AiAssistantPanel({
       if (result?.content) setGeneratedContent(result.content);
     } else if (activeTab === "tags") {
       if (!currentTitle) {
-        message.warning("กรุณาใส่ชื่อบทความก่อน");
+        showModal({
+          type: "confirm",
+          title: "กรุณาใส่ชื่อบทความก่อน",
+          description:
+            "กรอกชื่อบทความในฟอร์มก่อน เพื่อให้ AI แนะนำ tags ที่เหมาะสมกับเนื้อหาได้ถูกต้องมากขึ้น",
+          confirmLabel: "ตกลง",
+        });
         return;
       }
       const result = (await aiAssist({
@@ -208,7 +231,13 @@ export function AiAssistantPanel({
       if (result?.tags) setGeneratedTags(result.tags);
     } else if (activeTab === "seo") {
       if (!currentTitle) {
-        message.warning("กรุณาใส่ชื่อบทความก่อน");
+        showModal({
+          type: "confirm",
+          title: "กรุณาใส่ชื่อบทความก่อน",
+          description:
+            "ความแม่นยำของชื่อบทความจะช่วยให้ผลวิเคราะห์ SEO แม่นยำมากขึ้น",
+          confirmLabel: "ตกลง",
+        });
         return;
       }
       await aiAssist({
@@ -399,7 +428,6 @@ export function AiAssistantPanel({
               }}
               onClick={() => {
                 onApplyTitle?.(t);
-                message.success("ใส่ชื่อบทความแล้ว");
               }}
             >
               <Text style={{ fontSize: 13, flex: 1 }}>{t}</Text>
@@ -433,7 +461,6 @@ export function AiAssistantPanel({
             ghost
             onClick={() => {
               onApplyExcerpt?.(generatedExcerpt);
-              message.success("ใส่สรุปย่อแล้ว");
             }}
           >
             นำไปใส่ในฟอร์ม
@@ -453,7 +480,6 @@ export function AiAssistantPanel({
               type="primary"
               onClick={() => {
                 onApplyContent?.(generatedContent);
-                message.success("ใส่เนื้อหาแล้ว");
               }}
             >
               นำไปใช้
@@ -492,7 +518,6 @@ export function AiAssistantPanel({
                 style={{ cursor: "pointer", borderRadius: 6, fontSize: 12 }}
                 onClick={() => {
                   onApplyTags?.(generatedTags);
-                  message.success("เพิ่ม tags แล้ว");
                 }}
               >
                 {tag}
@@ -505,7 +530,6 @@ export function AiAssistantPanel({
             ghost
             onClick={() => {
               onApplyTags?.(generatedTags);
-              message.success("ใส่ tags ทั้งหมดแล้ว");
             }}
           >
             ใส่ tags ทั้งหมด

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { JobStatus } from "@prisma/client";
 import { createJobSchema } from "@/app/api/v1/employer/jobs/validation/job-schema";
+import { createAuditLog } from "../service/admin-job-service";
 
 // ✨ POST /api/v1/admin/jobs/create?admin_user_id=xxx&school_profile_id=xxx
 // Admin สร้างประกาศงานแทนโรงเรียนใดก็ได้ในระบบ
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     // ✨ ตรวจสอบ role ว่าเป็น ADMIN จริง
     const adminProfile = await prisma.profile.findUnique({
       where: { userId: adminUserId },
-      select: { role: true },
+      select: { id: true, role: true },
     });
 
     if (!adminProfile) {
@@ -149,6 +150,23 @@ export async function POST(request: Request) {
         include: { jobSubjects: true, jobGrades: true, jobBenefits: true },
       });
     });
+
+    // ✨ บันทึก Audit Log + แจ้งเตือน Admin หลังสร้างสำเร็จ
+    if (job && adminProfile?.id) {
+      const school = await prisma.schoolProfile.findUnique({
+        where: { id: schoolProfileId },
+        select: { schoolName: true },
+      });
+      createAuditLog({
+        adminId:     adminProfile.id,
+        action:      "CREATE_JOB",
+        targetType:  "job",
+        targetId:    job.id,
+        targetLabel: `${job.title} (${school?.schoolName ?? schoolProfileId})`,
+        note:        `สร้างในนาม ${school?.schoolName ?? schoolProfileId}`,
+        metadata:    { schoolProfileId, status: job.status },
+      }).catch((e) => console.error("❌ [audit] create_job:", e));
+    }
 
     return Response.json(
       {
