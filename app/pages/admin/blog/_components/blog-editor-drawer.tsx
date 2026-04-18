@@ -198,6 +198,7 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
   const watchedTitle = Form.useWatch("title", form) as string | undefined;
   const watchedExcerpt = Form.useWatch("excerpt", form) as string | undefined;
   const watchedSlug = Form.useWatch("slug", form) as string | undefined;
+  const watchedContent = Form.useWatch("content", form) as string | undefined;
 
   // ✨ AI callbacks — ใส่ค่าที่ AI generate ลงใน form ทันที
   const handleApplyTitle = (title: string) =>
@@ -545,6 +546,40 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
                 }}
               />
             </Form.Item>
+
+            {/* ✨ Reading Time + Word Count badge — คำนวณ real-time ขณะพิมพ์ */}
+            {(() => {
+              const raw = (watchedContent ?? "").trim();
+              // ✨ นับคำ: แยกด้วย whitespace และ zero-width chars, กรองบรรทัดว่าง
+              const wordCount =
+                raw.length === 0
+                  ? 0
+                  : raw.split(/[\s\u200b\u3000\n\r]+/).filter(Boolean).length;
+              // ✨ เฉลี่ย 200 คำ/นาที สำหรับภาษาไทย (ภาษาอังกฤษ ~250)
+              const minutes = Math.max(1, Math.ceil(wordCount / 200));
+              return wordCount > 0 ? (
+                <div
+                  style={{
+                    marginTop: -16,
+                    marginBottom: 20,
+                    textAlign: "right",
+                  }}
+                >
+                  <Text
+                    type="secondary"
+                    style={{
+                      fontSize: 12,
+                      background: token.colorFillSecondary,
+                      padding: "2px 10px",
+                      borderRadius: 20,
+                      display: "inline-block",
+                    }}
+                  >
+                    ~{minutes} min read · {wordCount.toLocaleString()} คำ
+                  </Text>
+                </div>
+              ) : null;
+            })()}
           </Form>
         </Col>
 
