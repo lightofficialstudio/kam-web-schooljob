@@ -121,6 +121,9 @@ model Profile {
   orgInvitedByMe OrgMember[] @relation("OrgMemberInviter")
   orgInvitesSent OrgInvite[] @relation("OrgInviteInviter")
 
+  // Relations — Admin
+  adminAuditLogs AdminAuditLog[] @relation("AdminAuditLogAdmin")
+
   @@index([role], name: "idx_profiles_role")
   @@index([userId], name: "idx_profiles_user_id")
   @@map("profiles")
@@ -638,6 +641,26 @@ model ConfigOption {
   @@unique([group, value], name: "unique_config_option")
   @@index([group, isActive], name: "idx_config_options_group_active")
   @@map("config_options")
+}
+
+// ── admin_audit_logs — บันทึกการกระทำของ ADMIN ทุกรายการ ──
+model AdminAuditLog {
+  id           String   @id @default(uuid())
+  adminId      String   @map("admin_id") // profileId ของ Admin
+  action       String   // CREATE_JOB | UPDATE_JOB_STATUS | DELETE_JOB | ...
+  targetType   String   @map("target_type") // job | user | blog | ...
+  targetId     String   @map("target_id") // id ของ record ที่ถูกกระทำ
+  targetLabel  String?  @map("target_label") // ชื่อ/label เพื่อให้อ่านง่าย
+  note         String?  // หมายเหตุเพิ่มเติม
+  metadata     String?  // JSON payload ก่อน/หลัง (optional)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  admin Profile @relation("AdminAuditLogAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId], name: "idx_admin_audit_logs_admin_id")
+  @@index([targetType, targetId], name: "idx_admin_audit_logs_target")
+  @@index([createdAt], name: "idx_admin_audit_logs_created_at")
+  @@map("admin_audit_logs")
 }
 
 // ── ตารางเก็บ Package Plan ทั้งหมด — Admin จัดการได้ครบจาก Dashboard ──
