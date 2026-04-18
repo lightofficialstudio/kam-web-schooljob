@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { fetchJobById, fetchJobList } from "../_api/job-search-api";
+import { fetchJobById, fetchJobList, fetchJobOptions } from "../_api/job-search-api";
+import { buildCascaderTree, type CascaderNode } from "@/app/pages/landing/_api/landing-api";
 
 export interface Job {
   id: string;
@@ -41,13 +42,11 @@ export interface JobFilters {
   gradeLevel: string | null;
 }
 
-// แผนที่จังหวัดตาม Location Filter
-const LOCATION_MAP: Record<string, string> = {
-  bkk: "กรุงเทพมหานคร",
-  center: "นนทบุรี",
-  north: "เชียงใหม่",
-  east: "ชลบุรี",
-};
+// ✨ URL ข้อมูลภูมิศาสตร์ไทยจาก GitHub
+const BASE_GEO = "https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest";
+
+interface Province { id: number; name_th: string; }
+interface District { id: number; name_th: string; province_id: number; }
 
 interface JobSearchState {
   jobs: Job[];
@@ -59,6 +58,13 @@ interface JobSearchState {
   selectedJob: Job | null;
   isDrawerOpen: boolean;
   pageSize: number;
+  // ✨ Options สำหรับ dropdown — โหลดจาก API/GitHub
+  jobCategories: CascaderNode[];
+  geoOptions: CascaderNode[];
+  schoolTypeOptions: { value: string; label: string }[];
+  isLoadingCategories: boolean;
+  isLoadingGeo: boolean;
+  fetchOptions: () => Promise<void>;        // ✨ โหลด categories + geo + school_type
   fetchJobs: () => Promise<void>;           // ✨ โหลดครั้งแรก (reset list)
   loadMore: () => Promise<void>;            // ✨ โหลดเพิ่มเติม (append)
   fetchAndOpenJob: (id: string) => Promise<void>; // ✨ ดึง job แล้วเปิด Drawer (จาก URL param)
@@ -84,9 +90,8 @@ const DEFAULT_FILTERS: JobFilters = {
 
 // ✨ แปลง filters → query params
 const buildParams = (filters: JobFilters, cursor?: string | null, pageSize = 10) => {
-  const province = filters.location
-    ? LOCATION_MAP[filters.location] ?? filters.location
-    : undefined;
+  // location อาจเป็น string (province) หรือมาจาก Cascader เดิม
+  const province = filters.location ?? undefined;
 
   const licenseMap: Record<string, string> = {
     required: "required",
@@ -100,6 +105,7 @@ const buildParams = (filters: JobFilters, cursor?: string | null, pageSize = 10)
     ...(filters.schoolType && { school_type: filters.schoolType }),
     ...(filters.license && { license: licenseMap[filters.license] }),
     ...(filters.gradeLevel && { grade_level: filters.gradeLevel }),
+    ...(filters.employmentType && { job_type: filters.employmentType }),
     ...(filters.salaryRange[0] > 0 && { salary_min: filters.salaryRange[0] }),
     ...(filters.salaryRange[1] < 100000 && { salary_max: filters.salaryRange[1] }),
     ...(cursor ? { cursor } : {}),
@@ -117,6 +123,57 @@ export const useJobSearchStore = create<JobSearchState>((set, get) => ({
   selectedJob: null,
   isDrawerOpen: false,
   pageSize: 10,
+  jobCategories: [],
+  geoOptions: [],
+  schoolTypeOptions: [],
+  isLoadingCategories: false,
+  isLoadingGeo: false,
+
+  // ✨ โหลด job_category + geo + school_type พร้อมกัน
+  fetchOptions: async () => {
+    set({ isLoadingCategories: true, isLoadingGeo: true });
+    try {
+      const [catOptions, schoolTypeOptions, geoData] = await Promise.all([
+        fetchJobOptions("job_category"),
+        fetchJobOptions("school_type"),
+        Promise.all([
+          fetch(`${BASE_GEO}/province.json`).then((r) => r.json() as Promise<Province[]>),
+          fetch(`${BASE_GEO}/district.json`).then((r) => r.json() as Promise<District[]>),
+        ]),
+      ]);
+
+      // ✨ สร้าง tree สำหรับ Job Categories
+      const jobCategories = buildCascaderTree(catOptions);
+
+      // ✨ School type flat options
+      const schoolTypes = schoolTypeOptions.map((o: { value: string; label: string }) => ({
+        value: o.value,
+        label: o.label,
+      }));
+
+      // ✨ สร้าง tree จังหวัด → เขต/อำเภอ
+      const [provinces, districts] = geoData;
+      const geoOptions: CascaderNode[] = provinces.map((p) => ({
+        label: p.name_th,
+        value: p.name_th,
+        children: districts
+          .filter((d) => d.province_id === p.id)
+          .map((d) => ({ label: d.name_th, value: d.name_th })),
+      }));
+
+      set({
+        jobCategories,
+        schoolTypeOptions: schoolTypes,
+        geoOptions,
+        isLoadingCategories: false,
+        isLoadingGeo: false,
+      });
+    } catch (err) {
+      console.error("❌ fetchOptions:", err);
+      set({ isLoadingCategories: false, isLoadingGeo: false });
+    }
+  },
+
 
   // ✨ โหลดครั้งแรก — reset list
   fetchJobs: async () => {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { JobCategoryOption } from "@/app/pages/landing/_api/landing-api";
 
 // ✨ Params สำหรับค้นหางาน (Cursor-based)
 export interface JobSearchParams {
@@ -23,6 +24,14 @@ export const fetchJobList = async (params?: JobSearchParams) => {
 export const fetchJobById = async (jobId: string) => {
   const response = await axios.get(`/api/v1/jobs/${jobId}`);
   return response.data;
+};
+
+// ✨ ดึง config options ตาม group (job_category, school_type, ฯลฯ)
+export const fetchJobOptions = async (group: string): Promise<JobCategoryOption[]> => {
+  const { data } = await axios.get<{ status_code: number; data: JobCategoryOption[] }>(
+    `/api/v1/config/options?group=${group}`
+  );
+  return data.data ?? [];
 };
 
 // ✨ ดึงใบสมัครของ Employee ตาม user_id
