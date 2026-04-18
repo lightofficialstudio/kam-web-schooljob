@@ -1,3 +1,4 @@
+import { createNotification } from "@/lib/notification";
 import { updateApplicantStatusService } from "../../service/job-service";
 
 const VALID_STATUSES = ["PENDING", "INTERVIEW", "ACCEPTED", "REJECTED"] as const;
@@ -42,6 +43,24 @@ export async function PATCH(request: Request) {
       application_id,
       status as ApplicationStatus,
     );
+
+    // ✨ แจ้ง EMPLOYEE ว่าสถานะใบสมัครเปลี่ยนแล้ว
+    const statusLabelMap: Record<ApplicationStatus, string> = {
+      PENDING:   "รอการพิจารณา",
+      INTERVIEW: "ได้รับเลือกให้สัมภาษณ์",
+      ACCEPTED:  "ผ่านการคัดเลือก 🎉",
+      REJECTED:  "ไม่ผ่านการคัดเลือก",
+    };
+    if (status !== "PENDING") {
+      createNotification({
+        profileId:     result.applicantId,
+        type:          "application_status",
+        title:         `${result.job.schoolProfile.schoolName}: ${statusLabelMap[status as ApplicationStatus]}`,
+        message:       `ใบสมัครตำแหน่ง "${result.job.title}" ได้รับการอัปเดตสถานะ`,
+        referenceId:   result.id,
+        referenceType: "application",
+      }).catch((e) => console.error("❌ [notification] application_status:", e));
+    }
 
     return Response.json({
       status_code: 200,

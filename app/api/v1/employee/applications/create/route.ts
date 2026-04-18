@@ -1,3 +1,4 @@
+import { createNotification } from "@/lib/notification";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -43,10 +44,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // ✨ ตรวจสอบว่า job มีอยู่
+    // ✨ ตรวจสอบว่า job มีอยู่ + ดึงชื่องานและ profileId ของ EMPLOYER ไว้ส่ง notification
     const job = await prisma.job.findFirst({
       where: { id: job_id, status: "OPEN" },
-      select: { id: true },
+      select: {
+        id: true,
+        title: true,
+        schoolProfile: { select: { schoolName: true, profile: { select: { id: true } } } },
+      },
     });
 
     if (!job) {
@@ -78,6 +83,19 @@ export async function POST(request: Request) {
       },
       select: { id: true, status: true, appliedAt: true },
     });
+
+    // ✨ แจ้ง EMPLOYER ว่ามีใบสมัครใหม่
+    const employerProfileId = job.schoolProfile.profile?.id;
+    if (employerProfileId) {
+      createNotification({
+        profileId:     employerProfileId,
+        type:          "application_submitted",
+        title:         `มีใบสมัครใหม่สำหรับ "${job.title}"`,
+        message:       `${job.schoolProfile.schoolName} มีผู้สมัครใหม่รออนุมัติ`,
+        referenceId:   application.id,
+        referenceType: "application",
+      }).catch((e) => console.error("❌ [notification] application_submitted:", e));
+    }
 
     return Response.json(
       { status_code: 201, message_th: "ส่งใบสมัครสำเร็จ", message_en: "Application submitted", data: application },

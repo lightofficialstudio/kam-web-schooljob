@@ -508,14 +508,24 @@ export const updateApplicantStatusService = async (
       id: applicationId,
       job: { schoolProfileId },
     },
-    select: { id: true },
+    select: {
+      id: true,
+      applicantId: true,
+      job: { select: { title: true, schoolProfile: { select: { schoolName: true } } } },
+    },
   });
   if (!application) throw new Error("APPLICATION_NOT_FOUND");
 
   return await prisma.application.update({
     where: { id: applicationId },
     data: { status },
-    select: { id: true, status: true, updatedAt: true },
+    select: {
+      id: true,
+      status: true,
+      updatedAt: true,
+      applicantId: true,
+      job: { select: { title: true, schoolProfile: { select: { schoolName: true } } } },
+    },
   });
 };
 
