@@ -10,12 +10,14 @@ import {
   SafetyOutlined,
 } from "@ant-design/icons";
 import { Card, Col, Flex, Progress, Row, Tag, Typography, theme } from "antd";
+import { useDashboardStore } from "../_state/dashboard-store";
 
 const { Text } = Typography;
 
-// ✨ [System Health Section — service status grid + progress bars]
+// ✨ [System Health Section — service status + dynamic stats จาก dashboard data]
 export function SystemHealthSection() {
   const { token } = theme.useToken();
+  const { data } = useDashboardStore();
 
   const services = [
     {
@@ -45,36 +47,42 @@ export function SystemHealthSection() {
     {
       icon: <FileOutlined />,
       label: "Storage",
-      tagLabel: "45%",
-      barColor: token.colorError,
-      percent: 45,
+      tagLabel: "Active",
+      barColor: token.colorPrimary,
+      percent: 100,
       note: "ใช้งาน",
     },
   ];
 
+  // ✨ ดึงค่าจาก live data แทน hardcode
+  const totalUsers = data?.stats.users.total ?? 0;
+  const newLast7Days = data?.stats.users.newLast7Days ?? 0;
+  const openJobs = data?.stats.jobs.open ?? 0;
+  const pendingApps = data?.stats.applications.pending ?? 0;
+
   const metrics = [
     {
       icon: <ClockCircleOutlined />,
-      label: "Avg Response",
-      value: "145ms",
+      label: "ผู้ใช้ใหม่ 7 วัน",
+      value: newLast7Days.toLocaleString(),
       color: token.colorPrimary,
     },
     {
       icon: <CheckCircleOutlined />,
-      label: "Uptime",
-      value: "99.9%",
+      label: "ผู้ใช้ทั้งหมด",
+      value: totalUsers.toLocaleString(),
       color: token.colorSuccess,
     },
     {
       icon: <DatabaseOutlined />,
-      label: "DB Size",
-      value: "~2.5 MB",
-      color: token.colorText,
+      label: "งานเปิดรับ",
+      value: openJobs.toLocaleString(),
+      color: token.colorWarning,
     },
     {
       icon: <ApiOutlined />,
-      label: "Connections",
-      value: "1",
+      label: "รอพิจารณา",
+      value: pendingApps.toLocaleString(),
       color: token.colorText,
     },
   ];
@@ -138,8 +146,8 @@ export function SystemHealthSection() {
                 <Text style={{ fontSize: 13 }}>{svc.label}</Text>
               </Flex>
               <Tag
-                color={svc.percent === 100 ? "success" : "warning"}
-                icon={svc.percent === 100 ? <CheckCircleOutlined /> : undefined}
+                color="success"
+                icon={<CheckCircleOutlined />}
                 style={{ borderRadius: 100 }}
               >
                 {svc.tagLabel}

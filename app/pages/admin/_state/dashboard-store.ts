@@ -52,7 +52,8 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
       if (res.data.status_code === 200) {
         set({ data: res.data.data, lastFetchedAt: new Date().toISOString() });
       } else {
-        set((s) => ({
+        // ✨ ลบ isLoading: false ออกจาก error path — ให้ finally จัดการแต่ผู้เดียว
+        set({
           modal: {
             open: true,
             type: "error",
@@ -60,12 +61,11 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
             description: res.data.message_th ?? res.data.message_en,
             errorDetails: res.data,
           },
-          isLoading: false,
-        }));
-        return;
+        });
       }
     } catch (err: unknown) {
-      set((s) => ({
+      // ✨ ลบ isLoading: false ออกจาก catch path — ให้ finally จัดการแต่ผู้เดียว
+      set({
         modal: {
           open: true,
           type: "error",
@@ -74,9 +74,7 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
             "ไม่สามารถดึงข้อมูลได้ กรุณาลองใหม่อีกครั้ง หรือแจ้ง Admin",
           errorDetails: err,
         },
-        isLoading: false,
-      }));
-      return;
+      });
     } finally {
       set({ isLoading: false });
     }

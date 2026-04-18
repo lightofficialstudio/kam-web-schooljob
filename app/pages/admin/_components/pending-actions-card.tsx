@@ -111,8 +111,8 @@ export function PendingActionsCard() {
           {/* ✨ เรียง high ก่อน */}
           {[...actions]
             .sort((a, b) => {
-              const order = { high: 0, medium: 1, low: 2 };
-              return order[a.severity] - order[b.severity];
+              const order: Record<string, number> = { high: 0, medium: 1, low: 2 };
+              return (order[a.severity] ?? 99) - (order[b.severity] ?? 99);
             })
             .map((action) => {
               const cfg = severityConfig[action.severity];

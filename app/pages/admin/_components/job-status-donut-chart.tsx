@@ -311,7 +311,7 @@ export function JobStatusDonutChart() {
                           </Text>
                           <Text
                             strong
-                            style={{ fontSize: 11, color: "#11b6f5" }}
+                            style={{ fontSize: 11, color: token.colorPrimary }}
                           >
                             {p.count}
                           </Text>

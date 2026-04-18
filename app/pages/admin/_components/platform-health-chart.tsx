@@ -171,7 +171,9 @@ export function PlatformHealthChart() {
 
   // 4. School Engagement — EMPLOYER count / total users
   const schoolEngagement =
-    users && users.total > 0 ? (users.byRole.EMPLOYER / users.total) * 100 : 0;
+    users && users.total > 0 && users.byRole
+      ? (users.byRole.EMPLOYER / users.total) * 100
+      : 0;
 
   // ✨ composite Health Score เฉลี่ย 4 metric
   const healthScore =
