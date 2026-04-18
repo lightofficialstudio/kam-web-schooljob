@@ -3,7 +3,9 @@
 import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
+  BellOutlined,
   CaretDownOutlined,
+  CheckOutlined,
   KeyOutlined,
   LogoutOutlined,
   MoonOutlined,
@@ -45,6 +47,28 @@ interface DelegatedSchool {
   role: { name: string; color: string };
 }
 
+// ✨ รูปแบบ notification จาก API
+interface AppNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string | null;
+  isRead: boolean;
+  referenceId: string | null;
+  referenceType: string | null;
+  createdAt: string;
+}
+
+// ✨ แปลง type → icon emoji
+const NOTIF_ICON: Record<string, string> = {
+  application_submitted: "📋",
+  application_status:    "✅",
+  invite_sent:           "✉️",
+  invite_accepted:       "🎉",
+  job_posted:            "💼",
+  system:                "📣",
+};
+
 export default function Navbar() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
@@ -56,6 +80,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   // ✨ [Delegated schools จาก DB]
   const [delegatedSchools, setDelegatedSchools] = useState<DelegatedSchool[]>([]);
+  // ✨ [Notifications]
+  const [notifications, setNotifications]       = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount]            = useState(0);
+  const [notifOpen, setNotifOpen]                = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -75,6 +103,151 @@ export default function Navbar() {
       })
       .catch(() => {/* ไม่แสดง error บน Navbar */});
   }, [user?.user_id, user?.role]);
+
+  // ✨ ดึง notifications + unread count — เฉพาะเมื่อ login แล้ว
+  const fetchNotifications = () => {
+    if (!user?.user_id) return;
+    axios
+      .get<{ status_code: number; data: { notifications: AppNotification[]; unreadCount: number } }>(
+        `/api/v1/notifications/read?user_id=${user.user_id}`,
+      )
+      .then((res) => {
+        if (res.data.status_code === 200) {
+          setNotifications(res.data.data.notifications);
+          setUnreadCount(res.data.data.unreadCount);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // ✨ polling ทุก 30 วินาทีเพื่ออัปเดต badge โดยไม่ต้อง refresh
+    const interval = setInterval(fetchNotifications, 30_000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.user_id]);
+
+  // ✨ mark อ่านแล้ว + refresh list
+  const handleMarkRead = (notifId: string) => {
+    if (!user?.user_id) return;
+    axios
+      .patch(`/api/v1/notifications/read?user_id=${user.user_id}&id=${notifId}`)
+      .then(() => fetchNotifications())
+      .catch(() => {});
+  };
+
+  // ✨ mark ทั้งหมดว่าอ่านแล้ว
+  const handleMarkAllRead = () => {
+    if (!user?.user_id) return;
+    axios
+      .patch(`/api/v1/notifications/read-all?user_id=${user.user_id}`)
+      .then(() => fetchNotifications())
+      .catch(() => {});
+  };
+
+  // ✨ Notification dropdown panel
+  const notificationDropdown = (
+    <div
+      style={{
+        width: 360,
+        borderRadius: 16,
+        overflow: "hidden",
+        border: `1px solid ${token.colorBorderSecondary}`,
+        backgroundColor: token.colorBgContainer,
+        boxShadow: "0 16px 48px rgba(0,0,0,0.12)",
+      }}
+    >
+      {/* Header */}
+      <Flex
+        align="center"
+        justify="space-between"
+        style={{ padding: "14px 16px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}
+      >
+        <Flex align="center" gap={8}>
+          <BellOutlined style={{ color: token.colorPrimary, fontSize: 15 }} />
+          <Text strong style={{ fontSize: 14 }}>การแจ้งเตือน</Text>
+          {unreadCount > 0 && (
+            <Badge count={unreadCount} size="small" color={token.colorPrimary} />
+          )}
+        </Flex>
+        {unreadCount > 0 && (
+          <Button
+            type="link"
+            size="small"
+            icon={<CheckOutlined />}
+            onClick={handleMarkAllRead}
+            style={{ fontSize: 12, padding: 0, color: token.colorTextSecondary }}
+          >
+            อ่านทั้งหมด
+          </Button>
+        )}
+      </Flex>
+
+      {/* List */}
+      <div style={{ maxHeight: 360, overflowY: "auto" }}>
+        {notifications.length === 0 ? (
+          <Flex vertical align="center" justify="center" style={{ padding: "40px 0" }} gap={8}>
+            <BellOutlined style={{ fontSize: 28, color: token.colorTextQuaternary }} />
+            <Text type="secondary" style={{ fontSize: 13 }}>ยังไม่มีการแจ้งเตือน</Text>
+          </Flex>
+        ) : (
+          notifications.map((n) => (
+            <div
+              key={n.id}
+              onClick={() => { if (!n.isRead) handleMarkRead(n.id); }}
+              style={{
+                padding: "12px 16px",
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                backgroundColor: n.isRead ? "transparent" : token.colorInfoBg,
+                cursor: n.isRead ? "default" : "pointer",
+                transition: "background 0.2s",
+              }}
+            >
+              <Flex gap={10} align="flex-start">
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    backgroundColor: n.isRead ? token.colorBgLayout : token.colorPrimaryBg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 16,
+                    flexShrink: 0,
+                  }}
+                >
+                  {NOTIF_ICON[n.type] ?? "🔔"}
+                </div>
+                <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
+                  <Flex align="center" justify="space-between" gap={4}>
+                    <Text
+                      strong={!n.isRead}
+                      style={{ fontSize: 13, color: n.isRead ? token.colorTextSecondary : token.colorText }}
+                    >
+                      {n.title}
+                    </Text>
+                    {!n.isRead && (
+                      <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: token.colorPrimary, flexShrink: 0 }} />
+                    )}
+                  </Flex>
+                  {n.message && (
+                    <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.5 }}>
+                      {n.message}
+                    </Text>
+                  )}
+                  <Text type="secondary" style={{ fontSize: 11, marginTop: 2 }}>
+                    {new Date(n.createdAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                  </Text>
+                </Flex>
+              </Flex>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
 
   const userMenuItems = [
     {
@@ -460,6 +633,32 @@ export default function Navbar() {
 
         {/* Right actions */}
         <Space size={8} style={{ flexShrink: 0 }}>
+          {/* ✨ [Notification Bell — แสดงเฉพาะ login แล้ว] */}
+          {user && (
+            <Dropdown
+              open={notifOpen}
+              onOpenChange={(v) => {
+                setNotifOpen(v);
+                if (v) fetchNotifications();
+              }}
+              popupRender={() => notificationDropdown}
+              placement="bottomRight"
+              trigger={["click"]}
+            >
+              <Tooltip title="การแจ้งเตือน">
+                <Badge count={unreadCount} size="small" offset={[-2, 2]}>
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<BellOutlined />}
+                    size={scrolled ? "small" : "middle"}
+                    style={{ fontSize: "16px" }}
+                  />
+                </Badge>
+              </Tooltip>
+            </Dropdown>
+          )}
+
           {/* ✨ [Dark Mode Toggle] */}
           <Tooltip title={mode === "dark" ? "Light Mode" : "Dark Mode"}>
             <Button

@@ -347,8 +347,8 @@ export default function HeroSection() {
                       setSearchParam("category", value as string[][])
                     }
                     placeholder="เลือกสายงานที่สนใจ"
-                    style={{ width: "100%" }}
-                    className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold"
+                    style={{ width: "100%", textAlign: "left" }}
+                    className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold [&_.ant-select-selection-placeholder]:text-left [&_.ant-select-selection-placeholder]:pl-0"
                     popupClassName="min-w-[300px]"
                     size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}

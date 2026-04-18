@@ -1,4 +1,5 @@
 import { sendInviteEmail } from "@/lib/mailer";
+import { createNotification } from "@/lib/notification";
 import { prisma } from "@/lib/prisma";
 import {
   getPendingInvitesService,
@@ -69,6 +70,26 @@ export async function POST(request: Request) {
       });
     } catch (mailErr) {
       console.error("❌ [mailer] ส่ง invite email ล้มเหลว:", mailErr);
+    }
+
+    // ✨ ส่ง notification ให้ผู้รับเชิญ (ถ้ามี profile ในระบบแล้ว)
+    try {
+      const inviteeProfile = await prisma.profile.findUnique({
+        where: { email: parsed.data.email },
+        select: { id: true },
+      });
+      if (inviteeProfile) {
+        await createNotification({
+          profileId:     inviteeProfile.id,
+          type:          "invite_sent",
+          title:         `คุณได้รับคำเชิญจาก ${schoolName}`,
+          message:       `${inviterName} เชิญคุณเข้าร่วมในฐานะ ${roleName}`,
+          referenceId:   invite.id,
+          referenceType: "invite",
+        });
+      }
+    } catch (notifErr) {
+      console.error("❌ [notification] สร้าง invite notification ล้มเหลว:", notifErr);
     }
 
     return Response.json(

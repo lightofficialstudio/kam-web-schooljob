@@ -1,5 +1,6 @@
 "use client";
 
+import { SummaryCard } from "@/app/components/card/summary-card.component";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   BankOutlined,
@@ -458,32 +459,30 @@ export default function SchoolManagementPage() {
     {
       label: "สมาชิกทั้งหมด",
       value: members.length,
-      icon: <TeamOutlined style={{ fontSize: 20, color: PRIMARY }} />,
-      bg: token.colorPrimaryBg,
+      unit: "คน",
+      icon: <TeamOutlined style={{ fontSize: 20 }} />,
+      color: token.colorPrimary,
     },
     {
       label: "กำลังใช้งาน",
       value: activeMembers,
-      icon: (
-        <CheckCircleFilled
-          style={{ fontSize: 20, color: token.colorSuccess }}
-        />
-      ),
-      bg: token.colorSuccessBg,
+      unit: "คน",
+      icon: <CheckCircleFilled style={{ fontSize: 20 }} />,
+      color: token.colorSuccess,
     },
     {
       label: "รอยืนยัน",
       value: pendingMembers + invites.length,
-      icon: (
-        <MailOutlined style={{ fontSize: 20, color: token.colorWarning }} />
-      ),
-      bg: token.colorWarningBg,
+      unit: "คน",
+      icon: <MailOutlined style={{ fontSize: 20 }} />,
+      color: token.colorWarning,
     },
     {
       label: "คำเชิญที่ส่งออก",
       value: invites.length,
-      icon: <KeyOutlined style={{ fontSize: 20, color: "#6366F1" }} />,
-      bg: "#EEF2FF",
+      unit: "รายการ",
+      icon: <KeyOutlined style={{ fontSize: 20 }} />,
+      color: "#6366F1",
     },
   ];
 
@@ -862,78 +861,18 @@ export default function SchoolManagementPage() {
       {/* ─── Stats Row ────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px" }}>
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          {isLoadingMembers || isLoadingInvites
-            ? // ✨ Stats Card Skeleton
-              [1, 2, 3, 4].map((i) => (
-                <Col xs={12} md={6} key={i}>
-                  <Card
-                    variant="borderless"
-                    style={{
-                      borderRadius: 12,
-                      background: token.colorBgContainer,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                    }}
-                    styles={{ body: { padding: "16px 20px" } }}
-                  >
-                    <Flex align="center" gap={12}>
-                      <Skeleton.Avatar
-                        active
-                        size={44}
-                        shape="square"
-                        style={{ borderRadius: 10 }}
-                      />
-                      <Flex vertical gap={4} style={{ flex: 1 }}>
-                        <Skeleton.Input
-                          active
-                          size="small"
-                          style={{ width: "60%", height: 14 }}
-                        />
-                        <Skeleton.Input
-                          active
-                          size="small"
-                          style={{ width: "40%", height: 22 }}
-                        />
-                      </Flex>
-                    </Flex>
-                  </Card>
-                </Col>
-              ))
-            : statCards.map((card) => (
-                <Col xs={12} md={6} key={card.label}>
-                  <Card
-                    variant="borderless"
-                    style={{
-                      borderRadius: 12,
-                      backgroundColor: card.bg,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                    }}
-                    styles={{ body: { padding: "16px 20px" } }}
-                  >
-                    <Flex align="center" gap={12}>
-                      <Flex
-                        align="center"
-                        justify="center"
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 10,
-                          backgroundColor: "rgba(255,255,255,0.7)",
-                        }}
-                      >
-                        {card.icon}
-                      </Flex>
-                      <Flex vertical gap={2}>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          {card.label}
-                        </Text>
-                        <Text strong style={{ fontSize: 22, lineHeight: 1 }}>
-                          {card.value}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </Card>
-                </Col>
-              ))}
+          {statCards.map((card) => (
+            <Col xs={12} md={6} key={card.label}>
+              <SummaryCard
+                title={card.label}
+                value={card.value}
+                unit={card.unit}
+                icon={card.icon}
+                color={card.color}
+                isLoading={isLoadingMembers || isLoadingInvites}
+              />
+            </Col>
+          ))}
         </Row>
 
         {/* ─── Tab Navigation ────────────────────────────────────────── */}
