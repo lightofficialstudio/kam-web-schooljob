@@ -1,7 +1,7 @@
 "use client";
 
 // ✨ Announcement History — ตาราง Broadcast ที่ส่งแล้ว + pagination
-import { BellOutlined, ClockCircleOutlined, TeamOutlined } from "@ant-design/icons";
+import { BellOutlined, ClockCircleOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import { Card, Empty, Flex, Pagination, Skeleton, Tag, Typography, theme } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/th";
@@ -10,6 +10,13 @@ import { useAnnouncementStore } from "../_state/announcement-store";
 const { Text } = Typography;
 
 dayjs.locale("th");
+
+// ✨ config Tag สำหรับแต่ละ target role
+const TARGET_TAG: Record<"ALL" | "EMPLOYEE" | "EMPLOYER", { label: string; color: string; icon: React.ReactNode }> = {
+  ALL:      { label: "ทุกคน",          color: "#11b6f5", icon: <TeamOutlined /> },
+  EMPLOYEE: { label: "ครู / ผู้หางาน", color: "#22c55e", icon: <UserOutlined /> },
+  EMPLOYER: { label: "โรงเรียน",       color: "#f59e0b", icon: <BellOutlined /> },
+};
 
 interface Props {
   adminUserId: string;
@@ -88,20 +95,42 @@ export function AnnouncementHistory({ adminUserId }: Props) {
             {/* ✨ Content */}
             <Flex vertical gap={4} style={{ flex: 1, minWidth: 0 }}>
               <Flex justify="space-between" align="flex-start" gap={8} wrap="wrap">
-                <Text strong style={{ fontSize: 14, lineHeight: 1.4 }}>{item.title}</Text>
-                <Tag
-                  icon={<TeamOutlined />}
-                  style={{
-                    fontSize: 11,
-                    borderRadius: 20,
-                    border: "1px solid rgba(17,182,245,0.4)",
-                    color: "#11b6f5",
-                    background: "rgba(17,182,245,0.08)",
-                    flexShrink: 0,
-                  }}
-                >
-                  {item.sentCount.toLocaleString()} คนได้รับ
-                </Tag>
+                <Text strong style={{ fontSize: 14, lineHeight: 1.4, flex: 1, minWidth: 0 }}>{item.title}</Text>
+                <Flex gap={6} align="center" style={{ flexShrink: 0 }}>
+                  {/* ✨ Target Role Tag */}
+                  {(() => {
+                    const cfg = TARGET_TAG[item.targetRole] ?? TARGET_TAG.ALL;
+                    return (
+                      <Tag
+                        icon={cfg.icon}
+                        style={{
+                          fontSize: 11,
+                          borderRadius: 20,
+                          border: `1px solid ${cfg.color}50`,
+                          color: cfg.color,
+                          background: `${cfg.color}10`,
+                          margin: 0,
+                        }}
+                      >
+                        {cfg.label}
+                      </Tag>
+                    );
+                  })()}
+                  {/* ✨ Sent count */}
+                  <Tag
+                    icon={<TeamOutlined />}
+                    style={{
+                      fontSize: 11,
+                      borderRadius: 20,
+                      border: "1px solid rgba(17,182,245,0.4)",
+                      color: "#11b6f5",
+                      background: "rgba(17,182,245,0.08)",
+                      margin: 0,
+                    }}
+                  >
+                    {item.sentCount.toLocaleString()} คนได้รับ
+                  </Tag>
+                </Flex>
               </Flex>
 
               <Text

@@ -17,6 +17,7 @@ export interface AnnouncementHistoryItem {
   title: string;
   message: string;
   type: string;
+  targetRole: "ALL" | "EMPLOYEE" | "EMPLOYER";
   sentCount: number;
   createdAt: string;
 }

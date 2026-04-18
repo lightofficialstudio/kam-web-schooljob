@@ -34,7 +34,8 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
         title: data.title,
         message: data.message,
         referenceId: data.reference_id ?? null,
-        referenceType: data.reference_type ?? null,
+        // ✨ เก็บ target_role ใน referenceType เพื่อแสดงใน History
+        referenceType: data.target_role,
       })),
       skipDuplicates: true,
     });
@@ -48,9 +49,9 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
 export const getAnnouncementHistoryService = async (page: number) => {
   const skip = (page - 1) * PAGE_SIZE;
 
-  // ✨ ดึง distinct title+message+createdAt โดยใช้ groupBy
+  // ✨ ดึง distinct title+message+createdAt+referenceType โดยใช้ groupBy
   const groups = await prisma.notification.groupBy({
-    by: ["title", "message", "type", "createdAt"],
+    by: ["title", "message", "type", "referenceType", "createdAt"],
     where: { type: "system" },
     _count: { id: true },
     orderBy: { createdAt: "desc" },
@@ -59,7 +60,7 @@ export const getAnnouncementHistoryService = async (page: number) => {
   });
 
   const total = await prisma.notification.groupBy({
-    by: ["title", "message", "type", "createdAt"],
+    by: ["title", "message", "type", "referenceType", "createdAt"],
     where: { type: "system" },
     _count: { id: true },
   }).then((r) => r.length);
@@ -69,6 +70,8 @@ export const getAnnouncementHistoryService = async (page: number) => {
       title: g.title,
       message: g.message ?? "",
       type: g.type,
+      // ✨ referenceType เก็บ target_role ไว้ตอน broadcast
+      targetRole: (g.referenceType ?? "ALL") as "ALL" | "EMPLOYEE" | "EMPLOYER",
       sentCount: g._count.id,
       createdAt: g.createdAt,
     })),
