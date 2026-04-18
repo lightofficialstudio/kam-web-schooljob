@@ -230,13 +230,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         colorBgElevated: mode === "dark" ? "#2D3748" : "#ffffff",
       },
 
-      // ✨ [Drawer Styling — Apple Store Connect Style]
+      // ✨ [Drawer Styling — Ultra Minimal & Premium Style]
       Drawer: {
-        colorBgElevated: mode === "dark" ? "#1E293B" : "#fcfcfd",
-        colorBorder: mode === "dark" ? "#475569" : "#e2e8f0",
+        colorBgElevated: mode === "dark" ? "#1E293B" : "#ffffff",
+        colorBorderSecondary: "transparent", // ✨ ลบเส้นคั่น Header/Footer เพื่อความเป็น Minimal
         paddingLG: 24,
-        footerPaddingBlock: 16,
+        footerPaddingBlock: 20,
         footerPaddingInline: 24,
+        borderRadiusLG: 24, // ✨ เพิ่มความโค้งมนให้ดู Premium (สำหรับกรณี placement="bottom" หรือ floating)
       },
 
       // ✨ [Dropdown Styling]

@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # CLAUDE.md — KAM-WEB-SCHOOLJOB
 
 Thai education job marketplace — เชื่อม **ครู (EMPLOYEE)** กับ **โรงเรียน (EMPLOYER)**
@@ -37,10 +41,70 @@ bunx prisma studio         # GUI
 
 - **Comments** → ภาษาไทยเสมอ + emoji (`// ✨ ดึงรายการ...`)
 - **API calls (client)** → Axios เท่านั้น — ห้าม native `fetch()`
-- **State** → Zustand `_state/` เสมอ — ห้าม `useState` สำหรับ shared state
+- **State** → Zustand `_stores/` เสมอ — ห้าม `useState` สำหรับ shared state
 - **Build** → `bun run build` ทุกครั้งหลังแก้ไข ตรวจ error ก่อนรายงาน done
 - **Scope** → ห้ามเพิ่ม feature / refactor นอก scope ที่ขอ
 - **Response format** → `{ status_code, message_th, message_en, data }` ทุก API
+
+---
+
+## Architecture
+
+### Page Module Pattern
+
+ทุก page ที่มี state/data จะมี local modules ในรูปแบบ:
+
+```
+app/pages/<role>/<page>/
+├── page.tsx               # Server/Client component หลัก
+├── _components/           # UI components เฉพาะหน้านี้
+├── _stores/               # Zustand store เฉพาะหน้า (ถ้า state ซับซ้อน)
+└── _api/                  # Axios API calls ไปยัง /api/v1/...
+```
+
+- `_stores/` คือ page-level Zustand ที่ไม่ persist — ต่างจาก `app/stores/` (global, persisted)
+- `_api/` รับผิดชอบ Axios calls ทั้งหมด ไม่มี fetch() ใน component
+
+### API Layer Pattern
+
+ทุก API route ใช้โครงสร้าง 3 ชั้น:
+
+```
+app/api/v1/<domain>/<action>/
+├── route.ts               # HTTP handler: validate → call service → return JSON
+├── validation/            # Zod schemas
+└── service/               # Business logic + Prisma queries
+```
+
+- `route.ts` ไม่มี Prisma โดยตรง — delegate ทั้งหมดไปที่ service
+- Service ใช้ `prisma.$transaction()` สำหรับ upsert หลาย relation พร้อมกัน
+- Soft-delete: ใช้ `isDeleted: true` แทนการลบจริง — query ทุกจุดต้อง filter `where: { isDeleted: false }`
+
+### Dual Auth System
+
+Signup/Signin ใช้สองระบบพร้อมกัน:
+
+1. **Supabase Auth** — จัดการ credential, session, JWT
+2. **Prisma `Profile`** — เก็บ role, name, school info, และ relations ทั้งหมด
+
+Flow:
+- Signup: สร้าง Supabase user → upsert Prisma Profile (fail gracefully ถ้า Prisma error)
+- Signin: auth กับ Supabase → ดึง Prisma Profile (รวม schoolProfile สำหรับ EMPLOYER) → merge เป็น `User` object ใน `useAuthStore`
+- `useAuthStore` (persisted localStorage) คือ source of truth ฝั่ง client
+
+### Layout & Routing Guard
+
+`app/components/layouts/layout-selector.tsx` wrap ทุก page:
+- path `/pages/admin/*` → `AdminLayout` (guard: redirect ถ้าไม่ใช่ ADMIN)
+- ทุก path อื่น → `LandingLayout`
+- Role-home map: `EMPLOYEE → /pages/employee/profile`, `EMPLOYER → /pages/employer/profile`
+
+### Theme System
+
+`app/contexts/theme-context.tsx` wrap ทั้งแอปด้วย Ant Design `ConfigProvider`:
+- primary color: `#11b6f5` — ห้าม hardcode สีอื่น
+- dark mode toggle เก็บใน localStorage `"app-theme"`
+- ใช้ `antTheme.useToken()` เพื่อดึง token ใน component — ห้าม hardcode hex ที่ไม่ใช่ primary
 
 ---
 
@@ -142,19 +206,19 @@ DELETE /api/v1/storage/delete        ลบไฟล์
 
 ```
 app/
-├── api/v1/                  # REST APIs
-│   ├── authenticate/        # signup, signin
-│   ├── jobs/                # public job search (cursor-based)
-│   ├── blogs/               # public blog
-│   ├── employee/            # employee APIs
-│   ├── employer/            # employer APIs
-│   ├── admin/               # admin APIs
-│   └── storage/             # file upload/delete
-├── pages/                   # UI pages (App Router)
-├── components/layouts/      # LandingLayout, AdminLayout, Modals
-├── stores/                  # auth-store.ts, notification-modal-store.ts
-├── contexts/                # theme-context.tsx (light/dark + Ant Design config)
-└── lib/                     # supabase.ts
+├── api/v1/                  # REST APIs (route → validation → service)
+│   ├── authenticate/
+│   ├── jobs/
+│   ├── blogs/
+│   ├── employee/
+│   ├── employer/
+│   ├── admin/
+│   └── storage/
+├── pages/                   # UI pages — แต่ละหน้ามี _components/, _stores/, _api/
+├── components/layouts/      # LandingLayout, AdminLayout, LayoutSelector, Modals
+├── stores/                  # Global stores: auth-store.ts, notification-modal-store.ts
+├── contexts/                # theme-context.tsx (light/dark + Ant Design ConfigProvider)
+└── lib/                     # supabase.ts (client)
 lib/
 └── prisma.ts                # Prisma client singleton
 prisma/

@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Drawer, Space, theme as antTheme } from "antd";
+import { useTheme } from "@/app/contexts/theme-context";
+import { Button, Drawer, theme as antTheme } from "antd";
 import React, { ReactNode } from "react";
 
 interface ProfileEditDrawerProps {
@@ -23,6 +24,7 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
   width = 520,
 }) => {
   const { token } = antTheme.useToken();
+  const { mode } = useTheme();
 
   return (
     <Drawer
@@ -38,23 +40,35 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       open={isOpen}
       size={width}
       styles={{
-        header: { borderBottom: `1px solid ${token.colorBorderSecondary}` },
-        body: { padding: "24px" },
+        header: {
+          borderBottom: "none", // ✨ Minimal: ลบเส้นคั่นออก
+          padding: "32px 32px 8px 32px",
+          background: "transparent",
+        },
+        body: {
+          padding: "0 32px",
+          background: "transparent",
+        },
         footer: {
-          borderTop: `1px solid ${token.colorBorderSecondary}`,
-          padding: "16px 24px",
+          borderTop: "none", // ✨ Minimal: ลบเส้นคั่นออก
+          padding: "24px 32px 40px 32px",
+          background: "transparent",
+        },
+        mask: {
+          backdropFilter: "blur(8px)", // ✨ เพิ่ม Blur ให้ความรู้สึกหรูหรา
+          backgroundColor:
+            mode === "dark" ? "rgba(0, 0, 0, 0.65)" : "rgba(0, 0, 0, 0.25)",
         },
       }}
       footer={
-        <Space size={12} style={{ width: "100%", justifyContent: "flex-end" }}>
+        <div className="flex gap-3 justify-end w-full">
           <Button
             onClick={onClose}
             size="large"
+            className="px-8 h-12 border-none hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-medium"
             style={{
-              minWidth: "120px",
-              height: "48px",
-              fontSize: "16px",
-              borderRadius: token.borderRadiusLG,
+              borderRadius: "14px",
+              color: token.colorTextSecondary,
             }}
           >
             ยกเลิก
@@ -64,19 +78,19 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
             onClick={onSave}
             loading={loading}
             size="large"
+            className="px-10 h-12 font-bold shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all"
             style={{
-              minWidth: "160px",
-              height: "48px",
-              fontSize: "16px",
-              borderRadius: token.borderRadiusLG,
+              borderRadius: "14px",
+              background: `linear-gradient(135deg, ${token.colorPrimary} 0%, #0d8fd4 100%)`,
+              border: "none",
             }}
           >
             บันทึกข้อมูล
           </Button>
-        </Space>
+        </div>
       }
     >
-      {children}
+      <div className="py-6">{children}</div>
     </Drawer>
   );
 };
