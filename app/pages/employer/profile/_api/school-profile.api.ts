@@ -42,7 +42,7 @@ export const requestFetchSchoolProfile = async (
         studentCount?: number | null;
         affiliation?: string | null;
         curriculum?: string | null;
-        levels?: string | null;       // JSON string ใน DB
+        levels?: string | null; // JSON string ใน DB
         logoUrl?: string | null;
         coverImageUrl?: string | null;
         accountPlan: string;
@@ -103,21 +103,23 @@ export const requestUpdateSchoolProfile = async (
     school_name: data.name,
     school_type: data.type || null,
     province: data.location,
-    district: data.district || null,
-    address: data.address || null,
-    website: data.website || null,
-    phone: data.phone || null,
-    description: data.description || null,
-    vision: data.vision || null,
-    founded_year: data.established ? parseInt(data.established, 10) || null : null,
+    district: data.district ?? null,
+    address: data.address ?? null,
+    website: data.website ?? null,
+    phone: data.phone ?? null,
+    description: data.description ?? null,
+    vision: data.vision ?? null,
+    founded_year: data.established
+      ? parseInt(data.established, 10) || null
+      : null,
     teacher_count: data.teacherCount ?? null,
     student_count: data.studentCount ?? null,
-    affiliation: data.affiliation || null,
-    curriculum: data.curriculum || null,
+    affiliation: data.affiliation ?? null,
+    curriculum: data.curriculum ?? null,
     levels: data.levels ?? [],
     benefits: data.benefits ?? [],
-    logo_url: data.logoUrl || null,
-    cover_image_url: data.coverImageUrl || null,
+    logo_url: data.logoUrl ?? null,
+    cover_image_url: data.coverImageUrl ?? null,
     gallery: data.gallery ?? [],
   });
 };

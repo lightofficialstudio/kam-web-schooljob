@@ -216,7 +216,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
         <SectionTitle
           icon={<ThunderboltOutlined />}
-          color="#001e45"
+          color={token.colorPrimary}
           text="วิสัยทัศน์"
         />
         {profile.vision ? (

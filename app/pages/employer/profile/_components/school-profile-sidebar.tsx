@@ -139,7 +139,6 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
                       width: 28,
                       height: 28,
                       minWidth: 28,
-                      backgroundColor: "#001e45",
                       borderColor: "white",
                       boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
                     }}
@@ -260,10 +259,8 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
               marginTop: 12,
               height: 56,
               borderRadius: 16,
-              background: "linear-gradient(135deg, #001e45 0%, #0a4a8a 100%)",
               fontWeight: 900,
               fontSize: 16,
-              boxShadow: "0 10px 25px -5px rgba(0,30,69,0.3)",
               border: "none",
             }}
             className="hover:scale-[1.02] active:scale-[0.98] transition-all"
