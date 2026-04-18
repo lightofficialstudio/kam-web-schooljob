@@ -9,6 +9,8 @@ import {
 import { Card, Col, Flex, Row, Tag, Typography, theme as antTheme } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import { JobDetailDrawer } from "../../../../../job/_components/job-detail-drawer";
+import { useJobSearchStore } from "../../../../../job/_state/job-search-store";
 import type { SchoolOpenJob } from "../_api/school-profile-api";
 
 const { Title, Text } = Typography;
@@ -22,6 +24,7 @@ interface OpenJobsSectionProps {
 export const OpenJobsSection = ({ jobs, schoolId }: OpenJobsSectionProps) => {
   const { token } = antTheme.useToken();
   const router = useRouter();
+  const { fetchAndOpenJob } = useJobSearchStore();
 
   if (!jobs.length) {
     return (
@@ -88,8 +91,8 @@ export const OpenJobsSection = ({ jobs, schoolId }: OpenJobsSectionProps) => {
             <Card
               key={job.id}
               hoverable
-              onClick={() => router.push(`/pages/job/${job.id}`)}
-              className="group border-none! shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(67,127,199,0.12)] transition-all duration-500 overflow-hidden"
+              onClick={() => fetchAndOpenJob(job.id)}
+              className="group border-none! shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(67,127,199,0.12)] transition-all duration-500 overflow-hidden relative"
               style={{
                 borderRadius: 32,
                 backgroundColor: token.colorBgContainer,
@@ -177,6 +180,9 @@ export const OpenJobsSection = ({ jobs, schoolId }: OpenJobsSectionProps) => {
           );
         })}
       </div>
+
+      {/* ✨ Job Detail Drawer */}
+      <JobDetailDrawer />
     </Flex>
   );
 };

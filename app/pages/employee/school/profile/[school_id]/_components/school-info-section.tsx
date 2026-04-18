@@ -6,10 +6,10 @@ import {
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Row, Typography, theme as antTheme } from "antd";
+import { Typography, theme as antTheme } from "antd";
 import type { SchoolProfileDetail } from "../_api/school-profile-api";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 interface SchoolInfoSectionProps {
   school: SchoolProfileDetail;
@@ -19,35 +19,40 @@ interface SchoolInfoSectionProps {
 export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
   const { token } = antTheme.useToken();
 
+  // foundedYear ใน DB เก็บเป็น พ.ศ. อยู่แล้ว — ไม่ต้องบวก 543
   const stats = [
     school.foundedYear && {
-      icon: (
-        <CalendarOutlined style={{ fontSize: 24, color: token.colorPrimary }} />
-      ),
+      icon: <CalendarOutlined />,
+      color: token.colorPrimary,
+      bg: "#EDF6FF",
       label: "ก่อตั้งเมื่อ",
-      value: `พ.ศ. ${school.foundedYear + 543}`,
+      value: `พ.ศ. ${school.foundedYear}`,
     },
     school.studentCount != null && {
-      icon: (
-        <UserOutlined style={{ fontSize: 24, color: token.colorSuccess }} />
-      ),
-      label: "จำนวนนักเรียน",
-      value: `${school.studentCount.toLocaleString()} คน`,
+      icon: <UserOutlined />,
+      color: token.colorSuccess,
+      bg: "#F0FFF4",
+      label: "นักเรียน",
+      value: school.studentCount.toLocaleString(),
     },
     school.teacherCount != null && {
-      icon: (
-        <TeamOutlined style={{ fontSize: 24, color: token.colorWarning }} />
-      ),
+      icon: <TeamOutlined />,
+      color: token.colorWarning,
+      bg: "#FFFBEB",
       label: "ครู/บุคลากร",
-      value: `${school.teacherCount.toLocaleString()} คน`,
+      value: school.teacherCount.toLocaleString(),
     },
     school.schoolType && {
-      icon: <BankOutlined style={{ fontSize: 24, color: token.colorInfo }} />,
-      label: "ประเภทสถาบัน",
+      icon: <BankOutlined />,
+      color: token.colorInfo,
+      bg: "#EFF6FF",
+      label: "ประเภท",
       value: school.schoolType,
     },
   ].filter(Boolean) as {
     icon: React.ReactNode;
+    color: string;
+    bg: string;
     label: string;
     value: string;
   }[];
@@ -55,57 +60,79 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
   if (!school.description && stats.length === 0) return null;
 
   return (
-    <Card
-      className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] border-none! transition-all duration-300"
+    <div
+      className="rounded-[28px] overflow-hidden border"
       style={{
-        borderRadius: 32,
         backgroundColor: token.colorBgContainer,
+        borderColor: token.colorBorderSecondary,
       }}
-      styles={{ body: { padding: 32 } }}
     >
-      <div className="flex items-center gap-4 mb-8">
-        <div className="p-3 rounded-2xl bg-blue-50 text-blue-500">
-          <BankOutlined className="text-xl" />
-        </div>
-        <Title
-          level={4}
-          className="m-0! font-black text-2xl tracking-tight"
-          style={{ color: "#0F172A" }}
+      {/* ── Header ── */}
+      <div className="px-6 pt-6 pb-4 flex items-center gap-3">
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-sm"
+          style={{ backgroundColor: "#EDF6FF", color: token.colorPrimary }}
         >
+          <BankOutlined />
+        </div>
+        <Text className="font-black text-base tracking-tight" style={{ color: "#0F172A" }}>
           เกี่ยวกับสถาบัน
-        </Title>
+        </Text>
       </div>
 
+      {/* ── Description ── */}
       {school.description && (
-        <Paragraph className="text-lg leading-loose text-slate-500 font-medium mb-10">
-          {school.description}
-        </Paragraph>
+        <div className="px-6 pb-4">
+          <Paragraph
+            className="m-0! text-sm leading-relaxed"
+            style={{ color: token.colorTextSecondary }}
+            ellipsis={{ rows: 4, expandable: true, symbol: "อ่านเพิ่ม" }}
+          >
+            {school.description}
+          </Paragraph>
+        </div>
       )}
 
+      {/* ── Stats Grid ── */}
       {stats.length > 0 && (
-        <Row gutter={[16, 16]}>
+        <div
+          className="grid gap-px"
+          style={{
+            gridTemplateColumns: `repeat(${Math.min(stats.length, 2)}, 1fr)`,
+            backgroundColor: token.colorBorderSecondary,
+            borderTop: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           {stats.map((stat, i) => (
-            <Col span={24} key={i}>
+            <div
+              key={i}
+              className="flex items-center gap-3 px-5 py-4"
+              style={{ backgroundColor: token.colorBgContainer }}
+            >
               <div
-                className="p-6 rounded-3xl transition-all hover:translate-y-[-4px] border border-slate-50 dark:border-slate-800"
-                style={{
-                  background: token.colorBgLayout,
-                }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm"
+                style={{ backgroundColor: stat.bg, color: stat.color }}
               >
-                <div className="mb-4">{stat.icon}</div>
-                <div className="flex flex-col">
-                  <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
-                    {stat.label}
-                  </Text>
-                  <Text className="text-[#0F172A] dark:text-white text-xl font-black">
-                    {stat.value}
-                  </Text>
-                </div>
+                {stat.icon}
               </div>
-            </Col>
+              <div className="flex flex-col min-w-0">
+                <Text
+                  className="text-[10px] font-bold uppercase tracking-widest leading-none mb-0.5"
+                  style={{ color: token.colorTextQuaternary }}
+                >
+                  {stat.label}
+                </Text>
+                <Text
+                  className="text-sm font-black leading-tight truncate"
+                  style={{ color: "#0F172A" }}
+                >
+                  {stat.value}
+                </Text>
+              </div>
+            </div>
           ))}
-        </Row>
+        </div>
       )}
-    </Card>
+    </div>
   );
 };
