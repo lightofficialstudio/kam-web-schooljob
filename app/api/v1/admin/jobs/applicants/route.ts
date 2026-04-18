@@ -12,9 +12,14 @@ export async function GET(request: Request) {
       return Response.json({ status_code: 400, message_th: "กรุณาระบุ admin_user_id และ job_id", message_en: "admin_user_id and job_id are required", data: null }, { status: 400 });
     }
 
-    // ตรวจ role
-    const admin = await prisma.profile.findUnique({
-      where: { userId: adminUserId },
+    // ✨ ตรวจ role — รองรับทั้ง Supabase UID และ Profile ID
+    const admin = await prisma.profile.findFirst({
+      where: {
+        OR: [
+          { userId: adminUserId },
+          { id: adminUserId },
+        ],
+      },
       select: { role: true },
     });
     if (!admin || admin.role !== "ADMIN") {

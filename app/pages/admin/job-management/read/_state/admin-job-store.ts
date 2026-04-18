@@ -1,5 +1,6 @@
 "use client";
 
+import type { ModalType } from "@/app/components/modal/modal.component";
 import { create } from "zustand";
 import {
   AdminJob,
@@ -20,6 +21,20 @@ interface Filters {
   schoolProfileId: string;
 }
 
+// ✨ Modal state สำหรับรายงานสถานะ Success / Error / Warning
+interface ModalState {
+  open: boolean;
+  type: ModalType;
+  title: string;
+  description?: string;
+  errorDetails?: unknown;
+  onConfirm?: () => void;
+  confirmLabel?: string;
+  cancelLabel?: string;
+}
+
+const DEFAULT_MODAL: ModalState = { open: false, type: "success", title: "" };
+
 interface AdminJobStore {
   jobs: AdminJob[];
   total: number;
@@ -28,6 +43,7 @@ interface AdminJobStore {
   pageSize: number;
   isLoading: boolean;
   filters: Filters;
+  modal: ModalState;
 
   // drawer งาน — 3 tabs: info / applicants / audit
   drawerOpen: boolean;
@@ -50,19 +66,34 @@ interface AdminJobStore {
   isLoadingAudit: boolean;
   auditDrawerOpen: boolean;
 
+  showModal: (opts: Omit<ModalState, "open">) => void;
+  hideModal: () => void;
   setFilters: (f: Partial<Filters>) => void;
   setPage: (p: number) => void;
   fetchJobs: (adminUserId: string) => Promise<void>;
   openDrawer: (job: AdminJob, adminUserId: string) => void;
   closeDrawer: () => void;
-  updateStatus: (adminUserId: string, jobId: string, status: "OPEN" | "CLOSED" | "DRAFT", note?: string) => Promise<void>;
-  deleteJob: (adminUserId: string, jobId: string, note?: string) => Promise<void>;
+  updateStatus: (
+    adminUserId: string,
+    jobId: string,
+    status: "OPEN" | "CLOSED" | "DRAFT",
+    note?: string,
+  ) => Promise<void>;
+  deleteJob: (
+    adminUserId: string,
+    jobId: string,
+    note?: string,
+  ) => Promise<void>;
   fetchApplicants: (adminUserId: string, jobId: string) => Promise<void>;
   fetchJobAuditLogs: (jobId: string) => Promise<void>;
   openAuditDrawer: () => void;
   closeAuditDrawer: () => void;
   setAuditFilterAction: (action: string) => void;
-  fetchAuditLogs: (adminUserId: string, page?: number, action?: string) => Promise<void>;
+  fetchAuditLogs: (
+    adminUserId: string,
+    page?: number,
+    action?: string,
+  ) => Promise<void>;
 }
 
 export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
@@ -73,6 +104,11 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
   pageSize: 20,
   isLoading: false,
   filters: { keyword: "", status: "", province: "", schoolProfileId: "" },
+  modal: DEFAULT_MODAL,
+
+  // ✨ เปิด/ปิด modal
+  showModal: (opts) => set({ modal: { ...opts, open: true } }),
+  hideModal: () => set({ modal: DEFAULT_MODAL }),
 
   drawerOpen: false,
   drawerJob: null,
@@ -94,20 +130,28 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
   setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f }, page: 1 })),
   setPage: (p) => set({ page: p }),
 
+  // ✨ ดึงรายการงาน — error แสดงผ่าน modal
   fetchJobs: async (adminUserId) => {
     const { filters, page, pageSize } = get();
     set({ isLoading: true });
     try {
       const res = await fetchAdminJobs({
         adminUserId,
-        keyword:         filters.keyword || undefined,
-        status:          filters.status || undefined,
-        province:        filters.province || undefined,
+        keyword: filters.keyword || undefined,
+        status: filters.status || undefined,
+        province: filters.province || undefined,
         schoolProfileId: filters.schoolProfileId || undefined,
         page,
         pageSize,
       });
       set({ jobs: res.jobs, total: res.total, totalPages: res.totalPages });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "โหลดรายการงานไม่สำเร็จ",
+        description: "ไม่สามารถดึงข้อมูลได้ กรุณาลองใหม่หรือแจ้ง Admin",
+        errorDetails: err,
+      });
     } finally {
       set({ isLoading: false });
     }
@@ -119,30 +163,73 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
     get().fetchApplicants(adminUserId, job.id);
     get().fetchJobAuditLogs(job.id);
   },
-  closeDrawer: () => set({ drawerOpen: false, drawerJob: null, applicants: [], jobAuditLogs: [] }),
+  closeDrawer: () =>
+    set({
+      drawerOpen: false,
+      drawerJob: null,
+      applicants: [],
+      jobAuditLogs: [],
+    }),
 
   updateStatus: async (adminUserId, jobId, status, note) => {
-    await fetchUpdateJobStatus(adminUserId, jobId, status, note);
-    set((s) => ({
-      jobs:      s.jobs.map((j) => (j.id === jobId ? { ...j, status } : j)),
-      drawerJob: s.drawerJob?.id === jobId ? { ...s.drawerJob, status } : s.drawerJob,
-    }));
-    if (get().drawerJob?.id === jobId) get().fetchJobAuditLogs(jobId);
+    try {
+      await fetchUpdateJobStatus(adminUserId, jobId, status, note);
+      set((s) => ({
+        jobs: s.jobs.map((j) => (j.id === jobId ? { ...j, status } : j)),
+        drawerJob:
+          s.drawerJob?.id === jobId ? { ...s.drawerJob, status } : s.drawerJob,
+      }));
+      if (get().drawerJob?.id === jobId) get().fetchJobAuditLogs(jobId);
+      const statusTh =
+        status === "OPEN"
+          ? "เปิดรับสมัคร"
+          : status === "CLOSED"
+            ? "ปิดรับสมัคร"
+            : "ฉบับร่าง";
+      get().showModal({
+        type: "success",
+        title: "อัปเดตสถานะสำเร็จ",
+        description: `เปลี่ยนสถานะเป็น "${statusTh}" เรียบร้อยแล้ว`,
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "อัปเดตสถานะไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง หรือตรวจสอบสิทธิ์ของคุณ",
+        errorDetails: err,
+      });
+      throw err;
+    }
   },
 
   deleteJob: async (adminUserId, jobId, note) => {
-    await fetchDeleteJob(adminUserId, jobId, note);
-    set((s) => ({
-      jobs:        s.jobs.filter((j) => j.id !== jobId),
-      total:       s.total - 1,
-      drawerOpen:  false,
-      drawerJob:   null,
-      applicants:  [],
-      jobAuditLogs: [],
-    }));
+    try {
+      await fetchDeleteJob(adminUserId, jobId, note);
+      set((s) => ({
+        jobs: s.jobs.filter((j) => j.id !== jobId),
+        total: s.total - 1,
+        drawerOpen: false,
+        drawerJob: null,
+        applicants: [],
+        jobAuditLogs: [],
+      }));
+      get().showModal({
+        type: "success",
+        title: "ลบประกาศงานสำเร็จ",
+        description: "ประกาศงานถูกลบออกจากระบบเรียบร้อยแล้ว",
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "ลบประกาศงานไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
+      throw err;
+    }
   },
 
-  // ✨ ดึงผู้สมัครของ post
+  // ✨ ดึงผู้สมัครของ post — error ไม่ต้อง interrupt UX (silent)
   fetchApplicants: async (adminUserId, jobId) => {
     set({ isLoadingApplicants: true });
     try {
@@ -160,12 +247,14 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
     try {
       const res = await fetchAuditLogsByJob(jobId);
       set({ jobAuditLogs: res.logs });
+    } catch {
+      // ✨ silent — audit log ไม่ critical
     } finally {
       set({ isLoadingJobAudit: false });
     }
   },
 
-  openAuditDrawer:  () => set({ auditDrawerOpen: true }),
+  openAuditDrawer: () => set({ auditDrawerOpen: true }),
   closeAuditDrawer: () => set({ auditDrawerOpen: false }),
   setAuditFilterAction: (action) => set({ auditFilterAction: action }),
 
@@ -176,11 +265,22 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
     try {
       const res = await fetchAuditLogs({
         targetType: "job",
-        action:     effectiveAction || undefined,
+        action: effectiveAction || undefined,
         page,
-        pageSize:   20,
+        pageSize: 20,
       });
-      set({ auditLogs: res.logs, auditTotal: res.total, auditTotalPages: res.totalPages });
+      set({
+        auditLogs: res.logs,
+        auditTotal: res.total,
+        auditTotalPages: res.totalPages,
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "โหลด Audit Log ไม่สำเร็จ",
+        description: "ไม่สามารถดึงประวัติการดำเนินการได้",
+        errorDetails: err,
+      });
     } finally {
       set({ isLoadingAudit: false });
     }

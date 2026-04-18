@@ -1,10 +1,11 @@
 "use client";
 
+import { ModalComponent } from "@/app/components/modal/modal.component";
+import { useAuthStore } from "@/app/stores/auth-store";
 import { AuditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Flex, message, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAuthStore } from "@/app/stores/auth-store";
 import { AuditLogDrawer } from "./_components/audit-log-drawer";
 import { JobDetailDrawer } from "./_components/job-detail-drawer";
 import { JobFilterBar } from "./_components/job-filter-bar";
@@ -15,14 +16,24 @@ import { useAdminJobStore } from "./_state/admin-job-store";
 const { Title } = Typography;
 
 export default function AdminJobManagementPage() {
-  const router   = useRouter();
+  const router = useRouter();
   const { user } = useAuthStore();
 
   const {
-    jobs, total, page, pageSize, isLoading,
-    fetchJobs, setPage,
-    openDrawer, openAuditDrawer, fetchAuditLogs,
-    updateStatus, deleteJob,
+    jobs,
+    total,
+    page,
+    pageSize,
+    isLoading,
+    fetchJobs,
+    setPage,
+    openDrawer,
+    openAuditDrawer,
+    fetchAuditLogs,
+    updateStatus,
+    deleteJob,
+    modal,
+    hideModal,
   } = useAdminJobStore();
 
   const adminUserId = user?.user_id ?? "";
@@ -42,21 +53,23 @@ export default function AdminJobManagementPage() {
     fetchJobs(adminUserId);
   };
 
-  const handleUpdateStatus = async (jobId: string, status: "OPEN" | "CLOSED" | "DRAFT") => {
+  // ✨ store จัดการ showModal success/error เอง — page แค่ delegate + catch silently
+  const handleUpdateStatus = async (
+    jobId: string,
+    status: "OPEN" | "CLOSED" | "DRAFT",
+  ) => {
     try {
       await updateStatus(adminUserId, jobId, status);
-      message.success("อัปเดตสถานะสำเร็จ");
     } catch {
-      message.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      // ✨ store แสดง modal error แล้ว
     }
   };
 
   const handleDelete = async (jobId: string) => {
     try {
       await deleteJob(adminUserId, jobId);
-      message.success("ลบประกาศงานสำเร็จ");
     } catch {
-      message.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      // ✨ store แสดง modal error แล้ว
     }
   };
 
@@ -86,8 +99,8 @@ export default function AdminJobManagementPage() {
         </Flex>
       </Flex>
 
-      {/* สถิติ */}
-      <StatsBar jobs={jobs} total={total} />
+      {/* ✨ สถิติ */}
+      <StatsBar jobs={jobs} total={total} isLoading={isLoading} />
 
       {/* filter */}
       <JobFilterBar onSearch={handleSearch} />
@@ -109,6 +122,19 @@ export default function AdminJobManagementPage() {
       {/* Drawers */}
       <JobDetailDrawer onUpdateStatus={handleUpdateStatus} />
       <AuditLogDrawer adminUserId={adminUserId} />
+
+      {/* ✨ Status Modal — Success / Error / Warning */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        onClose={hideModal}
+        onConfirm={modal.onConfirm ?? hideModal}
+        confirmLabel={modal.confirmLabel}
+        cancelLabel={modal.cancelLabel}
+      />
     </Flex>
   );
 }

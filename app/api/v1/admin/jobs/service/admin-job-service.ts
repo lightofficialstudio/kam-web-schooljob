@@ -14,24 +14,24 @@ export const createAuditLog = async (input: {
 }) => {
   // บันทึก Audit Log — ถ้าตาราง DB ยังไม่มี ให้ skip โดยไม่ crash
   let log;
-  try {
-    log = await prisma.adminAuditLog.create({
-      data: {
-        adminId:     input.adminId,
-        action:      input.action,
-        targetType:  input.targetType,
-        targetId:    input.targetId,
-        targetLabel: input.targetLabel,
-        note:        input.note,
-        metadata:    input.metadata ? JSON.stringify(input.metadata) : null,
-      },
-    });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "";
-    if (!msg.includes("does not exist") && !msg.includes("relation") && !msg.includes("table")) {
-      throw e;
+  if (!prisma.adminAuditLog) {
+    console.warn("⚠️ [audit] Prisma client ยังไม่รู้จัก adminAuditLog — skip");
+  } else {
+    try {
+      log = await prisma.adminAuditLog.create({
+        data: {
+          adminId:     input.adminId,
+          action:      input.action,
+          targetType:  input.targetType,
+          targetId:    input.targetId,
+          targetLabel: input.targetLabel,
+          note:        input.note,
+          metadata:    input.metadata ? JSON.stringify(input.metadata) : null,
+        },
+      });
+    } catch (e: unknown) {
+      console.warn("⚠️ [audit] สร้าง audit log ไม่สำเร็จ:", e instanceof Error ? e.message : e);
     }
-    console.warn("⚠️ [audit] ตาราง admin_audit_logs ยังไม่ถูกสร้าง — skip audit log");
   }
 
   // ยิง Notification ไปหา Admin ตัวเอง — ทำ async ไม่บล็อก
@@ -197,6 +197,11 @@ export const adminGetAuditLogsService = async (params: {
 }) => {
   const { adminUserId, targetType, targetId, action, page, pageSize } = params;
 
+  // ✨ ตรวจก่อนว่า Prisma client รู้จัก model นี้หรือเปล่า (กันกรณี schema ยังไม่ push)
+  if (!prisma.adminAuditLog) {
+    return { logs: [], total: 0, page, pageSize, totalPages: 0 };
+  }
+
   const where: Parameters<typeof prisma.adminAuditLog.findMany>[0]["where"] = {};
 
   if (action)     where.action     = { contains: action, mode: "insensitive" };
@@ -232,10 +237,7 @@ export const adminGetAuditLogsService = async (params: {
     return { logs, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   } catch (e: unknown) {
     // ตารางยังไม่ถูกสร้าง — return empty gracefully
-    const msg = e instanceof Error ? e.message : "";
-    if (msg.includes("does not exist") || msg.includes("relation") || msg.includes("table")) {
-      return { logs: [], total: 0, page, pageSize, totalPages: 0 };
-    }
-    throw e;
+    console.warn("⚠️ [audit] adminGetAuditLogsService error (graceful):", e instanceof Error ? e.message : e);
+    return { logs: [], total: 0, page, pageSize, totalPages: 0 };
   }
 };

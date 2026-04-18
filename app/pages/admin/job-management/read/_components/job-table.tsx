@@ -158,7 +158,7 @@ export function JobTable({
               showInfo={false}
               size={["100%", 4]}
               strokeColor={color}
-              trailColor={token.colorFillSecondary}
+              railColor={token.colorFillSecondary}
             />
           </div>
         );
