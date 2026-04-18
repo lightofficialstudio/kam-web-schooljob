@@ -1,11 +1,31 @@
 "use client";
 
 // ✨ Edit Option Modal — ฟอร์มแก้ไข label + sortOrder (value ห้ามเปลี่ยน)
-import { Alert, Form, Input, InputNumber, Modal, Typography } from "antd";
+import {
+  Alert,
+  Divider,
+  Flex,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Typography,
+} from "antd";
 import { useEffect } from "react";
 import { GROUP_META, useConfigStore } from "../_state/config-store";
 
 const { Text } = Typography;
+
+// ✨ แปลง ISO string เป็นวันที่ภาษาไทย พร้อมเวลา
+function formatThaiDateTime(iso: string): string {
+  return new Date(iso).toLocaleString("th-TH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export function EditOptionModal() {
   const {
@@ -89,6 +109,31 @@ export function EditOptionModal() {
           <Text type="secondary" style={{ fontSize: 12 }}>
             Value: <code>{editingOption.value}</code> (ไม่สามารถแก้ไขได้)
           </Text>
+        )}
+
+        {/* ✨ Audit trail — แสดง createdAt / updatedAt */}
+        {editingOption && (
+          <>
+            <Divider style={{ margin: "12px 0" }} />
+            <Flex gap={24}>
+              <Flex vertical gap={2}>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  สร้างเมื่อ
+                </Text>
+                <Text style={{ fontSize: 12 }}>
+                  {formatThaiDateTime(editingOption.createdAt)}
+                </Text>
+              </Flex>
+              <Flex vertical gap={2}>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  แก้ไขล่าสุด
+                </Text>
+                <Text style={{ fontSize: 12, fontWeight: 500 }}>
+                  {formatThaiDateTime(editingOption.updatedAt)}
+                </Text>
+              </Flex>
+            </Flex>
+          </>
         )}
       </Form>
     </Modal>
