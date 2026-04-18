@@ -336,31 +336,28 @@ export default function HeroSection() {
                   >
                     หมวดหมู่สายงาน
                   </span>
-                  <div className="relative w-full">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                      <Briefcase size={20} className="text-[#437FC7]" />
-                    </div>
-                    <Cascader
-                      options={jobCategories}
-                      loading={isLoadingCategories}
-                      multiple
-                      maxTagCount="responsive"
-                      showSearch
-                      value={searchParams.category}
-                      onChange={(value) =>
-                        setSearchParam("category", value as string[][])
-                      }
-                      placeholder="เลือกสายงานที่สนใจ"
-                      style={{ width: "100%" }}
-                      className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold [&_.ant-select-selector]:pl-[44px]! [&_.ant-select-selection-placeholder]:text-left [&_.ant-select-selection-placeholder]:leading-[64px]"
-                      popupClassName="min-w-[300px]"
-                      size="large"
-                      showCheckedStrategy={Cascader.SHOW_CHILD}
-                      suffixIcon={
-                        <ChevronDown size={16} className="text-gray-400" />
-                      }
-                    />
-                  </div>
+                  <Cascader
+                    options={jobCategories}
+                    loading={isLoadingCategories}
+                    multiple
+                    maxTagCount="responsive"
+                    showSearch
+                    value={searchParams.category}
+                    onChange={(value) =>
+                      setSearchParam("category", value as string[][])
+                    }
+                    placeholder="เลือกสายงานที่สนใจ"
+                    style={{ width: "100%" }}
+                    className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold"
+                    classNames={{ placeholder: "text-left" }}
+                    styles={{ placeholder: { lineHeight: "64px" } }}
+                    size="large"
+                    showCheckedStrategy={Cascader.SHOW_CHILD}
+                    prefix={<Briefcase size={18} className="text-[#437FC7]" />}
+                    suffixIcon={
+                      <ChevronDown size={16} className="text-gray-400" />
+                    }
+                  />
                 </div>
               </Col>
 
@@ -372,29 +369,27 @@ export default function HeroSection() {
                   >
                     ทำเลที่ต้องการ
                   </span>
-                  <div className="relative w-full">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                      <MapPin size={20} className="text-[#437FC7]" />
-                    </div>
-                    <Cascader
-                      options={geoOptions}
-                      loading={isLoadingGeo}
-                      showSearch
-                      placeholder="เลือกจังหวัด / เขต"
-                      style={{ width: "100%" }}
-                      className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold [&_.ant-select-selector]:pl-[44px]! [&_.ant-select-selection-placeholder]:text-left [&_.ant-select-selection-placeholder]:leading-[64px]"
-                      popupClassName="min-w-[220px]"
-                      size="large"
-                      value={searchParams.location as string[] | undefined}
-                      onChange={(value) =>
-                        setSearchParam("location", value as string[])
-                      }
-                      expandTrigger="hover"
-                      suffixIcon={
-                        <ChevronDown size={16} className="text-gray-400" />
-                      }
-                    />
-                  </div>
+                  <Cascader
+                    options={geoOptions}
+                    loading={isLoadingGeo}
+                    showSearch
+                    placeholder="เลือกจังหวัด / เขต"
+                    style={{ width: "100%" }}
+                    className="h-16 custom-cascader-v2 rounded-2xl bg-gray-50/80 dark:bg-black/30 shadow-sm border-2! border-[#EDF6FF]! dark:border-none! font-semibold"
+                    classNames={{ placeholder: "text-left" }}
+                    styles={{ placeholder: { lineHeight: "64px" } }}
+                    popupClassName="min-w-[220px]"
+                    size="large"
+                    value={searchParams.location as string[] | undefined}
+                    onChange={(value) =>
+                      setSearchParam("location", value as string[])
+                    }
+                    expandTrigger="hover"
+                    prefix={<MapPin size={18} className="text-[#437FC7]" />}
+                    suffixIcon={
+                      <ChevronDown size={16} className="text-gray-400" />
+                    }
+                  />
                 </div>
               </Col>
             </Row>
