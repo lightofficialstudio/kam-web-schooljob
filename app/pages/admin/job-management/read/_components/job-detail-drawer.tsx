@@ -215,13 +215,20 @@ export function JobDetailDrawer({ onUpdateStatus }: JobDetailDrawerProps) {
           borderBottom: `1px solid ${token.colorBorderSecondary}`,
         }}
       >
+        {/* ✨ Bug #5 fix: wrap ทุก onUpdateStatus call ด้วย try/catch ป้องกัน unhandled rejection */}
         {drawerJob.status !== "OPEN" ? (
           <Button
             type="primary"
             icon={<PlayCircleOutlined />}
             size="small"
             style={{ borderRadius: 20 }}
-            onClick={() => onUpdateStatus(drawerJob.id, "OPEN")}
+            onClick={async () => {
+              try {
+                await onUpdateStatus(drawerJob.id, "OPEN");
+              } catch {
+                /* store แสดง modal error แล้ว */
+              }
+            }}
           >
             เปิดรับสมัคร
           </Button>
@@ -231,7 +238,13 @@ export function JobDetailDrawer({ onUpdateStatus }: JobDetailDrawerProps) {
             icon={<PauseCircleOutlined />}
             size="small"
             style={{ borderRadius: 20 }}
-            onClick={() => onUpdateStatus(drawerJob.id, "CLOSED")}
+            onClick={async () => {
+              try {
+                await onUpdateStatus(drawerJob.id, "CLOSED");
+              } catch {
+                /* store แสดง modal error แล้ว */
+              }
+            }}
           >
             ปิดรับสมัคร
           </Button>
@@ -240,7 +253,13 @@ export function JobDetailDrawer({ onUpdateStatus }: JobDetailDrawerProps) {
           <Button
             size="small"
             style={{ borderRadius: 20 }}
-            onClick={() => onUpdateStatus(drawerJob.id, "DRAFT")}
+            onClick={async () => {
+              try {
+                await onUpdateStatus(drawerJob.id, "DRAFT");
+              } catch {
+                /* store แสดง modal error แล้ว */
+              }
+            }}
           >
             ตั้งเป็น Draft
           </Button>

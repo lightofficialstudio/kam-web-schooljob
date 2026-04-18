@@ -21,27 +21,31 @@ const { Text } = Typography;
 const ACTION_OPTIONS = [
   { label: "ทุก action", value: "" },
   { label: "สร้างประกาศงาน", value: "CREATE_JOB" },
+  { label: "แก้ไขเนื้อหา", value: "UPDATE_JOB" },
   { label: "เปลี่ยนสถานะ", value: "UPDATE_JOB_STATUS" },
   { label: "ลบประกาศงาน", value: "DELETE_JOB" },
 ];
 
 // ✨ สีสำหรับ action badge
 const ACTION_DOT: Record<string, string> = {
-  CREATE_JOB: "#22c55e",
+  CREATE_JOB:        "#22c55e",
+  UPDATE_JOB:        "#a855f7",
   UPDATE_JOB_STATUS: "#11b6f5",
-  DELETE_JOB: "#ef4444",
+  DELETE_JOB:        "#ef4444",
 };
 
 const ACTION_TAG_COLOR: Record<string, string> = {
-  CREATE_JOB: "green",
+  CREATE_JOB:        "green",
+  UPDATE_JOB:        "purple",
   UPDATE_JOB_STATUS: "blue",
-  DELETE_JOB: "red",
+  DELETE_JOB:        "red",
 };
 
 const ACTION_TH: Record<string, string> = {
-  CREATE_JOB: "สร้างประกาศ",
+  CREATE_JOB:        "สร้างประกาศ",
+  UPDATE_JOB:        "แก้ไขเนื้อหา",
   UPDATE_JOB_STATUS: "เปลี่ยนสถานะ",
-  DELETE_JOB: "ลบประกาศ",
+  DELETE_JOB:        "ลบประกาศ",
 };
 
 interface AuditLogDrawerProps {

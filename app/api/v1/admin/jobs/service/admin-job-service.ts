@@ -52,6 +52,7 @@ export const createAuditLog = async (input: {
 // ✨ ป้าย action ภาษาไทย สำหรับ notification title
 const ACTION_LABEL: Record<string, string> = {
   CREATE_JOB:        "สร้างประกาศงานใหม่",
+  UPDATE_JOB:        "แก้ไขเนื้อหาประกาศงาน",
   UPDATE_JOB_STATUS: "เปลี่ยนสถานะประกาศงาน",
   DELETE_JOB:        "ลบประกาศงาน",
 };
@@ -182,6 +183,102 @@ export const adminDeleteJobService = async (
 
   await prisma.job.delete({ where: { id: jobId } });
   await auditPromise;
+
+  return { id: jobId };
+};
+
+// ✨ Admin แก้ไขเนื้อหาประกาศงาน (ไม่ต้อง ownership) + บันทึก Audit
+export const adminUpdateJobContentService = async (
+  adminUserId: string,
+  jobId: string,
+  payload: {
+    title?: string;
+    employment_type?: string | null;
+    vacancy_count?: number;
+    subjects?: string[];
+    grades?: string[];
+    salary_type?: string | null;
+    salary_min?: number | null;
+    salary_max?: number | null;
+    salary_negotiable?: boolean;
+    description?: string | null;
+    education_level?: string | null;
+    experience?: string | null;
+    license?: string | null;
+    gender?: string | null;
+    qualifications?: string | null;
+    province?: string;
+    area?: string | null;
+    deadline_days?: number | null;
+    is_published?: boolean;
+    benefits?: string[];
+  },
+) => {
+  const adminProfileId = await getAdminProfileId(adminUserId);
+
+  const existing = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { id: true, title: true, status: true, deadline: true, schoolProfile: { select: { schoolName: true } } },
+  });
+  if (!existing) throw new Error("JOB_NOT_FOUND");
+
+  await prisma.$transaction(async (tx) => {
+    const deadline =
+      payload.deadline_days !== undefined
+        ? payload.deadline_days
+          ? new Date(Date.now() + payload.deadline_days * 24 * 60 * 60 * 1000)
+          : null
+        : existing.deadline;
+
+    await tx.job.update({
+      where: { id: jobId },
+      data: {
+        ...(payload.title !== undefined         && { title: payload.title }),
+        ...(payload.employment_type !== undefined && { jobType: payload.employment_type ?? null }),
+        ...(payload.vacancy_count !== undefined   && { positionsAvailable: payload.vacancy_count }),
+        ...(payload.salary_min !== undefined      && { salaryMin: payload.salary_min ?? null }),
+        ...(payload.salary_max !== undefined      && { salaryMax: payload.salary_max ?? null }),
+        ...(payload.salary_negotiable !== undefined && { salaryNegotiable: payload.salary_negotiable }),
+        ...(payload.description !== undefined     && { description: payload.description ?? null }),
+        ...(payload.education_level !== undefined && { educationLevel: payload.education_level ?? null }),
+        ...(payload.experience !== undefined      && { experience: payload.experience ?? null }),
+        ...(payload.qualifications !== undefined  && { qualifications: payload.qualifications ?? null }),
+        ...(payload.gender !== undefined          && { gender: payload.gender ?? null }),
+        ...(payload.province !== undefined        && { province: payload.province }),
+        ...(payload.area !== undefined            && { district: payload.area ?? null }),
+        ...(payload.is_published !== undefined    && { status: payload.is_published ? "OPEN" : "DRAFT" }),
+        ...(payload.license !== undefined         && {
+          licenseRequired: payload.license === "จำเป็นต้องมี" ? "required" : "not_required",
+        }),
+        deadline,
+      },
+    });
+
+    if (payload.subjects !== undefined) {
+      await tx.jobSubject.deleteMany({ where: { jobId } });
+      if (payload.subjects.length > 0)
+        await tx.jobSubject.createMany({ data: payload.subjects.map((subject) => ({ jobId, subject })) });
+    }
+    if (payload.grades !== undefined) {
+      await tx.jobGrade.deleteMany({ where: { jobId } });
+      if (payload.grades.length > 0)
+        await tx.jobGrade.createMany({ data: payload.grades.map((grade) => ({ jobId, grade })) });
+    }
+    if (payload.benefits !== undefined) {
+      await tx.jobBenefit.deleteMany({ where: { jobId } });
+      if (payload.benefits.length > 0)
+        await tx.jobBenefit.createMany({ data: payload.benefits.map((benefit) => ({ jobId, benefit })) });
+    }
+  });
+
+  createAuditLog({
+    adminId:     adminProfileId,
+    action:      "UPDATE_JOB",
+    targetType:  "job",
+    targetId:    jobId,
+    targetLabel: `${payload.title ?? existing.title} (${existing.schoolProfile.schoolName})`,
+    note:        "แก้ไขเนื้อหาโดย Admin",
+  }).catch(() => {});
 
   return { id: jobId };
 };

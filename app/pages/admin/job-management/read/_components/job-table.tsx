@@ -308,7 +308,7 @@ export function JobTable({
                 key: "edit",
                 icon: <EditOutlined />,
                 label: "แก้ไขประกาศ",
-                onClick: () => router.push(`/pages/employer/job/post/${r.id}`),
+                onClick: () => router.push(`/pages/admin/job-management/edit/${r.id}`),
               },
               { type: "divider" },
               r.status !== "OPEN"

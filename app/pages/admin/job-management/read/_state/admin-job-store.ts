@@ -131,8 +131,10 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
   setPage: (p) => set({ page: p }),
 
   // ✨ ดึงรายการงาน — error แสดงผ่าน modal
+  // Bug #3 fix: อ่าน page จาก state หลัง set เสร็จแล้ว ป้องกัน race condition
   fetchJobs: async (adminUserId) => {
-    const { filters, page, pageSize } = get();
+    const { filters, pageSize } = get();
+    const page = get().page; // ✨ อ่านใหม่ทุกครั้งเพื่อป้องกัน stale closure
     set({ isLoading: true });
     try {
       const res = await fetchAdminJobs({
@@ -263,7 +265,9 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
     const effectiveAction = action ?? auditFilterAction;
     set({ isLoadingAudit: true, auditPage: page });
     try {
+      // ✨ Bug #4 fix: ส่ง adminUserId เข้า API เพื่อให้ endpoint auth ได้ถูกต้อง
       const res = await fetchAuditLogs({
+        adminUserId: adminUserId || undefined,
         targetType: "job",
         action: effectiveAction || undefined,
         page,
