@@ -41,3 +41,10 @@ export const requestAnnouncementHistory = (adminUserId: string, page = 1) =>
     "/api/v1/admin/announcements/history",
     { params: { admin_user_id: adminUserId, page } }
   );
+
+// ✨ นับจำนวนผู้รับตาม target role (ก่อนส่ง)
+export const requestRecipientCount = (targetRole: TargetRole) =>
+  axios.get<{ status_code: number; data: { count: number } }>(
+    "/api/v1/admin/announcements/count",
+    { params: { target_role: targetRole } }
+  );

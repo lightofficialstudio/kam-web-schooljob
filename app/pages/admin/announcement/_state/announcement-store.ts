@@ -6,6 +6,7 @@ import {
   BroadcastPayload,
   requestAnnouncementHistory,
   requestBroadcast,
+  requestRecipientCount,
   TargetRole,
 } from "../_api/announcement-api";
 
@@ -16,6 +17,10 @@ interface AnnouncementStore {
   targetRole: TargetRole;
   isSending: boolean;
   lastSentCount: number | null;
+
+  // ✨ Recipient count (นับก่อนส่ง)
+  recipientCount: number | null;
+  isCountingRecipients: boolean;
 
   // ✨ History state
   history: AnnouncementHistoryItem[];
@@ -28,6 +33,7 @@ interface AnnouncementStore {
   setMessage: (v: string) => void;
   setTargetRole: (v: TargetRole) => void;
   resetForm: () => void;
+  fetchRecipientCount: (role: TargetRole) => Promise<void>;
   broadcast: (adminUserId: string) => Promise<{ ok: boolean; sentCount: number; error?: string }>;
   fetchHistory: (adminUserId: string, page?: number) => Promise<void>;
 }
@@ -38,6 +44,8 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
   targetRole: "ALL",
   isSending: false,
   lastSentCount: null,
+  recipientCount: null,
+  isCountingRecipients: false,
   history: [],
   historyTotal: 0,
   historyPage: 1,
@@ -48,7 +56,22 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
   setTargetRole: (v) => set({ targetRole: v }),
 
   // ✨ reset form หลังส่ง
-  resetForm: () => set({ title: "", message: "", targetRole: "ALL", lastSentCount: null }),
+  resetForm: () => set({ title: "", message: "", targetRole: "ALL", lastSentCount: null, recipientCount: null }),
+
+  // ✨ นับจำนวนผู้รับก่อนเปิด Confirm Modal
+  fetchRecipientCount: async (role) => {
+    set({ isCountingRecipients: true, recipientCount: null });
+    try {
+      const res = await requestRecipientCount(role);
+      if (res.data.status_code === 200) {
+        set({ recipientCount: res.data.data.count });
+      }
+    } catch {
+      set({ recipientCount: null });
+    } finally {
+      set({ isCountingRecipients: false });
+    }
+  },
 
   // ✨ ส่ง Broadcast — return ok + sentCount สำหรับแสดง Modal
   broadcast: async (adminUserId) => {
