@@ -29,7 +29,6 @@ import {
   Descriptions,
   Drawer,
   Flex,
-  Modal,
   Row,
   Select,
   Skeleton,
@@ -40,7 +39,6 @@ import {
   Timeline,
   Tooltip,
   Typography,
-  message,
   theme,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
@@ -92,6 +90,8 @@ export function UserDetailDrawer() {
     updateUserRole,
     banUser,
     deleteUser,
+    showModal,
+    setModalLoading,
   } = useUserManagementStore();
 
   const d = drawerDetail;
@@ -101,28 +101,47 @@ export function UserDetailDrawer() {
     if (!d) return;
     try {
       await updateUserRole(d.id, role);
-      message.success(`เปลี่ยน Role เป็น ${role} สำเร็จ`);
-    } catch {
-      message.error("เปลี่ยน Role ไม่สำเร็จ");
+      showModal({
+        type: "success",
+        title: "เปลี่ยน Role สำเร็จ",
+        description: `เปลี่ยน Role ของ ${d.email} เป็น ${role} เรียบร้อยแล้ว`,
+      });
+    } catch (err) {
+      showModal({
+        type: "error",
+        title: "เปลี่ยน Role ไม่สำเร็จ",
+        description: "เกิดข้อผิดพลาดขณะเปลี่ยน Role",
+        errorDetails: err,
+      });
     }
   };
 
   const handleBan = (ban: boolean) => {
     if (!d) return;
-    Modal.confirm({
+    showModal({
+      type: "confirm",
       title: ban ? "แบน User นี้?" : "ปลด Ban User นี้?",
-      content: ban
+      description: ban
         ? `ผู้ใช้ ${d.email} จะไม่สามารถเข้าสู่ระบบได้`
         : `ผู้ใช้ ${d.email} จะกลับมาใช้งานได้ปกติ`,
-      okText: ban ? "แบน" : "ปลด Ban",
-      okButtonProps: { danger: ban },
-      cancelText: "ยกเลิก",
-      onOk: async () => {
+      confirmLabel: ban ? "แบน" : "ปลด Ban",
+      cancelLabel: "ยกเลิก",
+      onConfirm: async () => {
+        setModalLoading(true);
         try {
           await banUser(d.id, ban);
-          message.success(ban ? "แบน User สำเร็จ" : "ปลด Ban สำเร็จ");
-        } catch {
-          message.error("ดำเนินการไม่สำเร็จ");
+          showModal({
+            type: "success",
+            title: ban ? "แบน User สำเร็จ" : "ปลด Ban สำเร็จ",
+            description: `ดำเนินการกับ ${d.email} เรียบร้อยแล้ว`,
+          });
+        } catch (err) {
+          showModal({
+            type: "error",
+            title: "ดำเนินการไม่สำเร็จ",
+            description: "เกิดข้อผิดพลาดขณะดำเนินการ",
+            errorDetails: err,
+          });
         }
       },
     });
@@ -130,29 +149,29 @@ export function UserDetailDrawer() {
 
   const handleDelete = () => {
     if (!d) return;
-    Modal.confirm({
+    showModal({
+      type: "delete",
       title: "ลบ User นี้ถาวร?",
-      content: (
-        <Flex vertical gap={8}>
-          <Text>
-            ลบ <Text strong>{d.email}</Text> ออกจากระบบทั้งหมด
-          </Text>
-          <Text type="danger" style={{ fontSize: 12 }}>
-            ⚠️ ลบทั้ง Supabase Auth + Prisma Profile และ data ทั้งหมด —
-            ไม่สามารถย้อนกลับได้
-          </Text>
-        </Flex>
-      ),
-      okText: "ลบถาวร",
-      okButtonProps: { danger: true },
-      cancelText: "ยกเลิก",
-      onOk: async () => {
+      description: `ลบ ${d.email} ออกจากระบบทั้งหมด — ลบทั้ง Supabase Auth + Prisma Profile และ data ทั้งหมด ไม่สามารถย้อนกลับได้`,
+      confirmLabel: "ลบถาวร",
+      cancelLabel: "ยกเลิก",
+      onConfirm: async () => {
+        setModalLoading(true);
         try {
           await deleteUser(d.id);
-          message.success("ลบ User สำเร็จ");
+          showModal({
+            type: "success",
+            title: "ลบ User สำเร็จ",
+            description: `${d.email} ถูกลบออกจากระบบเรียบร้อยแล้ว`,
+          });
           closeDrawer();
-        } catch {
-          message.error("ลบ User ไม่สำเร็จ");
+        } catch (err) {
+          showModal({
+            type: "error",
+            title: "ลบ User ไม่สำเร็จ",
+            description: "เกิดข้อผิดพลาดขณะลบ User",
+            errorDetails: err,
+          });
         }
       },
     });

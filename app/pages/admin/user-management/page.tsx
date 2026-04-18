@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ [Orchestrator — User Management Page with Audit Log + Deep Analytics]
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { Col, Row } from "antd";
 import { useEffect } from "react";
 import { BulkActionSection } from "./_components/bulk-action-section";
@@ -12,8 +13,15 @@ import { UserTable } from "./_components/user-table";
 import { useUserManagementStore } from "./_state/user-management-store";
 
 export default function UserManagementPage() {
-  const { fetchUsers, filterRole, filterStatus, filterKeyword, page } =
-    useUserManagementStore();
+  const {
+    fetchUsers,
+    filterRole,
+    filterStatus,
+    filterKeyword,
+    page,
+    modal,
+    hideModal,
+  } = useUserManagementStore();
 
   // ✨ โหลดข้อมูลเมื่อ mount
   useEffect(() => {
@@ -47,6 +55,20 @@ export default function UserManagementPage() {
 
       {/* ─── User Detail Drawer (Audit Log + Analytics) ─── */}
       <UserDetailDrawer />
+
+      {/* ─── Global Modal สำหรับ feedback ทั้งหน้า ─── */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        loading={modal.loading}
+        confirmLabel={modal.confirmLabel}
+        cancelLabel={modal.cancelLabel}
+        onClose={hideModal}
+        onConfirm={modal.onConfirm}
+      />
     </>
   );
 }

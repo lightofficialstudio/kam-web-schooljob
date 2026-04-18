@@ -1,5 +1,6 @@
 "use client";
 
+import { ModalType } from "@/app/components/modal/modal.component";
 import { create } from "zustand";
 import {
   requestDeleteUser,
@@ -12,6 +13,30 @@ import {
 } from "../_api/user-management-api";
 
 interface UserManagementStore {
+  // ─── Modal state ───
+  modal: {
+    open: boolean;
+    type: ModalType;
+    title: string;
+    description: string;
+    errorDetails?: unknown;
+    onConfirm?: () => void;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    loading: boolean;
+  };
+  showModal: (opts: {
+    type: ModalType;
+    title: string;
+    description?: string;
+    errorDetails?: unknown;
+    onConfirm?: () => void;
+    confirmLabel?: string;
+    cancelLabel?: string;
+  }) => void;
+  hideModal: () => void;
+  setModalLoading: (loading: boolean) => void;
+
   // ─── List state ───
   users: UserRecord[];
   total: number;
@@ -52,6 +77,35 @@ interface UserManagementStore {
 
 export const useUserManagementStore = create<UserManagementStore>(
   (set, get) => ({
+    // ✨ Modal state เริ่มต้น
+    modal: {
+      open: false,
+      type: "success" as ModalType,
+      title: "",
+      description: "",
+      loading: false,
+    },
+    showModal: (opts) =>
+      set({
+        modal: {
+          open: true,
+          type: opts.type,
+          title: opts.title,
+          description: opts.description ?? "",
+          errorDetails: opts.errorDetails,
+          onConfirm: opts.onConfirm,
+          confirmLabel: opts.confirmLabel,
+          cancelLabel: opts.cancelLabel,
+          loading: false,
+        },
+      }),
+    hideModal: () =>
+      set((s) => ({
+        modal: { ...s.modal, open: false, onConfirm: undefined },
+      })),
+    setModalLoading: (loading) =>
+      set((s) => ({ modal: { ...s.modal, loading } })),
+
     users: [],
     total: 0,
     totalPages: 0,
@@ -103,7 +157,12 @@ export const useUserManagementStore = create<UserManagementStore>(
 
     // ✨ เปิด Drawer พร้อมโหลด detail
     openDrawer: async (userId) => {
-      set({ drawerOpen: true, drawerUserId: userId, drawerDetail: null, isLoadingDetail: true });
+      set({
+        drawerOpen: true,
+        drawerUserId: userId,
+        drawerDetail: null,
+        isLoadingDetail: true,
+      });
       try {
         const res = await requestUserDetail(userId);
         if (res.data.status_code === 200) {
@@ -126,14 +185,15 @@ export const useUserManagementStore = create<UserManagementStore>(
           users: s.users.map((u) =>
             u.id === userId ? { ...u, role: role as UserRecord["role"] } : u,
           ),
-          drawerDetail: s.drawerDetail?.id === userId
-            ? {
-                ...s.drawerDetail,
-                profile: s.drawerDetail.profile
-                  ? { ...s.drawerDetail.profile, role }
-                  : null,
-              }
-            : s.drawerDetail,
+          drawerDetail:
+            s.drawerDetail?.id === userId
+              ? {
+                  ...s.drawerDetail,
+                  profile: s.drawerDetail.profile
+                    ? { ...s.drawerDetail.profile, role }
+                    : null,
+                }
+              : s.drawerDetail,
         }));
       } finally {
         set({ isUpdatingUser: false });
@@ -149,9 +209,10 @@ export const useUserManagementStore = create<UserManagementStore>(
           users: s.users.map((u) =>
             u.id === userId ? { ...u, isBanned: ban } : u,
           ),
-          drawerDetail: s.drawerDetail?.id === userId
-            ? { ...s.drawerDetail, isBanned: ban }
-            : s.drawerDetail,
+          drawerDetail:
+            s.drawerDetail?.id === userId
+              ? { ...s.drawerDetail, isBanned: ban }
+              : s.drawerDetail,
         }));
       } finally {
         set({ isUpdatingUser: false });

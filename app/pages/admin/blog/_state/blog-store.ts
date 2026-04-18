@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { ModalType } from "@/app/components/modal/modal.component";
 import {
   AiAction,
   BlogStatsOverview,
@@ -83,6 +84,17 @@ interface BlogStore {
   quickPublish: (id: string, currentStatus: "DRAFT" | "PUBLISHED") => Promise<void>;
   // ✨ analytics actions
   fetchStatsOverview: () => Promise<void>;
+  // ✨ modal feedback
+  modal: {
+    open: boolean;
+    type: ModalType;
+    title: string;
+    description: string;
+    errorDetails?: unknown;
+    loading: boolean;
+  };
+  showModal: (opts: { type: ModalType; title: string; description?: string; errorDetails?: unknown }) => void;
+  hideModal: () => void;
   // ✨ AI actions
   aiAssist: (payload: {
     action: AiAction;
@@ -110,6 +122,10 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   aiSeoScore: null,
   statsOverview: null,
   isStatsLoading: false,
+  modal: { open: false, type: "success" as ModalType, title: "", description: "", loading: false },
+  showModal: (opts) =>
+    set({ modal: { open: true, type: opts.type, title: opts.title, description: opts.description ?? "", errorDetails: opts.errorDetails, loading: false } }),
+  hideModal: () => set((s) => ({ modal: { ...s.modal, open: false } })),
 
   setFilterStatus: (s) => set({ filterStatus: s, page: 1 }),
   setFilterKeyword: (k) => set({ filterKeyword: k, page: 1 }),
@@ -141,7 +157,7 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
 
   // ✨ สร้าง หรือ แก้ไขบทความ
   submitBlog: async (values) => {
-    const { editingBlog, fetchBlogs, closeDrawer } = get();
+    const { editingBlog, fetchBlogs, closeDrawer, showModal } = get();
     set({ isSubmitting: true });
     try {
       if (editingBlog) {
@@ -151,6 +167,10 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
       }
       closeDrawer();
       await fetchBlogs();
+      showModal({ type: "success", title: editingBlog ? "บันทึกการแก้ไขสำเร็จ" : "สร้างบทความสำเร็จ", description: `บทความ "${values.title}" ถูกบันทึกเรียบร้อยแล้ว` });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({ type: "error", title: editingBlog ? "แก้ไขบทความไม่สำเร็จ" : "สร้างบทความไม่สำเร็จ", description: msg, errorDetails: err });
     } finally {
       set({ isSubmitting: false });
     }
@@ -158,22 +178,35 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
 
   // ✨ ลบบทความแล้ว refresh
   deleteBlog: async (id: string) => {
-    await requestAdminDeleteBlog(id);
-    await get().fetchBlogs();
+    const { showModal, fetchBlogs } = get();
+    try {
+      await requestAdminDeleteBlog(id);
+      await fetchBlogs();
+      showModal({ type: "success", title: "ลบบทความสำเร็จ", description: "บทความถูกลบออกจากระบบแล้ว" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({ type: "error", title: "ลบบทความไม่สำเร็จ", description: msg, errorDetails: err });
+    }
   },
 
   // ✨ สลับ DRAFT ↔ PUBLISHED ทันที (quick publish)
   quickPublish: async (id, currentStatus) => {
+    const { showModal } = get();
     const newStatus = currentStatus === "DRAFT" ? "PUBLISHED" : "DRAFT";
-    await requestAdminUpdateBlog({ id, status: newStatus });
-    // ✨ update local state ทันที ไม่รอ refetch
-    set((s) => ({
-      blogs: s.blogs.map((b) =>
-        b.id === id
-          ? { ...b, status: newStatus, publishedAt: newStatus === "PUBLISHED" ? new Date().toISOString() : b.publishedAt }
-          : b,
-      ),
-    }));
+    try {
+      await requestAdminUpdateBlog({ id, status: newStatus });
+      set((s) => ({
+        blogs: s.blogs.map((b) =>
+          b.id === id
+            ? { ...b, status: newStatus, publishedAt: newStatus === "PUBLISHED" ? new Date().toISOString() : b.publishedAt }
+            : b,
+        ),
+      }));
+      showModal({ type: "success", title: newStatus === "PUBLISHED" ? "เผยแพร่บทความสำเร็จ" : "ย้ายกลับ Draft สำเร็จ", description: `สถานะบทความเปลี่ยนเป็น ${newStatus} แล้ว` });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({ type: "error", title: "เปลี่ยนสถานะไม่สำเร็จ", description: msg, errorDetails: err });
+    }
   },
 
   // ✨ ดึง analytics overview

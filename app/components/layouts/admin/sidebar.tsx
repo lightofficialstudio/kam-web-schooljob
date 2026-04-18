@@ -69,7 +69,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
       key: "/pages/admin/job-management",
       icon: <SolutionOutlined />,
       label: "จัดการประกาศงาน",
-      onClick: () => router.push("/pages/admin/job-management/create"),
+      onClick: () => router.push("/pages/admin/job-management/read"),
     },
   ];
 

@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { BlogAnalyticsSection } from "./_components/blog-analytics-section";
 import { BlogEditorDrawer } from "./_components/blog-editor-drawer";
 import { BlogKanban } from "./_components/blog-kanban";
@@ -179,6 +180,7 @@ export default function AdminBlogPage() {
     viewMode,
     setFilterStatus, setFilterKeyword, setFilterCategory, setViewMode,
     openCreate, fetchBlogs, fetchStatsOverview,
+    modal, hideModal,
   } = useAdminBlogStore();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -406,6 +408,17 @@ export default function AdminBlogPage() {
 
       {/* ─── Editor Drawer (มี AI Assistant อยู่ด้านขวา) ─── */}
       <BlogEditorDrawer authorId={user?.user_id} />
+
+      {/* ─── Global Modal feedback ─── */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        loading={modal.loading}
+        onClose={hideModal}
+      />
     </div>
   );
 }

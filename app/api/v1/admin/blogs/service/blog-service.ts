@@ -82,6 +82,17 @@ export class AdminBlogService {
     const existing = await prisma.blog.findUnique({ where: { slug: input.slug } });
     if (existing) throw new Error("slug นี้ถูกใช้แล้ว");
 
+    // ✨ แปลง author_id (Supabase UID) → Profile.id (Prisma UUID)
+    // เนื่องจาก auth store เก็บ Supabase UID แต่ Blog.authorId อ้างอิง Profile.id
+    let resolvedAuthorId: string | null = null;
+    if (input.author_id) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: input.author_id },
+        select: { id: true },
+      });
+      resolvedAuthorId = profile?.id ?? null;
+    }
+
     const blog = await prisma.blog.create({
       data: {
         title: input.title,
@@ -92,7 +103,7 @@ export class AdminBlogService {
         category: input.category ?? null,
         tags: input.tags ? JSON.stringify(input.tags) : null,
         status: input.status,
-        authorId: input.author_id ?? null,
+        authorId: resolvedAuthorId,
         publishedAt: input.status === "PUBLISHED" ? new Date() : null,
       },
     });
@@ -115,6 +126,20 @@ export class AdminBlogService {
     const current = await prisma.blog.findUnique({ where: { id }, select: { status: true, publishedAt: true } });
     const isPublishing = data.status === "PUBLISHED" && current?.status !== "PUBLISHED";
 
+    // ✨ แปลง author_id (Supabase UID) → Profile.id ถ้ามีการส่งมา
+    let resolvedAuthorId: string | null | undefined = undefined;
+    if (data.author_id !== undefined) {
+      if (data.author_id) {
+        const profile = await prisma.profile.findUnique({
+          where: { userId: data.author_id },
+          select: { id: true },
+        });
+        resolvedAuthorId = profile?.id ?? null;
+      } else {
+        resolvedAuthorId = null;
+      }
+    }
+
     const blog = await prisma.blog.update({
       where: { id },
       data: {
@@ -126,7 +151,7 @@ export class AdminBlogService {
         ...(data.category !== undefined && { category: data.category }),
         ...(data.tags !== undefined && { tags: JSON.stringify(data.tags) }),
         ...(data.status && { status: data.status }),
-        ...(data.author_id !== undefined && { authorId: data.author_id }),
+        ...(resolvedAuthorId !== undefined && { authorId: resolvedAuthorId }),
         ...(isPublishing && !current?.publishedAt && { publishedAt: new Date() }),
       },
     });
