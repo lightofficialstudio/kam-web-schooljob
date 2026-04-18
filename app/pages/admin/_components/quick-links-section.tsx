@@ -14,12 +14,48 @@ import Link from "next/link";
 const { Text } = Typography;
 
 const links = [
-  { icon: <TeamOutlined />, label: "จัดการผู้ใช้", href: "/pages/admin/user-management", colorKey: "colorPrimary" as const },
-  { icon: <BookOutlined />, label: "จัดการงาน", href: "/pages/job", colorKey: "colorSuccess" as const },
-  { icon: <ApiOutlined />, label: "API Docs", href: "/api/v1/authenticate/docs", colorKey: "colorInfo" as const },
-  { icon: <SettingOutlined />, label: "จัดการแพ็กเกจ", href: "/pages/admin/package-management", colorKey: "colorWarning" as const },
-  { icon: <RocketOutlined />, label: "จัดการบล็อก", href: "/pages/admin/blog", colorKey: "colorError" as const },
-  { icon: <ThunderboltOutlined />, label: "จัดการผู้ใช้", href: "/pages/admin/user-management", colorKey: "colorPurple" as const },
+  {
+    key: "users",
+    icon: <TeamOutlined />,
+    label: "จัดการผู้ใช้",
+    href: "/pages/admin/user-management",
+    colorKey: "colorPrimary" as const,
+  },
+  {
+    key: "jobs",
+    icon: <BookOutlined />,
+    label: "จัดการงาน",
+    href: "/pages/job",
+    colorKey: "colorSuccess" as const,
+  },
+  {
+    key: "api",
+    icon: <ApiOutlined />,
+    label: "API Docs",
+    href: "/api/v1/authenticate/docs",
+    colorKey: "colorInfo" as const,
+  },
+  {
+    key: "packages",
+    icon: <SettingOutlined />,
+    label: "จัดการแพ็กเกจ",
+    href: "/pages/admin/package-management",
+    colorKey: "colorWarning" as const,
+  },
+  {
+    key: "blog",
+    icon: <RocketOutlined />,
+    label: "จัดการบล็อก",
+    href: "/pages/admin/blog",
+    colorKey: "colorError" as const,
+  },
+  {
+    key: "jobs-mgmt",
+    icon: <ThunderboltOutlined />,
+    label: "จัดการประกาศงาน",
+    href: "/pages/admin/job-management/read",
+    colorKey: "colorPrimary" as const,
+  },
 ];
 
 // ✨ [Quick Links Section]
@@ -43,9 +79,11 @@ export function QuickLinksSection() {
     >
       <Row gutter={[10, 10]}>
         {links.map((lnk) => {
-          const color = (token as Record<string, unknown>)[lnk.colorKey] as string ?? token.colorPrimary;
+          const color =
+            ((token as Record<string, unknown>)[lnk.colorKey] as string) ??
+            token.colorPrimary;
           return (
-            <Col xs={12} key={lnk.label}>
+            <Col xs={12} key={lnk.key}>
               <Link href={lnk.href} style={{ textDecoration: "none" }}>
                 <Flex
                   align="center"
@@ -59,12 +97,16 @@ export function QuickLinksSection() {
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = color;
-                    (e.currentTarget as HTMLDivElement).style.background = token.colorFillSecondary;
+                    (e.currentTarget as HTMLDivElement).style.borderColor =
+                      color;
+                    (e.currentTarget as HTMLDivElement).style.background =
+                      token.colorFillSecondary;
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = token.colorBorderSecondary;
-                    (e.currentTarget as HTMLDivElement).style.background = token.colorFillQuaternary;
+                    (e.currentTarget as HTMLDivElement).style.borderColor =
+                      token.colorBorderSecondary;
+                    (e.currentTarget as HTMLDivElement).style.background =
+                      token.colorFillQuaternary;
                   }}
                 >
                   <span style={{ color, fontSize: 16 }}>{lnk.icon}</span>

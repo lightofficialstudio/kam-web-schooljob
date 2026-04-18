@@ -104,6 +104,26 @@ export async function GET() {
         }),
         // 9 — Blog DRAFT ที่ยังไม่ publish
         prisma.blog.count({ where: { status: "DRAFT" } }),
+        // 10 — Applications รายเดือน 6 เดือนย้อนหลัง (demand side)
+        prisma.$queryRaw<{ month: string; status: string; count: bigint }[]>`
+          SELECT
+            TO_CHAR(applied_at, 'YYYY-MM') AS month,
+            status,
+            COUNT(*) AS count
+          FROM applications
+          WHERE applied_at >= NOW() - INTERVAL '6 months'
+          GROUP BY month, status
+          ORDER BY month ASC
+        `,
+        // 11 — Province distribution ของ jobs ที่ OPEN (top 8)
+        prisma.$queryRaw<{ province: string; count: bigint }[]>`
+          SELECT province, COUNT(*) AS count
+          FROM jobs
+          WHERE status = 'OPEN'
+          GROUP BY province
+          ORDER BY count DESC
+          LIMIT 8
+        `,
       ]),
     ]);
 
@@ -119,6 +139,8 @@ export async function GET() {
       jobGrowthRaw,
       stalePendingCount,
       draftBlogCount,
+      appGrowthRaw,
+      provinceDistRaw,
     ] = prismaStats;
 
     // ─── Stats ───
@@ -258,6 +280,9 @@ export async function GET() {
       const employee = profileGrowthRaw.find((r) => r.month === m && r.role === "EMPLOYEE");
       const employer = profileGrowthRaw.find((r) => r.month === m && r.role === "EMPLOYER");
       const jobs = jobGrowthRaw.find((r) => r.month === m);
+      const appsMonth = appGrowthRaw.filter((r) => r.month === m);
+      const appTotal = appsMonth.reduce((s, r) => s + Number(r.count), 0);
+      const appAccepted = Number(appsMonth.find((r) => r.status === "ACCEPTED")?.count ?? 0);
       return {
         month: thaiMonthShort[mo - 1],
         year: yr,
@@ -266,8 +291,16 @@ export async function GET() {
         schools: Number(employer?.count ?? 0),
         users: Number(employee?.count ?? 0) + Number(employer?.count ?? 0),
         jobs: Number(jobs?.count ?? 0),
+        applications: appTotal,
+        accepted: appAccepted,
       };
     });
+
+    // ─── Province distribution ───
+    const provinceDistribution = (provinceDistRaw as { province: string; count: bigint }[]).map((p) => ({
+      province: p.province,
+      count: Number(p.count),
+    }));
 
     // ─── Deadline Jobs detail ───
     const deadlineJobsFormatted = deadlineJobs.map((j) => ({
@@ -290,6 +323,7 @@ export async function GET() {
         pendingActions,
         recentSignups,
         growthChart,
+        provinceDistribution,
         deadlineJobs: deadlineJobsFormatted,
         inactiveSchools: inactiveSchools.map((s) => ({
           id: s.id,

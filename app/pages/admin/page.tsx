@@ -4,7 +4,11 @@
 import { ModalComponent } from "@/app/components/modal/modal.component";
 import { Col, Row } from "antd";
 import { useEffect } from "react";
+import { ApplicationFunnelChart } from "./_components/application-funnel-chart";
+import { JobApplicationTrendChart } from "./_components/job-application-trend-chart";
+import { JobStatusDonutChart } from "./_components/job-status-donut-chart";
 import { PendingActionsCard } from "./_components/pending-actions-card";
+import { PlatformHealthChart } from "./_components/platform-health-chart";
 import { QuickLinksSection } from "./_components/quick-links-section";
 import { RecentSignupsCard } from "./_components/recent-signups-card";
 import { RoleDistributionChart } from "./_components/role-distribution-chart";
@@ -36,12 +40,28 @@ export default function AdminPage() {
           <StatsSection />
         </Col>
 
-        {/* ✨ Charts Row */}
+        {/* ✨ Charts Row — User Growth + Role Distribution */}
         <Col xs={24} lg={14}>
           <UserGrowthChart />
         </Col>
         <Col xs={24} lg={10}>
           <RoleDistributionChart />
+        </Col>
+
+        {/* ✨ Analytics Row 1 — Supply vs Demand + Application Funnel */}
+        <Col xs={24} lg={15}>
+          <JobApplicationTrendChart />
+        </Col>
+        <Col xs={24} lg={9}>
+          <ApplicationFunnelChart />
+        </Col>
+
+        {/* ✨ Analytics Row 2 — Job Status Donut + Platform Health Score */}
+        <Col xs={24} lg={9}>
+          <JobStatusDonutChart />
+        </Col>
+        <Col xs={24} lg={15}>
+          <PlatformHealthChart />
         </Col>
 
         {/* ✨ Pending Actions + Recent Signups */}

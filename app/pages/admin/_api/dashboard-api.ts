@@ -58,6 +58,13 @@ export interface GrowthPoint {
   schools: number;
   users: number;
   jobs: number;
+  applications: number;
+  accepted: number;
+}
+
+export interface ProvincePoint {
+  province: string;
+  count: number;
 }
 
 export interface DeadlineJob {
@@ -74,6 +81,7 @@ export interface DashboardData {
   pendingActions: PendingAction[];
   recentSignups: RecentSignup[];
   growthChart: GrowthPoint[];
+  provinceDistribution: ProvincePoint[];
   deadlineJobs: DeadlineJob[];
   inactiveSchools: { id: string; schoolName: string; province: string; email: string }[];
 }
