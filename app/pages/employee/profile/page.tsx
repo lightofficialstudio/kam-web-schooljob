@@ -381,8 +381,8 @@ export default function EmployeeProfilePage() {
                               letterSpacing: "-0.025em",
                             }}
                           >
-                            {profile.firstName || "THANAT"}{" "}
-                            {profile.lastName || "PROMPIRIYA"}
+                            {profile.firstName || "-"}{" "}
+                            {profile.lastName || ""}
                           </Title>
 
                           {/* Mockup Button */}
@@ -409,7 +409,7 @@ export default function EmployeeProfilePage() {
                               />
                               <Text type="secondary">
                                 {profile.preferredProvinces?.[0] ||
-                                  "Bang Sue, Bangkok"}
+                                  "ยังไม่ระบุจังหวัด"}
                               </Text>
                             </Space>
                             <Space size={12}>
@@ -417,8 +417,7 @@ export default function EmployeeProfilePage() {
                                 style={{ color: token.colorTextDescription }}
                               />
                               <Text type="secondary">
-                                {profile.email ||
-                                  "lightofficialstudio@gmail.com"}
+                                {profile.email || user?.email || "-"}
                               </Text>
                             </Space>
                             <Space size={12}>
