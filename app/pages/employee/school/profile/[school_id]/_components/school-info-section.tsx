@@ -6,14 +6,7 @@ import {
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import {
-  Card,
-  Col,
-  Flex,
-  Row,
-  Typography,
-  theme as antTheme,
-} from "antd";
+import { Card, Col, Row, Typography, theme as antTheme } from "antd";
 import type { SchoolProfileDetail } from "../_api/school-profile-api";
 
 const { Title, Text, Paragraph } = Typography;
@@ -28,17 +21,23 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
 
   const stats = [
     school.foundedYear && {
-      icon: <CalendarOutlined style={{ fontSize: 24, color: token.colorPrimary }} />,
+      icon: (
+        <CalendarOutlined style={{ fontSize: 24, color: token.colorPrimary }} />
+      ),
       label: "ก่อตั้งเมื่อ",
       value: `พ.ศ. ${school.foundedYear + 543}`,
     },
     school.studentCount != null && {
-      icon: <UserOutlined style={{ fontSize: 24, color: token.colorSuccess }} />,
+      icon: (
+        <UserOutlined style={{ fontSize: 24, color: token.colorSuccess }} />
+      ),
       label: "จำนวนนักเรียน",
       value: `${school.studentCount.toLocaleString()} คน`,
     },
     school.teacherCount != null && {
-      icon: <TeamOutlined style={{ fontSize: 24, color: token.colorWarning }} />,
+      icon: (
+        <TeamOutlined style={{ fontSize: 24, color: token.colorWarning }} />
+      ),
       label: "ครู/บุคลากร",
       value: `${school.teacherCount.toLocaleString()} คน`,
     },
@@ -47,31 +46,38 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       label: "ประเภทสถาบัน",
       value: school.schoolType,
     },
-  ].filter(Boolean) as { icon: React.ReactNode; label: string; value: string }[];
+  ].filter(Boolean) as {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+  }[];
 
   if (!school.description && stats.length === 0) return null;
 
   return (
     <Card
+      className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] border-none! transition-all duration-300"
       style={{
-        borderRadius: token.borderRadiusLG,
-        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: 32,
+        backgroundColor: token.colorBgContainer,
       }}
-      styles={{ body: { padding: 28 } }}
+      styles={{ body: { padding: 32 } }}
     >
-      <Title level={4} style={{ margin: "0 0 16px" }}>
-        เกี่ยวกับโรงเรียน
-      </Title>
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-3 rounded-2xl bg-blue-50 text-blue-500">
+          <BankOutlined className="text-xl" />
+        </div>
+        <Title
+          level={4}
+          className="m-0! font-black text-2xl tracking-tight"
+          style={{ color: "#0F172A" }}
+        >
+          เกี่ยวกับสถาบัน
+        </Title>
+      </div>
 
       {school.description && (
-        <Paragraph
-          style={{
-            fontSize: 15,
-            lineHeight: 1.75,
-            color: token.colorText,
-            marginBottom: stats.length > 0 ? 24 : 0,
-          }}
-        >
+        <Paragraph className="text-lg leading-loose text-slate-500 font-medium mb-10">
           {school.description}
         </Paragraph>
       )}
@@ -79,22 +85,23 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       {stats.length > 0 && (
         <Row gutter={[16, 16]}>
           {stats.map((stat, i) => (
-            <Col xs={12} sm={6} key={i}>
-              <Flex
-                vertical
-                align="center"
-                gap={8}
+            <Col xs={12} key={i}>
+              <div
+                className="p-6 rounded-3xl transition-all hover:translate-y-[-4px] border border-slate-50 dark:border-slate-800"
                 style={{
-                  padding: "20px 12px",
                   background: token.colorBgLayout,
-                  borderRadius: token.borderRadius,
-                  textAlign: "center",
                 }}
               >
-                {stat.icon}
-                <Text strong style={{ fontSize: 16 }}>{stat.value}</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>{stat.label}</Text>
-              </Flex>
+                <div className="mb-4">{stat.icon}</div>
+                <div className="flex flex-col">
+                  <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+                    {stat.label}
+                  </Text>
+                  <Text className="text-[#0F172A] dark:text-white text-xl font-black">
+                    {stat.value}
+                  </Text>
+                </div>
+              </div>
             </Col>
           ))}
         </Row>
