@@ -157,7 +157,7 @@ export const SearchFilterSection = () => {
                     options={jobCategories}
                     loading={isLoadingCategories}
                     multiple
-                    maxTagCount={1}
+                    maxTagCount="responsive"
                     value={filters.category}
                     onChange={(value) =>
                       setFilters({ category: value as string[][] })
@@ -174,6 +174,7 @@ export const SearchFilterSection = () => {
                     suffixIcon={
                       <SolutionOutlined style={{ color: token.colorPrimary }} />
                     }
+                    displayRender={(labels) => labels[labels.length - 1]}
                   />
                 </Flex>
               </Col>

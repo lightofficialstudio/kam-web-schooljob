@@ -27,14 +27,23 @@ function JobSearchPageContent() {
 
   // ✨ Sync URL params → store เมื่อ mount
   useEffect(() => {
-    const keyword = searchParams.get("keyword");
+    const keyword  = searchParams.get("keyword");
     const province = searchParams.get("province");
     const category = searchParams.get("category");
 
-    const partial: Record<string, string> = {};
-    if (keyword) partial.keyword = keyword;
-    if (province) partial.province = province;
-    if (category) partial.category = category;
+    const partial: Parameters<typeof setFilters>[0] = {};
+    if (keyword)  partial.keyword  = keyword;
+    if (province) partial.location = province;
+
+    // ✨ category จาก URL คือ JSON ของ string[][] เช่น [["general_subject","thai_teacher"]]
+    if (category) {
+      try {
+        const parsed = JSON.parse(category);
+        if (Array.isArray(parsed)) partial.category = parsed as string[][];
+      } catch {
+        // ถ้า parse ไม่ได้ ให้ข้ามไป
+      }
+    }
 
     if (Object.keys(partial).length > 0) {
       setFilters(partial);
