@@ -1,18 +1,10 @@
 "use client";
 
 // ✨ Signin Form — Minimal + Modern + subtle animation
-import ResultModal from "@/app/components/layouts/modal/result-modal";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Col,
-  Divider,
-  Flex,
-  Form,
-  Input,
-  Typography,
-} from "antd";
+import { Button, Col, Divider, Flex, Form, Input, Typography } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { requestSignin } from "../_api/signin-api";
@@ -27,7 +19,8 @@ export const SigninForm = () => {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
   const { setUser } = useAuthStore();
-  const { isLoading, modal, setLoading, showModal, hideModal } = useSigninStore();
+  const { isLoading, modal, setLoading, showModal, hideModal } =
+    useSigninStore();
 
   const handleModalConfirm = () => {
     if (modal.type !== "success") return;
@@ -67,10 +60,19 @@ export const SigninForm = () => {
         is_first_login: result.data.is_first_login || false,
         profile_image_url: result.data.profile_image_url || undefined,
       });
-      showModal("success", "เข้าสู่ระบบสำเร็จ", result.message_th || "เข้าสู่ระบบเรียบร้อยแล้ว");
+      showModal(
+        "success",
+        "เข้าสู่ระบบสำเร็จ",
+        result.message_th || "เข้าสู่ระบบเรียบร้อยแล้ว",
+      );
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { message_th?: string } }; message?: string })?.response?.data?.message_th ||
+        (
+          err as {
+            response?: { data?: { message_th?: string } };
+            message?: string;
+          }
+        )?.response?.data?.message_th ||
         (err as { message?: string })?.message ||
         "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
       showModal("error", "เกิดข้อผิดพลาด", message);
@@ -81,16 +83,14 @@ export const SigninForm = () => {
 
   return (
     <>
-      <ResultModal
+      <ModalComponent
         open={modal.open}
-        type={modal.type}
-        mainTitle={modal.mainTitle}
+        type={modal.type as "success" | "error" | "confirm" | "delete"}
+        title={modal.mainTitle}
         description={modal.description}
-        onConfirm={handleModalConfirm}
-        onCancel={hideModal}
-        confirmText="ตกลง"
-        centered
-        width={420}
+        onClose={hideModal}
+        onConfirm={modal.type === "success" ? handleModalConfirm : undefined}
+        confirmLabel="ตกลง"
       />
 
       {/* ✨ Animation styles */}
@@ -122,7 +122,10 @@ export const SigninForm = () => {
         >
           {/* ✨ Header */}
           <Flex vertical gap={6} style={{ marginBottom: 36 }}>
-            <Title level={3} style={{ margin: 0, fontWeight: 800, letterSpacing: "-0.5px" }}>
+            <Title
+              level={3}
+              style={{ margin: 0, fontWeight: 800, letterSpacing: "-0.5px" }}
+            >
               เข้าสู่ระบบ
             </Title>
             <Text type="secondary" style={{ fontSize: 14 }}>
@@ -131,12 +134,25 @@ export const SigninForm = () => {
           </Flex>
 
           {/* ✨ Form */}
-          <Form layout="vertical" onFinish={onFinish} size="large" requiredMark={false}>
+          <Form
+            layout="vertical"
+            onFinish={onFinish}
+            size="large"
+            requiredMark={false}
+          >
             <div className="signin-input-row">
               <Form.Item
                 name="email"
-                label={<Text style={{ fontSize: 13, fontWeight: 600 }}>อีเมล</Text>}
-                rules={[{ required: true, type: "email", message: "กรุณากรอกอีเมลที่ถูกต้อง" }]}
+                label={
+                  <Text style={{ fontSize: 13, fontWeight: 600 }}>อีเมล</Text>
+                }
+                rules={[
+                  {
+                    required: true,
+                    type: "email",
+                    message: "กรุณากรอกอีเมลที่ถูกต้อง",
+                  },
+                ]}
                 style={{ marginBottom: 16 }}
               >
                 <Input
@@ -150,7 +166,11 @@ export const SigninForm = () => {
             <div className="signin-input-row">
               <Form.Item
                 name="password"
-                label={<Text style={{ fontSize: 13, fontWeight: 600 }}>รหัสผ่าน</Text>}
+                label={
+                  <Text style={{ fontSize: 13, fontWeight: 600 }}>
+                    รหัสผ่าน
+                  </Text>
+                }
                 rules={[{ required: true, message: "กรุณากรอกรหัสผ่าน" }]}
                 style={{ marginBottom: 8 }}
               >
@@ -195,12 +215,16 @@ export const SigninForm = () => {
                     transition: "box-shadow 0.2s, transform 0.15s",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 12px 28px ${PRIMARY}55`;
+                    (e.currentTarget as HTMLButtonElement).style.transform =
+                      "translateY(-1px)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                      `0 12px 28px ${PRIMARY}55`;
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 24px ${PRIMARY}45`;
+                    (e.currentTarget as HTMLButtonElement).style.transform =
+                      "translateY(0)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                      `0 8px 24px ${PRIMARY}45`;
                   }}
                 >
                   {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
@@ -212,10 +236,14 @@ export const SigninForm = () => {
           {/* ✨ Footer */}
           <div className="signin-footer" style={{ marginTop: 28 }}>
             <Divider style={{ margin: "0 0 20px" }}>
-              <Text type="secondary" style={{ fontSize: 12, padding: "0 8px" }}>หรือ</Text>
+              <Text type="secondary" style={{ fontSize: 12, padding: "0 8px" }}>
+                หรือ
+              </Text>
             </Divider>
             <Flex justify="center" align="center" gap={6}>
-              <Text type="secondary" style={{ fontSize: 14 }}>ยังไม่มีบัญชี?</Text>
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                ยังไม่มีบัญชี?
+              </Text>
               <Link
                 href="/pages/signup"
                 style={{ fontWeight: 700, color: PRIMARY, fontSize: 14 }}
@@ -224,7 +252,6 @@ export const SigninForm = () => {
               </Link>
             </Flex>
           </div>
-
         </Flex>
       </Col>
     </>

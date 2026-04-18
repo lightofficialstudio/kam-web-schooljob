@@ -1,6 +1,6 @@
 "use client";
 
-import ResultModal from "@/app/components/layouts/modal/result-modal";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import {
   BankOutlined,
   LockOutlined,
@@ -38,7 +38,8 @@ export const SignupForm = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   const { token } = antTheme.useToken();
-  const { isLoading, modal, setLoading, showModal, hideModal } = useSignupStore();
+  const { isLoading, modal, setLoading, showModal, hideModal } =
+    useSignupStore();
 
   const handleModalConfirm = () => {
     if (modal.type === "success") router.push("/pages/signin");
@@ -66,11 +67,14 @@ export const SignupForm = () => {
               {values.email}
             </Text>
           </Text>
-          <Text type="secondary" style={{ fontSize: 13, textAlign: "center", lineHeight: "1.7" }}>
+          <Text
+            type="secondary"
+            style={{ fontSize: 13, textAlign: "center", lineHeight: "1.7" }}
+          >
             ไม่พบอีเมล? ตรวจสอบโฟลเดอร์ "สแปม" หรือ "โปรโมชัน" <br />
             ลิงก์มีอายุ 72 ชั่วโมง
           </Text>
-        </Flex>
+        </Flex>,
       );
     } catch (err: any) {
       const message =
@@ -85,16 +89,14 @@ export const SignupForm = () => {
 
   return (
     <>
-      <ResultModal
+      <ModalComponent
         open={modal.open}
-        type={modal.type}
-        mainTitle={modal.mainTitle}
+        type={modal.type as "success" | "error" | "confirm" | "delete"}
+        title={modal.mainTitle}
         description={modal.description}
-        onConfirm={handleModalConfirm}
-        onCancel={hideModal}
-        confirmText="ตกลง"
-        centered
-        width={560}
+        onClose={hideModal}
+        onConfirm={modal.type === "success" ? handleModalConfirm : undefined}
+        confirmLabel="ตกลง"
       />
 
       <Col xs={24} md={15} style={{ padding: "40px 48px" }}>
@@ -106,7 +108,10 @@ export const SignupForm = () => {
             </Title>
             <Text type="secondary" style={{ fontSize: 14 }}>
               มีบัญชีอยู่แล้ว?{" "}
-              <Link href="/pages/signin" style={{ fontWeight: 600, color: token.colorPrimary }}>
+              <Link
+                href="/pages/signin"
+                style={{ fontWeight: 600, color: token.colorPrimary }}
+              >
                 เข้าสู่ระบบ
               </Link>
             </Text>
@@ -122,7 +127,9 @@ export const SignupForm = () => {
                   rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
                 >
                   <Input
-                    prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                    prefix={
+                      <UserOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="ชื่อของคุณ"
                   />
                 </Form.Item>
@@ -134,7 +141,9 @@ export const SignupForm = () => {
                   rules={[{ required: true, message: "กรุณาระบุนามสกุล" }]}
                 >
                   <Input
-                    prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                    prefix={
+                      <UserOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="นามสกุลของคุณ"
                   />
                 </Form.Item>
@@ -167,8 +176,12 @@ export const SignupForm = () => {
                       }}
                     >
                       <Space orientation="vertical" size={6}>
-                        <UserOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
-                        <Text strong style={{ fontSize: 14 }}>ครูผู้สอน</Text>
+                        <UserOutlined
+                          style={{ fontSize: 28, color: token.colorPrimary }}
+                        />
+                        <Text strong style={{ fontSize: 14 }}>
+                          ครูผู้สอน
+                        </Text>
                       </Space>
                     </Radio.Button>
                   </Col>
@@ -189,8 +202,12 @@ export const SignupForm = () => {
                       }}
                     >
                       <Space orientation="vertical" size={6}>
-                        <BankOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
-                        <Text strong style={{ fontSize: 14 }}>สถานศึกษา</Text>
+                        <BankOutlined
+                          style={{ fontSize: 28, color: token.colorPrimary }}
+                        />
+                        <Text strong style={{ fontSize: 14 }}>
+                          สถานศึกษา
+                        </Text>
                       </Space>
                     </Radio.Button>
                   </Col>
@@ -231,7 +248,9 @@ export const SignupForm = () => {
                   ]}
                 >
                   <Input.Password
-                    prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                    prefix={
+                      <LockOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="อย่างน้อย 8 ตัวอักษร"
                   />
                 </Form.Item>
@@ -253,7 +272,9 @@ export const SignupForm = () => {
                   ]}
                 >
                   <Input.Password
-                    prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                    prefix={
+                      <LockOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="กรอกรหัสผ่านอีกครั้ง"
                   />
                 </Form.Item>
@@ -269,18 +290,26 @@ export const SignupForm = () => {
                   validator: (_, value) =>
                     value
                       ? Promise.resolve()
-                      : Promise.reject(new Error("กรุณายอมรับข้อกำหนดและนโยบาย")),
+                      : Promise.reject(
+                          new Error("กรุณายอมรับข้อกำหนดและนโยบาย"),
+                        ),
                 },
               ]}
               style={{ marginBottom: 20 }}
             >
               <Checkbox style={{ fontSize: 13 }}>
                 ฉันยอมรับ{" "}
-                <Link href="/terms" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                <Link
+                  href="/terms"
+                  style={{ color: token.colorPrimary, fontWeight: 600 }}
+                >
                   ข้อกำหนดการใช้บริการ
                 </Link>{" "}
                 และ{" "}
-                <Link href="/privacy" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                <Link
+                  href="/privacy"
+                  style={{ color: token.colorPrimary, fontWeight: 600 }}
+                >
                   นโยบายความเป็นส่วนตัว
                 </Link>
               </Checkbox>

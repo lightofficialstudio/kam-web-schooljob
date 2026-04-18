@@ -10,6 +10,7 @@ import {
   HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SolutionOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -63,6 +64,12 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
       icon: <AppstoreOutlined />,
       label: "ตัวเลือก Dropdown",
       onClick: () => router.push("/pages/admin/config"),
+    },
+    {
+      key: "/pages/admin/job-management",
+      icon: <SolutionOutlined />,
+      label: "จัดการประกาศงาน",
+      onClick: () => router.push("/pages/admin/job-management/create"),
     },
   ];
 
