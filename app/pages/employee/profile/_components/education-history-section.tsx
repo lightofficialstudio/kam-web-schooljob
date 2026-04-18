@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 import {
   CheckCircleFilled,
@@ -58,8 +59,15 @@ export const EducationHistorySection: React.FC = () => {
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { profile, addEducation, updateEducation, removeEducation } =
-    useProfileStore();
+  const {
+    profile,
+    addEducation,
+    updateEducation,
+    removeEducation,
+    saveProfile,
+    isSaving,
+  } = useProfileStore();
+  const { user } = useAuthStore();
   const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
@@ -108,22 +116,25 @@ export const EducationHistorySection: React.FC = () => {
       };
 
       if (editingIndex !== null) {
-        updateEducation(editingIndex, entry);
-        openNotification({
-          type: "success",
-          mainTitle: "อัปเดตข้อมูลสำเร็จ",
-          description: "ข้อมูลการศึกษาของคุณถูกบันทึกเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
-        });
+        // ✨ เก็บ id เดิมไว้เพื่อให้ backend รู้ว่า update record ไหน
+        const existingId = profile.educations?.[editingIndex]?.id;
+        updateEducation(editingIndex, { ...entry, id: existingId });
       } else {
         addEducation(entry);
-        openNotification({
-          type: "success",
-          mainTitle: "เพิ่มข้อมูลสำเร็จ",
-          description: "ข้อมูลการศึกษาใหม่ถูกเพิ่มเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
-        });
       }
+
+      // ✨ บันทึกลง DB ทันที — saveProfile อ่านค่าจาก store ที่อัปเดตแล้ว
+      if (user?.user_id) {
+        await saveProfile(user.user_id);
+      }
+
+      openNotification({
+        type: "success",
+        mainTitle:
+          editingIndex !== null ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มข้อมูลสำเร็จ",
+        description: "ข้อมูลการศึกษาถูกบันทึกลงฐานข้อมูลเรียบร้อยแล้ว",
+        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
+      });
 
       form.resetFields();
       setIsAddingNew(false);
@@ -151,12 +162,16 @@ export const EducationHistorySection: React.FC = () => {
       okText: "ลบ",
       cancelText: "ยกเลิก",
       okButtonProps: { danger: true },
-      onOk() {
+      async onOk() {
         removeEducation(index);
+        // ✨ บันทึกลง DB ทันทีหลังลบรายการ
+        if (user?.user_id) {
+          await saveProfile(user.user_id);
+        }
         openNotification({
           type: "success",
           mainTitle: "ลบข้อมูลสำเร็จ",
-          description: "ข้อมูลการศึกษาถูกลบเรียบร้อยแล้ว",
+          description: "ข้อมูลการศึกษาถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว",
           icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
         });
       },
@@ -308,6 +323,7 @@ export const EducationHistorySection: React.FC = () => {
                   type="primary"
                   onClick={handleSave}
                   size="large"
+                  loading={isSaving}
                   style={{ minWidth: 100 }}
                 >
                   บันทึก
