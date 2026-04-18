@@ -25,6 +25,38 @@ import { GROUP_META, useConfigStore } from "../_state/config-store";
 
 const { Text } = Typography;
 
+// ✨ UsedInBadges — แสดง chip หน้าที่ใช้ config group นี้ เพื่อ QA/Admin ตรวจสอบ
+function UsedInBadges({ group }: { group: string }) {
+  const usedIn = GROUP_META[group]?.usedIn;
+  if (!usedIn?.length) return null;
+  return (
+    <Flex gap={4} wrap="wrap">
+      {usedIn.map((path) => (
+        <Tooltip
+          key={path}
+          title={`หน้านี้ใช้ตัวเลือก group นี้ — ตรวจสอบหลังแก้ไข`}
+        >
+          <Tag
+            style={{
+              fontSize: 10,
+              borderRadius: 20,
+              padding: "0 7px",
+              margin: 0,
+              cursor: "default",
+              fontFamily: "monospace",
+              background: "rgba(17,182,245,0.08)",
+              border: "1px solid rgba(17,182,245,0.3)",
+              color: "#0d8fd4",
+            }}
+          >
+            {path}
+          </Tag>
+        </Tooltip>
+      ))}
+    </Flex>
+  );
+}
+
 // ✨ โครงสร้าง Tree สำหรับ Ant Design Table
 interface TreeConfigOption extends ConfigOption {
   children?: TreeConfigOption[];
@@ -88,7 +120,12 @@ export function ConfigTable() {
 
   const treeColumns = [
     {
-      title: "หมวดหมู่ / ตำแหน่ง",
+      title: (
+        <Flex align="center" gap={8}>
+          <span>หมวดหมู่ / ตำแหน่ง</span>
+          <UsedInBadges group={activeGroup} />
+        </Flex>
+      ),
       dataIndex: "label",
       render: (label: string, record: TreeConfigOption) => {
         const isParent = !record.parentValue;
@@ -193,7 +230,12 @@ export function ConfigTable() {
       sorter: (a: ConfigOption, b: ConfigOption) => a.sortOrder - b.sortOrder,
     },
     {
-      title: "ชื่อที่แสดง",
+      title: (
+        <Flex align="center" gap={8}>
+          <span>ชื่อที่แสดง</span>
+          <UsedInBadges group={activeGroup} />
+        </Flex>
+      ),
       dataIndex: "label",
       render: (label: string, record: ConfigOption) => (
         <Flex align="center" gap={8}>
