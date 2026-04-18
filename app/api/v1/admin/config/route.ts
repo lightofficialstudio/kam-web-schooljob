@@ -178,7 +178,19 @@ export async function DELETE(request: Request) {
       );
     }
 
-    await prisma.configOption.delete({ where: { id } });
+    // ✨ #6 fix: ลบ children ก่อน (parentValue ตรงกับ value ของ parent)
+    //    แล้วค่อยลบ parent — ใช้ transaction เพื่อ atomic
+    const target = await prisma.configOption.findUnique({ where: { id } });
+    await prisma.$transaction([
+      ...(target
+        ? [
+            prisma.configOption.deleteMany({
+              where: { parentValue: target.value },
+            }),
+          ]
+        : []),
+      prisma.configOption.delete({ where: { id } }),
+    ]);
 
     return Response.json({
       status_code: 200,

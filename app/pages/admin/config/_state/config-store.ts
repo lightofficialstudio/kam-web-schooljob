@@ -71,13 +71,19 @@ interface ConfigStore {
   batchReorder: (orderedIds: string[]) => Promise<void>;
 }
 
+// ✨ #7 fix: selector รวม allGroups ไว้ที่เดียว — ป้องกัน logic ซ้ำใน page.tsx และ config-table.tsx
+export const getAllGroups = (options: ConfigOption[]): string[] => [
+  ...new Set([...Object.keys(GROUP_META), ...options.map((o) => o.group)]),
+];
+
 const DEFAULT_MODAL: ModalState = { open: false, type: "success", title: "" };
 
 export const useConfigStore = create<ConfigStore>((set, get) => ({
   options: [],
   isLoading: false,
   isSaving: false,
-  activeGroup: "school_type",
+  // ✨ #5 fix: derive จาก GROUP_META แทน hardcode — ถ้า DB ไม่มี school_type จะไม่ empty
+  activeGroup: Object.keys(GROUP_META)[0] ?? "",
   isAddModalOpen: false,
   defaultParentValue: null,
   isEditModalOpen: false,

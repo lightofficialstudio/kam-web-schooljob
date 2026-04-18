@@ -9,7 +9,11 @@ import { useEffect } from "react";
 import { AddOptionModal } from "./_components/add-option-modal";
 import { ConfigTable } from "./_components/config-table";
 import { EditOptionModal } from "./_components/edit-option-modal";
-import { GROUP_META, useConfigStore } from "./_state/config-store";
+import {
+  GROUP_META,
+  getAllGroups,
+  useConfigStore,
+} from "./_state/config-store";
 
 const { Title, Text } = Typography;
 
@@ -30,10 +34,8 @@ export default function AdminConfigPage() {
     fetchOptions();
   }, [fetchOptions]);
 
-  // ✨ สร้าง group list รวม group ที่มีใน DB แต่ยังไม่อยู่ใน GROUP_META
-  const allGroups = [
-    ...new Set([...Object.keys(GROUP_META), ...options.map((o) => o.group)]),
-  ];
+  // ✨ #7 fix: ใช้ selector ใน store แทน inline logic
+  const allGroups = getAllGroups(options);
 
   return (
     <>

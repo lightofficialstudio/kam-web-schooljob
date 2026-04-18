@@ -38,7 +38,11 @@ import {
 } from "antd";
 import React from "react";
 import { ConfigOption } from "../_api/config-api";
-import { GROUP_META, useConfigStore } from "../_state/config-store";
+import {
+  GROUP_META,
+  getAllGroups,
+  useConfigStore,
+} from "../_state/config-store";
 
 const { Text } = Typography;
 
@@ -162,10 +166,8 @@ export function ConfigTable() {
   const treeData = buildTreeData(flatOptions);
   const isHierarchical = flatOptions.some((o) => o.parentValue !== null);
 
-  // ✨ Tab items
-  const allGroups = [
-    ...new Set([...Object.keys(GROUP_META), ...options.map((o) => o.group)]),
-  ];
+  // ✨ #7 fix: ใช้ selector ใน store แทน inline logic
+  const allGroups = getAllGroups(options);
   const tabItems = allGroups.map((g) => ({
     key: g,
     label: (
