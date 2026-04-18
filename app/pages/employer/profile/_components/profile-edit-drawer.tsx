@@ -148,7 +148,7 @@ export const ProfileEditDrawer: React.FC<ProfileEditDrawerProps> = ({
       onClose={() => setIsDrawerOpen(false)}
       open={isDrawerOpen}
       size="large"
-      className="!rounded-l-[32px] overflow-hidden"
+      className="rounded-l-4xl! overflow-hidden"
       styles={{
         header: {
           borderBottom: `1px solid ${token.colorBorderSecondary}`,

@@ -298,7 +298,7 @@ export default function HeroSection() {
         <motion.div
           variants={fadeInUp}
           className={cn(
-            "w-full max-w-320 mx-auto rounded-[32px] p-2 md:p-4 backdrop-blur-3xl transition-all duration-500 border overflow-hidden",
+            "w-full max-w-7xl mx-auto rounded-4xl p-2 md:p-4 backdrop-blur-3xl transition-all duration-500 border overflow-hidden",
             isDark
               ? "bg-[#1E293B]/80 border-white/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7)]"
               : "bg-white/80 border-[#EDF6FF] shadow-[0_40px_100px_-20px_rgba(67,127,199,0.12)]",
@@ -506,7 +506,7 @@ export default function HeroSection() {
                 size="large"
                 icon={<Search size={24} />}
                 onClick={handleSearch}
-                className="h-16 w-full md:w-[380px] rounded-2xl font-bold text-xl shadow-[0_20px_40px_-12px_rgba(67,127,199,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(67,127,199,0.4)] active:scale-[0.97] transition-all bg-linear-to-r from-[#437FC7] to-[#6DAFFE] border-none flex items-center justify-center gap-4"
+                className="h-16 w-full md:w-95 rounded-2xl font-bold text-xl shadow-[0_20px_40px_-12px_rgba(67,127,199,0.3)] hover:shadow-[0_25px_50px_-12px_rgba(67,127,199,0.4)] active:scale-[0.97] transition-all bg-linear-to-r from-[#437FC7] to-[#6DAFFE] border-none flex items-center justify-center gap-4"
               >
                 ค้นหาตำแหน่งงานตอนนี้
               </Button>

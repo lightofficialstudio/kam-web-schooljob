@@ -282,7 +282,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
                 </span>
                 <RightOutlined
                   className={[
-                    "text-xs opacity-50 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                    "text-xs opacity-50 transition-transform duration-300 ease-in-out",
                     isOpen ? "rotate-90" : "rotate-0",
                   ].join(" ")}
                 />
@@ -294,7 +294,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
         {/* ✨ Sub-menu accordion — เฉพาะตอน expanded */}
         {!collapsed && (
           <div
-            className="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            className="overflow-hidden transition-all duration-300 ease-in-out"
             style={{
               maxHeight: isOpen ? `${item.children.length * 52}px` : "0px",
             }}
@@ -376,7 +376,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
           <div
             className={[
               "flex flex-col overflow-hidden",
-              "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+              "transition-all duration-300 ease-in-out",
               collapsed ? "w-0 opacity-0" : "w-full opacity-100",
             ].join(" ")}
           >
@@ -490,7 +490,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
               <span
                 className={[
                   "flex shrink-0 items-center justify-center text-base",
-                  "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                  "transition-all duration-300 ease-in-out",
                   collapsed ? "rotate-0" : "rotate-180",
                 ].join(" ")}
               >
