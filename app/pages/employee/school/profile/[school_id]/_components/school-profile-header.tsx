@@ -70,26 +70,7 @@ export const SchoolProfileHeader = ({ school }: SchoolProfileHeaderProps) => {
         </div>
 
         {/* ✨ Quick Stats Badges (Mobile Hidden) */}
-        <div className="absolute bottom-16 right-12 hidden lg:flex gap-8 z-30">
-          <div className="px-8 py-5 rounded-[32px] backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl flex flex-col items-center min-w-[140px] transition-transform hover:scale-105">
-            <Text className="text-white text-4xl font-black leading-none tracking-tight">
-              {school.openJobCount}
-            </Text>
-            <Text className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
-              ตำแหน่งว่าง
-            </Text>
-          </div>
-          {school.teacherCount && (
-            <div className="px-8 py-5 rounded-[32px] backdrop-blur-2xl bg-white/10 border border-white/20 shadow-2xl flex flex-col items-center min-w-[140px] transition-transform hover:scale-105">
-              <Text className="text-white text-4xl font-black leading-none tracking-tight">
-                {school.teacherCount.toLocaleString()}
-              </Text>
-              <Text className="text-white/70 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
-                บุคลากร
-              </Text>
-            </div>
-          )}
-        </div>
+        <div className="absolute bottom-16 right-12 hidden lg:flex gap-8 z-30"></div>
       </div>
 
       {/* ── Identity Bar ── */}
