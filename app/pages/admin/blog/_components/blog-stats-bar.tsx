@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ Blog Stats Bar — KPI cards โดยใช้ SummaryCard กลาง
+import { SummaryCard } from "@/app/components/card/summary-card.component";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -8,7 +9,6 @@ import {
   RiseOutlined,
 } from "@ant-design/icons";
 import { Col, Row, theme } from "antd";
-import { SummaryCard } from "@/app/components/card/summary-card.component";
 import { useAdminBlogStore } from "../_state/blog-store";
 
 export function BlogStatsBar() {
@@ -20,8 +20,13 @@ export function BlogStatsBar() {
 
   // ✨ นับ category ที่เยอะที่สุด
   const categoryCount: Record<string, number> = {};
-  blogs.forEach((b) => { if (b.category) categoryCount[b.category] = (categoryCount[b.category] ?? 0) + 1; });
-  const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0];
+  blogs.forEach((b) => {
+    if (b.category)
+      categoryCount[b.category] = (categoryCount[b.category] ?? 0) + 1;
+  });
+  const topCategory = Object.entries(categoryCount).sort(
+    (a, b) => b[1] - a[1],
+  )[0];
 
   return (
     <Row gutter={[14, 14]}>
@@ -41,11 +46,19 @@ export function BlogStatsBar() {
           title="เผยแพร่แล้ว"
           value={published}
           unit="บทความ"
-          subtitle={total > 0 ? `${Math.round((published / Math.max(blogs.length, 1)) * 100)}% ของทั้งหมด` : "—"}
+          subtitle={
+            total > 0
+              ? `${Math.round((published / Math.max(blogs.length, 1)) * 100)}% ของทั้งหมด`
+              : "—"
+          }
           icon={<CheckCircleOutlined />}
           color="#52c41a"
           isLoading={isLoading}
-          trend={published > 0 ? { value: `${published}`, direction: "up" } : undefined}
+          trend={
+            published > 0
+              ? { value: `${published}`, direction: "up" }
+              : undefined
+          }
         />
       </Col>
       <Col xs={12} sm={6}>
@@ -57,7 +70,9 @@ export function BlogStatsBar() {
           icon={<ClockCircleOutlined />}
           color="#fa8c16"
           isLoading={isLoading}
-          trend={draft > 0 ? { value: `${draft}`, direction: "neutral" } : undefined}
+          trend={
+            draft > 0 ? { value: `${draft}`, direction: "neutral" } : undefined
+          }
         />
       </Col>
       <Col xs={12} sm={6}>

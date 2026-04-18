@@ -1,5 +1,7 @@
 "use client";
 
+import { SummaryCard } from "@/app/components/card/summary-card.component";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -9,7 +11,6 @@ import {
   TagOutlined,
 } from "@ant-design/icons";
 import {
-  Badge,
   Button,
   Card,
   Col,
@@ -18,7 +19,6 @@ import {
   Input,
   InputNumber,
   Modal,
-  Popconfirm,
   Row,
   Select,
   Switch,
@@ -26,7 +26,6 @@ import {
   Tabs,
   Tag,
   Typography,
-  message,
   theme,
 } from "antd";
 import { useEffect, useState } from "react";
@@ -72,8 +71,10 @@ export default function AdminConfigPage() {
     toggleActive,
     removeOption,
     updateLabel,
+    modal,
+    showModal,
+    hideModal,
   } = useConfigStore();
-  const [messageApi, contextHolder] = message.useMessage();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -132,13 +133,14 @@ export default function AdminConfigPage() {
         parent_value: values.parent_value ?? null,
         sort_order: values.sort_order ?? 0,
       });
-      messageApi.success("เพิ่มตัวเลือกสำเร็จ");
+      // ✨ ปิด form modal เฉพาะเมื่อ addOption สำเร็จ (ไม่ throw)
       addForm.resetFields();
       setDefaultParentValue(null);
       setIsAddModalOpen(false);
     } catch (err) {
+      // ✨ ถ้าเป็น form validation error — ไม่ต้องทำอะไร
       if ((err as { errorFields?: unknown })?.errorFields) return;
-      messageApi.error("เพิ่มตัวเลือกไม่สำเร็จ กรุณาลองใหม่");
+      // ✨ store จัดการ showModal error แล้ว — เพียงปิด form modal
     }
   };
 
@@ -156,22 +158,28 @@ export default function AdminConfigPage() {
     try {
       const values = await editForm.validateFields();
       await updateLabel(editingOption.id, values.label, values.sort_order ?? 0);
-      messageApi.success("แก้ไขสำเร็จ");
+      // ✨ ปิด form modal เฉพาะเมื่อ updateLabel สำเร็จ
       setIsEditModalOpen(false);
     } catch (err) {
       if ((err as { errorFields?: unknown })?.errorFields) return;
-      messageApi.error("แก้ไขไม่สำเร็จ กรุณาลองใหม่");
+      // ✨ store จัดการ showModal error แล้ว
     }
   };
 
-  const handleDelete = async (id: string) => {
-    await removeOption(id);
-    messageApi.success("ลบสำเร็จ");
+  // ✨ แสดง delete confirm modal แทน Popconfirm
+  const handleDeleteConfirm = (id: string, isParent: boolean) => {
+    showModal({
+      type: "delete",
+      title: isParent ? "ลบหมวดหมู่หลัก?" : "ลบตัวเลือกนี้?",
+      description: isParent
+        ? "การลบหมวดหมู่หลักจะลบรายการย่อยทั้งหมดด้วย การลบจะไม่กระทบข้อมูลที่บันทึกไว้แล้ว"
+        : "การลบจะไม่กระทบข้อมูลที่บันทึกไว้แล้ว",
+      onConfirm: () => removeOption(id),
+    });
   };
 
   const handleToggle = async (id: string, checked: boolean) => {
     await toggleActive(id, checked);
-    messageApi.success(checked ? "เปิดใช้งานแล้ว" : "ปิดใช้งานแล้ว");
   };
 
   // ✨ columns สำหรับ Tree Table (hierarchy)
@@ -256,25 +264,13 @@ export default function AdminConfigPage() {
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
             />
-            <Popconfirm
-              title="ลบตัวเลือกนี้?"
-              description={
-                isParent
-                  ? "การลบหมวดหมู่หลักจะลบรายการย่อยทั้งหมดด้วย"
-                  : "การลบจะไม่กระทบข้อมูลที่บันทึกไว้แล้ว"
-              }
-              onConfirm={() => handleDelete(record.id)}
-              okText="ลบ"
-              okButtonProps={{ danger: true }}
-              cancelText="ยกเลิก"
-            >
-              <Button
-                type="text"
-                size="small"
-                icon={<DeleteOutlined />}
-                danger
-              />
-            </Popconfirm>
+            <Button
+              type="text"
+              size="small"
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => handleDeleteConfirm(record.id, isParent)}
+            />
           </Flex>
         );
       },
@@ -340,16 +336,13 @@ export default function AdminConfigPage() {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           />
-          <Popconfirm
-            title="ลบตัวเลือกนี้?"
-            description="การลบจะไม่กระทบข้อมูลที่บันทึกไว้แล้ว"
-            onConfirm={() => handleDelete(record.id)}
-            okText="ลบ"
-            okButtonProps={{ danger: true }}
-            cancelText="ยกเลิก"
-          >
-            <Button type="text" size="small" icon={<DeleteOutlined />} danger />
-          </Popconfirm>
+          <Button
+            type="text"
+            size="small"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDeleteConfirm(record.id, false)}
+          />
         </Flex>
       ),
     },
@@ -357,7 +350,6 @@ export default function AdminConfigPage() {
 
   return (
     <>
-      {contextHolder}
       <Flex vertical gap={24}>
         {/* Header */}
         <Flex align="center" justify="space-between">
@@ -396,40 +388,36 @@ export default function AdminConfigPage() {
           </Button>
         </Flex>
 
-        {/* Stats Cards */}
+        {/* ✨ Stats Cards — SummaryCard แสดงสถิติแต่ละ Group */}
         <Row gutter={[16, 16]}>
           {allGroups.map((g) => {
             const count = options.filter((o) => o.group === g).length;
             const activeCount = options.filter(
               (o) => o.group === g && o.isActive,
             ).length;
+            const isSelected = activeGroup === g;
             return (
               <Col key={g} xs={24} sm={12} md={8}>
-                <Card
-                  variant="borderless"
+                <div
                   style={{
-                    border: `1px solid ${activeGroup === g ? token.colorPrimary : token.colorBorderSecondary}`,
-                    borderRadius: 12,
-                    cursor: "pointer",
-                    transition: "border-color 0.2s",
+                    outline: isSelected
+                      ? `2px solid ${token.colorPrimary}`
+                      : "2px solid transparent",
+                    borderRadius: 16,
+                    transition: "outline-color 0.2s",
                   }}
-                  onClick={() => setActiveGroup(g)}
                 >
-                  <Flex justify="space-between" align="center">
-                    <Flex vertical gap={2}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {GROUP_LABELS[g] ?? g}
-                      </Text>
-                      <Text strong style={{ fontSize: 20 }}>
-                        {count}
-                      </Text>
-                    </Flex>
-                    <Badge
-                      count={activeCount}
-                      style={{ backgroundColor: token.colorSuccess }}
-                    />
-                  </Flex>
-                </Card>
+                  <SummaryCard
+                    title={GROUP_LABELS[g] ?? g}
+                    value={count}
+                    unit="รายการ"
+                    subtitle={`เปิดใช้งาน ${activeCount} รายการ`}
+                    icon={<SettingOutlined />}
+                    color={isSelected ? token.colorPrimary : undefined}
+                    isLoading={isLoading}
+                    onClick={() => setActiveGroup(g)}
+                  />
+                </div>
               </Col>
             );
           })}
@@ -568,6 +556,19 @@ export default function AdminConfigPage() {
           )}
         </Form>
       </Modal>
+
+      {/* ✨ Status Modal — Success / Error / Warning / Delete confirm */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        onClose={hideModal}
+        onConfirm={modal.onConfirm ?? hideModal}
+        confirmLabel={modal.confirmLabel}
+        cancelLabel={modal.cancelLabel}
+      />
     </>
   );
 }

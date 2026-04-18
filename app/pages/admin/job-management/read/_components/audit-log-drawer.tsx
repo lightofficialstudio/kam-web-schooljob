@@ -61,7 +61,7 @@ export function AuditLogDrawer({ adminUserId }: AuditLogDrawerProps) {
           )}
         </Flex>
       }
-      width={500}
+      size="large"
     >
       {/* filter */}
       <Flex justify="flex-end" style={{ marginBottom: 16 }}>

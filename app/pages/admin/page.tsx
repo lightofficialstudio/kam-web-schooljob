@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ Admin Dashboard — Orchestrator ประกอบ Components จัด Layout + ดึง live data เมื่อ mount
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { Col, Row } from "antd";
 import { useEffect } from "react";
 import { PendingActionsCard } from "./_components/pending-actions-card";
@@ -15,7 +16,7 @@ import { WelcomeSection } from "./_components/welcome-section";
 import { useDashboardStore } from "./_state/dashboard-store";
 
 export default function AdminPage() {
-  const { fetchDashboard } = useDashboardStore();
+  const { fetchDashboard, modal, hideModal } = useDashboardStore();
 
   // ✨ ดึง live data เมื่อเปิดหน้า Dashboard
   useEffect(() => {
@@ -23,45 +24,60 @@ export default function AdminPage() {
   }, [fetchDashboard]);
 
   return (
-    <Row gutter={[16, 16]}>
-      {/* ✨ Welcome Banner */}
-      <Col xs={24}>
-        <WelcomeSection />
-      </Col>
+    <>
+      <Row gutter={[16, 16]}>
+        {/* ✨ Welcome Banner */}
+        <Col xs={24}>
+          <WelcomeSection />
+        </Col>
 
-      {/* ✨ KPI Stats Cards */}
-      <Col xs={24}>
-        <StatsSection />
-      </Col>
+        {/* ✨ KPI Stats Cards */}
+        <Col xs={24}>
+          <StatsSection />
+        </Col>
 
-      {/* ✨ Charts Row */}
-      <Col xs={24} lg={14}>
-        <UserGrowthChart />
-      </Col>
-      <Col xs={24} lg={10}>
-        <RoleDistributionChart />
-      </Col>
+        {/* ✨ Charts Row */}
+        <Col xs={24} lg={14}>
+          <UserGrowthChart />
+        </Col>
+        <Col xs={24} lg={10}>
+          <RoleDistributionChart />
+        </Col>
 
-      {/* ✨ Pending Actions + Recent Signups */}
-      <Col xs={24} lg={10}>
-        <PendingActionsCard />
-      </Col>
-      <Col xs={24} lg={14}>
-        <RecentSignupsCard />
-      </Col>
+        {/* ✨ Pending Actions + Recent Signups */}
+        <Col xs={24} lg={10}>
+          <PendingActionsCard />
+        </Col>
+        <Col xs={24} lg={14}>
+          <RecentSignupsCard />
+        </Col>
 
-      {/* ✨ System Status Row */}
-      <Col xs={24} lg={12}>
-        <SystemHealthSection />
-      </Col>
-      <Col xs={24} lg={12}>
-        <SystemInfoSection />
-      </Col>
+        {/* ✨ System Status Row */}
+        <Col xs={24} lg={12}>
+          <SystemHealthSection />
+        </Col>
+        <Col xs={24} lg={12}>
+          <SystemInfoSection />
+        </Col>
 
-      {/* ✨ Quick Links */}
-      <Col xs={24}>
-        <QuickLinksSection />
-      </Col>
-    </Row>
+        {/* ✨ Quick Links */}
+        <Col xs={24}>
+          <QuickLinksSection />
+        </Col>
+      </Row>
+
+      {/* ✨ Modal รายงานสถานะ — Success / Error / Warning */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        onClose={hideModal}
+        onConfirm={modal.onConfirm ?? hideModal}
+        confirmLabel={modal.confirmLabel}
+        cancelLabel={modal.cancelLabel}
+      />
+    </>
   );
 }

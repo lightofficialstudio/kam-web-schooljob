@@ -3,14 +3,15 @@ import { createClient } from "@supabase/supabase-js";
 // ✨ ใช้ Service Role Key เพื่อ bypass RLS ในฝั่ง Server (API route เท่านั้น)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
 // Bucket names
 export const BUCKETS = {
-  AVATARS: "avatars",   // public — รูปโปรไฟล์
-  RESUMES: "resumes",   // private — เรซูเม่ PDF
+  AVATARS: "avatars", // public — รูปโปรไฟล์
+  RESUMES: "resumes", // private — เรซูเม่ PDF
   LICENSES: "licenses", // private — ใบประกอบวิชาชีพ
+  BLOG_COVERS: "blog-covers", // public — รูป cover บทความ
 } as const;
 
 export type BucketName = (typeof BUCKETS)[keyof typeof BUCKETS];
@@ -36,7 +37,7 @@ export const uploadFileService = async (
   userId: string,
   fileName: string,
   fileBuffer: Buffer,
-  mimeType: string
+  mimeType: string,
 ): Promise<{ url: string; path: string }> => {
   const safeFileName = sanitizeFileName(fileName);
   const filePath = `${userId}/${Date.now()}_${safeFileName}`;
@@ -53,7 +54,7 @@ export const uploadFileService = async (
   }
 
   // ✨ Public bucket → getPublicUrl, Private bucket → createSignedUrl (1 ชั่วโมง)
-  if (bucket === BUCKETS.AVATARS) {
+  if (bucket === BUCKETS.AVATARS || bucket === BUCKETS.BLOG_COVERS) {
     const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(filePath);
     return { url: data.publicUrl, path: filePath };
   }
@@ -67,7 +68,7 @@ export const uploadFileService = async (
 export const getSignedUrlService = async (
   bucket: BucketName,
   filePath: string,
-  expiresInSeconds = 3600
+  expiresInSeconds = 3600,
 ): Promise<string> => {
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
@@ -83,11 +84,9 @@ export const getSignedUrlService = async (
 // ✨ ลบไฟล์ออกจาก Supabase Storage
 export const deleteFileService = async (
   bucket: BucketName,
-  filePath: string
+  filePath: string,
 ): Promise<void> => {
-  const { error } = await supabaseAdmin.storage
-    .from(bucket)
-    .remove([filePath]);
+  const { error } = await supabaseAdmin.storage.from(bucket).remove([filePath]);
 
   if (error) {
     throw new Error(`Delete failed: ${error.message}`);

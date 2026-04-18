@@ -12,18 +12,27 @@ export const createAuditLog = async (input: {
   note?: string;
   metadata?: object;
 }) => {
-  // บันทึก Audit Log
-  const log = await prisma.adminAuditLog.create({
-    data: {
-      adminId:     input.adminId,
-      action:      input.action,
-      targetType:  input.targetType,
-      targetId:    input.targetId,
-      targetLabel: input.targetLabel,
-      note:        input.note,
-      metadata:    input.metadata ? JSON.stringify(input.metadata) : null,
-    },
-  });
+  // บันทึก Audit Log — ถ้าตาราง DB ยังไม่มี ให้ skip โดยไม่ crash
+  let log;
+  try {
+    log = await prisma.adminAuditLog.create({
+      data: {
+        adminId:     input.adminId,
+        action:      input.action,
+        targetType:  input.targetType,
+        targetId:    input.targetId,
+        targetLabel: input.targetLabel,
+        note:        input.note,
+        metadata:    input.metadata ? JSON.stringify(input.metadata) : null,
+      },
+    });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "";
+    if (!msg.includes("does not exist") && !msg.includes("relation") && !msg.includes("table")) {
+      throw e;
+    }
+    console.warn("⚠️ [audit] ตาราง admin_audit_logs ยังไม่ถูกสร้าง — skip audit log");
+  }
 
   // ยิง Notification ไปหา Admin ตัวเอง — ทำ async ไม่บล็อก
   createNotification({
@@ -202,23 +211,31 @@ export const adminGetAuditLogsService = async (params: {
     if (profile) where.adminId = profile.id;
   }
 
-  const [total, logs] = await Promise.all([
-    prisma.adminAuditLog.count({ where }),
-    prisma.adminAuditLog.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip:    (page - 1) * pageSize,
-      take:    pageSize,
-      include: {
-        admin: {
-          select: {
-            id: true, firstName: true, lastName: true,
-            email: true, profileImageUrl: true,
+  try {
+    const [total, logs] = await Promise.all([
+      prisma.adminAuditLog.count({ where }),
+      prisma.adminAuditLog.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip:    (page - 1) * pageSize,
+        take:    pageSize,
+        include: {
+          admin: {
+            select: {
+              id: true, firstName: true, lastName: true,
+              email: true, profileImageUrl: true,
+            },
           },
         },
-      },
-    }),
-  ]);
-
-  return { logs, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+      }),
+    ]);
+    return { logs, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+  } catch (e: unknown) {
+    // ตารางยังไม่ถูกสร้าง — return empty gracefully
+    const msg = e instanceof Error ? e.message : "";
+    if (msg.includes("does not exist") || msg.includes("relation") || msg.includes("table")) {
+      return { logs: [], total: 0, page, pageSize, totalPages: 0 };
+    }
+    throw e;
+  }
 };

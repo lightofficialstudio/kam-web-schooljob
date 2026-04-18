@@ -39,7 +39,7 @@ export function StatsBar({ jobs, total }: StatsBarProps) {
             <Statistic
               title={it.title}
               value={it.value}
-              valueStyle={{ color: it.color, fontSize: 22, fontWeight: 700 }}
+              styles={{ content: { color: it.color, fontSize: 22, fontWeight: 700 } }}
             />
           </div>
         </Col>

@@ -1,13 +1,13 @@
 import axios from "axios";
 
-export type StorageBucket = "avatars" | "resumes" | "licenses";
+export type StorageBucket = "avatars" | "resumes" | "licenses" | "blog-covers";
 
 // ✨ Upload ไฟล์ไปยัง Supabase Storage ผ่าน API route (server-side)
 // คืน { url, path, file_name, file_size }
 export const uploadFile = async (
   bucket: StorageBucket,
   userId: string,
-  file: File
+  file: File,
 ) => {
   const formData = new FormData();
   formData.append("file", file);

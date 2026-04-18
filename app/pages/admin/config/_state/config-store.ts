@@ -1,3 +1,4 @@
+import type { ModalType } from "@/app/components/modal/modal.component";
 import { create } from "zustand";
 import {
   ConfigOption,
@@ -7,10 +8,25 @@ import {
   updateConfigOption,
 } from "../_api/config-api";
 
+// ✨ Modal state สำหรับรายงานสถานะ Success / Error / Warning
+interface ModalState {
+  open: boolean;
+  type: ModalType;
+  title: string;
+  description?: string;
+  errorDetails?: unknown;
+  onConfirm?: () => void;
+  confirmLabel?: string;
+  cancelLabel?: string;
+}
+
 interface ConfigStore {
   options: ConfigOption[];
   isLoading: boolean;
   isSaving: boolean;
+  modal: ModalState;
+  showModal: (opts: Omit<ModalState, "open">) => void;
+  hideModal: () => void;
   fetchOptions: () => Promise<void>;
   addOption: (payload: {
     group: string;
@@ -24,10 +40,19 @@ interface ConfigStore {
   updateLabel: (id: string, label: string, sortOrder: number) => Promise<void>;
 }
 
+const DEFAULT_MODAL: ModalState = { open: false, type: "success", title: "" };
+
 export const useConfigStore = create<ConfigStore>((set, get) => ({
   options: [],
   isLoading: false,
   isSaving: false,
+  modal: DEFAULT_MODAL,
+
+  // ✨ เปิด modal พร้อมตั้งค่า
+  showModal: (opts) => set({ modal: { ...opts, open: true } }),
+
+  // ✨ ปิด modal และ reset state
+  hideModal: () => set({ modal: DEFAULT_MODAL }),
 
   // ✨ ดึงข้อมูลทั้งหมดจาก API
   fetchOptions: async () => {
@@ -35,21 +60,39 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
     try {
       const options = await fetchAllConfigOptions();
       set({ options });
-    } catch (err) {
-      console.error("❌ fetchOptions:", err);
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "โหลดข้อมูลไม่สำเร็จ",
+        description: "ไม่สามารถดึงรายการตัวเลือกได้ กรุณาลองใหม่หรือแจ้ง Admin",
+        errorDetails: err,
+      });
     } finally {
       set({ isLoading: false });
     }
   },
 
-  // ✨ เพิ่มตัวเลือกใหม่
+  // ✨ เพิ่มตัวเลือกใหม่ — throw เพื่อให้ page ปิด modal ได้
   addOption: async (payload) => {
     set({ isSaving: true });
     try {
       const created = await createConfigOption(payload);
       if (created) {
         set((state) => ({ options: [...state.options, created] }));
+        get().showModal({
+          type: "success",
+          title: "เพิ่มตัวเลือกสำเร็จ",
+          description: `เพิ่ม "${payload.label}" เรียบร้อยแล้ว`,
+        });
       }
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "เพิ่มตัวเลือกไม่สำเร็จ",
+        description: "กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
+      throw err; // ✨ re-throw เพื่อให้ page ทราบว่าไม่ควรปิด form modal
     } finally {
       set({ isSaving: false });
     }
@@ -65,12 +108,26 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
           o.id === id ? { ...o, isActive } : o,
         ),
       }));
+      get().showModal({
+        type: "success",
+        title: isActive ? "เปิดใช้งานแล้ว" : "ปิดใช้งานแล้ว",
+        description: isActive
+          ? "ตัวเลือกนี้จะแสดงในฟอร์มระบบแล้ว"
+          : "ตัวเลือกนี้จะไม่แสดงในฟอร์มระบบชั่วคราว",
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "เปลี่ยนสถานะไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
     } finally {
       set({ isSaving: false });
     }
   },
 
-  // ✨ แก้ไขชื่อและลำดับ
+  // ✨ แก้ไขชื่อและลำดับ — throw เพื่อให้ page ปิด modal ได้
   updateLabel: async (id, label, sortOrder) => {
     set({ isSaving: true });
     try {
@@ -80,6 +137,19 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
           o.id === id ? { ...o, label, sortOrder } : o,
         ),
       }));
+      get().showModal({
+        type: "success",
+        title: "แก้ไขสำเร็จ",
+        description: `อัปเดตชื่อเป็น "${label}" เรียบร้อยแล้ว`,
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "แก้ไขไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
+      throw err;
     } finally {
       set({ isSaving: false });
     }
@@ -91,6 +161,19 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
     try {
       await deleteConfigOption(id);
       set((state) => ({ options: state.options.filter((o) => o.id !== id) }));
+      get().showModal({
+        type: "success",
+        title: "ลบสำเร็จ",
+        description:
+          "ลบตัวเลือกเรียบร้อยแล้ว ข้อมูลเดิมที่บันทึกไว้ไม่ได้รับผลกระทบ",
+      });
+    } catch (err: unknown) {
+      get().showModal({
+        type: "error",
+        title: "ลบไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
     } finally {
       set({ isSaving: false });
     }

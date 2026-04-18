@@ -25,6 +25,31 @@ export interface AdminJob {
   _count: { applications: number };
 }
 
+export interface Applicant {
+  id: string;
+  status: "PENDING" | "INTERVIEW" | "ACCEPTED" | "REJECTED";
+  appliedAt: string;
+  coverLetter: string | null;
+  resume: { fileName: string; fileUrl: string } | null;
+  applicant: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    phoneNumber: string | null;
+    profileImageUrl: string | null;
+    teachingExperience: string | null;
+    specialActivities: string | null;
+    licenseStatus: string | null;
+    canRelocate: boolean | null;
+    specializations: { subject: string }[];
+    gradeCanTeaches: { grade: string }[];
+    educations: { level: string; institution: string; major: string | null; graduationYear: number | null }[];
+    workExperiences: { jobTitle: string; companyName: string; startDate: string; endDate: string | null; inPresent: boolean }[];
+    preferredProvinces: { province: string }[];
+  };
+}
+
 export interface AuditLog {
   id: string;
   action: string;
@@ -92,6 +117,14 @@ export const fetchDeleteJob = async (adminUserId: string, jobId: string, note?: 
     params: { admin_user_id: adminUserId, job_id: jobId, note },
   });
   return data;
+};
+
+// ✨ ดึงผู้สมัครของ job (Admin — ไม่ต้องผ่าน ownership)
+export const fetchAdminApplicants = async (adminUserId: string, jobId: string) => {
+  const { data } = await axios.get("/api/v1/admin/jobs/applicants", {
+    params: { admin_user_id: adminUserId, job_id: jobId },
+  });
+  return data.data as { job: { id: string; title: string }; applicants: Applicant[] };
 };
 
 // ✨ ดึง Audit Logs (รวมระบบ หรือ per-post ถ้าใส่ targetId)

@@ -1,4 +1,8 @@
-import { deleteFileService, BUCKETS, BucketName } from "../service/storage-service";
+import {
+  BUCKETS,
+  BucketName,
+  deleteFileService,
+} from "../service/storage-service";
 
 // ✨ DELETE /api/v1/storage/delete
 // Body: { bucket, path }
@@ -15,15 +19,25 @@ export async function DELETE(request: Request) {
           message_en: "Missing required fields: bucket, path",
           data: null,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const allowedBuckets = [BUCKETS.AVATARS, BUCKETS.RESUMES, BUCKETS.LICENSES];
+    const allowedBuckets = [
+      BUCKETS.AVATARS,
+      BUCKETS.RESUMES,
+      BUCKETS.LICENSES,
+      BUCKETS.BLOG_COVERS,
+    ];
     if (!allowedBuckets.includes(bucket)) {
       return Response.json(
-        { status_code: 400, message_th: "Bucket ไม่ถูกต้อง", message_en: "Invalid bucket", data: null },
-        { status: 400 }
+        {
+          status_code: 400,
+          message_th: "Bucket ไม่ถูกต้อง",
+          message_en: "Invalid bucket",
+          data: null,
+        },
+        { status: 400 },
       );
     }
 
@@ -36,7 +50,7 @@ export async function DELETE(request: Request) {
         message_en: "File deleted successfully",
         data: null,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("❌ [storage/delete]:", error);
@@ -47,7 +61,7 @@ export async function DELETE(request: Request) {
         message_en: "File delete failed",
         data: null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

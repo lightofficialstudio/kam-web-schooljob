@@ -101,7 +101,7 @@ export default function AdminJobManagementPage() {
         isLoading={isLoading}
         adminUserId={adminUserId}
         onPageChange={handlePageChange}
-        onViewDetail={openDrawer}
+        onViewDetail={(job) => openDrawer(job, adminUserId)}
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDelete}
       />

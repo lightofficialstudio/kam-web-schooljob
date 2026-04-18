@@ -3,7 +3,9 @@
 import { create } from "zustand";
 import {
   AdminJob,
+  Applicant,
   AuditLog,
+  fetchAdminApplicants,
   fetchAdminJobs,
   fetchAuditLogs,
   fetchAuditLogsByJob,
@@ -19,24 +21,27 @@ interface Filters {
 }
 
 interface AdminJobStore {
-  // รายการงาน
   jobs: AdminJob[];
   total: number;
   totalPages: number;
   page: number;
   pageSize: number;
   isLoading: boolean;
-
-  // filters
   filters: Filters;
 
-  // drawer งาน (รายละเอียด + per-post audit)
+  // drawer งาน — 3 tabs: info / applicants / audit
   drawerOpen: boolean;
   drawerJob: AdminJob | null;
+
+  // tab: ผู้สมัคร
+  applicants: Applicant[];
+  isLoadingApplicants: boolean;
+
+  // tab: ประวัติ audit
   jobAuditLogs: AuditLog[];
   isLoadingJobAudit: boolean;
 
-  // audit log รวมระบบ
+  // audit drawer รวม
   auditLogs: AuditLog[];
   auditTotal: number;
   auditPage: number;
@@ -45,14 +50,14 @@ interface AdminJobStore {
   isLoadingAudit: boolean;
   auditDrawerOpen: boolean;
 
-  // actions
   setFilters: (f: Partial<Filters>) => void;
   setPage: (p: number) => void;
   fetchJobs: (adminUserId: string) => Promise<void>;
-  openDrawer: (job: AdminJob) => void;
+  openDrawer: (job: AdminJob, adminUserId: string) => void;
   closeDrawer: () => void;
   updateStatus: (adminUserId: string, jobId: string, status: "OPEN" | "CLOSED" | "DRAFT", note?: string) => Promise<void>;
   deleteJob: (adminUserId: string, jobId: string, note?: string) => Promise<void>;
+  fetchApplicants: (adminUserId: string, jobId: string) => Promise<void>;
   fetchJobAuditLogs: (jobId: string) => Promise<void>;
   openAuditDrawer: () => void;
   closeAuditDrawer: () => void;
@@ -71,6 +76,10 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
 
   drawerOpen: false,
   drawerJob: null,
+
+  applicants: [],
+  isLoadingApplicants: false,
+
   jobAuditLogs: [],
   isLoadingJobAudit: false,
 
@@ -85,7 +94,6 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
   setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f }, page: 1 })),
   setPage: (p) => set({ page: p }),
 
-  // ✨ ดึงรายการงานทั้งระบบ
   fetchJobs: async (adminUserId) => {
     const { filters, page, pageSize } = get();
     set({ isLoading: true });
@@ -105,39 +113,48 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
     }
   },
 
-  // ✨ เปิด drawer + โหลด per-post audit logs พร้อมกัน
-  openDrawer: (job) => {
-    set({ drawerOpen: true, drawerJob: job, jobAuditLogs: [] });
+  // ✨ เปิด drawer + โหลด applicants + audit พร้อมกัน
+  openDrawer: (job, adminUserId) => {
+    set({ drawerOpen: true, drawerJob: job, applicants: [], jobAuditLogs: [] });
+    get().fetchApplicants(adminUserId, job.id);
     get().fetchJobAuditLogs(job.id);
   },
-  closeDrawer: () => set({ drawerOpen: false, drawerJob: null, jobAuditLogs: [] }),
+  closeDrawer: () => set({ drawerOpen: false, drawerJob: null, applicants: [], jobAuditLogs: [] }),
 
-  // ✨ อัปเดตสถานะงาน + sync state + refresh per-post audit
   updateStatus: async (adminUserId, jobId, status, note) => {
     await fetchUpdateJobStatus(adminUserId, jobId, status, note);
     set((s) => ({
-      jobs: s.jobs.map((j) => (j.id === jobId ? { ...j, status } : j)),
+      jobs:      s.jobs.map((j) => (j.id === jobId ? { ...j, status } : j)),
       drawerJob: s.drawerJob?.id === jobId ? { ...s.drawerJob, status } : s.drawerJob,
     }));
-    // refresh per-post audit ถ้า drawer กำลังเปิด
-    if (get().drawerJob?.id === jobId) {
-      get().fetchJobAuditLogs(jobId);
-    }
+    if (get().drawerJob?.id === jobId) get().fetchJobAuditLogs(jobId);
   },
 
-  // ✨ ลบงาน + sync state
   deleteJob: async (adminUserId, jobId, note) => {
     await fetchDeleteJob(adminUserId, jobId, note);
     set((s) => ({
-      jobs: s.jobs.filter((j) => j.id !== jobId),
-      total: s.total - 1,
-      drawerOpen: false,
-      drawerJob: null,
+      jobs:        s.jobs.filter((j) => j.id !== jobId),
+      total:       s.total - 1,
+      drawerOpen:  false,
+      drawerJob:   null,
+      applicants:  [],
       jobAuditLogs: [],
     }));
   },
 
-  // ✨ ดึง Audit Logs เฉพาะ Post (per-post timeline)
+  // ✨ ดึงผู้สมัครของ post
+  fetchApplicants: async (adminUserId, jobId) => {
+    set({ isLoadingApplicants: true });
+    try {
+      const res = await fetchAdminApplicants(adminUserId, jobId);
+      set({ applicants: res.applicants });
+    } catch {
+      set({ applicants: [] });
+    } finally {
+      set({ isLoadingApplicants: false });
+    }
+  },
+
   fetchJobAuditLogs: async (jobId) => {
     set({ isLoadingJobAudit: true });
     try {
@@ -152,7 +169,6 @@ export const useAdminJobStore = create<AdminJobStore>((set, get) => ({
   closeAuditDrawer: () => set({ auditDrawerOpen: false }),
   setAuditFilterAction: (action) => set({ auditFilterAction: action }),
 
-  // ✨ ดึง Audit Logs รวมระบบ พร้อม filter + pagination
   fetchAuditLogs: async (adminUserId, page = 1, action) => {
     const { auditFilterAction } = get();
     const effectiveAction = action ?? auditFilterAction;
