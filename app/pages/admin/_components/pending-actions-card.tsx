@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ Pending Actions Card — สิ่งที่ Admin ควรทำ ดึงจาก live data
+import { useTheme } from "@/app/contexts/theme-context";
 import {
   AlertOutlined,
   CheckCircleOutlined,
@@ -23,15 +24,38 @@ import { useDashboardStore } from "../_state/dashboard-store";
 
 const { Text } = Typography;
 
-// ✨ สี + icon ตาม severity
+// ✨ สี + icon ตาม severity (แยก light/dark)
 const severityConfig = {
-  high: { color: "#ff4d4f", bgColor: "#fff1f0", borderColor: "#ffccc7", icon: <ExclamationCircleOutlined /> },
-  medium: { color: "#fa8c16", bgColor: "#fff7e6", borderColor: "#ffd591", icon: <WarningOutlined /> },
-  low: { color: "#52c41a", bgColor: "#f6ffed", borderColor: "#b7eb8f", icon: <CheckCircleOutlined /> },
+  high: {
+    color: "#ff4d4f",
+    bgLight: "#fff1f0",
+    borderLight: "#ffccc7",
+    bgDark: "rgba(239,68,68,0.12)",
+    borderDark: "rgba(239,68,68,0.3)",
+    icon: <ExclamationCircleOutlined />,
+  },
+  medium: {
+    color: "#fa8c16",
+    bgLight: "#fff7e6",
+    borderLight: "#ffd591",
+    bgDark: "rgba(250,140,22,0.12)",
+    borderDark: "rgba(250,140,22,0.3)",
+    icon: <WarningOutlined />,
+  },
+  low: {
+    color: "#22c55e",
+    bgLight: "#f6ffed",
+    borderLight: "#b7eb8f",
+    bgDark: "rgba(34,197,94,0.12)",
+    borderDark: "rgba(34,197,94,0.3)",
+    icon: <CheckCircleOutlined />,
+  },
 };
 
 export function PendingActionsCard() {
   const { token } = theme.useToken();
+  const { mode } = useTheme();
+  const isDark = mode === "dark";
   const { data, isLoading } = useDashboardStore();
 
   const actions = data?.pendingActions ?? [];
@@ -48,7 +72,9 @@ export function PendingActionsCard() {
       styles={{ body: { padding: "16px 20px" } }}
       title={
         <Flex align="center" gap={8}>
-          <AlertOutlined style={{ color: highCount > 0 ? "#ff4d4f" : token.colorPrimary }} />
+          <AlertOutlined
+            style={{ color: highCount > 0 ? "#ff4d4f" : token.colorPrimary }}
+          />
           <Text strong>Action ที่ต้องทำ</Text>
           {highCount > 0 && (
             <Badge
@@ -62,7 +88,12 @@ export function PendingActionsCard() {
       {isLoading ? (
         <Flex vertical gap={10}>
           {[0, 1, 2].map((i) => (
-            <Skeleton.Input key={i} active size="small" style={{ width: "100%", height: 52 }} />
+            <Skeleton.Input
+              key={i}
+              active
+              size="small"
+              style={{ width: "100%", height: 52 }}
+            />
           ))}
         </Flex>
       ) : actions.length === 0 ? (
@@ -86,32 +117,41 @@ export function PendingActionsCard() {
             .map((action) => {
               const cfg = severityConfig[action.severity];
               return (
-                <Link key={action.type} href={action.href} style={{ textDecoration: "none" }}>
+                <Link
+                  key={action.type}
+                  href={action.href}
+                  style={{ textDecoration: "none" }}
+                >
                   <Flex
                     align="center"
                     justify="space-between"
+                    className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                     style={{
                       padding: "10px 14px",
                       borderRadius: 10,
-                      background: token.colorMode === "dark" ? token.colorFillQuaternary : cfg.bgColor,
-                      border: `1px solid ${token.colorMode === "dark" ? token.colorBorderSecondary : cfg.borderColor}`,
+                      background: isDark ? cfg.bgDark : cfg.bgLight,
+                      border: `1px solid ${isDark ? cfg.borderDark : cfg.borderLight}`,
                       cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.opacity = "0.8";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.opacity = "1";
                     }}
                   >
                     <Flex align="center" gap={10}>
-                      <Text style={{ color: cfg.color, fontSize: 16 }}>{cfg.icon}</Text>
+                      <Text style={{ color: cfg.color, fontSize: 16 }}>
+                        {cfg.icon}
+                      </Text>
                       <Flex vertical gap={1}>
-                        <Text strong style={{ fontSize: 13, color: token.colorText }}>
+                        <Text
+                          strong
+                          style={{ fontSize: 13, color: token.colorText }}
+                        >
                           {action.label}
                         </Text>
-                        <Text style={{ fontSize: 12, color: cfg.color, fontWeight: 600 }}>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            color: cfg.color,
+                            fontWeight: 600,
+                          }}
+                        >
                           {action.count} รายการ
                         </Text>
                       </Flex>

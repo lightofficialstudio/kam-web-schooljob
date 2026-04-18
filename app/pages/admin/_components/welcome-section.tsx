@@ -37,8 +37,9 @@ export function WelcomeSection() {
 
   return (
     <Card
+      className="animate-[fadeInDown_0.5s_ease-out]"
       style={{
-        background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
+        background: `linear-gradient(135deg, #0d8fd4 0%, #11b6f5 55%, #5dd5fb 100%)`,
         border: "none",
         borderRadius: token.borderRadiusLG,
         overflow: "hidden",
@@ -64,7 +65,7 @@ export function WelcomeSection() {
               level={2}
               style={{ color: "#fff", margin: 0, fontWeight: 700 }}
             >
-              KAM School Job Platform
+              SCHOOL BOARD DASHBOARD
             </Title>
             <Text style={{ color: "rgba(255,255,255,0.70)", fontSize: 14 }}>
               <ClockCircleOutlined style={{ marginRight: 6 }} />

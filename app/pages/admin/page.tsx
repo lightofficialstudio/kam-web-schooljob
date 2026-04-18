@@ -36,52 +36,92 @@ export default function AdminPage() {
         </Col>
 
         {/* ✨ KPI Stats Cards */}
-        <Col xs={24}>
+        <Col xs={24} className="animate-[fadeInUp_0.4s_ease-out_0.1s_both]">
           <StatsSection />
         </Col>
 
         {/* ✨ Charts Row — User Growth + Role Distribution */}
-        <Col xs={24} lg={14}>
+        <Col
+          xs={24}
+          lg={14}
+          className="animate-[fadeInUp_0.4s_ease-out_0.2s_both]"
+        >
           <UserGrowthChart />
         </Col>
-        <Col xs={24} lg={10}>
+        <Col
+          xs={24}
+          lg={10}
+          className="animate-[fadeInUp_0.4s_ease-out_0.25s_both]"
+        >
           <RoleDistributionChart />
         </Col>
 
         {/* ✨ Analytics Row 1 — Supply vs Demand + Application Funnel */}
-        <Col xs={24} lg={15}>
+        <Col
+          xs={24}
+          lg={15}
+          className="animate-[fadeInUp_0.4s_ease-out_0.3s_both]"
+        >
           <JobApplicationTrendChart />
         </Col>
-        <Col xs={24} lg={9}>
+        <Col
+          xs={24}
+          lg={9}
+          className="animate-[fadeInUp_0.4s_ease-out_0.35s_both]"
+        >
           <ApplicationFunnelChart />
         </Col>
 
         {/* ✨ Analytics Row 2 — Job Status Donut + Platform Health Score */}
-        <Col xs={24} lg={9}>
+        <Col
+          xs={24}
+          lg={9}
+          className="animate-[fadeInUp_0.4s_ease-out_0.4s_both]"
+        >
           <JobStatusDonutChart />
         </Col>
-        <Col xs={24} lg={15}>
+        <Col
+          xs={24}
+          lg={15}
+          className="animate-[fadeInUp_0.4s_ease-out_0.45s_both]"
+        >
           <PlatformHealthChart />
         </Col>
 
         {/* ✨ Pending Actions + Recent Signups */}
-        <Col xs={24} lg={10}>
+        <Col
+          xs={24}
+          lg={10}
+          className="animate-[fadeInUp_0.4s_ease-out_0.5s_both]"
+        >
           <PendingActionsCard />
         </Col>
-        <Col xs={24} lg={14}>
+        <Col
+          xs={24}
+          lg={14}
+          className="animate-[fadeInUp_0.4s_ease-out_0.55s_both]"
+        >
           <RecentSignupsCard />
         </Col>
 
         {/* ✨ System Status Row */}
-        <Col xs={24} lg={12}>
+        <Col
+          xs={24}
+          lg={12}
+          className="animate-[fadeInUp_0.4s_ease-out_0.6s_both]"
+        >
           <SystemHealthSection />
         </Col>
-        <Col xs={24} lg={12}>
+        <Col
+          xs={24}
+          lg={12}
+          className="animate-[fadeInUp_0.4s_ease-out_0.65s_both]"
+        >
           <SystemInfoSection />
         </Col>
 
         {/* ✨ Quick Links */}
-        <Col xs={24}>
+        <Col xs={24} className="animate-[fadeInUp_0.4s_ease-out_0.7s_both]">
           <QuickLinksSection />
         </Col>
       </Row>
