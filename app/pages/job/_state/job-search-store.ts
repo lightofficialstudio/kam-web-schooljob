@@ -106,6 +106,7 @@ const buildParams = (filters: JobFilters, cursor?: string | null, pageSize = 10)
     ...(filters.license && { license: licenseMap[filters.license] }),
     ...(filters.gradeLevel && { grade_level: filters.gradeLevel }),
     ...(filters.employmentType && { job_type: filters.employmentType }),
+    ...(filters.postedAt && { posted_at: filters.postedAt }),
     ...(filters.salaryRange[0] > 0 && { salary_min: filters.salaryRange[0] }),
     ...(filters.salaryRange[1] < 100000 && { salary_max: filters.salaryRange[1] }),
     ...(cursor ? { cursor } : {}),

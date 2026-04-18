@@ -9,6 +9,8 @@ export const jobSearchQuerySchema = z.object({
   salary_min: z.coerce.number().optional(),
   salary_max: z.coerce.number().optional(),
   grade_level: z.string().optional(),
+  job_type: z.string().optional(),
+  posted_at: z.enum(["today", "3days", "7days", "30days"]).optional(),
   cursor: z.string().optional(), // ✨ cursor = id ของ job สุดท้าย
   page_size: z.coerce.number().min(1).max(50).default(10),
 });

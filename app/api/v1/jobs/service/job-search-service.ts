@@ -3,8 +3,19 @@ import { JobStatus, LicenseRequired, Prisma } from "@prisma/client";
 import { JobSearchQuery } from "../validation/job-search-schema";
 
 // ✨ ดึงรายการงานสำหรับหน้าค้นหา (Public — เฉพาะ Job ที่ OPEN เท่านั้น) — Cursor-based Lazy Loading
+// ✨ แปลง posted_at string → วันที่เริ่มต้น (ค้นหาตั้งแต่วันนั้นจนถึงปัจจุบัน)
+const postedAtToDate = (postedAt: string): Date => {
+  const now = new Date();
+  const dayMap: Record<string, number> = { today: 0, "3days": 3, "7days": 7, "30days": 30 };
+  const days = dayMap[postedAt] ?? 0;
+  const d = new Date(now);
+  d.setDate(d.getDate() - days);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
 export const searchJobsService = async (query: JobSearchQuery) => {
-  const { keyword, province, school_type, license, salary_min, salary_max, grade_level, cursor, page_size } = query;
+  const { keyword, province, school_type, license, salary_min, salary_max, grade_level, job_type, posted_at, cursor, page_size } = query;
 
   // ✨ สร้าง where clause สำหรับ filter
   const whereClause: Prisma.JobWhereInput = {
@@ -17,6 +28,10 @@ export const searchJobsService = async (query: JobSearchQuery) => {
     ...(license && {
       licenseRequired: license as LicenseRequired,
     }),
+    // กรองด้วยรูปแบบการจ้างงาน
+    ...(job_type && { jobType: job_type }),
+    // กรองด้วยวันที่ประกาศ
+    ...(posted_at && { createdAt: { gte: postedAtToDate(posted_at) } }),
     // กรองด้วยเงินเดือน
     ...(salary_min !== undefined && { salaryMin: { gte: salary_min } }),
     ...(salary_max !== undefined && { salaryMax: { lte: salary_max } }),
@@ -88,11 +103,9 @@ export const searchJobsService = async (query: JobSearchQuery) => {
     salaryMin: job.salaryMin ?? undefined,
     salaryMax: job.salaryMax ?? undefined,
     description: job.description ?? "",
-    educationLevel: "",
-    teachingExperience: "",
-    licenseRequired: licenseMap[job.licenseRequired],
     educationLevel: job.educationLevel ?? "",
     teachingExperience: job.experience ?? "",
+    licenseRequired: licenseMap[job.licenseRequired],
     qualifications: job.qualifications ?? "",
     gender: job.gender ?? "ไม่จำกัด",
     jobType: job.jobType ?? undefined,

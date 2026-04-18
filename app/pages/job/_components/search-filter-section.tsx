@@ -1,16 +1,16 @@
 "use client";
 
 import {
+  BankOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  FileProtectOutlined,
+  FilterOutlined,
   GlobalOutlined,
+  ReloadOutlined,
   SearchOutlined,
   SolutionOutlined,
-  CalendarOutlined,
-  FileProtectOutlined,
-  BankOutlined,
   TeamOutlined,
-  ClockCircleOutlined,
-  FilterOutlined,
-  ReloadOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -97,7 +97,7 @@ export const SearchFilterSection = () => {
   // ✨ โหลด options ครั้งเดียวตอน mount
   useEffect(() => {
     fetchOptions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -124,11 +124,16 @@ export const SearchFilterSection = () => {
               {/* Keyword */}
               <Col xs={24} lg={8}>
                 <Flex vertical gap={8}>
-                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                  <Text
+                    strong
+                    style={{ fontSize: 13, color: token.colorTextDescription }}
+                  >
                     ค้นหางานที่คุณสนใจ
                   </Text>
                   <Input
-                    prefix={<SearchOutlined style={{ color: token.colorPrimary }} />}
+                    prefix={
+                      <SearchOutlined style={{ color: token.colorPrimary }} />
+                    }
                     placeholder="ตำแหน่งงาน, วิชาเอก หรือโรงเรียน"
                     value={filters.keyword}
                     onChange={(e) => setFilters({ keyword: e.target.value })}
@@ -142,7 +147,10 @@ export const SearchFilterSection = () => {
               {/* Job Categories — โหลดจาก DB (ConfigOption group=job_category) */}
               <Col xs={24} lg={9}>
                 <Flex vertical gap={8}>
-                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                  <Text
+                    strong
+                    style={{ fontSize: 13, color: token.colorTextDescription }}
+                  >
                     ประเภทงาน / วิชาเอก
                   </Text>
                   <Cascader
@@ -151,13 +159,21 @@ export const SearchFilterSection = () => {
                     multiple
                     maxTagCount={1}
                     value={filters.category}
-                    onChange={(value) => setFilters({ category: value as string[][] })}
-                    placeholder={isLoadingCategories ? "กำลังโหลด..." : "เลือกตำแหน่งที่สนใจ"}
+                    onChange={(value) =>
+                      setFilters({ category: value as string[][] })
+                    }
+                    placeholder={
+                      isLoadingCategories
+                        ? "กำลังโหลด..."
+                        : "เลือกตำแหน่งที่สนใจ"
+                    }
                     style={{ width: "100%" }}
                     size="large"
                     showCheckedStrategy={Cascader.SHOW_CHILD}
                     showSearch
-                    suffixIcon={<SolutionOutlined style={{ color: token.colorPrimary }} />}
+                    suffixIcon={
+                      <SolutionOutlined style={{ color: token.colorPrimary }} />
+                    }
                   />
                 </Flex>
               </Col>
@@ -165,22 +181,33 @@ export const SearchFilterSection = () => {
               {/* Location — โหลดจากหวัด/เขต GitHub API */}
               <Col xs={24} lg={7}>
                 <Flex vertical gap={8}>
-                  <Text strong style={{ fontSize: 13, color: token.colorTextDescription }}>
+                  <Text
+                    strong
+                    style={{ fontSize: 13, color: token.colorTextDescription }}
+                  >
                     สถานที่
                   </Text>
                   <Cascader
                     options={geoOptions}
                     loading={isLoadingGeo}
                     showSearch
-                    placeholder={isLoadingGeo ? "กำลังโหลด..." : "เลือกจังหวัด / เขต"}
+                    placeholder={
+                      isLoadingGeo ? "กำลังโหลด..." : "เลือกจังหวัด / เขต"
+                    }
                     style={{ width: "100%" }}
                     size="large"
                     value={filters.location ? [filters.location] : undefined}
                     onChange={(value) =>
-                      setFilters({ location: value ? (value[value.length - 1] as string) : null })
+                      setFilters({
+                        location: value
+                          ? (value[value.length - 1] as string)
+                          : null,
+                      })
                     }
                     expandTrigger="hover"
-                    suffixIcon={<GlobalOutlined style={{ color: token.colorPrimary }} />}
+                    suffixIcon={
+                      <GlobalOutlined style={{ color: token.colorPrimary }} />
+                    }
                     allowClear
                   />
                 </Flex>
@@ -217,7 +244,10 @@ export const SearchFilterSection = () => {
                     </Tag>
                   )}
                 </Button>
-                {(advancedActiveCount > 0 || filters.keyword || filters.category.length > 0 || filters.location) && (
+                {(advancedActiveCount > 0 ||
+                  filters.keyword ||
+                  filters.category.length > 0 ||
+                  filters.location) && (
                   <Button
                     type="text"
                     icon={<ReloadOutlined />}
@@ -231,35 +261,83 @@ export const SearchFilterSection = () => {
               </Flex>
 
               {/* Active filter tags */}
-              <Flex gap={6} wrap="wrap" justify="flex-end" style={{ flex: 1, marginLeft: 12 }}>
+              <Flex
+                gap={6}
+                wrap="wrap"
+                justify="flex-end"
+                style={{ flex: 1, marginLeft: 12 }}
+              >
                 {filters.location && (
-                  <Tag closable onClose={() => setFilters({ location: null })} color="blue">
-                    📍 {filters.location}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ location: null })}
+                    color="blue"
+                    icon={<GlobalOutlined />}
+                  >
+                    {filters.location}
                   </Tag>
                 )}
                 {filters.schoolType && (
-                  <Tag closable onClose={() => setFilters({ schoolType: null })} color="cyan">
-                    🏫 {schoolTypeOptions.find((o) => o.value === filters.schoolType)?.label ?? filters.schoolType}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ schoolType: null })}
+                    color="cyan"
+                    icon={<BankOutlined />}
+                  >
+                    {schoolTypeOptions.find(
+                      (o) => o.value === filters.schoolType,
+                    )?.label ?? filters.schoolType}
                   </Tag>
                 )}
                 {filters.license && (
-                  <Tag closable onClose={() => setFilters({ license: null })} color="gold">
-                    📋 {LICENSE_OPTIONS.find((o) => o.value === filters.license)?.label}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ license: null })}
+                    color="gold"
+                    icon={<FileProtectOutlined />}
+                  >
+                    {
+                      LICENSE_OPTIONS.find((o) => o.value === filters.license)
+                        ?.label
+                    }
                   </Tag>
                 )}
                 {filters.employmentType && (
-                  <Tag closable onClose={() => setFilters({ employmentType: null })} color="green">
-                    💼 {EMPLOYMENT_TYPE_OPTIONS.find((o) => o.value === filters.employmentType)?.label}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ employmentType: null })}
+                    color="green"
+                    icon={<TeamOutlined />}
+                  >
+                    {
+                      EMPLOYMENT_TYPE_OPTIONS.find(
+                        (o) => o.value === filters.employmentType,
+                      )?.label
+                    }
                   </Tag>
                 )}
                 {filters.gradeLevel && (
-                  <Tag closable onClose={() => setFilters({ gradeLevel: null })} color="purple">
-                    🎓 {filters.gradeLevel}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ gradeLevel: null })}
+                    color="purple"
+                    icon={<SolutionOutlined />}
+                  >
+                    {filters.gradeLevel}
                   </Tag>
                 )}
                 {filters.postedAt && (
-                  <Tag closable onClose={() => setFilters({ postedAt: null })} color="orange">
-                    🕐 {POSTED_AT_OPTIONS.find((o) => o.value === filters.postedAt)?.label}
+                  <Tag
+                    closable
+                    onClose={() => setFilters({ postedAt: null })}
+                    color="orange"
+                    icon={<ClockCircleOutlined />}
+                  >
+                    {
+                      POSTED_AT_OPTIONS.find(
+                        (o) => o.value === filters.postedAt,
+                      )?.label
+                    }
                   </Tag>
                 )}
               </Flex>
@@ -270,11 +348,15 @@ export const SearchFilterSection = () => {
               <>
                 <Divider style={{ margin: "16px 0" }} />
                 <Row gutter={[16, 16]}>
-
                   {/* ประเภทโรงเรียน — โหลดจาก DB (ConfigOption group=school_type) */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
                         <BankOutlined style={{ marginRight: 6 }} />
                         ประเภทโรงเรียน
                       </Text>
@@ -285,7 +367,9 @@ export const SearchFilterSection = () => {
                         allowClear
                         loading={isLoadingCategories}
                         value={filters.schoolType}
-                        onChange={(value) => setFilters({ schoolType: value ?? null })}
+                        onChange={(value) =>
+                          setFilters({ schoolType: value ?? null })
+                        }
                         options={schoolTypeOptions}
                       />
                     </Flex>
@@ -294,7 +378,12 @@ export const SearchFilterSection = () => {
                   {/* ใบประกอบวิชาชีพ */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
                         <FileProtectOutlined style={{ marginRight: 6 }} />
                         ใบประกอบวิชาชีพ
                       </Text>
@@ -304,10 +393,14 @@ export const SearchFilterSection = () => {
                         size="large"
                         allowClear
                         value={filters.license}
-                        onChange={(value) => setFilters({ license: value ?? null })}
+                        onChange={(value) =>
+                          setFilters({ license: value ?? null })
+                        }
                       >
                         {LICENSE_OPTIONS.map((o) => (
-                          <Option key={o.value} value={o.value}>{o.label}</Option>
+                          <Option key={o.value} value={o.value}>
+                            {o.label}
+                          </Option>
                         ))}
                       </Select>
                     </Flex>
@@ -316,7 +409,12 @@ export const SearchFilterSection = () => {
                   {/* รูปแบบการจ้างงาน */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
                         <TeamOutlined style={{ marginRight: 6 }} />
                         รูปแบบการจ้างงาน
                       </Text>
@@ -326,10 +424,14 @@ export const SearchFilterSection = () => {
                         size="large"
                         allowClear
                         value={filters.employmentType}
-                        onChange={(value) => setFilters({ employmentType: value ?? null })}
+                        onChange={(value) =>
+                          setFilters({ employmentType: value ?? null })
+                        }
                       >
                         {EMPLOYMENT_TYPE_OPTIONS.map((o) => (
-                          <Option key={o.value} value={o.value}>{o.label}</Option>
+                          <Option key={o.value} value={o.value}>
+                            {o.label}
+                          </Option>
                         ))}
                       </Select>
                     </Flex>
@@ -338,8 +440,14 @@ export const SearchFilterSection = () => {
                   {/* ระดับชั้นที่สอน */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
-                        🎓 ระดับชั้นที่สอน
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
+                        <SolutionOutlined style={{ marginRight: 6 }} />{" "}
+                        ระดับชั้นที่สอน
                       </Text>
                       <Select
                         placeholder="ทุกระดับ"
@@ -347,10 +455,14 @@ export const SearchFilterSection = () => {
                         size="large"
                         allowClear
                         value={filters.gradeLevel}
-                        onChange={(value) => setFilters({ gradeLevel: value ?? null })}
+                        onChange={(value) =>
+                          setFilters({ gradeLevel: value ?? null })
+                        }
                       >
                         {GRADE_LEVEL_OPTIONS.map((o) => (
-                          <Option key={o.value} value={o.value}>{o.label}</Option>
+                          <Option key={o.value} value={o.value}>
+                            {o.label}
+                          </Option>
                         ))}
                       </Select>
                     </Flex>
@@ -359,7 +471,12 @@ export const SearchFilterSection = () => {
                   {/* ประกาศเมื่อ */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
                         <ClockCircleOutlined style={{ marginRight: 6 }} />
                         ประกาศเมื่อ
                       </Text>
@@ -369,10 +486,14 @@ export const SearchFilterSection = () => {
                         size="large"
                         allowClear
                         value={filters.postedAt}
-                        onChange={(value) => setFilters({ postedAt: value ?? null })}
+                        onChange={(value) =>
+                          setFilters({ postedAt: value ?? null })
+                        }
                       >
                         {POSTED_AT_OPTIONS.map((o) => (
-                          <Option key={o.value} value={o.value}>{o.label}</Option>
+                          <Option key={o.value} value={o.value}>
+                            {o.label}
+                          </Option>
                         ))}
                       </Select>
                     </Flex>
@@ -381,7 +502,12 @@ export const SearchFilterSection = () => {
                   {/* วันเริ่มงาน placeholder (ขยายได้) */}
                   <Col xs={24} sm={12} md={8}>
                     <Flex vertical gap={6}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
                         <CalendarOutlined style={{ marginRight: 6 }} />
                         เปิดรับสมัครถึง
                       </Text>
@@ -402,11 +528,21 @@ export const SearchFilterSection = () => {
                 <Row gutter={[16, 8]} style={{ marginTop: 20 }} align="middle">
                   <Col span={24}>
                     <Flex vertical gap={4}>
-                      <Text style={{ fontSize: 12, color: token.colorTextDescription }}>
-                        💰 ช่วงเงินเดือน (บาท)
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: token.colorTextDescription,
+                        }}
+                      >
+                        <span style={{ marginRight: 6 }}>฿</span> ช่วงเงินเดือน
+                        (บาท)
                         {isSalaryActive && (
-                          <Text strong style={{ marginLeft: 8, color: token.colorPrimary }}>
-                            ฿{salaryMin.toLocaleString()} — ฿{salaryMax.toLocaleString()}
+                          <Text
+                            strong
+                            style={{ marginLeft: 8, color: token.colorPrimary }}
+                          >
+                            ฿{salaryMin.toLocaleString()} — ฿
+                            {salaryMax.toLocaleString()}
                           </Text>
                         )}
                       </Text>
@@ -416,8 +552,12 @@ export const SearchFilterSection = () => {
                         max={100000}
                         step={5000}
                         value={filters.salaryRange}
-                        onChange={(value) => setFilters({ salaryRange: value as [number, number] })}
-                        tooltip={{ formatter: (v) => `฿${v?.toLocaleString()}` }}
+                        onChange={(value) =>
+                          setFilters({ salaryRange: value as [number, number] })
+                        }
+                        tooltip={{
+                          formatter: (v) => `฿${v?.toLocaleString()}`,
+                        }}
                         marks={{
                           0: "0",
                           25000: "25K",
