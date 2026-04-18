@@ -42,7 +42,7 @@ export const SchoolBenefitsSection = ({
 
       <Row gutter={[16, 16]}>
         {benefits.map((benefit, i) => (
-          <Col xs={24} sm={12} key={i}>
+          <Col span={24} key={i}>
             <div
               className="px-6 py-4 rounded-2xl flex items-center gap-4 border border-slate-50 dark:border-slate-800 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300 group"
               style={{ background: token.colorBgLayout }}

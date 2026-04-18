@@ -85,7 +85,7 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       {stats.length > 0 && (
         <Row gutter={[16, 16]}>
           {stats.map((stat, i) => (
-            <Col xs={12} key={i}>
+            <Col span={24} key={i}>
               <div
                 className="p-6 rounded-3xl transition-all hover:translate-y-[-4px] border border-slate-50 dark:border-slate-800"
                 style={{

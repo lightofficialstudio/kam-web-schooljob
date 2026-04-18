@@ -123,8 +123,7 @@ export const SchoolProfileHeader = ({ school }: SchoolProfileHeaderProps) => {
                 <Flex align="center" gap={12} wrap>
                   <Title
                     level={1}
-                    className="m-0! text-3xl md:text-5xl font-black tracking-tight"
-                    style={{ color: "#0F172A" }}
+                    className="m-0! text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white"
                   >
                     {school.schoolName}
                   </Title>
@@ -136,7 +135,7 @@ export const SchoolProfileHeader = ({ school }: SchoolProfileHeaderProps) => {
                   </Tag>
                 </Flex>
 
-                <Paragraph className="max-w-3xl text-lg text-slate-500 font-medium m-0!">
+                <Paragraph className="max-w-3xl text-lg text-slate-500 dark:text-slate-400 font-medium m-0!">
                   {[school.district, school.province]
                     .filter(Boolean)
                     .join(", ")}{" "}
@@ -150,17 +149,17 @@ export const SchoolProfileHeader = ({ school }: SchoolProfileHeaderProps) => {
 
                 <Flex gap={24} wrap className="items-center">
                   {school.phone && (
-                    <Space className="bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <Space className="bg-slate-100 dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800">
                       <PhoneOutlined className="text-blue-500" />
-                      <Text className="font-bold text-slate-600 dark:text-slate-300">
+                      <Text className="font-bold text-slate-800 dark:text-slate-200">
                         {school.phone}
                       </Text>
                     </Space>
                   )}
                   {school.email && (
-                    <Space className="bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <Space className="bg-slate-100 dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800">
                       <MailOutlined className="text-blue-500" />
-                      <Text className="font-bold text-slate-600 dark:text-slate-300">
+                      <Text className="font-bold text-slate-800 dark:text-slate-200">
                         {school.email}
                       </Text>
                     </Space>
