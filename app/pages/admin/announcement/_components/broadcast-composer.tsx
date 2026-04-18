@@ -25,7 +25,7 @@ import {
 } from "antd";
 import { useAnnouncementStore } from "../_state/announcement-store";
 import { TargetRole } from "../_api/announcement-api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -76,9 +76,14 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
   const cfg = TARGET_CONFIG[targetRole];
   const isValid = title.trim().length > 0 && message.trim().length > 0;
 
-  // ✨ กดปุ่ม Send — นับผู้รับก่อน แล้วเปิด Confirm Modal
-  const handleOpenConfirm = async () => {
-    await fetchRecipientCount(targetRole);
+  // ✨ โหลด count ครั้งแรกเมื่อ mount
+  useEffect(() => {
+    fetchRecipientCount(targetRole);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ✨ กดปุ่ม Send — count พร้อมแล้ว (update แบบ real-time) เปิด Modal ได้ทันที
+  const handleOpenConfirm = () => {
     setConfirmOpen(true);
   };
 
@@ -190,7 +195,6 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
             size="large"
             icon={<SendOutlined />}
             disabled={!isValid || isSending}
-            loading={isCountingRecipients}
             onClick={handleOpenConfirm}
             style={{
               width: "100%",
@@ -201,7 +205,7 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
               height: 46,
             }}
           >
-            {isCountingRecipients ? "กำลังตรวจสอบ..." : `ส่ง Broadcast ถึง${cfg.label}`}
+            {`ส่ง Broadcast ถึง${cfg.label}`}
           </Button>
         </Card>
 
@@ -263,23 +267,63 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
             </Flex>
           </div>
 
-          {/* ✨ กล่องแสดง target info */}
+          {/* ✨ Recipient Count Preview — แสดงแบบ real-time ตามที่เลือก role */}
           <div
             style={{
               marginTop: 14,
-              padding: "10px 12px",
-              borderRadius: 10,
+              padding: "14px 16px",
+              borderRadius: 12,
               background: `${cfg.color}0d`,
               border: `1px solid ${cfg.color}30`,
             }}
           >
-            <Flex align="center" gap={6}>
-              <span style={{ color: cfg.color, fontSize: 13 }}>{cfg.icon}</span>
-              <Text style={{ fontSize: 12, color: cfg.color, fontWeight: 600 }}>{cfg.desc}</Text>
+            <Flex justify="space-between" align="center">
+              <Flex vertical gap={2}>
+                <Flex align="center" gap={6}>
+                  <span style={{ color: cfg.color, fontSize: 13 }}>{cfg.icon}</span>
+                  <Text style={{ fontSize: 12, color: cfg.color, fontWeight: 700 }}>{cfg.label}</Text>
+                </Flex>
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  {cfg.desc}
+                </Text>
+                <Text type="secondary" style={{ fontSize: 10, marginTop: 2 }}>
+                  Notification ปรากฏใน In-app bell icon
+                </Text>
+              </Flex>
+
+              {/* ✨ ตัวเลขผู้รับ */}
+              <div
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 12,
+                  background: cfg.color,
+                  textAlign: "center",
+                  minWidth: 72,
+                  boxShadow: `0 4px 14px ${cfg.color}40`,
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {isCountingRecipients ? (
+                  <LoadingOutlined style={{ color: "#fff", fontSize: 16 }} />
+                ) : (
+                  <>
+                    <Text
+                      strong
+                      style={{
+                        fontSize: recipientCount !== null && recipientCount >= 1000 ? 16 : 22,
+                        color: "#fff",
+                        display: "block",
+                        lineHeight: 1.2,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      {recipientCount?.toLocaleString() ?? "—"}
+                    </Text>
+                    <Text style={{ fontSize: 10, color: "rgba(255,255,255,0.85)" }}>ผู้รับ</Text>
+                  </>
+                )}
+              </div>
             </Flex>
-            <Text type="secondary" style={{ fontSize: 11, marginTop: 4, display: "block" }}>
-              Notification จะปรากฏใน In-app bell icon ของผู้รับ
-            </Text>
           </div>
 
           {/* ✨ Character counter summary */}

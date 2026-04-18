@@ -53,7 +53,12 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
 
   setTitle: (v) => set({ title: v }),
   setMessage: (v) => set({ message: v }),
-  setTargetRole: (v) => set({ targetRole: v }),
+
+  // ✨ เปลี่ยน role แล้วนับผู้รับใหม่ทันที
+  setTargetRole: (v) => {
+    set({ targetRole: v });
+    get().fetchRecipientCount(v);
+  },
 
   // ✨ reset form หลังส่ง
   resetForm: () => set({ title: "", message: "", targetRole: "ALL", lastSentCount: null, recipientCount: null }),
