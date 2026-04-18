@@ -5,7 +5,6 @@ import { useNotificationModalStore } from "@/app/stores/notification-modal-store
 import {
   CheckCircleFilled,
   CloseCircleFilled,
-  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
@@ -14,14 +13,12 @@ import {
   Button,
   Card,
   Col,
-  Divider,
   Drawer,
   Empty,
   Flex,
   Form,
   Input,
   InputNumber,
-  Layout,
   Modal,
   Row,
   Select,
@@ -185,153 +182,110 @@ export const EducationHistorySection: React.FC = () => {
         open={isAddingNew}
         onClose={handleCancel}
         size="large"
-        closable={false}
+        title={
+          <Title level={4} style={{ margin: 0 }}>
+            {editingIndex !== null
+              ? "แก้ไขข้อมูลการศึกษา"
+              : "เพิ่มข้อมูลการศึกษา"}
+          </Title>
+        }
         placement="right"
-        styles={{ body: { padding: 0 } }}
-      >
-        <Layout
-          style={{
-            position: "relative",
-            minHeight: "100%",
-            backgroundColor: token.colorBgContainer,
-          }}
-        >
-          {/* Header Sticky Action Bar */}
-          <Layout.Header
-            style={{
-              position: "sticky",
-              top: 0,
-              zIndex: 100,
-              backgroundColor: token.colorBgContainer,
-              padding: "16px 24px",
-              borderBottom: `1px solid ${token.colorBorderSecondary}`,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "12px",
-              height: "auto",
-            }}
-          >
-            <Title level={4} style={{ margin: 0 }}>
-              {editingIndex !== null
-                ? "แก้ไขข้อมูลการศึกษา"
-                : "เพิ่มข้อมูลการศึกษา"}
-            </Title>
+        footer={
+          <Flex justify="end" gap={12} style={{ padding: "8px 0" }}>
             <Button
-              type="text"
-              icon={<CloseOutlined style={{ fontSize: "20px" }} />}
               onClick={handleCancel}
-            />
-          </Layout.Header>
-
-          {/* Form Content */}
-          <Layout.Content
-            style={{
-              padding: "32px 40px 80px 40px",
-              backgroundColor: token.colorBgContainer,
-            }}
+              size="large"
+              style={{ minWidth: 100 }}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSave}
+              size="large"
+              loading={isSaving}
+              style={{ minWidth: 100 }}
+            >
+              บันทึก
+            </Button>
+          </Flex>
+        }
+      >
+        <Form form={form} layout="vertical">
+          {/* [Fix #1] Dropdown ครบตาม Requirement */}
+          <Form.Item
+            label="ระดับการศึกษา"
+            name="level"
+            rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
           >
-            <Form form={form} layout="vertical">
-              {/* [Fix #1] Dropdown ครบตาม Requirement */}
-              <Form.Item
-                label="ระดับการศึกษา"
-                name="level"
-                rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
-              >
-                <Select
-                  options={EDUCATION_LEVELS}
-                  placeholder="เลือกระดับการศึกษา"
-                  size="large"
-                />
-              </Form.Item>
+            <Select
+              options={EDUCATION_LEVELS}
+              placeholder="เลือกระดับการศึกษา"
+              size="large"
+            />
+          </Form.Item>
 
-              <Form.Item
-                label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
-                name="institution"
-                rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
-              >
-                <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
-              </Form.Item>
+          <Form.Item
+            label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
+            name="institution"
+            rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
+          >
+            <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
+          </Form.Item>
 
-              <Form.Item
-                label="สาขาวิชา"
-                name="major"
-                rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
-              >
-                <Input
-                  placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ"
-                  size="large"
-                />
-              </Form.Item>
+          <Form.Item
+            label="สาขาวิชา"
+            name="major"
+            rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
+          >
+            <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" size="large" />
+          </Form.Item>
 
-              {/* [Fix #2] เพิ่ม field ปีที่สำเร็จการศึกษา (พ.ศ.) */}
-              <Form.Item
-                label="ปีที่สำเร็จการศึกษา (พ.ศ.)"
-                name="graduationYear"
-                rules={[
-                  { required: true, message: "กรุณากรอกปีที่สำเร็จการศึกษา" },
-                  {
-                    type: "number",
-                    min: YEAR_MIN,
-                    max: YEAR_MAX,
-                    message: `กรุณากรอกปี พ.ศ. ระหว่าง ${YEAR_MIN} - ${YEAR_MAX}`,
-                  },
-                ]}
-              >
-                <InputNumber
-                  placeholder={`เช่น ${YEAR_MAX}`}
-                  min={YEAR_MIN}
-                  max={YEAR_MAX}
-                  size="large"
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
+          {/* [Fix #2] เพิ่ม field ปีที่สำเร็จการศึกษา (พ.ศ.) */}
+          <Form.Item
+            label="ปีที่สำเร็จการศึกษา (พ.ศ.)"
+            name="graduationYear"
+            rules={[
+              { required: true, message: "กรุณากรอกปีที่สำเร็จการศึกษา" },
+              {
+                type: "number",
+                min: YEAR_MIN,
+                max: YEAR_MAX,
+                message: `กรุณากรอกปี พ.ศ. ระหว่าง ${YEAR_MIN} - ${YEAR_MAX}`,
+              },
+            ]}
+          >
+            <InputNumber
+              placeholder={`เช่น ${YEAR_MAX}`}
+              min={YEAR_MIN}
+              max={YEAR_MAX}
+              size="large"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
 
-              <Form.Item
-                label="เกรดเฉลี่ย (GPA)"
-                name="gpa"
-                rules={[
-                  {
-                    type: "number",
-                    min: 0,
-                    max: 4,
-                    message: "GPA ต้องเป็นตัวเลขระหว่าง 0.00 - 4.00",
-                  },
-                ]}
-              >
-                <InputNumber
-                  placeholder="เช่น 3.50"
-                  step={0.01}
-                  min={0}
-                  max={4}
-                  size="large"
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
-
-              <Divider style={{ margin: "32px 0 24px 0" }} />
-
-              <Flex justify="end" gap={12}>
-                <Button
-                  onClick={handleCancel}
-                  size="large"
-                  style={{ minWidth: 100 }}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={handleSave}
-                  size="large"
-                  loading={isSaving}
-                  style={{ minWidth: 100 }}
-                >
-                  บันทึก
-                </Button>
-              </Flex>
-            </Form>
-          </Layout.Content>
-        </Layout>
+          <Form.Item
+            label="เกรดเฉลี่ย (GPA)"
+            name="gpa"
+            rules={[
+              {
+                type: "number",
+                min: 0,
+                max: 4,
+                message: "GPA ต้องเป็นตัวเลขระหว่าง 0.00 - 4.00",
+              },
+            ]}
+          >
+            <InputNumber
+              placeholder="เช่น 3.50"
+              step={0.01}
+              min={0}
+              max={4}
+              size="large"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+        </Form>
       </Drawer>
 
       {/* 2. รายการประวัติการศึกษา */}

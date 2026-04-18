@@ -49,15 +49,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       fontFamily:
         "'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       fontSize: 14,
-      colorPrimary: "#11b6f5",
+      colorPrimary: "#437FC7",
       borderRadius: 12,
-      // ✨ [Enhanced color tokens for high visibility & Modern look]
-      colorBgBase: mode === "dark" ? "#0F172A" : "#ffffff",
-      colorTextBase: mode === "dark" ? "#F8FAFC" : "#1E293B",
-      colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
-      colorBgElevated: mode === "dark" ? "#1E293B" : "#ffffff",
-      colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
-      colorBgLayout: mode === "dark" ? "#0F172A" : "#F8FAFC",
+      // ✨ [Enhanced color tokens for Minimal Tone look]
+      colorBgBase: mode === "dark" ? "#0F172A" : "#FFFFFF",
+      colorTextBase: mode === "dark" ? "#F8FAFC" : "#2D3748",
+      colorBorder: mode === "dark" ? "#334155" : "#EDF6FF",
+      colorBgElevated: mode === "dark" ? "#1E293B" : "#FFFFFF",
+      colorBgContainer: mode === "dark" ? "#1E293B" : "#FFFFFF",
+      colorBgLayout: mode === "dark" ? "#0F172A" : "#EDF6FF",
     },
     algorithm:
       mode === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
@@ -78,14 +78,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Menu Styling]
       Menu: {
         itemBg: "transparent",
-        itemSelectedBg:
-          mode === "dark"
-            ? "rgba(17, 182, 245, 0.2)"
-            : "rgba(17, 182, 245, 0.1)",
-        itemSelectedColor: mode === "dark" ? "#52B8FF" : "#11b6f5",
-        itemHoverBg:
-          mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)",
-        itemHoverColor: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        itemSelectedBg: mode === "dark" ? "rgba(67, 127, 199, 0.2)" : "#EDF6FF",
+        itemSelectedColor: mode === "dark" ? "#6DAFFE" : "#437FC7",
+        itemHoverBg: mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "#F8FBFF",
+        itemHoverColor: mode === "dark" ? "#F8FAFC" : "#437FC7",
       },
 
       // ✨ [Card Styling - Clean & No Shadow Hover]
@@ -110,16 +106,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         controlHeight: 36,
         borderRadius: 8,
         colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
-        colorBorder: mode === "dark" ? "#334155" : "#E2E8F0",
-        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
+        colorBorder: mode === "dark" ? "#334155" : "#EDF6FF",
+        colorText: mode === "dark" ? "#F8FAFC" : "#2D3748",
         colorTextPlaceholder: mode === "dark" ? "#64748B" : "#9CA3AF",
-        hoverBorderColor: "#11b6f5",
-        activeBorderColor: "#11b6f5",
+        hoverBorderColor: "#6DAFFE",
+        activeBorderColor: "#437FC7",
         activeShadow:
           mode === "dark"
-            ? "0 0 0 2px rgba(17,182,245,0.2)"
-            : "0 0 0 2px rgba(17,182,245,0.1)",
-        addonBg: mode === "dark" ? "#0F172A" : "#fafafa",
+            ? "0 0 0 2px rgba(67,127,199,0.2)"
+            : "0 0 0 2px rgba(109,175,254,0.1)",
+        addonBg: mode === "dark" ? "#0F172A" : "#EDF6FF",
         colorBgContainerDisabled: mode === "dark" ? "#0F172A" : "#f5f5f5",
         colorTextDisabled: mode === "dark" ? "#475569" : "#00000040",
       },
@@ -151,17 +147,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Select Styling]
       Select: {
         colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
-        colorBorder: mode === "dark" ? "#475569" : "#cbd5e1", // เพิ่มความเข้มของ border
-        colorText: mode === "dark" ? "#F8FAFC" : "#1E293B",
-        colorTextPlaceholder: mode === "dark" ? "#94A3B8" : "#94A3B8", // ปรับสี placeholder ให้เข้มขึ้น
+        colorBorder: mode === "dark" ? "#475569" : "#EDF6FF", // ใช้สี Minimal Blue
+        colorText: mode === "dark" ? "#F8FAFC" : "#2D3748",
+        colorTextPlaceholder: mode === "dark" ? "#94A3B8" : "#94A3B8",
         controlHeight: 44, // ความสูงปกติ
         controlHeightLG: 56, // ปรับให้เท่ากับ h-14 (56px) สำหรับช่องค้นหา
         borderRadius: 12,
         borderRadiusLG: 16,
-        optionSelectedBg:
-          mode === "dark" ? "rgba(17,182,245,0.15)" : "rgba(17,182,245,0.08)",
-        optionActiveBg:
-          mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+        optionSelectedBg: mode === "dark" ? "rgba(67,127,199,0.15)" : "#EDF6FF",
+        optionActiveBg: mode === "dark" ? "rgba(255,255,255,0.05)" : "#F8FBFF",
       },
 
       // ✨ [Cascader Styling]
@@ -201,17 +195,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Table Styling - Striped Rows]
       Table: {
         colorBgContainer: mode === "dark" ? "#1E293B" : "#ffffff",
-        colorBgElevated: mode === "dark" ? "#0F172A" : "#fafafa",
-        colorBorder: mode === "dark" ? "#334155" : "#f0f0f0",
-        rowHoverBg:
-          mode === "dark"
-            ? "rgba(17, 182, 245, 0.08)"
-            : "rgba(17, 182, 245, 0.05)",
-        headerBg: mode === "dark" ? "#0F172A" : "#f0f7ff",
-        headerColor: mode === "dark" ? "#94A3B8" : "#64748B",
-        headerSplitColor: mode === "dark" ? "#334155" : "#E2E8F0",
-        rowExpandedBg: mode === "dark" ? "#162032" : "#f8fbff",
-        bodySortBg: mode === "dark" ? "#1a2744" : "#f0f7ff",
+        colorBgElevated: mode === "dark" ? "#0F172A" : "#FFFFFF",
+        colorBorder: mode === "dark" ? "#334155" : "#EDF6FF",
+        rowHoverBg: mode === "dark" ? "rgba(67, 127, 199, 0.08)" : "#F8FBFF",
+        headerBg: mode === "dark" ? "#0F172A" : "#EDF6FF",
+        headerColor: mode === "dark" ? "#94A3B8" : "#437FC7",
+        headerSplitColor: mode === "dark" ? "#334155" : "#EDF6FF",
+        rowExpandedBg: mode === "dark" ? "#162032" : "#F8FBFF",
+        bodySortBg: mode === "dark" ? "#1a2744" : "#EDF6FF",
       },
 
       // ✨ [Statistic Styling]
@@ -228,16 +219,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ✨ [Modal Styling]
       Modal: {
         colorBgElevated: mode === "dark" ? "#2D3748" : "#ffffff",
-      },
-
-      // ✨ [Drawer Styling — Ultra Minimal & Premium Style]
-      Drawer: {
-        colorBgElevated: mode === "dark" ? "#1E293B" : "#ffffff",
-        colorBorderSecondary: "transparent", // ✨ ลบเส้นคั่น Header/Footer เพื่อความเป็น Minimal
-        paddingLG: 24,
-        footerPaddingBlock: 20,
-        footerPaddingInline: 24,
-        borderRadiusLG: 24, // ✨ เพิ่มความโค้งมนให้ดู Premium (สำหรับกรณี placement="bottom" หรือ floating)
       },
 
       // ✨ [Dropdown Styling]

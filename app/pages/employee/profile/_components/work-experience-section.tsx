@@ -5,7 +5,6 @@ import { useNotificationModalStore } from "@/app/stores/notification-modal-store
 import {
   CheckCircleFilled,
   CloseCircleFilled,
-  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
@@ -22,7 +21,6 @@ import {
   Flex,
   Form,
   Input,
-  Layout,
   Modal,
   Row,
   Space,
@@ -213,175 +211,136 @@ export const WorkExperienceSection: React.FC = () => {
         open={isAddingNew}
         onClose={handleCancel}
         size="large"
-        closable={false}
+        title={
+          <Title level={4} style={{ margin: 0 }}>
+            {editingIndex !== null
+              ? "แก้ไขประสบการณ์การทำงาน"
+              : "เพิ่มประสบการณ์การทำงาน"}
+          </Title>
+        }
         placement="right"
-        styles={{ body: { padding: 0 } }}
-      >
-        <Layout
-          style={{
-            position: "relative",
-            minHeight: "100%",
-            backgroundColor: token.colorBgContainer,
-          }}
-        >
-          {/* Header Sticky Action Bar */}
-          <Layout.Header
-            style={{
-              position: "sticky",
-              top: 0,
-              zIndex: 100,
-              backgroundColor: token.colorBgContainer,
-              padding: "16px 24px",
-              borderBottom: `1px solid ${token.colorBorderSecondary}`,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "12px",
-              height: "auto",
-            }}
-          >
-            <Title level={4} style={{ margin: 0 }}>
-              {editingIndex !== null
-                ? "แก้ไขประสบการณ์การทำงาน"
-                : "เพิ่มประสบการณ์การทำงาน"}
-            </Title>
+        footer={
+          <Flex justify="end" gap={12} style={{ padding: "8px 0" }}>
             <Button
-              type="text"
-              icon={<CloseOutlined style={{ fontSize: "20px" }} />}
               onClick={handleCancel}
-            />
-          </Layout.Header>
-
-          <Layout.Content
-            style={{
-              padding: "32px 40px 80px 40px",
-              backgroundColor: token.colorBgContainer,
-            }}
+              size="large"
+              style={{ minWidth: 100 }}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSave}
+              size="large"
+              loading={isSaving}
+              style={{ minWidth: 100 }}
+            >
+              บันทึก
+            </Button>
+          </Flex>
+        }
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="ตำแหน่งงาน"
+            name="jobTitle"
+            rules={[{ required: true, message: "กรุณากรอกตำแหน่งงาน" }]}
           >
-            <Form form={form} layout="vertical">
-              <Form.Item
-                label="ตำแหน่งงาน"
-                name="jobTitle"
-                rules={[{ required: true, message: "กรุณากรอกตำแหน่งงาน" }]}
-              >
-                <Input placeholder="เช่น ครูสอนภาษาอังกฤษ" size="large" />
-              </Form.Item>
+            <Input placeholder="เช่น ครูสอนภาษาอังกฤษ" size="large" />
+          </Form.Item>
 
+          <Form.Item
+            label="ชื่อโรงเรียน / บริษัท"
+            name="companyName"
+            rules={[
+              { required: true, message: "กรุณากรอกชื่อโรงเรียน/บริษัท" },
+            ]}
+          >
+            <Input placeholder="เช่น โรงเรียนสาธิตจุฬาฯ" size="large" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. */}
+            <Col span={12}>
               <Form.Item
-                label="ชื่อโรงเรียน / บริษัท"
-                name="companyName"
+                label="เริ่มงาน (เดือน/ปี พ.ศ.)"
+                name="startDate"
                 rules={[
-                  { required: true, message: "กรุณากรอกชื่อโรงเรียน/บริษัท" },
+                  {
+                    required: true,
+                    message: "กรุณาเลือกเดือนและปีที่เริ่มงาน",
+                  },
                 ]}
               >
-                <Input placeholder="เช่น โรงเรียนสาธิตจุฬาฯ" size="large" />
-              </Form.Item>
-
-              <Row gutter={16}>
-                {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. */}
-                <Col span={12}>
-                  <Form.Item
-                    label="เริ่มงาน (เดือน/ปี พ.ศ.)"
-                    name="startDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณาเลือกเดือนและปีที่เริ่มงาน",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      picker="month"
-                      style={{ width: "100%" }}
-                      size="large"
-                      format={(value) =>
-                        `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
-                      }
-                      placeholder="เลือกเดือน/ปี"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. + [Fix #2b] Required เมื่อ inPresent = false */}
-                  <Form.Item
-                    label="จนถึง (เดือน/ปี พ.ศ.)"
-                    name="endDate"
-                    dependencies={["inPresent"]}
-                    rules={[
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (getFieldValue("inPresent") || value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด"),
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <DatePicker
-                      picker="month"
-                      style={{ width: "100%" }}
-                      size="large"
-                      format={(value) =>
-                        `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
-                      }
-                      placeholder="เลือกเดือน/ปี"
-                      disabled={Form.useWatch("inPresent", form)}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Form.Item
-                name="inPresent"
-                valuePropName="checked"
-                initialValue={false}
-              >
-                <Checkbox
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      form.setFieldValue("endDate", null);
-                    }
-                    // re-validate endDate เมื่อ checkbox เปลี่ยน
-                    form.validateFields(["endDate"]);
-                  }}
-                >
-                  ยังคงทำงานที่นี่อยู่
-                </Checkbox>
-              </Form.Item>
-
-              <Form.Item label="รายละเอียดงาน" name="description">
-                <Input.TextArea
-                  rows={6}
-                  placeholder="อธิบายความรับผิดชอบและผลงานที่ผ่านมา..."
+                <DatePicker
+                  picker="month"
+                  style={{ width: "100%" }}
+                  size="large"
+                  format={(value) =>
+                    `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
+                  }
+                  placeholder="เลือกเดือน/ปี"
                 />
               </Form.Item>
-
-              <Divider style={{ margin: "32px 0 24px 0" }} />
-
-              <Flex justify="end" gap={12}>
-                <Button
-                  onClick={handleCancel}
+            </Col>
+            <Col span={12}>
+              {/* [Fix #1] picker="month" + [Fix #2] format แสดง พ.ศ. + [Fix #2b] Required เมื่อ inPresent = false */}
+              <Form.Item
+                label="จนถึง (เดือน/ปี พ.ศ.)"
+                name="endDate"
+                dependencies={["inPresent"]}
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (getFieldValue("inPresent") || value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด"),
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <DatePicker
+                  picker="month"
+                  style={{ width: "100%" }}
                   size="large"
-                  style={{ minWidth: 100 }}
-                >
-                  ยกเลิก
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={handleSave}
-                  size="large"
-                  loading={isSaving}
-                  style={{ minWidth: 100 }}
-                >
-                  บันทึก
-                </Button>
-              </Flex>
-            </Form>
-          </Layout.Content>
-        </Layout>
+                  format={(value) =>
+                    `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
+                  }
+                  placeholder="เลือกเดือน/ปี"
+                  disabled={Form.useWatch("inPresent", form)}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="inPresent"
+            valuePropName="checked"
+            initialValue={false}
+          >
+            <Checkbox
+              onChange={(e) => {
+                if (e.target.checked) {
+                  form.setFieldValue("endDate", null);
+                }
+                // re-validate endDate เมื่อ checkbox เปลี่ยน
+                form.validateFields(["endDate"]);
+              }}
+            >
+              ยังคงทำงานที่นี่อยู่
+            </Checkbox>
+          </Form.Item>
+
+          <Form.Item label="รายละเอียดงาน" name="description">
+            <Input.TextArea
+              rows={6}
+              placeholder="อธิบายความรับผิดชอบและผลงานที่ผ่านมา..."
+            />
+          </Form.Item>
+        </Form>
       </Drawer>
 
       {/* 2. รายการประวัติการทำงาน */}
