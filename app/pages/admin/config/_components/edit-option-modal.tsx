@@ -1,9 +1,9 @@
 "use client";
 
 // ✨ Edit Option Modal — ฟอร์มแก้ไข label + sortOrder (value ห้ามเปลี่ยน)
-import { Form, Input, InputNumber, Modal, Typography } from "antd";
+import { Alert, Form, Input, InputNumber, Modal, Typography } from "antd";
 import { useEffect } from "react";
-import { useConfigStore } from "../_state/config-store";
+import { GROUP_META, useConfigStore } from "../_state/config-store";
 
 const { Text } = Typography;
 
@@ -41,6 +41,11 @@ export function EditOptionModal() {
     }
   };
 
+  // ✨ หน้าที่ได้รับผลกระทบจาก group นี้
+  const usedInPages = editingOption
+    ? (GROUP_META[editingOption.group]?.usedIn ?? [])
+    : [];
+
   return (
     <Modal
       title="แก้ไขตัวเลือก"
@@ -52,6 +57,22 @@ export function EditOptionModal() {
       confirmLoading={isSaving}
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+        {/* ✨ Warning — แสดงเมื่อ item กำลังใช้งานอยู่ */}
+        {editingOption?.isActive && usedInPages.length > 0 && (
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="label นี้กำลังถูกใช้งานอยู่"
+            description={
+              <>
+                การเปลี่ยนชื่อจะกระทบ UX ใน{" "}
+                <strong>{usedInPages.length} หน้า</strong>:{" "}
+                {usedInPages.join(", ")}
+              </>
+            }
+          />
+        )}
         <Form.Item
           name="label"
           label="ชื่อที่แสดงผล"
