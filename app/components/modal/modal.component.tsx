@@ -53,7 +53,7 @@ export interface ModalComponentProps {
   type: ModalType;
   title?: string;
   /** ข้อความอธิบาย รองรับ string หรือ ReactNode (optional) */
-  description?: React.ReactNode;
+  description?: string | React.ReactNode;
   onClose: () => void;
   onConfirm?: () => void;
   loading?: boolean;
@@ -447,7 +447,7 @@ export const ModalComponent: React.FC<ModalComponentProps> = ({
                       {title ?? cfg.defaultTitle}
                     </h2>
                     {description && (
-                      <p
+                      <div
                         style={{
                           fontSize: 14,
                           color: textSecondary,
@@ -457,7 +457,7 @@ export const ModalComponent: React.FC<ModalComponentProps> = ({
                         }}
                       >
                         {description}
-                      </p>
+                      </div>
                     )}
                   </motion.div>
                 </div>
@@ -521,7 +521,7 @@ export const ModalComponent: React.FC<ModalComponentProps> = ({
                 )}
 
                 {/* ✨ Debug panel (เฉพาะ error + errorDetails) */}
-                {isError && errorDetails && (
+                {isError && errorDetails != null && (
                   <motion.div
                     style={{
                       marginBottom: 20,

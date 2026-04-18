@@ -37,32 +37,31 @@ export function LayoutSelector({ children }: LayoutSelectorProps) {
     setIsMounted(true);
   }, []);
 
-  // ✨ [ถ้าไม่ได้ login และพยายามเข้า admin route ให้ redirect ไปหน้า login]
-  // (รอให้ storage hydrate เสร็จก่อน)
+  // ✨ [Guard: admin route + redirect ADMIN กลับบ้าน]
   useEffect(() => {
     if (!isMounted) return;
 
-    if (!isAdminRoute) return;
-
-    if (!user) {
-      console.log(
-        "🔐 [LAYOUT SELECTOR] Not logged in, redirecting to signin...",
-      );
-      router.replace(`/pages/signin?redirect=${encodeURIComponent(pathname)}`);
+    // ถ้าเป็น admin route
+    if (isAdminRoute) {
+      if (!user) {
+        router.replace(`/pages/signin?redirect=${encodeURIComponent(pathname)}`);
+        return;
+      }
+      if (user.role !== "ADMIN") {
+        router.replace(ROLE_HOME[user.role] ?? "/");
+      }
       return;
     }
 
-    if (user.role !== "ADMIN") {
-      console.log(
-        "🚫 [LAYOUT SELECTOR] Not ADMIN, redirecting to role home...",
-      );
-      router.replace(ROLE_HOME[user.role] ?? "/");
+    // ถ้า ADMIN อยู่นอก admin route (เช่น signin/signup) → พา redirect กลับ /pages/admin
+    const isAuthPage = pathname.startsWith("/pages/signin") || pathname.startsWith("/pages/signup");
+    if (user?.role === "ADMIN" && isAuthPage) {
+      router.replace("/pages/admin");
     }
   }, [isMounted, isAdminRoute, user, pathname, router]);
 
-  // ✨ [Admin Layout เฉพาะ ADMIN เท่านั้น]
-  if (isAdminRoute || (user && user.role === "ADMIN")) {
-    // ถ้ายังไม่ mount หรือ user ไม่ใช่ ADMIN → render null ระหว่าง redirect
+  // ✨ [Admin Layout เฉพาะ admin route เท่านั้น]
+  if (isAdminRoute) {
     if (!isMounted || !user || user.role !== "ADMIN") return null;
     console.log("📊 [LAYOUT SELECTOR] Rendering AdminLayout");
     return <AdminLayout>{children}</AdminLayout>;
