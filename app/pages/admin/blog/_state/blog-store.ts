@@ -1,7 +1,7 @@
 "use client";
 
-import { create } from "zustand";
 import { ModalType } from "@/app/components/modal/modal.component";
+import { create } from "zustand";
 import {
   AiAction,
   BlogStatsOverview,
@@ -81,7 +81,10 @@ interface BlogStore {
     author_id?: string;
   }) => Promise<void>;
   deleteBlog: (id: string) => Promise<void>;
-  quickPublish: (id: string, currentStatus: "DRAFT" | "PUBLISHED") => Promise<void>;
+  quickPublish: (
+    id: string,
+    currentStatus: "DRAFT" | "PUBLISHED",
+  ) => Promise<void>;
   // ✨ analytics actions
   fetchStatsOverview: () => Promise<void>;
   // ✨ modal feedback
@@ -93,7 +96,12 @@ interface BlogStore {
     errorDetails?: unknown;
     loading: boolean;
   };
-  showModal: (opts: { type: ModalType; title: string; description?: string; errorDetails?: unknown }) => void;
+  showModal: (opts: {
+    type: ModalType;
+    title: string;
+    description?: string;
+    errorDetails?: unknown;
+  }) => void;
   hideModal: () => void;
   // ✨ AI actions
   aiAssist: (payload: {
@@ -122,9 +130,24 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   aiSeoScore: null,
   statsOverview: null,
   isStatsLoading: false,
-  modal: { open: false, type: "success" as ModalType, title: "", description: "", loading: false },
+  modal: {
+    open: false,
+    type: "success" as ModalType,
+    title: "",
+    description: "",
+    loading: false,
+  },
   showModal: (opts) =>
-    set({ modal: { open: true, type: opts.type, title: opts.title, description: opts.description ?? "", errorDetails: opts.errorDetails, loading: false } }),
+    set({
+      modal: {
+        open: true,
+        type: opts.type,
+        title: opts.title,
+        description: opts.description ?? "",
+        errorDetails: opts.errorDetails,
+        loading: false,
+      },
+    }),
   hideModal: () => set((s) => ({ modal: { ...s.modal, open: false } })),
 
   setFilterStatus: (s) => set({ filterStatus: s, page: 1 }),
@@ -167,10 +190,20 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
       }
       closeDrawer();
       await fetchBlogs();
-      showModal({ type: "success", title: editingBlog ? "บันทึกการแก้ไขสำเร็จ" : "สร้างบทความสำเร็จ", description: `บทความ "${values.title}" ถูกบันทึกเรียบร้อยแล้ว` });
+      showModal({
+        type: "success",
+        title: editingBlog ? "บันทึกการแก้ไขสำเร็จ" : "สร้างบทความสำเร็จ",
+        description: `บทความ "${values.title}" ถูกบันทึกเรียบร้อยแล้ว`,
+      });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
-      showModal({ type: "error", title: editingBlog ? "แก้ไขบทความไม่สำเร็จ" : "สร้างบทความไม่สำเร็จ", description: msg, errorDetails: err });
+      const msg =
+        err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({
+        type: "error",
+        title: editingBlog ? "แก้ไขบทความไม่สำเร็จ" : "สร้างบทความไม่สำเร็จ",
+        description: msg,
+        errorDetails: err,
+      });
     } finally {
       set({ isSubmitting: false });
     }
@@ -182,10 +215,20 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
     try {
       await requestAdminDeleteBlog(id);
       await fetchBlogs();
-      showModal({ type: "success", title: "ลบบทความสำเร็จ", description: "บทความถูกลบออกจากระบบแล้ว" });
+      showModal({
+        type: "success",
+        title: "ลบบทความสำเร็จ",
+        description: "บทความถูกลบออกจากระบบแล้ว",
+      });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
-      showModal({ type: "error", title: "ลบบทความไม่สำเร็จ", description: msg, errorDetails: err });
+      const msg =
+        err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({
+        type: "error",
+        title: "ลบบทความไม่สำเร็จ",
+        description: msg,
+        errorDetails: err,
+      });
     }
   },
 
@@ -198,14 +241,34 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
       set((s) => ({
         blogs: s.blogs.map((b) =>
           b.id === id
-            ? { ...b, status: newStatus, publishedAt: newStatus === "PUBLISHED" ? new Date().toISOString() : b.publishedAt }
+            ? {
+                ...b,
+                status: newStatus,
+                publishedAt:
+                  newStatus === "PUBLISHED"
+                    ? new Date().toISOString()
+                    : b.publishedAt,
+              }
             : b,
         ),
       }));
-      showModal({ type: "success", title: newStatus === "PUBLISHED" ? "เผยแพร่บทความสำเร็จ" : "ย้ายกลับ Draft สำเร็จ", description: `สถานะบทความเปลี่ยนเป็น ${newStatus} แล้ว` });
+      showModal({
+        type: "success",
+        title:
+          newStatus === "PUBLISHED"
+            ? "เผยแพร่บทความสำเร็จ"
+            : "ย้ายกลับ Draft สำเร็จ",
+        description: `สถานะบทความเปลี่ยนเป็น ${newStatus} แล้ว`,
+      });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
-      showModal({ type: "error", title: "เปลี่ยนสถานะไม่สำเร็จ", description: msg, errorDetails: err });
+      const msg =
+        err instanceof Error ? err.message : "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+      showModal({
+        type: "error",
+        title: "เปลี่ยนสถานะไม่สำเร็จ",
+        description: msg,
+        errorDetails: err,
+      });
     }
   },
 

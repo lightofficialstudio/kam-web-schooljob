@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ Admin Blog Management — Enterprise UI + AI Blog Assistant
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
   AppstoreOutlined,
@@ -23,8 +24,8 @@ import {
   Flex,
   Input,
   Row,
-  Select,
   Segmented,
+  Select,
   Tag,
   Tooltip,
   Typography,
@@ -33,7 +34,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ModalComponent } from "@/app/components/modal/modal.component";
 import { BlogAnalyticsSection } from "./_components/blog-analytics-section";
 import { BlogEditorDrawer } from "./_components/blog-editor-drawer";
 import { BlogKanban } from "./_components/blog-kanban";
@@ -53,7 +53,11 @@ const CATEGORIES = [
 ];
 
 // ✨ Blog Grid Card
-function BlogGridCard({ blog }: { blog: import("./_state/blog-store").AdminBlogItem }) {
+function BlogGridCard({
+  blog,
+}: {
+  blog: import("./_state/blog-store").AdminBlogItem;
+}) {
   const { token } = theme.useToken();
   const { openEdit, quickPublish } = useAdminBlogStore();
 
@@ -61,18 +65,30 @@ function BlogGridCard({ blog }: { blog: import("./_state/blog-store").AdminBlogI
     <Card
       variant="borderless"
       style={{
-        borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-        height: "100%", display: "flex", flexDirection: "column",
+        borderRadius: 16,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
         transition: "box-shadow 0.2s",
       }}
-      styles={{ body: { padding: 0, display: "flex", flexDirection: "column", height: "100%" } }}
+      styles={{
+        body: {
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        },
+      }}
       cover={
         blog.coverImageUrl ? (
           <div
             style={{
-              height: 150, borderRadius: "16px 16px 0 0",
+              height: 150,
+              borderRadius: "16px 16px 0 0",
               backgroundImage: `url(${blog.coverImageUrl})`,
-              backgroundSize: "cover", backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
               position: "relative",
             }}
           >
@@ -86,9 +102,12 @@ function BlogGridCard({ blog }: { blog: import("./_state/blog-store").AdminBlogI
             </div>
           </div>
         ) : (
-          <Flex align="center" justify="center"
+          <Flex
+            align="center"
+            justify="center"
             style={{
-              height: 100, borderRadius: "16px 16px 0 0",
+              height: 100,
+              borderRadius: "16px 16px 0 0",
               background: `linear-gradient(135deg, ${token.colorPrimaryBg} 0%, ${token.colorInfoBg} 100%)`,
               position: "relative",
             }}
@@ -108,51 +127,104 @@ function BlogGridCard({ blog }: { blog: import("./_state/blog-store").AdminBlogI
     >
       <Flex vertical style={{ padding: "16px", flex: 1 }} gap={10}>
         <Flex align="center" justify="space-between">
-          {blog.category && <Tag color="processing" style={{ fontSize: 11, borderRadius: 6, margin: 0 }}>{blog.category}</Tag>}
+          {blog.category && (
+            <Tag
+              color="processing"
+              style={{ fontSize: 11, borderRadius: 6, margin: 0 }}
+            >
+              {blog.category}
+            </Tag>
+          )}
           <Text type="secondary" style={{ fontSize: 11 }}>
             {blog.status === "PUBLISHED"
-              ? new Date(blog.publishedAt ?? "").toLocaleDateString("th-TH", { day: "numeric", month: "short" })
+              ? new Date(blog.publishedAt ?? "").toLocaleDateString("th-TH", {
+                  day: "numeric",
+                  month: "short",
+                })
               : `แก้ไข ${new Date(blog.updatedAt).toLocaleDateString("th-TH", { day: "numeric", month: "short" })}`}
           </Text>
         </Flex>
 
-        <Text strong style={{ fontSize: 13, lineHeight: 1.4 }} ellipsis={{ tooltip: blog.title }}>
+        <Text
+          strong
+          style={{ fontSize: 13, lineHeight: 1.4 }}
+          ellipsis={{ tooltip: blog.title }}
+        >
           {blog.title}
         </Text>
 
         {blog.excerpt && (
-          <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.5 }} ellipsis>
+          <Text
+            type="secondary"
+            style={{ fontSize: 12, lineHeight: 1.5 }}
+            ellipsis
+          >
             {blog.excerpt}
           </Text>
         )}
 
         <Flex gap={4} wrap="wrap">
-          {blog.tags.slice(0, 3).map((t) => <Tag key={t} style={{ fontSize: 10, borderRadius: 6, margin: 0 }}>{t}</Tag>)}
-          {blog.tags.length > 3 && <Text type="secondary" style={{ fontSize: 11 }}>+{blog.tags.length - 3}</Text>}
+          {blog.tags.slice(0, 3).map((t) => (
+            <Tag key={t} style={{ fontSize: 10, borderRadius: 6, margin: 0 }}>
+              {t}
+            </Tag>
+          ))}
+          {blog.tags.length > 3 && (
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              +{blog.tags.length - 3}
+            </Text>
+          )}
         </Flex>
 
-        <Flex align="center" justify="space-between" style={{ marginTop: "auto", paddingTop: 10, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
+        <Flex
+          align="center"
+          justify="space-between"
+          style={{
+            marginTop: "auto",
+            paddingTop: 10,
+            borderTop: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           {/* ✨ ยอดวิว — แสดงเฉพาะ PUBLISHED */}
           {blog.status === "PUBLISHED" ? (
             <Flex align="center" gap={4}>
-              <EyeOutlined style={{ fontSize: 12, color: token.colorTextSecondary }} />
+              <EyeOutlined
+                style={{ fontSize: 12, color: token.colorTextSecondary }}
+              />
               <Text type="secondary" style={{ fontSize: 12, fontWeight: 600 }}>
                 {(blog.viewCount ?? 0).toLocaleString()}
               </Text>
             </Flex>
           ) : (
-            <Text type="secondary" style={{ fontSize: 11 }}>{blog.author.name}</Text>
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              {blog.author.name}
+            </Text>
           )}
           <Flex align="center" gap={4}>
             {blog.status === "PUBLISHED" && (
               <Tooltip title="ดูบทความ">
-                <Button size="small" type="text" icon={<EyeOutlined />} href={`/pages/blog/${blog.id}`} target="_blank" />
+                <Button
+                  size="small"
+                  type="text"
+                  icon={<EyeOutlined />}
+                  href={`/pages/blog/${blog.id}`}
+                  target="_blank"
+                />
               </Tooltip>
             )}
             <Tooltip title="แก้ไข">
-              <Button size="small" type="text" icon={<EditOutlined />} onClick={() => openEdit(blog)} />
+              <Button
+                size="small"
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => openEdit(blog)}
+              />
             </Tooltip>
-            <Tooltip title={blog.status === "DRAFT" ? "เผยแพร่ทันที" : "ย้ายกลับ Draft"}>
+            <Tooltip
+              title={
+                blog.status === "DRAFT" ? "เผยแพร่ทันที" : "ย้ายกลับ Draft"
+              }
+            >
               <Button
                 size="small"
                 type={blog.status === "PUBLISHED" ? "default" : "primary"}
@@ -175,23 +247,37 @@ export default function AdminBlogPage() {
   const { user, isAuthenticated } = useAuthStore();
 
   const {
-    blogs, isLoading,
-    filterStatus, filterKeyword, filterCategory,
+    blogs,
+    isLoading,
+    filterStatus,
+    filterKeyword,
+    filterCategory,
     viewMode,
-    setFilterStatus, setFilterKeyword, setFilterCategory, setViewMode,
-    openCreate, fetchBlogs, fetchStatsOverview,
-    modal, hideModal,
+    setFilterStatus,
+    setFilterKeyword,
+    setFilterCategory,
+    setViewMode,
+    openCreate,
+    fetchBlogs,
+    fetchStatsOverview,
+    modal,
+    hideModal,
   } = useAdminBlogStore();
 
   const [isMounted, setIsMounted] = useState(false);
   const [searchInput, setSearchInput] = useState(filterKeyword);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // ✨ Guard: ADMIN เท่านั้น
   useEffect(() => {
     if (!isMounted) return;
-    if (!isAuthenticated || !user) { router.replace("/pages/signin"); return; }
+    if (!isAuthenticated || !user) {
+      router.replace("/pages/signin");
+      return;
+    }
     if (user.role !== "ADMIN") router.replace("/");
   }, [isMounted, isAuthenticated, user?.role]);
 
@@ -214,26 +300,75 @@ export default function AdminBlogPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: token.colorBgLayout }}>
-
       {/* ─── Hero Banner ─── */}
       <div
         style={{
-          background: "linear-gradient(135deg, #001e45 0%, #0a4a8a 55%, #11b6f5 100%)",
+          background:
+            "linear-gradient(135deg, #001e45 0%, #0a4a8a 55%, #11b6f5 100%)",
           padding: "36px 0 72px",
           position: "relative",
           overflow: "hidden",
         }}
       >
         {/* ✨ Decoration circles */}
-        <div style={{ position: "absolute", top: -60, right: -60, width: 280, height: 280, borderRadius: "50%", background: "rgba(17,182,245,0.12)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -40, left: "30%", width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", top: 40, left: -40, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
+        <div
+          style={{
+            position: "absolute",
+            top: -60,
+            right: -60,
+            width: 280,
+            height: 280,
+            borderRadius: "50%",
+            background: "rgba(17,182,245,0.12)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -40,
+            left: "30%",
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.05)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 40,
+            left: -40,
+            width: 120,
+            height: 120,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.04)",
+            pointerEvents: "none",
+          }}
+        />
 
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative" }}>
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 24px",
+            position: "relative",
+          }}
+        >
           <Breadcrumb
             style={{ marginBottom: 16 }}
             items={[
-              { title: <Link href="/pages/admin" style={{ color: "rgba(255,255,255,0.65)" }}>แดชบอร์ด</Link> },
+              {
+                title: (
+                  <Link
+                    href="/pages/admin"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
+                    แดชบอร์ด
+                  </Link>
+                ),
+              },
               { title: <span style={{ color: "white" }}>จัดการบทความ</span> },
             ]}
           />
@@ -241,7 +376,9 @@ export default function AdminBlogPage() {
           <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>
             <Flex vertical gap={6}>
               <Flex align="center" gap={10}>
-                <Title level={2} style={{ margin: 0, color: "white" }}>จัดการบทความ</Title>
+                <Title level={2} style={{ margin: 0, color: "white" }}>
+                  จัดการบทความ
+                </Title>
                 {draftCount > 0 && (
                   <Badge
                     count={`${draftCount} Draft`}
@@ -260,8 +397,13 @@ export default function AdminBlogPage() {
                   icon={<RobotOutlined />}
                   color="processing"
                   style={{
-                    fontSize: 13, padding: "5px 14px", borderRadius: 20, cursor: "help",
-                    background: "rgba(17,182,245,0.2)", borderColor: "rgba(17,182,245,0.5)", color: "white",
+                    fontSize: 13,
+                    padding: "5px 14px",
+                    borderRadius: 20,
+                    cursor: "help",
+                    background: "rgba(17,182,245,0.2)",
+                    borderColor: "rgba(17,182,245,0.5)",
+                    color: "white",
                   }}
                 >
                   AI-Powered
@@ -290,8 +432,14 @@ export default function AdminBlogPage() {
       </div>
 
       {/* ─── Main Content ─── */}
-      <div style={{ maxWidth: 1200, margin: "-36px auto 0", padding: "0 24px 80px", position: "relative" }}>
-
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "-36px auto 0",
+          padding: "0 24px 80px",
+          position: "relative",
+        }}
+      >
         {/* ─── Stats Bar ─── */}
         <div style={{ marginBottom: 20 }}>
           <BlogStatsBar />
@@ -305,7 +453,11 @@ export default function AdminBlogPage() {
         {/* ─── Filter + View Controls ─── */}
         <Card
           variant="borderless"
-          style={{ borderRadius: 16, marginBottom: 18, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}
+          style={{
+            borderRadius: 16,
+            marginBottom: 18,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          }}
           styles={{ body: { padding: "14px 20px" } }}
         >
           <Flex align="center" gap={10} wrap="wrap">
@@ -313,7 +465,9 @@ export default function AdminBlogPage() {
 
             {/* ✨ Search */}
             <Input
-              prefix={<SearchOutlined style={{ color: token.colorTextTertiary }} />}
+              prefix={
+                <SearchOutlined style={{ color: token.colorTextTertiary }} />
+              }
               placeholder="ค้นหาชื่อบทความ, slug..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -345,7 +499,11 @@ export default function AdminBlogPage() {
 
             {/* ✨ Refresh */}
             <Tooltip title="รีเฟรชข้อมูล">
-              <Button icon={<ReloadOutlined />} onClick={fetchBlogs} loading={isLoading} />
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={fetchBlogs}
+                loading={isLoading}
+              />
             </Tooltip>
 
             {/* ✨ View mode toggle */}
@@ -355,7 +513,11 @@ export default function AdminBlogPage() {
                 onChange={(v) => setViewMode(v as "grid" | "table" | "kanban")}
                 options={[
                   { value: "grid", icon: <AppstoreOutlined />, label: "Grid" },
-                  { value: "kanban", icon: <ProjectOutlined />, label: "Kanban" },
+                  {
+                    value: "kanban",
+                    icon: <ProjectOutlined />,
+                    label: "Kanban",
+                  },
                   { value: "table", icon: <BarsOutlined />, label: "ตาราง" },
                 ]}
               />
@@ -367,41 +529,90 @@ export default function AdminBlogPage() {
         {viewMode === "kanban" && <BlogKanban />}
 
         {viewMode === "table" && (
-          <Card variant="borderless" style={{ borderRadius: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+          <Card
+            variant="borderless"
+            style={{
+              borderRadius: 16,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+            }}
+          >
             <BlogTable />
           </Card>
         )}
 
         {viewMode === "grid" && (
           <Row gutter={[16, 16]}>
-            {isLoading
-              ? Array.from({ length: 6 }).map((_, i) => (
-                  <Col xs={24} sm={12} lg={8} key={i}>
-                    <Card variant="borderless" style={{ borderRadius: 16 }}>
-                      <div style={{ height: 100, background: token.colorFillSecondary, borderRadius: 10, marginBottom: 14 }} />
-                      <div style={{ height: 12, background: token.colorFillSecondary, borderRadius: 6, marginBottom: 8, width: "80%" }} />
-                      <div style={{ height: 12, background: token.colorFillSecondary, borderRadius: 6, width: "60%" }} />
-                    </Card>
-                  </Col>
-                ))
-              : blogs.length === 0
-              ? (
-                <Col xs={24}>
-                  <Card variant="borderless" style={{ borderRadius: 16, textAlign: "center", padding: "60px 24px" }}>
-                    <Text style={{ fontSize: 48, display: "block", marginBottom: 16 }}>📝</Text>
-                    <Title level={4} style={{ color: token.colorTextSecondary }}>ยังไม่มีบทความ</Title>
-                    <Text type="secondary">กดปุ่ม "สร้างบทความใหม่" หรือใช้ AI ช่วยเขียน</Text>
-                    <div style={{ marginTop: 20 }}>
-                      <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>สร้างบทความใหม่</Button>
-                    </div>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <Col xs={24} sm={12} lg={8} key={i}>
+                  <Card variant="borderless" style={{ borderRadius: 16 }}>
+                    <div
+                      style={{
+                        height: 100,
+                        background: token.colorFillSecondary,
+                        borderRadius: 10,
+                        marginBottom: 14,
+                      }}
+                    />
+                    <div
+                      style={{
+                        height: 12,
+                        background: token.colorFillSecondary,
+                        borderRadius: 6,
+                        marginBottom: 8,
+                        width: "80%",
+                      }}
+                    />
+                    <div
+                      style={{
+                        height: 12,
+                        background: token.colorFillSecondary,
+                        borderRadius: 6,
+                        width: "60%",
+                      }}
+                    />
                   </Card>
                 </Col>
-              )
-              : blogs.map((blog) => (
-                  <Col xs={24} sm={12} lg={8} key={blog.id}>
-                    <BlogGridCard blog={blog} />
-                  </Col>
-                ))}
+              ))
+            ) : blogs.length === 0 ? (
+              <Col xs={24}>
+                <Card
+                  variant="borderless"
+                  style={{
+                    borderRadius: 16,
+                    textAlign: "center",
+                    padding: "60px 24px",
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 48, display: "block", marginBottom: 16 }}
+                  >
+                    📝
+                  </Text>
+                  <Title level={4} style={{ color: token.colorTextSecondary }}>
+                    ยังไม่มีบทความ
+                  </Title>
+                  <Text type="secondary">
+                    กดปุ่ม "สร้างบทความใหม่" หรือใช้ AI ช่วยเขียน
+                  </Text>
+                  <div style={{ marginTop: 20 }}>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={openCreate}
+                    >
+                      สร้างบทความใหม่
+                    </Button>
+                  </div>
+                </Card>
+              </Col>
+            ) : (
+              blogs.map((blog) => (
+                <Col xs={24} sm={12} lg={8} key={blog.id}>
+                  <BlogGridCard blog={blog} />
+                </Col>
+              ))
+            )}
           </Row>
         )}
       </div>

@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { CreateBlogInput, ListBlogQueryInput, UpdateBlogInput } from "../validation/blog-schema";
+import {
+  CreateBlogInput,
+  ListBlogQueryInput,
+  UpdateBlogInput,
+} from "../validation/blog-schema";
 
 export class AdminBlogService {
   // ✨ ดึงรายการบทความทั้งหมด (รวม DRAFT) สำหรับ admin
@@ -26,7 +30,12 @@ export class AdminBlogService {
         // ✨ ใช้ include แทน select เพื่อให้ _count ทำงานได้
         include: {
           author: {
-            select: { id: true, firstName: true, lastName: true, profileImageUrl: true },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profileImageUrl: true,
+            },
           },
           _count: { select: { blogViews: true } },
         },
@@ -52,13 +61,21 @@ export class AdminBlogService {
       author: b.author
         ? {
             id: b.author.id,
-            name: `${b.author.firstName ?? ""} ${b.author.lastName ?? ""}`.trim() || "ทีมงาน KAM",
+            name:
+              `${b.author.firstName ?? ""} ${b.author.lastName ?? ""}`.trim() ||
+              "ทีมงาน KAM",
             imageUrl: b.author.profileImageUrl ?? null,
           }
         : { id: null, name: "ทีมงาน KAM", imageUrl: null },
     }));
 
-    return { blogs: formatted, total, page, page_size, total_pages: Math.ceil(total / page_size) };
+    return {
+      blogs: formatted,
+      total,
+      page,
+      page_size,
+      total_pages: Math.ceil(total / page_size),
+    };
   }
 
   // ✨ ดึงบทความ 1 ชิ้นโดย id สำหรับแก้ไข
@@ -79,7 +96,9 @@ export class AdminBlogService {
   // ✨ สร้างบทความใหม่
   async createBlog(input: CreateBlogInput) {
     // ✨ ตรวจ slug ซ้ำ
-    const existing = await prisma.blog.findUnique({ where: { slug: input.slug } });
+    const existing = await prisma.blog.findUnique({
+      where: { slug: input.slug },
+    });
     if (existing) throw new Error("slug นี้ถูกใช้แล้ว");
 
     // ✨ แปลง author_id (Supabase UID) → Profile.id (Prisma UUID)
@@ -123,8 +142,12 @@ export class AdminBlogService {
     }
 
     // ✨ ถ้าเปลี่ยน status เป็น PUBLISHED และยังไม่มี publishedAt → set ตอนนี้
-    const current = await prisma.blog.findUnique({ where: { id }, select: { status: true, publishedAt: true } });
-    const isPublishing = data.status === "PUBLISHED" && current?.status !== "PUBLISHED";
+    const current = await prisma.blog.findUnique({
+      where: { id },
+      select: { status: true, publishedAt: true },
+    });
+    const isPublishing =
+      data.status === "PUBLISHED" && current?.status !== "PUBLISHED";
 
     // ✨ แปลง author_id (Supabase UID) → Profile.id ถ้ามีการส่งมา
     let resolvedAuthorId: string | null | undefined = undefined;
@@ -147,12 +170,15 @@ export class AdminBlogService {
         ...(data.slug && { slug: data.slug }),
         ...(data.content !== undefined && { content: data.content }),
         ...(data.excerpt !== undefined && { excerpt: data.excerpt }),
-        ...(data.cover_image_url !== undefined && { coverImageUrl: data.cover_image_url || null }),
+        ...(data.cover_image_url !== undefined && {
+          coverImageUrl: data.cover_image_url || null,
+        }),
         ...(data.category !== undefined && { category: data.category }),
         ...(data.tags !== undefined && { tags: JSON.stringify(data.tags) }),
         ...(data.status && { status: data.status }),
         ...(resolvedAuthorId !== undefined && { authorId: resolvedAuthorId }),
-        ...(isPublishing && !current?.publishedAt && { publishedAt: new Date() }),
+        ...(isPublishing &&
+          !current?.publishedAt && { publishedAt: new Date() }),
       },
     });
     return blog;
