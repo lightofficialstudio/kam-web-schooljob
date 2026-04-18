@@ -115,7 +115,7 @@ const BreakdownBar = ({
         percent={percent}
         showInfo={false}
         strokeColor={color}
-        trailColor={token.colorFillSecondary}
+        railColor={token.colorFillSecondary}
         size="small"
         style={{ margin: 0 }}
       />
@@ -319,7 +319,7 @@ export const JobStatsModal = () => {
                         )}
                         showInfo={false}
                         strokeColor={step.color}
-                        trailColor={token.colorFillSecondary}
+                        railColor={token.colorFillSecondary}
                         size="small"
                         style={{ margin: 0 }}
                       />

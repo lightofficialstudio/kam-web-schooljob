@@ -261,7 +261,7 @@ export const PackageBanner: React.FC<{ userId: string }> = ({ userId }) => {
         <Alert
           type="warning"
           showIcon
-          message={
+          title={
             <Flex align="center" justify="space-between" wrap="wrap" gap={8}>
               <Text style={{ fontSize: 13 }}>
                 ใช้ Job Quota ไปแล้ว <b>{pkg.quotaUsagePercent}%</b> — เหลืออีก{" "}

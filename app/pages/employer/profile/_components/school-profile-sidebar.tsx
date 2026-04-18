@@ -21,7 +21,7 @@ import {
   Divider,
   Empty,
   Flex,
-  message,
+  App,
   Tag,
   Tooltip,
   Typography,
@@ -49,6 +49,7 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
 }) => {
   const { saveProfile, setProfile } = useSchoolProfileState();
   const { user } = useAuthStore();
+  const { message } = App.useApp();
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // ✨ อัปโหลดโลโก้โรงเรียนไป Supabase Storage แล้ว save URL ลง DB
