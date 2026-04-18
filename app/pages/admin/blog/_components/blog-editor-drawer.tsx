@@ -230,12 +230,13 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
         </Flex>
       }
       placement="right"
-      size="large"
-      style={{ minWidth: 900 }}
       onClose={closeDrawer}
       open={isDrawerOpen}
       forceRender
-      styles={{ body: { padding: 0 } }}
+      styles={{
+        wrapper: { width: "min(88vw, 1400px)" },
+        body: { padding: 0, overflow: "hidden" },
+      }}
       extra={
         <Space>
           <Button onClick={closeDrawer}>ยกเลิก</Button>
@@ -253,16 +254,16 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
         </Space>
       }
     >
-      <Row style={{ height: "100%" }}>
+      <Row style={{ height: "100%", overflow: "hidden", flexWrap: "nowrap" }}>
         {/* ─── ฝั่งซ้าย: Form ─── */}
         <Col
-          xs={24}
-          md={14}
+          flex="0 0 58%"
           style={{
             padding: "20px 24px",
             borderRight: `1px solid ${token.colorBorderSecondary}`,
             overflowY: "auto",
             height: "100%",
+            minWidth: 0,
           }}
         >
           <Form
@@ -543,13 +544,13 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
 
         {/* ─── ฝั่งขวา: AI Assistant ─── */}
         <Col
-          xs={0}
-          md={10}
+          flex="0 0 42%"
           style={{
-            padding: "20px 20px",
+            padding: "20px",
             background: token.colorBgLayout,
             overflowY: "auto",
             height: "100%",
+            minWidth: 0,
           }}
         >
           <AiAssistantPanel
