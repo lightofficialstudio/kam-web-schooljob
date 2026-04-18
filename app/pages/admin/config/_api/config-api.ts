@@ -58,3 +58,14 @@ export const updateConfigOption = async (payload: {
 export const deleteConfigOption = async (id: string) => {
   await axios.delete(`/api/v1/admin/config?id=${id}`);
 };
+
+// ✨ Batch reorder — อัปเดต sortOrder หลายรายการพร้อมกัน
+export const batchReorderConfigOptions = async (
+  items: { id: string; sort_order: number }[],
+) => {
+  const { data } = await axios.patch<ApiResponse<null>>(
+    "/api/v1/admin/config/reorder",
+    { items },
+  );
+  return data;
+};

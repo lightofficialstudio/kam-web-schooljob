@@ -2,6 +2,7 @@ import type { ModalType } from "@/app/components/modal/modal.component";
 import { create } from "zustand";
 import {
   ConfigOption,
+  batchReorderConfigOptions,
   createConfigOption,
   deleteConfigOption,
   fetchAllConfigOptions,
@@ -66,6 +67,8 @@ interface ConfigStore {
   toggleActive: (id: string, isActive: boolean) => Promise<void>;
   removeOption: (id: string) => Promise<void>;
   updateLabel: (id: string, label: string, sortOrder: number) => Promise<void>;
+  // ✨ Batch reorder — drag-and-drop บันทึก sortOrder ทีเดียว
+  batchReorder: (orderedIds: string[]) => Promise<void>;
 }
 
 const DEFAULT_MODAL: ModalState = { open: false, type: "success", title: "" };
@@ -222,6 +225,31 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
       });
     } finally {
       set({ isSaving: false });
+    }
+  },
+
+  // ✨ Batch reorder — อัปเดต sortOrder ทั้งก้อนหลังจาก drag-and-drop เสร็จ
+  batchReorder: async (orderedIds) => {
+    // ✨ optimistic update ก่อน เพื่อ UI ไม่กระตุก
+    set((state) => ({
+      options: state.options.map((o) => {
+        const idx = orderedIds.indexOf(o.id);
+        return idx !== -1 ? { ...o, sortOrder: idx } : o;
+      }),
+    }));
+    try {
+      await batchReorderConfigOptions(
+        orderedIds.map((id, idx) => ({ id, sort_order: idx })),
+      );
+    } catch (err: unknown) {
+      // ✨ ถ้า fail — reload ข้อมูลจาก server เพื่อ revert
+      await get().fetchOptions();
+      get().showModal({
+        type: "error",
+        title: "บันทึกลำดับไม่สำเร็จ",
+        description: "กรุณาลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
     }
   },
 }));

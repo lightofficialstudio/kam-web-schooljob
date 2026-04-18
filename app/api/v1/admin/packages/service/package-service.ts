@@ -211,6 +211,90 @@ export class AdminPackageService {
     };
   }
 
+  // ✨ ดึงรายละเอียดโรงเรียนเดี่ยว — สำหรับ School Detail Drawer
+  async getSchoolDetail(schoolId: string) {
+    const school = await prisma.schoolProfile.findUnique({
+      where: { id: schoolId },
+      include: {
+        profile: {
+          select: { id: true, email: true, firstName: true, lastName: true, phoneNumber: true, profileImageUrl: true, createdAt: true },
+        },
+        jobs: {
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: {
+            id: true, title: true, status: true, createdAt: true, deadline: true,
+            _count: { select: { applications: true } },
+          },
+        },
+        _count: { select: { jobs: true } },
+      },
+    });
+    if (!school) throw new Error("SCHOOL_NOT_FOUND");
+
+    const allJobs = await prisma.job.count({ where: { schoolProfileId: schoolId } });
+    const openJobs = await prisma.job.count({ where: { schoolProfileId: schoolId, status: "OPEN" } });
+    const totalApps = await prisma.application.count({ where: { job: { schoolProfileId: schoolId } } });
+
+    return {
+      id: school.id,
+      schoolName: school.schoolName,
+      schoolType: school.schoolType,
+      province: school.province,
+      district: school.district,
+      logoUrl: school.logoUrl,
+      website: school.website,
+      phone: school.phone,
+      studentCount: school.studentCount,
+      teacherCount: school.teacherCount,
+      accountPlan: school.accountPlan,
+      jobQuotaMax: school.jobQuotaMax,
+      createdAt: school.createdAt.toISOString(),
+      updatedAt: school.updatedAt.toISOString(),
+      owner: {
+        profileId: school.profile.id,
+        email: school.profile.email,
+        name: [school.profile.firstName, school.profile.lastName].filter(Boolean).join(" ") || "—",
+        phoneNumber: school.profile.phoneNumber ?? null,
+        profileImageUrl: school.profile.profileImageUrl ?? null,
+        joinedAt: school.profile.createdAt.toISOString(),
+      },
+      stats: {
+        totalJobs: allJobs,
+        openJobs,
+        totalApplications: totalApps,
+        activeJobCount: openJobs,
+        quotaUsagePercent: school.jobQuotaMax > 0
+          ? Math.min(100, Math.round((openJobs / school.jobQuotaMax) * 100))
+          : 0,
+      },
+      recentJobs: school.jobs.map((j) => ({
+        id: j.id,
+        title: j.title,
+        status: j.status,
+        createdAt: j.createdAt.toISOString(),
+        deadline: j.deadline?.toISOString() ?? null,
+        applicationCount: j._count.applications,
+      })),
+    };
+  }
+
+  // ✨ Bulk อัปเดต Plan หลายโรงเรียนพร้อมกัน (Admin เลือก checkbox แล้วกด)
+  async bulkUpdatePlan(input: { school_ids: string[]; plan: string; job_quota_max?: number }) {
+    const { school_ids, plan, job_quota_max } = input;
+    if (school_ids.length === 0) throw new Error("NO_SCHOOLS");
+
+    const planConfig = await this.getPlanConfig(plan);
+    const finalQuota = job_quota_max !== undefined ? job_quota_max : planConfig.jobQuota;
+
+    await prisma.schoolProfile.updateMany({
+      where: { id: { in: school_ids } },
+      data: { accountPlan: plan, jobQuotaMax: finalQuota },
+    });
+
+    return { updated: school_ids.length, plan, jobQuotaMax: finalQuota };
+  }
+
   // ✨ อัปเดต Plan ของโรงเรียน (Admin กด manual หรือ Payment webhook เรียก)
   async updateSchoolPlan(input: UpdateSchoolPlanInput) {
     const { school_profile_id, plan, job_quota_max } = input;

@@ -70,3 +70,56 @@ export const requestPatchPlan = (
 // ✨ ลบ Package Plan (Admin)
 export const requestDeletePlan = (planKey: string) =>
   axios.delete(`${BASE}/plans/${planKey}`);
+
+// ✨ ดึงรายละเอียดโรงเรียนเดี่ยว (School Detail Drawer)
+export const requestSchoolDetail = (schoolId: string) =>
+  axios.get<{ status_code: number; data: SchoolDetail }>(`${BASE}/school-detail`, {
+    params: { school_id: schoolId },
+  });
+
+// ✨ Bulk เปลี่ยน Plan หลายโรงเรียนพร้อมกัน
+export const requestBulkUpdatePlan = (data: {
+  school_ids: string[];
+  plan: string;
+  job_quota_max?: number;
+}) => axios.put(`${BASE}/bulk-update`, data);
+
+export interface SchoolDetail {
+  id: string;
+  schoolName: string;
+  schoolType: string | null;
+  province: string;
+  district: string | null;
+  logoUrl: string | null;
+  website: string | null;
+  phone: string | null;
+  studentCount: number | null;
+  teacherCount: number | null;
+  accountPlan: string;
+  jobQuotaMax: number;
+  createdAt: string;
+  updatedAt: string;
+  owner: {
+    profileId: string;
+    email: string;
+    name: string;
+    phoneNumber: string | null;
+    profileImageUrl: string | null;
+    joinedAt: string;
+  };
+  stats: {
+    totalJobs: number;
+    openJobs: number;
+    totalApplications: number;
+    activeJobCount: number;
+    quotaUsagePercent: number;
+  };
+  recentJobs: {
+    id: string;
+    title: string;
+    status: string;
+    createdAt: string;
+    deadline: string | null;
+    applicationCount: number;
+  }[];
+}

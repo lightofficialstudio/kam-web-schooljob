@@ -1,13 +1,29 @@
 "use client";
 
-// ✨ Config Table — Tabs + Tree/Flat Table + Column definitions
+// ✨ Config Table — Tabs + Drag-and-drop sortable Table (dnd-kit)
 import {
   DeleteOutlined,
   EditOutlined,
   FolderOutlined,
+  HolderOutlined,
   PlusOutlined,
   TagOutlined,
 } from "@ant-design/icons";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   Button,
   Card,
@@ -57,12 +73,12 @@ function UsedInBadges({ group }: { group: string }) {
   );
 }
 
-// ✨ โครงสร้าง Tree สำหรับ Ant Design Table
+// ─── Tree types ───────────────────────────────────────────────────────────────
+
 interface TreeConfigOption extends ConfigOption {
   children?: TreeConfigOption[];
 }
 
-// ✨ แปลง flat array → tree (parent → children)
 const buildTreeData = (options: ConfigOption[]): TreeConfigOption[] => {
   const roots = options
     .filter((o) => !o.parentValue)
@@ -74,6 +90,57 @@ const buildTreeData = (options: ConfigOption[]): TreeConfigOption[] => {
     return { ...parent, children: children.length > 0 ? children : undefined };
   });
 };
+
+// ─── Drag handle cell — ใช้ใน custom row ─────────────────────────────────────
+
+function DragHandleCell({ id }: { id: string }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({ id });
+  return (
+    <td
+      ref={setNodeRef}
+      style={{
+        width: 32,
+        cursor: isDragging ? "grabbing" : "grab",
+        color: "#8c8c8c",
+        paddingLeft: 8,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      <HolderOutlined />
+    </td>
+  );
+}
+
+// ─── Sortable row wrapper ─────────────────────────────────────────────────────
+
+function SortableRow({
+  id,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLTableRowElement> & { id: string }) {
+  const { setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  return (
+    <tr
+      ref={setNodeRef}
+      {...props}
+      style={{
+        ...props.style,
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.6 : 1,
+        background: isDragging ? "rgba(17,182,245,0.06)" : undefined,
+        zIndex: isDragging ? 9999 : undefined,
+        position: isDragging ? "relative" : undefined,
+      }}
+    >
+      {children}
+    </tr>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export function ConfigTable() {
   const { token } = theme.useToken();
@@ -88,20 +155,46 @@ export function ConfigTable() {
     openAddModal,
     openEditModal,
     showModal,
+    batchReorder,
   } = useConfigStore();
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+
   // ✨ options เฉพาะ group ที่ active อยู่
-  const flatOptions = options.filter((o) => o.group === activeGroup);
+  const flatOptions = options
+    .filter((o) => o.group === activeGroup)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
   const treeData = buildTreeData(flatOptions);
   const isHierarchical = flatOptions.some((o) => o.parentValue !== null);
 
-  // ✨ Tab items — ใช้ GROUP_META เป็น label + fallback ถ้ามี group ใหม่จาก DB
+  // ✨ Tab items
   const allGroups = [
     ...new Set([...Object.keys(GROUP_META), ...options.map((o) => o.group)]),
   ];
   const tabItems = allGroups.map((g) => ({
     key: g,
-    label: GROUP_META[g]?.label ?? g,
+    label: (
+      <Flex align="center" gap={6}>
+        <span>{GROUP_META[g]?.label ?? g}</span>
+        {(GROUP_META[g]?.usedIn?.length ?? 0) > 0 && (
+          <Tag
+            style={{
+              fontSize: 10,
+              borderRadius: 20,
+              padding: "0 6px",
+              margin: 0,
+              background: "rgba(17,182,245,0.1)",
+              border: "1px solid rgba(17,182,245,0.3)",
+              color: "#0d8fd4",
+            }}
+          >
+            {GROUP_META[g].usedIn.length} หน้า
+          </Tag>
+        )}
+      </Flex>
+    ),
   }));
 
   // ✨ confirm modal ก่อนลบ
@@ -116,9 +209,44 @@ export function ConfigTable() {
     });
   };
 
-  // ─── Tree Table Columns ───────────────────────────────────────────────────────
+  // ✨ drag end handler สำหรับ flat table
+  const handleFlatDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = flatOptions.findIndex((o) => o.id === active.id);
+    const newIndex = flatOptions.findIndex((o) => o.id === over.id);
+    const reordered = arrayMove(flatOptions, oldIndex, newIndex);
+    batchReorder(reordered.map((o) => o.id));
+  };
+
+  // ✨ drag end handler สำหรับ tree table (เฉพาะ parent-level)
+  const parentOptions = treeData;
+  const handleTreeDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = parentOptions.findIndex((o) => o.id === active.id);
+    const newIndex = parentOptions.findIndex((o) => o.id === over.id);
+    const reordered = arrayMove(parentOptions, oldIndex, newIndex);
+    // ✨ เก็บ id ทั้ง parent และ children ตามลำดับ
+    const orderedIds: string[] = [];
+    reordered.forEach((p) => {
+      orderedIds.push(p.id);
+      (p.children ?? []).forEach((c) => orderedIds.push(c.id));
+    });
+    batchReorder(orderedIds);
+  };
+
+  // ─── Tree Table Columns ──────────────────────────────────────────────────────
 
   const treeColumns = [
+    {
+      title: "",
+      key: "drag",
+      width: 32,
+      render: (_: unknown, record: TreeConfigOption) =>
+        // ✨ แสดง drag handle เฉพาะ parent row
+        !record.parentValue ? (
+          <HolderOutlined style={{ color: "#bfbfbf", cursor: "grab" }} />
+        ) : null,
+    },
     {
       title: (
         <Flex align="center" gap={8}>
@@ -220,14 +348,21 @@ export function ConfigTable() {
     },
   ];
 
-  // ─── Flat Table Columns ───────────────────────────────────────────────────────
+  // ─── Flat Table Columns ──────────────────────────────────────────────────────
 
   const flatColumns = [
     {
+      title: "",
+      key: "drag",
+      width: 32,
+      render: () => (
+        <HolderOutlined style={{ color: "#bfbfbf", cursor: "grab" }} />
+      ),
+    },
+    {
       title: "ลำดับ",
       dataIndex: "sortOrder",
-      width: 70,
-      sorter: (a: ConfigOption, b: ConfigOption) => a.sortOrder - b.sortOrder,
+      width: 60,
     },
     {
       title: (
@@ -301,6 +436,8 @@ export function ConfigTable() {
     },
   ];
 
+  // ─── Render ───────────────────────────────────────────────────────────────────
+
   return (
     <Card
       variant="borderless"
@@ -317,32 +454,92 @@ export function ConfigTable() {
       />
 
       {isHierarchical ? (
-        // ✨ Tree Table — parent → children expandable
-        <Table<TreeConfigOption>
-          dataSource={treeData}
-          columns={treeColumns}
-          rowKey="id"
-          loading={isLoading}
-          pagination={false}
-          size="middle"
-          defaultExpandAllRows
-          indentSize={28}
-          rowClassName={(record) => {
-            if (!record.parentValue) return "font-semibold";
-            return !record.isActive ? "opacity-50" : "";
-          }}
-        />
+        // ✨ Tree Table — drag เฉพาะ parent row เพื่อเรียงหมวดหมู่
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleTreeDragEnd}
+        >
+          <SortableContext
+            items={parentOptions.map((o) => o.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <Table<TreeConfigOption>
+              dataSource={treeData}
+              columns={treeColumns}
+              rowKey="id"
+              loading={isLoading}
+              pagination={false}
+              size="middle"
+              defaultExpandAllRows
+              indentSize={28}
+              rowClassName={(record) => {
+                if (!record.parentValue) return "font-semibold";
+                return !record.isActive ? "opacity-50" : "";
+              }}
+              components={{
+                body: {
+                  row: ({
+                    children,
+                    ...props
+                  }: React.HTMLAttributes<HTMLTableRowElement> & {
+                    "data-row-key"?: string;
+                  }) => {
+                    const id = props["data-row-key"] ?? "";
+                    // ✨ เฉพาะ parent row ที่ drag ได้
+                    const isParent = parentOptions.some((p) => p.id === id);
+                    return isParent ? (
+                      <SortableRow id={id} {...props}>
+                        {children}
+                      </SortableRow>
+                    ) : (
+                      <tr {...props}>{children}</tr>
+                    );
+                  },
+                },
+              }}
+            />
+          </SortableContext>
+        </DndContext>
       ) : (
-        // ✨ Flat Table — group ที่ไม่มี hierarchy
-        <Table<ConfigOption>
-          dataSource={flatOptions}
-          columns={flatColumns}
-          rowKey="id"
-          loading={isLoading}
-          pagination={false}
-          size="middle"
-          rowClassName={(record) => (!record.isActive ? "opacity-50" : "")}
-        />
+        // ✨ Flat Table — drag ทุก row ได้เลย
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleFlatDragEnd}
+        >
+          <SortableContext
+            items={flatOptions.map((o) => o.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <Table<ConfigOption>
+              dataSource={flatOptions}
+              columns={flatColumns}
+              rowKey="id"
+              loading={isLoading}
+              pagination={false}
+              size="middle"
+              rowClassName={(record) => (!record.isActive ? "opacity-50" : "")}
+              components={{
+                body: {
+                  row: ({
+                    children,
+                    ...props
+                  }: React.HTMLAttributes<HTMLTableRowElement> & {
+                    "data-row-key"?: string;
+                  }) => {
+                    const id = props["data-row-key"] ?? "";
+                    return (
+                      <SortableRow id={id} {...props}>
+                        {children}
+                      </SortableRow>
+                    );
+                  },
+                },
+              }}
+            />
+          </SortableContext>
+        </DndContext>
       )}
     </Card>
   );

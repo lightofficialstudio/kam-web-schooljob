@@ -2,14 +2,17 @@
 
 import { create } from "zustand";
 import {
+  requestBulkUpdatePlan,
   requestCreatePlan,
   requestDeletePlan,
   requestGetPackagePlans,
   requestListSchools,
   requestPackageSummary,
   requestPatchPlan,
+  requestSchoolDetail,
   requestSeedPlans,
   requestUpdateSchoolPlan,
+  SchoolDetail,
 } from "../_api/package-api";
 
 // ✨ ข้อมูล Package Plan ที่โหลดจาก DB
@@ -75,7 +78,7 @@ interface PackageStore {
   plans: PackagePlanItem[];
   isLoadingPlans: boolean;
   isSavingPlan: boolean;
-  isDeletingPlan: string | null; // plan key ที่กำลัง delete
+  isDeletingPlan: string | null;
   fetchPlans: (includeInactive?: boolean) => Promise<void>;
   seedPlans: () => Promise<void>;
   createPlan: (data: PlanFormData) => Promise<void>;
@@ -97,6 +100,22 @@ interface PackageStore {
   fetchSummary: () => Promise<void>;
   fetchSchools: () => Promise<void>;
   updatePlan: (schoolId: string, plan: string, jobQuotaMax?: number) => Promise<void>;
+
+  // ─── School Detail Drawer ───
+  drawerSchoolId: string | null;
+  drawerDetail: SchoolDetail | null;
+  isLoadingDetail: boolean;
+  openDrawer: (schoolId: string) => void;
+  closeDrawer: () => void;
+  fetchSchoolDetail: (schoolId: string) => Promise<void>;
+
+  // ─── Bulk Plan Change ───
+  selectedIds: string[];
+  isBulkUpdating: boolean;
+  toggleSelect: (id: string) => void;
+  selectAll: () => void;
+  clearSelection: () => void;
+  bulkUpdatePlan: (plan: string, jobQuotaMax?: number) => Promise<void>;
 }
 
 export const usePackageStore = create<PackageStore>((set, get) => ({
@@ -177,9 +196,7 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
     try {
       const res = await requestPackageSummary();
       if (res.data.status_code === 200) set({ summary: res.data.data });
-    } catch {
-      /* silent */
-    }
+    } catch { /* silent */ }
   },
 
   // ✨ ดึงรายการโรงเรียนตาม filter
@@ -205,21 +222,70 @@ export const usePackageStore = create<PackageStore>((set, get) => ({
   updatePlan: async (schoolId, plan, jobQuotaMax) => {
     set({ isUpdating: schoolId });
     try {
-      await requestUpdateSchoolPlan({
-        school_profile_id: schoolId,
-        plan,
-        job_quota_max: jobQuotaMax,
-      });
+      await requestUpdateSchoolPlan({ school_profile_id: schoolId, plan, job_quota_max: jobQuotaMax });
       set((s) => ({
         schools: s.schools.map((sc) =>
-          sc.id === schoolId
-            ? { ...sc, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax }
-            : sc,
+          sc.id === schoolId ? { ...sc, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax } : sc,
         ),
+        drawerDetail: s.drawerDetail?.id === schoolId
+          ? { ...s.drawerDetail, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? s.drawerDetail.jobQuotaMax }
+          : s.drawerDetail,
       }));
       await get().fetchSummary();
     } finally {
       set({ isUpdating: null });
+    }
+  },
+
+  // ─── School Detail Drawer ───
+  drawerSchoolId: null,
+  drawerDetail: null,
+  isLoadingDetail: false,
+
+  openDrawer: (schoolId) => {
+    set({ drawerSchoolId: schoolId, drawerDetail: null });
+    get().fetchSchoolDetail(schoolId);
+  },
+  closeDrawer: () => set({ drawerSchoolId: null, drawerDetail: null }),
+
+  fetchSchoolDetail: async (schoolId) => {
+    set({ isLoadingDetail: true });
+    try {
+      const res = await requestSchoolDetail(schoolId);
+      if (res.data.status_code === 200) set({ drawerDetail: res.data.data });
+    } catch { /* silent */ }
+    finally { set({ isLoadingDetail: false }); }
+  },
+
+  // ─── Bulk Plan Change ───
+  selectedIds: [],
+  isBulkUpdating: false,
+
+  toggleSelect: (id) => set((s) => ({
+    selectedIds: s.selectedIds.includes(id)
+      ? s.selectedIds.filter((x) => x !== id)
+      : [...s.selectedIds, id],
+  })),
+  selectAll: () => set((s) => ({ selectedIds: s.schools.map((sc) => sc.id) })),
+  clearSelection: () => set({ selectedIds: [] }),
+
+  bulkUpdatePlan: async (plan, jobQuotaMax) => {
+    const { selectedIds } = get();
+    if (selectedIds.length === 0) return;
+    set({ isBulkUpdating: true });
+    try {
+      await requestBulkUpdatePlan({ school_ids: selectedIds, plan, job_quota_max: jobQuotaMax });
+      set((s) => ({
+        schools: s.schools.map((sc) =>
+          s.selectedIds.includes(sc.id)
+            ? { ...sc, accountPlan: plan, jobQuotaMax: jobQuotaMax ?? sc.jobQuotaMax }
+            : sc,
+        ),
+        selectedIds: [],
+      }));
+      await get().fetchSummary();
+    } finally {
+      set({ isBulkUpdating: false });
     }
   },
 }));
