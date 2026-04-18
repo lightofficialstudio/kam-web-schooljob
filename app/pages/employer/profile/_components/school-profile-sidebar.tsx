@@ -198,13 +198,17 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
             }}
           >
             <Descriptions.Item label={<EnvironmentOutlined />}>
-              <Text>
-                {[profile.district, profile.location]
-                  .filter(Boolean)
-                  .join(", ")}
-              </Text>
+              {[profile.district, profile.location].filter(Boolean).length > 0 ? (
+                <Text>
+                  {[profile.district, profile.location]
+                    .filter(Boolean)
+                    .join(", ")}
+                </Text>
+              ) : (
+                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+              )}
             </Descriptions.Item>
-            {profile.website && (
+            {profile.website ? (
               <Descriptions.Item label={<GlobalOutlined />}>
                 <Link
                   href={`https://${profile.website}`}
@@ -214,12 +218,24 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
                   {profile.website}
                 </Link>
               </Descriptions.Item>
+            ) : (
+              <Descriptions.Item label={<GlobalOutlined />}>
+                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+              </Descriptions.Item>
             )}
             <Descriptions.Item label={<MailOutlined />}>
-              <Text copyable>{profile.email}</Text>
+              {profile.email ? (
+                <Text copyable>{profile.email}</Text>
+              ) : (
+                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+              )}
             </Descriptions.Item>
             <Descriptions.Item label={<PhoneOutlined />}>
-              <Text>{profile.phone}</Text>
+              {profile.phone ? (
+                <Text>{profile.phone}</Text>
+              ) : (
+                <Text className="text-red-500 font-bold text-xs">โปรดระบุข้อมูล *</Text>
+              )}
             </Descriptions.Item>
           </Descriptions>
 
