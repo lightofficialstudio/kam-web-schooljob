@@ -204,12 +204,18 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
     }
   },
 
-  // ✨ ลบตัวเลือก
+  // ✨ ลบตัวเลือก — ถ้าเป็น parent ต้องลบ children ออกจาก local state ด้วย
   removeOption: async (id) => {
     set({ isSaving: true });
+    // ✨ Bug #2 fix: หา value ของ option ที่จะลบก่อน เพื่อระบุ children
+    const toDelete = get().options.find((o) => o.id === id);
     try {
       await deleteConfigOption(id);
-      set((state) => ({ options: state.options.filter((o) => o.id !== id) }));
+      set((state) => ({
+        options: state.options.filter(
+          (o) => o.id !== id && o.parentValue !== toDelete?.value,
+        ),
+      }));
       get().showModal({
         type: "success",
         title: "ลบสำเร็จ",

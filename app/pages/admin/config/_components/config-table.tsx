@@ -36,12 +36,13 @@ import {
   Typography,
   theme,
 } from "antd";
+import React from "react";
 import { ConfigOption } from "../_api/config-api";
 import { GROUP_META, useConfigStore } from "../_state/config-store";
 
 const { Text } = Typography;
 
-// ✨ UsedInBadges — แสดง chip หน้าที่ใช้ config group นี้ เพื่อ QA/Admin ตรวจสอบ
+// ✨ UsedInBadges — แสดง chip หน้าที่ใช้ config group นี้
 function UsedInBadges({ group }: { group: string }) {
   const usedIn = GROUP_META[group]?.usedIn;
   if (!usedIn?.length) return null;
@@ -50,7 +51,7 @@ function UsedInBadges({ group }: { group: string }) {
       {usedIn.map((path) => (
         <Tooltip
           key={path}
-          title={`หน้านี้ใช้ตัวเลือก group นี้ — ตรวจสอบหลังแก้ไข`}
+          title="หน้านี้ใช้ตัวเลือก group นี้ — ตรวจสอบหลังแก้ไข"
         >
           <Tag
             style={{
@@ -91,40 +92,31 @@ const buildTreeData = (options: ConfigOption[]): TreeConfigOption[] => {
   });
 };
 
-// ─── Drag handle cell — ใช้ใน custom row ─────────────────────────────────────
-
-function DragHandleCell({ id }: { id: string }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useSortable({ id });
-  return (
-    <td
-      ref={setNodeRef}
-      style={{
-        width: 32,
-        cursor: isDragging ? "grabbing" : "grab",
-        color: "#8c8c8c",
-        paddingLeft: 8,
-        opacity: isDragging ? 0.5 : 1,
-      }}
-      {...attributes}
-      {...listeners}
-    >
-      <HolderOutlined />
-    </td>
-  );
-}
-
 // ─── Sortable row wrapper ─────────────────────────────────────────────────────
+// ✨ Bug #3+4 fix: useSortable เรียกที่นี่ครั้งเดียว — ไม่มี DragHandleCell แยก
+//    เพื่อป้องกัน double useSortable conflict ต่อ id เดียวกัน
+//    HolderOutlined ในคอลัมน์เป็นแค่ visual hint, drag triggers ผ่าน row เต็ม
 
 function SortableRow({
   id,
   children,
   ...props
 }: React.HTMLAttributes<HTMLTableRowElement> & { id: string }) {
-  const { setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
   return (
     <tr
       ref={setNodeRef}
       {...props}
+      {...attributes}
+      {...listeners}
       style={{
         ...props.style,
         transform: CSS.Transform.toString(transform),
@@ -133,6 +125,7 @@ function SortableRow({
         background: isDragging ? "rgba(17,182,245,0.06)" : undefined,
         zIndex: isDragging ? 9999 : undefined,
         position: isDragging ? "relative" : undefined,
+        cursor: isDragging ? "grabbing" : "grab",
       }}
     >
       {children}
@@ -241,10 +234,12 @@ export function ConfigTable() {
       title: "",
       key: "drag",
       width: 32,
+      // ✨ Bug #3 fix: HolderOutlined เป็นแค่ visual hint — drag ทำงานผ่าน SortableRow
       render: (_: unknown, record: TreeConfigOption) =>
-        // ✨ แสดง drag handle เฉพาะ parent row
         !record.parentValue ? (
-          <HolderOutlined style={{ color: "#bfbfbf", cursor: "grab" }} />
+          <HolderOutlined
+            style={{ color: token.colorTextDisabled, fontSize: 14 }}
+          />
         ) : null,
     },
     {
@@ -319,7 +314,10 @@ export function ConfigTable() {
                 type="text"
                 size="small"
                 icon={<PlusOutlined />}
-                onClick={() => openAddModal(record.value)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openAddModal(record.value);
+                }}
                 style={{ color: token.colorPrimary, fontSize: 11 }}
               >
                 เพิ่ม
@@ -330,7 +328,10 @@ export function ConfigTable() {
                 type="text"
                 size="small"
                 icon={<EditOutlined />}
-                onClick={() => openEditModal(record)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditModal(record);
+                }}
               />
             </Tooltip>
             <Tooltip title="ลบ">
@@ -339,7 +340,10 @@ export function ConfigTable() {
                 size="small"
                 icon={<DeleteOutlined />}
                 danger
-                onClick={() => handleDeleteConfirm(record.id, isParent)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteConfirm(record.id, isParent);
+                }}
               />
             </Tooltip>
           </Flex>
@@ -356,7 +360,9 @@ export function ConfigTable() {
       key: "drag",
       width: 32,
       render: () => (
-        <HolderOutlined style={{ color: "#bfbfbf", cursor: "grab" }} />
+        <HolderOutlined
+          style={{ color: token.colorTextDisabled, fontSize: 14 }}
+        />
       ),
     },
     {
@@ -419,7 +425,10 @@ export function ConfigTable() {
               type="text"
               size="small"
               icon={<EditOutlined />}
-              onClick={() => openEditModal(record)}
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(record);
+              }}
             />
           </Tooltip>
           <Tooltip title="ลบ">
@@ -428,13 +437,55 @@ export function ConfigTable() {
               size="small"
               icon={<DeleteOutlined />}
               danger
-              onClick={() => handleDeleteConfirm(record.id, false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteConfirm(record.id, false);
+              }}
             />
           </Tooltip>
         </Flex>
       ),
     },
   ];
+
+  // ─── Row component factories ─────────────────────────────────────────────────
+
+  // ✨ Tree: ใช้ SortableRow เฉพาะ parent row — children เป็น <tr> ธรรมดา
+  const TreeBodyRow = ({
+    children,
+    ...rowProps
+  }: React.HTMLAttributes<HTMLTableRowElement> & {
+    "data-row-key"?: string;
+  }) => {
+    const rowKey = rowProps["data-row-key"];
+    const isParent = rowKey ? treeData.some((p) => p.id === rowKey) : false;
+    if (isParent && rowKey) {
+      return (
+        <SortableRow id={rowKey} {...rowProps}>
+          {children}
+        </SortableRow>
+      );
+    }
+    return <tr {...rowProps}>{children}</tr>;
+  };
+
+  // ✨ Flat: ทุก row เป็น SortableRow
+  const FlatBodyRow = ({
+    children,
+    ...rowProps
+  }: React.HTMLAttributes<HTMLTableRowElement> & {
+    "data-row-key"?: string;
+  }) => {
+    const rowKey = rowProps["data-row-key"];
+    if (rowKey) {
+      return (
+        <SortableRow id={rowKey} {...rowProps}>
+          {children}
+        </SortableRow>
+      );
+    }
+    return <tr {...rowProps}>{children}</tr>;
+  };
 
   // ─── Render ───────────────────────────────────────────────────────────────────
 
@@ -470,39 +521,14 @@ export function ConfigTable() {
               rowKey="id"
               loading={isLoading}
               pagination={false}
-              size="middle"
-              defaultExpandAllRows
-              indentSize={28}
-              rowClassName={(record) => {
-                if (!record.parentValue) return "font-semibold";
-                return !record.isActive ? "opacity-50" : "";
-              }}
-              components={{
-                body: {
-                  row: ({
-                    children,
-                    ...props
-                  }: React.HTMLAttributes<HTMLTableRowElement> & {
-                    "data-row-key"?: string;
-                  }) => {
-                    const id = props["data-row-key"] ?? "";
-                    // ✨ เฉพาะ parent row ที่ drag ได้
-                    const isParent = parentOptions.some((p) => p.id === id);
-                    return isParent ? (
-                      <SortableRow id={id} {...props}>
-                        {children}
-                      </SortableRow>
-                    ) : (
-                      <tr {...props}>{children}</tr>
-                    );
-                  },
-                },
-              }}
+              size="small"
+              expandable={{ defaultExpandAllRows: true }}
+              components={{ body: { row: TreeBodyRow } }}
             />
           </SortableContext>
         </DndContext>
       ) : (
-        // ✨ Flat Table — drag ทุก row ได้เลย
+        // ✨ Flat Table — drag ทุก row ได้
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -518,25 +544,8 @@ export function ConfigTable() {
               rowKey="id"
               loading={isLoading}
               pagination={false}
-              size="middle"
-              rowClassName={(record) => (!record.isActive ? "opacity-50" : "")}
-              components={{
-                body: {
-                  row: ({
-                    children,
-                    ...props
-                  }: React.HTMLAttributes<HTMLTableRowElement> & {
-                    "data-row-key"?: string;
-                  }) => {
-                    const id = props["data-row-key"] ?? "";
-                    return (
-                      <SortableRow id={id} {...props}>
-                        {children}
-                      </SortableRow>
-                    );
-                  },
-                },
-              }}
+              size="small"
+              components={{ body: { row: FlatBodyRow } }}
             />
           </SortableContext>
         </DndContext>
