@@ -230,9 +230,11 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
         </Flex>
       }
       placement="right"
-      width={900}
+      size="large"
+      style={{ minWidth: 900 }}
       onClose={closeDrawer}
       open={isDrawerOpen}
+      forceRender
       styles={{ body: { padding: 0 } }}
       extra={
         <Space>
