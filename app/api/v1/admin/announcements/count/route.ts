@@ -1,17 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
+const VALID_ROLES = ["ALL", "EMPLOYEE", "EMPLOYER"] as const;
+type TargetRole = (typeof VALID_ROLES)[number];
+
 // ✨ GET /api/v1/admin/announcements/count?target_role=ALL|EMPLOYEE|EMPLOYER
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const targetRole = searchParams.get("target_role") ?? "ALL";
+    const rawRole = searchParams.get("target_role") ?? "ALL";
 
-    const whereRole =
-      targetRole === "ALL"
-        ? {}
-        : { role: targetRole as UserRole };
+    // ✨ validate enum ก่อน — ป้องกัน unsafe cast ที่ทำให้ Prisma error 500
+    if (!(VALID_ROLES as readonly string[]).includes(rawRole)) {
+      return Response.json(
+        { status_code: 400, message_th: "target_role ไม่ถูกต้อง", message_en: "Invalid target_role", data: null },
+        { status: 400 }
+      );
+    }
 
+    const targetRole = rawRole as TargetRole;
+    const whereRole = targetRole === "ALL" ? {} : { role: targetRole as UserRole };
     const count = await prisma.profile.count({ where: whereRole });
 
     return Response.json(

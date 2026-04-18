@@ -4,9 +4,11 @@ import { BroadcastInput } from "../validation/announcement-schema";
 
 const PAGE_SIZE = 20;
 
+// ✨ prefix สำหรับแยก broadcast target_role ออกจาก entity reference อื่น
+const BROADCAST_PREFIX = "broadcast:";
+
 // ✨ ส่ง Notification ไปยัง profiles ทุกคนตาม role ที่เลือก
 export const broadcastAnnouncementService = async (data: BroadcastInput) => {
-  // ✨ ดึง profile ids ตาม role target
   const whereRole =
     data.target_role === "ALL"
       ? {}
@@ -21,7 +23,9 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
     return { sentCount: 0 };
   }
 
-  // ✨ createMany ใน batch เพื่อ performance
+  // ✨ timestamp ร่วมกันทุก batch เพื่อให้ groupBy รวมเป็น 1 announcement เสมอ
+  const broadcastAt = new Date();
+
   const BATCH = 500;
   let sentCount = 0;
 
@@ -34,8 +38,9 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
         title: data.title,
         message: data.message,
         referenceId: data.reference_id ?? null,
-        // ✨ เก็บ target_role ใน referenceType เพื่อแสดงใน History
-        referenceType: data.target_role,
+        // ✨ ใช้ prefix "broadcast:" เพื่อไม่ชน entity reference อื่น ('job', 'blog', ฯลฯ)
+        referenceType: `${BROADCAST_PREFIX}${data.target_role}`,
+        createdAt: broadcastAt,
       })),
       skipDuplicates: true,
     });
@@ -45,33 +50,46 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
   return { sentCount };
 };
 
-// ✨ ดึงประวัติ Announcement (system type, เรียงล่าสุด, แบบ pagination)
+// ✨ parse target_role คืนจาก referenceType ที่มี prefix
+const parseTargetRole = (referenceType: string | null): "ALL" | "EMPLOYEE" | "EMPLOYER" => {
+  if (!referenceType?.startsWith(BROADCAST_PREFIX)) return "ALL";
+  const role = referenceType.slice(BROADCAST_PREFIX.length);
+  if (role === "EMPLOYEE" || role === "EMPLOYER") return role;
+  return "ALL";
+};
+
+// ✨ ดึงประวัติ Announcement (system type) โดยนับ sentCount จาก referenceType+title+message+createdAt
 export const getAnnouncementHistoryService = async (page: number) => {
   const skip = (page - 1) * PAGE_SIZE;
 
-  // ✨ ดึง distinct title+message+createdAt+referenceType โดยใช้ groupBy
+  // ✨ groupBy โดยไม่รวม profileId — timestamp เดียวกันทุก batch จึงรวมเป็น 1 row
   const groups = await prisma.notification.groupBy({
     by: ["title", "message", "type", "referenceType", "createdAt"],
-    where: { type: "system" },
+    where: { type: "system", referenceType: { startsWith: BROADCAST_PREFIX } },
     _count: { id: true },
     orderBy: { createdAt: "desc" },
     skip,
     take: PAGE_SIZE,
   });
 
-  const total = await prisma.notification.groupBy({
-    by: ["title", "message", "type", "referenceType", "createdAt"],
-    where: { type: "system" },
-    _count: { id: true },
-  }).then((r) => r.length);
+  // ✨ นับ total: ถ้าหน้าแรกและได้น้อยกว่า PAGE_SIZE — ไม่ต้อง query ซ้ำ
+  const total =
+    skip === 0 && groups.length < PAGE_SIZE
+      ? groups.length
+      : await prisma.notification
+          .groupBy({
+            by: ["title", "message", "type", "referenceType", "createdAt"],
+            where: { type: "system", referenceType: { startsWith: BROADCAST_PREFIX } },
+            _count: { id: true },
+          })
+          .then((r) => r.length);
 
   return {
     items: groups.map((g) => ({
       title: g.title,
       message: g.message ?? "",
       type: g.type,
-      // ✨ referenceType เก็บ target_role ไว้ตอน broadcast
-      targetRole: (g.referenceType ?? "ALL") as "ALL" | "EMPLOYEE" | "EMPLOYER",
+      targetRole: parseTargetRole(g.referenceType),
       sentCount: g._count.id,
       createdAt: g.createdAt,
     })),

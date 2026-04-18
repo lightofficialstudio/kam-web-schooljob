@@ -54,22 +54,26 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
   setTitle: (v) => set({ title: v }),
   setMessage: (v) => set({ message: v }),
 
-  // ✨ เปลี่ยน role แล้วนับผู้รับใหม่ทันที
+  // ✨ แก้ race condition — pass role โดยตรงเข้า fetchRecipientCount แทนการ get() state ใหม่
   setTargetRole: (v) => {
     set({ targetRole: v });
+    // ✨ เรียกด้วย v (ค่าใหม่) ไม่ใช่ get().targetRole (อาจยังเป็นค่าเก่า)
     get().fetchRecipientCount(v);
   },
 
   // ✨ reset form หลังส่ง
   resetForm: () => set({ title: "", message: "", targetRole: "ALL", lastSentCount: null, recipientCount: null }),
 
-  // ✨ นับจำนวนผู้รับก่อนเปิด Confirm Modal
+  // ✨ นับจำนวนผู้รับตาม role ที่รับมาโดยตรง
   fetchRecipientCount: async (role) => {
     set({ isCountingRecipients: true, recipientCount: null });
     try {
       const res = await requestRecipientCount(role);
-      if (res.data.status_code === 200) {
+      // ✨ ตรวจ status_code ก่อนอ่านค่า — ป้องกัน API error แต่ HTTP 200
+      if (res.data.status_code === 200 && res.data.data) {
         set({ recipientCount: res.data.data.count });
+      } else {
+        set({ recipientCount: null });
       }
     } catch {
       set({ recipientCount: null });
@@ -78,8 +82,13 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
     }
   },
 
-  // ✨ ส่ง Broadcast — return ok + sentCount สำหรับแสดง Modal
+  // ✨ ส่ง Broadcast — ตรวจ status_code + adminUserId ก่อนเสมอ
   broadcast: async (adminUserId) => {
+    // ✨ #6 guard: ป้องกันส่ง request โดยไม่มี auth
+    if (!adminUserId) {
+      return { ok: false, sentCount: 0, error: "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่" };
+    }
+
     const { title, message, targetRole } = get();
     set({ isSending: true });
     try {
@@ -91,7 +100,13 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
         type: "system",
       };
       const res = await requestBroadcast(payload);
-      const sentCount = res.data.data?.sentCount ?? 0;
+
+      // ✨ ตรวจ status_code ก่อนอ่าน sentCount
+      if (res.data.status_code !== 200 || !res.data.data) {
+        return { ok: false, sentCount: 0, error: res.data.message_th ?? "ส่งไม่สำเร็จ" };
+      }
+
+      const sentCount = res.data.data.sentCount ?? 0;
       set({ lastSentCount: sentCount });
       return { ok: true, sentCount };
     } catch (err: unknown) {
@@ -104,12 +119,13 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
     }
   },
 
-  // ✨ โหลดประวัติ Announcement
+  // ✨ โหลดประวัติ — guard adminUserId ว่างก่อน fetch
   fetchHistory: async (adminUserId, page = 1) => {
+    if (!adminUserId) return;
     set({ isLoadingHistory: true });
     try {
       const res = await requestAnnouncementHistory(adminUserId, page);
-      if (res.data.status_code === 200) {
+      if (res.data.status_code === 200 && res.data.data) {
         set({
           history: res.data.data.items,
           historyTotal: res.data.data.total,
@@ -117,7 +133,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
         });
       }
     } catch {
-      // ✨ ไม่แสดง error ร้ายแรง — แค่ history โหลดไม่ได้
+      // ✨ history โหลดไม่ได้ — ไม่แสดง error ร้ายแรง
     } finally {
       set({ isLoadingHistory: false });
     }

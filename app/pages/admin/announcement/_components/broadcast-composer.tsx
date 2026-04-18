@@ -18,7 +18,6 @@ import {
   Input,
   Modal,
   Radio,
-  Skeleton,
   Tag,
   Typography,
   theme,
@@ -76,11 +75,10 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
   const cfg = TARGET_CONFIG[targetRole];
   const isValid = title.trim().length > 0 && message.trim().length > 0;
 
-  // ✨ โหลด count ครั้งแรกเมื่อ mount
+  // ✨ โหลด count ครั้งแรกเมื่อ mount — ใช้ targetRole ปัจจุบันจาก store
   useEffect(() => {
     fetchRecipientCount(targetRole);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchRecipientCount, targetRole]);
 
   // ✨ กดปุ่ม Send — count พร้อมแล้ว (update แบบ real-time) เปิด Modal ได้ทันที
   const handleOpenConfirm = () => {

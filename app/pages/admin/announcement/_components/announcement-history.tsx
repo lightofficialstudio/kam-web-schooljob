@@ -64,7 +64,7 @@ export function AnnouncementHistory({ adminUserId }: Props) {
       {/* ── รายการ ── */}
       {history.map((item, idx) => (
         <Card
-          key={`${item.title}-${item.createdAt}-${idx}`}
+          key={`${new Date(item.createdAt).getTime()}-${item.targetRole}-${idx}`}
           style={{
             borderRadius: 12,
             border: `1px solid ${token.colorBorderSecondary}`,
