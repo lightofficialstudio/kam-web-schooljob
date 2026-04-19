@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@/app/contexts/theme-context";
+import { useAuthStore } from "@/app/stores/auth-store";
 import {
   FacebookOutlined,
   LineOutlined,
@@ -9,13 +10,81 @@ import {
   YoutubeOutlined,
 } from "@ant-design/icons";
 import { Card, Col, Divider, Flex, Row, Space, theme, Typography } from "antd";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const { Text, Title, Paragraph } = Typography;
+
+// ─── Link definitions ตาม role ───────────────────────────────────────────────
+
+const LINKS_EMPLOYEE = [
+  { label: "ค้นหาตำแหน่งงาน", href: "/pages/job" },
+  { label: "โปรไฟล์ของฉัน", href: "/pages/employee/profile" },
+  { label: "ค้นหาโรงเรียน", href: "/pages/employee/school" },
+  { label: "ตั้งค่าบัญชี", href: "/pages/employee/account-setting" },
+];
+
+const LINKS_EMPLOYER = [
+  { label: "ประกาศรับสมัครงาน", href: "/pages/employer/job/post" },
+  { label: "จัดการประกาศงาน", href: "/pages/employer/job/read" },
+  { label: "โปรไฟล์โรงเรียน", href: "/pages/employer/profile" },
+  { label: "จัดการสมาชิก", href: "/pages/employer/school-management" },
+  { label: "ตั้งค่าบัญชี", href: "/pages/employer/account-setting" },
+];
+
+const LINKS_ADMIN = [
+  { label: "แดชบอร์ด", href: "/pages/admin" },
+  { label: "จัดการผู้ใช้", href: "/pages/admin/user-management" },
+  { label: "จัดการงาน", href: "/pages/admin/job-management/read" },
+  { label: "จัดการบทความ", href: "/pages/admin/blog" },
+  { label: "แพ็กเกจ", href: "/pages/admin/package-management" },
+];
+
+const LINKS_GUEST = [
+  { label: "ค้นหาตำแหน่งงาน", href: "/pages/job" },
+  { label: "อ่านบทความ", href: "/pages/blog" },
+  { label: "เข้าสู่ระบบ", href: "/pages/signin" },
+  { label: "สมัครสมาชิก", href: "/pages/signup" },
+];
+
+// ─── Column title ตาม role ────────────────────────────────────────────────────
+
+const COL_TITLE: Record<string, string> = {
+  EMPLOYEE: "เมนูสำหรับครู",
+  EMPLOYER: "เมนูสำหรับโรงเรียน",
+  ADMIN: "เมนูผู้ดูแลระบบ",
+  GUEST: "เริ่มต้นใช้งาน",
+};
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
 
 export default function Footer() {
   const { token } = theme.useToken();
   const { mode } = useTheme();
   const isDark = mode === "dark";
+  const { user, isAuthenticated } = useAuthStore();
+
+  // ✨ ป้องกัน hydration mismatch — รอ mount ก่อนอ่าน store
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
+  const role = isMounted && isAuthenticated && user?.role ? user.role : "GUEST";
+
+  const links =
+    role === "EMPLOYEE"
+      ? LINKS_EMPLOYEE
+      : role === "EMPLOYER"
+        ? LINKS_EMPLOYER
+        : role === "ADMIN"
+          ? LINKS_ADMIN
+          : LINKS_GUEST;
+
+  const colTitle = COL_TITLE[role];
+
+  // ✨ column 2 — "สำหรับคนหางาน" แสดงเฉพาะ guest/employee
+  const showJobSeekerCol = role === "GUEST" || role === "EMPLOYEE";
+  // ✨ column 3 — "สำหรับสถานศึกษา" แสดงเฉพาะ guest/employer
+  const showSchoolCol = role === "GUEST" || role === "EMPLOYER";
 
   return (
     <footer
@@ -27,6 +96,7 @@ export default function Footer() {
       }}
     >
       <Row gutter={[48, 32]} style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        {/* ─── Brand ─── */}
         <Col xs={24} lg={8}>
           <Flex vertical gap={24} style={{ width: "100%" }}>
             <Space size="small">
@@ -73,66 +143,73 @@ export default function Footer() {
           </Flex>
         </Col>
 
+        {/* ─── Column ตาม role ─── */}
         <Col xs={12} lg={4}>
           <Flex vertical gap={24} style={{ width: "100%" }}>
             <Title level={5} style={{ margin: 0, color: token.colorText }}>
-              สำหรับคนหางาน
+              {colTitle}
             </Title>
             <Flex vertical gap={12}>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                ค้นหาตำแหน่งงาน
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                ฝากประวัติ (Resume)
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                งานครูตามวิชาเอก
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                บทความเตรียมสอบ
-              </Text>
+              {links.map((link) => (
+                <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
+                  <Text
+                    style={{
+                      cursor: "pointer",
+                      color: token.colorTextSecondary,
+                      transition: "color 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      ((e.currentTarget as HTMLElement).style.color = token.colorPrimary)
+                    }
+                    onMouseLeave={(e) =>
+                      ((e.currentTarget as HTMLElement).style.color = token.colorTextSecondary)
+                    }
+                  >
+                    {link.label}
+                  </Text>
+                </Link>
+              ))}
             </Flex>
           </Flex>
         </Col>
 
-        <Col xs={12} lg={4}>
-          <Flex vertical gap={24} style={{ width: "100%" }}>
-            <Title level={5} style={{ margin: 0, color: token.colorText }}>
-              สำหรับสถานศึกษา
-            </Title>
-            <Flex vertical gap={12}>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                ประกาศรับสมัครงาน
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                ค้นหาประวัติครู
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                แพ็กเกจสมาชิก
-              </Text>
-              <Text
-                style={{ cursor: "pointer", color: token.colorTextSecondary }}
-              >
-                คู่มือการใช้งาน
-              </Text>
+        {/* ─── Column เสริม (guest เห็นทั้งสองฝั่ง) ─── */}
+        {(showJobSeekerCol || showSchoolCol) && (
+          <Col xs={12} lg={4}>
+            <Flex vertical gap={24} style={{ width: "100%" }}>
+              {showJobSeekerCol && role === "GUEST" && (
+                <>
+                  <Title level={5} style={{ margin: 0, color: token.colorText }}>
+                    สำหรับสถานศึกษา
+                  </Title>
+                  <Flex vertical gap={12}>
+                    {[
+                      { label: "ประกาศรับสมัครงาน", href: "/pages/signup" },
+                      { label: "แพ็กเกจสมาชิก", href: "/pages/signup" },
+                      { label: "ค้นหาประวัติครู", href: "/pages/signup" },
+                    ].map((link) => (
+                      <Link key={link.label} href={link.href} style={{ textDecoration: "none" }}>
+                        <Text
+                          style={{ cursor: "pointer", color: token.colorTextSecondary }}
+                          onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLElement).style.color = token.colorPrimary)
+                          }
+                          onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLElement).style.color = token.colorTextSecondary)
+                          }
+                        >
+                          {link.label}
+                        </Text>
+                      </Link>
+                    ))}
+                  </Flex>
+                </>
+              )}
             </Flex>
-          </Flex>
-        </Col>
+          </Col>
+        )}
 
+        {/* ─── ติดต่อเรา ─── */}
         <Col xs={24} lg={8}>
           <Flex vertical gap={24} style={{ width: "100%" }}>
             <Title level={5} style={{ margin: 0, color: token.colorText }}>
@@ -175,6 +252,32 @@ export default function Footer() {
                   </Text>
                 </Flex>
               </Card>
+
+              {/* ✨ แสดงชื่อ user ที่ login อยู่ */}
+              {isMounted && isAuthenticated && user && (
+                <Card
+                  size="small"
+                  variant="borderless"
+                  style={{
+                    borderRadius: "12px",
+                    backgroundColor: `${token.colorPrimary}10`,
+                    border: `1px solid ${token.colorPrimary}30`,
+                  }}
+                >
+                  <Flex vertical gap={2}>
+                    <Text strong style={{ color: token.colorText, fontSize: 13 }}>
+                      {user.full_name || user.email}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+                      {role === "EMPLOYEE"
+                        ? "ครู / ผู้หางาน"
+                        : role === "EMPLOYER"
+                          ? "สถานศึกษา"
+                          : "ผู้ดูแลระบบ"}
+                    </Text>
+                  </Flex>
+                </Card>
+              )}
             </Flex>
           </Flex>
         </Col>
