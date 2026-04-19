@@ -17,6 +17,8 @@ export const updateSummarySchema = z.object({
   specializations: z.array(z.string()).optional(),       // วิชาที่สอน
   grade_can_teaches: z.array(z.string()).optional(),     // ระดับชั้นที่สอนได้
   preferred_provinces: z.array(z.string()).optional(),   // จังหวัดที่ต้องการทำงาน
+  languages_spoken: z.array(z.string()).optional(),      // ทักษะด้านภาษา
+  it_skills: z.array(z.string()).optional(),             // ทักษะด้านไอที
 });
 
 export type UpdateSummaryInput = z.infer<typeof updateSummarySchema>;

@@ -7,7 +7,7 @@ export const updateSummaryService = async (
   userId: string,
   payload: UpdateSummaryInput
 ) => {
-  const { specializations, grade_can_teaches, preferred_provinces, ...scalarFields } =
+  const { specializations, grade_can_teaches, preferred_provinces, languages_spoken, it_skills, ...scalarFields } =
     payload;
 
   return await prisma.$transaction(async (tx) => {
@@ -76,6 +76,26 @@ export const updateSummaryService = async (
       if (preferred_provinces.length > 0) {
         await tx.preferredProvince.createMany({
           data: preferred_provinces.map((province) => ({ profileId, province })),
+        });
+      }
+    }
+
+    // ✨ Sync languages_spoken
+    if (languages_spoken !== undefined) {
+      await tx.language.deleteMany({ where: { profileId } });
+      if (languages_spoken.length > 0) {
+        await tx.language.createMany({
+          data: languages_spoken.map((languageName) => ({ profileId, languageName })),
+        });
+      }
+    }
+
+    // ✨ Sync it_skills
+    if (it_skills !== undefined) {
+      await tx.skill.deleteMany({ where: { profileId } });
+      if (it_skills.length > 0) {
+        await tx.skill.createMany({
+          data: it_skills.map((skillName) => ({ profileId, skillName })),
         });
       }
     }

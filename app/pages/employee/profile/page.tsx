@@ -241,13 +241,13 @@ export default function EmployeeProfilePage() {
             : ((dateOfBirth as string | undefined) ?? undefined)
           : undefined;
 
+      // ✨ teachingSkillsSection ใช้ languageAndItSkills (combined) — เก็บใน languagesSpoken, clear itSkills
       const merged = {
         ...profile,
         ...rest,
         ...(dobStr !== undefined ? { dateOfBirth: dobStr } : {}),
-        // ✨ languageAndItSkills รวม language + IT ไว้ด้วยกัน — เก็บทั้งหมดใน languagesSpoken
         ...(languageAndItSkills !== undefined
-          ? { languagesSpoken: languageAndItSkills }
+          ? { languagesSpoken: languageAndItSkills, itSkills: [] }
           : {}),
       };
       setProfile(merged);
@@ -272,10 +272,14 @@ export default function EmployeeProfilePage() {
             preferred_provinces: (vals.preferredProvinces as string[]) ?? [],
             can_relocate: vals.canRelocate as boolean ?? false,
           });
-        } else if (
-          editSection === "teaching-skills" ||
-          editSection === "personal-summary"
-        ) {
+        } else if (editSection === "teaching-skills") {
+          // ✨ TeachingSkillsSection — languageAndItSkills รวม 2 อย่าง → ส่งเป็น languages_spoken, it_skills=[]
+          await patchSummary(user.user_id, {
+            specializations: merged.specialization ?? [],
+            languages_spoken: languageAndItSkills ?? [],
+            it_skills: [],
+          });
+        } else if (editSection === "personal-summary") {
           await patchSummary(user.user_id, {
             special_activities: merged.specialActivities ?? null,
             teaching_experience: merged.teachingExperience ?? null,
