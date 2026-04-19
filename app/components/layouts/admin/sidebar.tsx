@@ -11,6 +11,7 @@ import {
   HomeOutlined,
   MenuUnfoldOutlined,
   RightOutlined,
+  SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -89,6 +90,13 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
           label: "Announcement",
           icon: <BellOutlined />,
           href: "/pages/admin/announcement",
+        },
+        {
+          type: "leaf",
+          key: "/pages/admin/menu-management",
+          label: "จัดการระบบ",
+          icon: <SettingOutlined />,
+          href: "/pages/admin/menu-management",
         },
       ],
     },

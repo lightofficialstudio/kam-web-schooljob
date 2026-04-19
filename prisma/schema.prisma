@@ -664,6 +664,16 @@ model AdminAuditLog {
   @@map("admin_audit_logs")
 }
 
+// ── SiteSetting — Key-Value store สำหรับตั้งค่าระบบ (Admin เท่านั้น) ──
+model SiteSetting {
+  key       String   @id // เช่น "maintenance_mode", "maintenance_message"
+  value     String   // เก็บเป็น string (boolean → "true"/"false", JSON string ก็ได้)
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by") // userId ของ Admin ที่แก้ไขล่าสุด
+
+  @@map("site_settings")
+}
+
 // ── ตารางเก็บ Package Plan ทั้งหมด — Admin จัดการได้ครบจาก Dashboard ──
 model PackagePlan {
   id                     String   @id @default(uuid())
