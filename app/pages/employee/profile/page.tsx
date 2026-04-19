@@ -37,6 +37,7 @@ import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
+import { patchWorkLocation } from "./_api/work-location-api";
 import {
   BasicInfoSection,
   EducationHistorySection,
@@ -50,6 +51,7 @@ import {
   TeachingSkillsSection,
   WorkExperienceSection,
 } from "./_components";
+import { WorkLocationSection } from "./_components/work-location-section";
 import { useProfileStore } from "./_stores/profile-store";
 
 const { Title, Text, Link } = Typography;
@@ -62,7 +64,8 @@ type SectionId =
   | "work-experience"
   | "skills"
   | "teaching-skills"
-  | "personal-summary";
+  | "personal-summary"
+  | "work-location";
 
 export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
@@ -202,10 +205,14 @@ export default function EmployeeProfilePage() {
         ],
       });
     } else if (sectionId === "skills") {
-      // ✨ SkillsLocationSection ใช้ field แยก: languagesSpoken, itSkills, preferredProvinces, canRelocate
+      // ✨ SkillsLocationSection — เฉพาะ languagesSpoken + itSkills (work location แยก drawer)
       form.setFieldsValue({
         languagesSpoken: profile.languagesSpoken ?? [],
         itSkills: profile.itSkills ?? [],
+      });
+    } else if (sectionId === "work-location") {
+      // ✨ WorkLocationSection — แยก Drawer 1:1 เฉพาะ preferredProvinces + canRelocate
+      form.setFieldsValue({
         preferredProvinces: profile.preferredProvinces ?? [],
         canRelocate: profile.canRelocate ?? false,
       });
@@ -258,9 +265,16 @@ export default function EmployeeProfilePage() {
             profile_visibility: merged.profileVisibility,
           });
         } else if (editSection === "skills") {
-          // ✨ SkillsLocationSection — ส่ง field แยก languagesSpoken, itSkills, preferred_provinces, can_relocate
+          // ✨ SkillsLocationSection — เฉพาะ languagesSpoken + itSkills (work-location แยกต่างหาก)
           const vals = values as Record<string, unknown>;
           await patchSummary(user.user_id, {
+            languages_spoken: (vals.languagesSpoken as string[]) ?? [],
+            it_skills: (vals.itSkills as string[]) ?? [],
+          });
+        } else if (editSection === "work-location") {
+          // ✨ WorkLocationSection — 1:1 API เฉพาะ preferred_provinces + can_relocate
+          const vals = values as Record<string, unknown>;
+          await patchWorkLocation(user.user_id, {
             preferred_provinces: (vals.preferredProvinces as string[]) ?? [],
             can_relocate: (vals.canRelocate as boolean) ?? false,
           });
@@ -621,10 +635,10 @@ export default function EmployeeProfilePage() {
                     <ResumeUploadSection userId={user?.user_id ?? ""} />
                   </ProfileSectionWrapper>
 
-                  {/* ✨ สถานที่ทำงาน */}
+                  {/* ✨ สถานที่ทำงาน — Drawer แยก 1:1 */}
                   <ProfileSectionWrapper
                     title="สถานที่ทำงาน"
-                    onEdit={() => handleOpenEdit("skills")}
+                    onEdit={() => handleOpenEdit("work-location")}
                   >
                     <Flex vertical gap={16} style={{ width: "100%" }}>
                       <Flex vertical gap={8}>
@@ -860,8 +874,10 @@ export default function EmployeeProfilePage() {
             : editSection === "personal-info"
               ? "แก้ไขข้อมูลส่วนตัว"
               : editSection === "skills"
-                ? "แก้ไขทักษะและสถานที่ทำงาน"
-                : editSection === "teaching-skills"
+                ? "แก้ไขทักษะด้านภาษาและไอที"
+                : editSection === "work-location"
+                  ? "แก้ไขสถานที่ทำงาน"
+                  : editSection === "teaching-skills"
                   ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
                   : editSection === "personal-summary"
                     ? "แก้ไขสรุปข้อมูลส่วนตัว"
@@ -874,6 +890,7 @@ export default function EmployeeProfilePage() {
             <GenderDobPhotoSection form={form} userId={user?.user_id ?? ""} />
           )}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
+          {editSection === "work-location" && <WorkLocationSection form={form} />}
           {editSection === "teaching-skills" && (
             <TeachingSkillsSection form={form} />
           )}

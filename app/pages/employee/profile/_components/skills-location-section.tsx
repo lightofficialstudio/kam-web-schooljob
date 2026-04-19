@@ -1,23 +1,9 @@
-import { Checkbox, Col, Form, Row, Select } from "antd";
+import { Col, Form, Row, Select } from "antd";
 import React from "react";
 
 interface SkillsLocationSectionProps {
-  form: any;
+  form: ReturnType<typeof Form.useForm>[0];
 }
-
-const PROVINCE_OPTIONS = [
-  { label: "กรุงเทพมหานคร", value: "bangkok" },
-  { label: "นนทบุรี", value: "nonthaburi" },
-  { label: "ปทุมธานี", value: "pathumthani" },
-  { label: "สมุทรปราการ", value: "samutprakarn" },
-  { label: "เชียงใหม่", value: "chiangmai" },
-  { label: "เชียงราย", value: "chiangrai" },
-  { label: "ขอนแก่น", value: "khonkaen" },
-  { label: "นครราชสีมา", value: "nakhonratchasima" },
-  { label: "ระยอง", value: "rayong" },
-  { label: "สระแก้ว", value: "sakaeo" },
-  { label: "ปีนัง (อื่นๆ)", value: "others" },
-];
 
 export const SkillsLocationSection: React.FC<SkillsLocationSectionProps> = ({
   form,
@@ -58,54 +44,6 @@ export const SkillsLocationSection: React.FC<SkillsLocationSectionProps> = ({
                 { label: "Coding", value: "coding" },
               ]}
             />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <hr style={{ margin: "24px 0" }} />
-
-      {/* Work Location Section */}
-      <h4
-        style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "16px" }}
-      >
-        สถานที่ทำงาน
-      </h4>
-
-      <Row gutter={16}>
-        <Col xs={24}>
-          <Form.Item
-            label="จังหวัดที่ต้องการทำงาน"
-            name="preferredProvinces"
-            rules={[
-              {
-                required: true,
-                message: "กรุณาเลือกจังหวัดที่ต้องการทำงาน",
-              },
-            ]}
-          >
-            <Select
-              mode="multiple"
-              placeholder="เลือกจังหวัด"
-              options={PROVINCE_OPTIONS}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col xs={24}>
-          <Form.Item
-            label="สามารถย้ายที่อยู่ได้"
-            name="canRelocate"
-            valuePropName="checked"
-            rules={[
-              {
-                required: true,
-                message: "กรุณาระบุว่าสามารถย้ายที่อยู่ได้หรือไม่",
-              },
-            ]}
-          >
-            <Checkbox>ฉันสามารถย้ายที่อยู่ได้</Checkbox>
           </Form.Item>
         </Col>
       </Row>

@@ -29,3 +29,6 @@ export { PersonalSummarySection } from "./personal-summary-section";
 export { ProfileEditDrawer } from "./profile-edit-drawer";
 export { ProfileSectionWrapper } from "./profile-section-wrapper";
 
+// Work Location Section (แยก Drawer 1:1)
+export { WorkLocationSection } from "./work-location-section";
+

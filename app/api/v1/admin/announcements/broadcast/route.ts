@@ -15,16 +15,18 @@ export async function POST(request: Request) {
     }
 
     // ✨ ตรวจสิทธิ์ Admin
-    const admin = await prisma.profile.findFirst({
-      where: { OR: [{ userId: parsed.data.admin_user_id }, { id: parsed.data.admin_user_id }], role: "ADMIN" },
-      select: { id: true },
+    const adminProfile = await prisma.profile.findFirst({
+      where: { OR: [{ userId: parsed.data.admin_user_id }, { id: parsed.data.admin_user_id }] },
+      select: { id: true, role: true, userId: true },
     });
-    if (!admin) {
+    console.log("🔐 [broadcast] admin_user_id:", parsed.data.admin_user_id, "found profile:", adminProfile);
+    if (!adminProfile || adminProfile.role !== "ADMIN") {
       return Response.json(
         { status_code: 403, message_th: "ไม่มีสิทธิ์เข้าถึง", message_en: "Forbidden", data: null },
         { status: 403 }
       );
     }
+    const admin = adminProfile;
 
     const result = await broadcastAnnouncementService(parsed.data);
 
