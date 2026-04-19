@@ -114,7 +114,7 @@ export default function SchoolProfilePage() {
               <Col xs={24} lg={16}>
                 <Flex vertical gap={40}>
                   {/* ตำแหน่งงาน */}
-                  <OpenJobsSection jobs={school.jobs} schoolId={school.id} />
+                  <OpenJobsSection jobs={school.jobs} schoolId={school.id} isLoading={isLoading} />
                 </Flex>
               </Col>
 

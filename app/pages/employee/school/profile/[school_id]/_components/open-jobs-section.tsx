@@ -6,7 +6,16 @@ import {
   SolutionOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Card, Col, Flex, Row, Tag, Typography, theme as antTheme } from "antd";
+import {
+  Card,
+  Col,
+  Flex,
+  Row,
+  Skeleton,
+  Tag,
+  Typography,
+  theme as antTheme,
+} from "antd";
 import { JobDetailDrawer } from "../../../../../job/_components/job-detail-drawer";
 import { useJobSearchStore } from "../../../../../job/_state/job-search-store";
 import type { SchoolOpenJob } from "../_api/school-profile-api";
@@ -16,168 +25,330 @@ const { Title, Text } = Typography;
 interface OpenJobsSectionProps {
   jobs: SchoolOpenJob[];
   schoolId: string;
+  isLoading?: boolean;
 }
 
+// ✨ Skeleton card สำหรับ loading state
+const JobCardSkeleton = () => {
+  const { token } = antTheme.useToken();
+  return (
+    <Card
+      style={{
+        borderRadius: 24,
+        backgroundColor: token.colorBgContainer,
+        border: `1px solid ${token.colorBorderSecondary}`,
+      }}
+      styles={{ body: { padding: 32 } }}
+    >
+      <Flex vertical gap={16}>
+        <Flex gap={8}>
+          <Skeleton.Button active size="small" style={{ borderRadius: 100, width: 60 }} />
+          <Skeleton.Button active size="small" style={{ borderRadius: 100, width: 80 }} />
+        </Flex>
+        <Skeleton active title={{ width: "55%" }} paragraph={{ rows: 1, width: "35%" }} />
+        <Flex gap={8}>
+          <Skeleton.Button active size="small" style={{ borderRadius: 8, width: 70 }} />
+          <Skeleton.Button active size="small" style={{ borderRadius: 8, width: 90 }} />
+          <Skeleton.Button active size="small" style={{ borderRadius: 8, width: 60 }} />
+        </Flex>
+      </Flex>
+    </Card>
+  );
+};
+
 // ✨ แสดงตำแหน่งงานที่กำลังเปิดรับสมัครของโรงเรียน — ไม่มี logic ใน UI
-export const OpenJobsSection = ({ jobs }: OpenJobsSectionProps) => {
+export const OpenJobsSection = ({ jobs, isLoading }: OpenJobsSectionProps) => {
   const { token } = antTheme.useToken();
   const { fetchAndOpenJob } = useJobSearchStore();
 
+  // ── Skeleton Loading ──
+  if (isLoading) {
+    return (
+      <Flex vertical gap={24}>
+        {/* Header skeleton */}
+        <Flex align="center" justify="space-between">
+          <Flex gap={12} align="center">
+            <Skeleton.Avatar active size={48} shape="square" style={{ borderRadius: 16 }} />
+            <Skeleton.Input active style={{ width: 200, height: 28 }} />
+          </Flex>
+          <Skeleton.Button active style={{ borderRadius: 100, width: 100 }} />
+        </Flex>
+        {/* Card skeletons */}
+        {Array.from({ length: 3 }).map((_, i) => (
+          <JobCardSkeleton key={i} />
+        ))}
+      </Flex>
+    );
+  }
+
+  // ── Empty State ──
   if (!jobs.length) {
     return (
       <Card
         style={{
-          borderRadius: token.borderRadiusLG,
+          borderRadius: 24,
           border: `1px solid ${token.colorBorderSecondary}`,
-          textAlign: "center",
-          padding: "40px 0",
+          background: token.colorBgContainer,
         }}
+        styles={{ body: { padding: "56px 32px" } }}
       >
-        <Flex vertical align="center" gap={12}>
-          <Text style={{ fontSize: 40 }}>📋</Text>
-          <Title level={5} style={{ margin: 0 }}>
-            ยังไม่มีตำแหน่งงานเปิดรับสมัครในขณะนี้
-          </Title>
-          <Text type="secondary">
-            ติดตามโรงเรียนนี้เพื่อรับการแจ้งเตือนเมื่อมีตำแหน่งใหม่
-          </Text>
+        <Flex vertical align="center" gap={16}>
+          {/* ✨ Icon circle */}
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: "50%",
+              background: `rgba(17,182,245,0.08)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SolutionOutlined style={{ fontSize: 32, color: token.colorPrimary }} />
+          </div>
+          <Flex vertical align="center" gap={6}>
+            <Title level={5} style={{ margin: 0, color: token.colorTextHeading }}>
+              ยังไม่มีตำแหน่งงานเปิดรับสมัคร
+            </Title>
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              ติดตามโรงเรียนนี้เพื่อรับแจ้งเตือนเมื่อมีตำแหน่งใหม่
+            </Text>
+          </Flex>
         </Flex>
       </Card>
     );
   }
 
   return (
-    <Flex vertical gap={24}>
-      <div className="flex items-center justify-between mb-2">
+    <Flex vertical gap={20}>
+      {/* ── Section Header ── */}
+      <Flex align="center" justify="space-between">
         <Flex gap={12} align="center">
           <div
-            className="p-3 rounded-2xl"
-            style={{ backgroundColor: token.colorSuccessBg, color: token.colorSuccess }}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 16,
+              background: `linear-gradient(135deg, rgba(17,182,245,0.15) 0%, rgba(17,182,245,0.05) 100%)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: `1px solid rgba(17,182,245,0.2)`,
+            }}
           >
-            <SolutionOutlined className="text-xl" />
+            <SolutionOutlined style={{ fontSize: 20, color: token.colorPrimary }} />
           </div>
-          <Title
-            level={3}
-            className="m-0! font-black text-2xl tracking-tight"
-            style={{ color: token.colorTextHeading }}
-          >
-            ตำแหน่งที่เปิดรับสมัคร
-          </Title>
+          <Flex vertical gap={2}>
+            <Title level={4} style={{ margin: 0, color: token.colorTextHeading, fontSize: 20 }}>
+              ตำแหน่งที่เปิดรับสมัคร
+            </Title>
+            <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              อัปเดตล่าสุด — คลิกที่การ์ดเพื่อดูรายละเอียด
+            </Text>
+          </Flex>
         </Flex>
         <Tag
-          className="border-none! px-4 py-1.5 rounded-full font-black text-sm shadow-sm"
-          style={{ backgroundColor: token.colorSuccessBg, color: token.colorSuccess }}
+          style={{
+            background: `linear-gradient(135deg, #11b6f5 0%, #0d8fd4 100%)`,
+            color: "#fff",
+            border: "none",
+            borderRadius: 100,
+            padding: "4px 16px",
+            fontWeight: 700,
+            fontSize: 13,
+          }}
         >
-          {jobs.length} ตำแหน่งงาน
+          {jobs.length} ตำแหน่ง
         </Tag>
-      </div>
+      </Flex>
 
-      <div className="grid gap-6">
+      {/* ── Job Cards ── */}
+      <div className="grid gap-4">
         {jobs.map((job) => (
-          <Card
+          <div
             key={job.id}
-            hoverable
             onClick={() => fetchAndOpenJob(job.id)}
-            className="group border-none! shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden relative"
+            className="group cursor-pointer"
             style={{
-              borderRadius: 32,
+              borderRadius: 20,
+              border: `1px solid ${token.colorBorderSecondary}`,
               backgroundColor: token.colorBgContainer,
+              overflow: "hidden",
+              transition: "all 0.25s ease",
+              position: "relative",
             }}
-            styles={{ body: { padding: 40 } }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLDivElement).style.borderColor = "#11b6f5";
+              (e.currentTarget as HTMLDivElement).style.boxShadow =
+                "0 8px 32px rgba(17,182,245,0.12)";
+              (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLDivElement).style.borderColor = token.colorBorderSecondary;
+              (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+              (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+            }}
           >
-            {/* ✨ accent bar ซ้าย */}
+            {/* ✨ Accent bar top */}
             <div
-              className="absolute top-0 left-0 w-2 h-full opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ backgroundColor: token.colorPrimary }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, #11b6f5 0%, #5dd5fb 100%)`,
+                opacity: 0,
+                transition: "opacity 0.25s ease",
+              }}
+              className="group-hover:opacity-100"
             />
 
-            <Row justify="space-between" align="middle" gutter={[24, 24]}>
-              <Col flex="auto">
-                <Flex gap={10} align="center" style={{ marginBottom: 12 }} wrap>
-                  {/* ✨ isNew และ isDeadlineSoon มาจาก backend แล้ว */}
-                  {job.isNew && (
+            <div style={{ padding: "24px 28px" }}>
+              <Row justify="space-between" align="middle" gutter={[16, 16]}>
+                <Col flex="auto">
+                  {/* ── Badges row ── */}
+                  <Flex gap={6} align="center" style={{ marginBottom: 12 }} wrap>
+                    {job.isNew && (
+                      <Tag
+                        icon={<StarFilled style={{ fontSize: 9 }} />}
+                        style={{
+                          background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 100,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: "2px 10px",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        ใหม่
+                      </Tag>
+                    )}
+                    {job.isDeadlineSoon && (
+                      <Tag
+                        icon={<ClockCircleOutlined style={{ fontSize: 10 }} />}
+                        style={{
+                          backgroundColor: token.colorErrorBg,
+                          color: token.colorError,
+                          border: "none",
+                          borderRadius: 100,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: "2px 10px",
+                        }}
+                      >
+                        ใกล้ปิดรับ
+                      </Tag>
+                    )}
                     <Tag
-                      className="border-none! px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider shadow-sm"
-                      style={{ backgroundColor: token.colorWarningBg, color: token.colorWarning }}
-                      icon={<StarFilled />}
+                      style={{
+                        backgroundColor: token.colorFillAlter,
+                        color: token.colorTextSecondary,
+                        border: "none",
+                        borderRadius: 100,
+                        fontSize: 10,
+                        fontWeight: 600,
+                        padding: "2px 10px",
+                      }}
                     >
-                      ใหม่
+                      {job.jobType || "งานประจำ"}
                     </Tag>
-                  )}
-                  {job.isDeadlineSoon && (
-                    <Tag
-                      className="border-none! px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider"
-                      style={{ backgroundColor: token.colorErrorBg, color: token.colorError }}
-                      icon={<ClockCircleOutlined />}
-                    >
-                      ใกล้ปิดรับ
-                    </Tag>
-                  )}
-                  <Tag
-                    className="border-none! px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider"
-                    style={{ backgroundColor: token.colorFillAlter, color: token.colorTextSecondary }}
+                  </Flex>
+
+                  {/* ── Title ── */}
+                  <Title
+                    level={5}
+                    style={{
+                      margin: "0 0 16px",
+                      fontSize: 17,
+                      fontWeight: 800,
+                      color: token.colorTextHeading,
+                      lineHeight: 1.4,
+                      transition: "color 0.2s",
+                    }}
+                    className="group-hover:text-[#11b6f5]!"
                   >
-                    {job.jobType || "งานประจำ"}
-                  </Tag>
-                </Flex>
+                    {job.title}
+                  </Title>
 
-                <Title
-                  level={4}
-                  className="m-0! text-2xl font-black mb-4 transition-colors"
-                  style={{ color: token.colorText }}
-                >
-                  {job.title}
-                </Title>
-
-                <Flex gap={32} wrap className="mb-6">
-                  <Flex vertical>
-                    <Text
-                      className="text-[11px] font-bold uppercase tracking-widest mb-1"
-                      style={{ color: token.colorTextQuaternary }}
-                    >
-                      งบประมาณรายเดือน
-                    </Text>
-                    {/* ✨ salaryText มาจาก backend แล้ว */}
-                    <Text className="text-xl font-black" style={{ color: token.colorPrimary }}>
-                      {job.salaryText}
-                    </Text>
+                  {/* ── Stats row ── */}
+                  <Flex gap={24} wrap style={{ marginBottom: 16 }}>
+                    <Flex vertical gap={2}>
+                      <Text style={{ fontSize: 10, color: token.colorTextQuaternary, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                        เงินเดือน
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 800,
+                          color: job.salaryText !== "ไม่ระบุ" ? token.colorPrimary : token.colorTextQuaternary,
+                        }}
+                      >
+                        {job.salaryText || "ไม่ระบุ"}
+                      </Text>
+                    </Flex>
+                    <Flex vertical gap={2}>
+                      <Text style={{ fontSize: 10, color: token.colorTextQuaternary, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                        รับจำนวน
+                      </Text>
+                      <Text style={{ fontSize: 16, fontWeight: 800, color: token.colorText }}>
+                        {job.positionsAvailable} อัตรา
+                      </Text>
+                    </Flex>
                   </Flex>
-                  <Flex vertical>
-                    <Text
-                      className="text-[11px] font-bold uppercase tracking-widest mb-1"
-                      style={{ color: token.colorTextQuaternary }}
-                    >
-                      จำนวนที่รับ
-                    </Text>
-                    <Text className="text-xl font-black" style={{ color: token.colorText }}>
-                      {job.positionsAvailable} อัตรา
-                    </Text>
-                  </Flex>
-                </Flex>
 
-                <Flex gap={8} wrap>
-                  {job.subjects.map((s) => (
-                    <Tag
-                      key={s}
-                      className="border-none! px-4 py-1 rounded-xl font-bold text-xs cursor-default"
-                      style={{ backgroundColor: token.colorFillAlter, color: token.colorTextSecondary }}
-                    >
-                      {s}
-                    </Tag>
-                  ))}
-                </Flex>
-              </Col>
+                  {/* ── Subject tags ── */}
+                  {job.subjects.length > 0 && (
+                    <Flex gap={6} wrap>
+                      {job.subjects.map((s) => (
+                        <span
+                          key={s}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "3px 12px",
+                            borderRadius: 8,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            backgroundColor: `rgba(17,182,245,0.07)`,
+                            color: token.colorPrimary,
+                            border: `1px solid rgba(17,182,245,0.18)`,
+                          }}
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </Flex>
+                  )}
+                </Col>
 
-              <Col className="hidden sm:block">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300"
-                  style={{ backgroundColor: token.colorPrimaryBg, color: token.colorPrimary }}
-                >
-                  <RightOutlined className="text-xl font-bold" />
-                </div>
-              </Col>
-            </Row>
-          </Card>
+                {/* ── Arrow CTA ── */}
+                <Col className="hidden sm:block">
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 14,
+                      background: `rgba(17,182,245,0.08)`,
+                      border: `1px solid rgba(17,182,245,0.2)`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: token.colorPrimary,
+                      transition: "all 0.25s ease",
+                      flexShrink: 0,
+                    }}
+                    className="group-hover:bg-[#11b6f5]! group-hover:text-white! group-hover:border-[#11b6f5]!"
+                  >
+                    <RightOutlined style={{ fontSize: 14, fontWeight: 700 }} />
+                  </div>
+                </Col>
+              </Row>
+            </div>
+          </div>
         ))}
       </div>
 
