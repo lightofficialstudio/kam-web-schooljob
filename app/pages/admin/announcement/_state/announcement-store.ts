@@ -14,6 +14,7 @@ interface AnnouncementStore {
   // ✨ Form state
   title: string;
   message: string;
+  imageUrl: string | null;
   targetRole: TargetRole;
   isSending: boolean;
   lastSentCount: number | null;
@@ -31,6 +32,7 @@ interface AnnouncementStore {
   // ✨ Actions
   setTitle: (v: string) => void;
   setMessage: (v: string) => void;
+  setImageUrl: (v: string | null) => void;
   setTargetRole: (v: TargetRole) => void;
   resetForm: () => void;
   fetchRecipientCount: (role: TargetRole) => Promise<void>;
@@ -41,6 +43,7 @@ interface AnnouncementStore {
 export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
   title: "",
   message: "",
+  imageUrl: null,
   targetRole: "ALL",
   isSending: false,
   lastSentCount: null,
@@ -53,6 +56,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
 
   setTitle: (v) => set({ title: v }),
   setMessage: (v) => set({ message: v }),
+  setImageUrl: (v) => set({ imageUrl: v }),
 
   // ✨ แก้ race condition — pass role โดยตรงเข้า fetchRecipientCount แทนการ get() state ใหม่
   setTargetRole: (v) => {
@@ -62,7 +66,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
   },
 
   // ✨ reset form หลังส่ง
-  resetForm: () => set({ title: "", message: "", targetRole: "ALL", lastSentCount: null, recipientCount: null }),
+  resetForm: () => set({ title: "", message: "", imageUrl: null, targetRole: "ALL", lastSentCount: null, recipientCount: null }),
 
   // ✨ นับจำนวนผู้รับตาม role ที่รับมาโดยตรง
   fetchRecipientCount: async (role) => {
@@ -89,7 +93,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
       return { ok: false, sentCount: 0, error: "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่" };
     }
 
-    const { title, message, targetRole } = get();
+    const { title, message, imageUrl, targetRole } = get();
     set({ isSending: true });
     try {
       const payload: BroadcastPayload = {
@@ -98,6 +102,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set, get) => ({
         message,
         target_role: targetRole,
         type: "system",
+        image_url: imageUrl ?? null,
       };
       const res = await requestBroadcast(payload);
 

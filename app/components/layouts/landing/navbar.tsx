@@ -22,6 +22,7 @@ import {
   Card,
   Dropdown,
   Flex,
+  Modal,
   Space,
   theme,
   Tooltip,
@@ -53,6 +54,7 @@ interface AppNotification {
   type: string;
   title: string;
   message: string | null;
+  imageUrl?: string | null;
   isRead: boolean;
   referenceId: string | null;
   referenceType: string | null;
@@ -86,6 +88,7 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [previewNotif, setPreviewNotif] = useState<AppNotification | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -225,33 +228,59 @@ export default function Navbar() {
               key={n.id}
               onClick={() => {
                 if (!n.isRead) handleMarkRead(n.id);
+                setPreviewNotif(n);
+                setNotifOpen(false);
               }}
               style={{
                 padding: "12px 16px",
                 borderBottom: `1px solid ${token.colorBorderSecondary}`,
                 backgroundColor: n.isRead ? "transparent" : token.colorInfoBg,
-                cursor: n.isRead ? "default" : "pointer",
+                cursor: "pointer",
                 transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor =
+                  n.isRead ? token.colorFillQuaternary : token.colorInfoBg;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.backgroundColor =
+                  n.isRead ? "transparent" : token.colorInfoBg;
               }}
             >
               <Flex gap={10} align="flex-start">
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    backgroundColor: n.isRead
-                      ? token.colorBgLayout
-                      : token.colorPrimaryBg,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                    flexShrink: 0,
-                  }}
-                >
-                  {NOTIF_ICON[n.type] ?? "🔔"}
-                </div>
+                {/* ✨ Thumbnail รูปภาพ หรือ emoji icon */}
+                {n.imageUrl ? (
+                  <img
+                    src={n.imageUrl}
+                    alt=""
+                    style={{
+                      width: 44,
+                      height: 44,
+                      objectFit: "cover",
+                      borderRadius: 10,
+                      flexShrink: 0,
+                      border: `1px solid ${token.colorBorderSecondary}`,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 10,
+                      backgroundColor: n.isRead
+                        ? token.colorBgLayout
+                        : token.colorPrimaryBg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 16,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {NOTIF_ICON[n.type] ?? "🔔"}
+                  </div>
+                )}
                 <Flex vertical gap={2} style={{ flex: 1, minWidth: 0 }}>
                   <Flex align="center" justify="space-between" gap={4}>
                     <Text
@@ -261,6 +290,9 @@ export default function Navbar() {
                         color: n.isRead
                           ? token.colorTextSecondary
                           : token.colorText,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {n.title}
@@ -280,7 +312,14 @@ export default function Navbar() {
                   {n.message && (
                     <Text
                       type="secondary"
-                      style={{ fontSize: 12, lineHeight: 1.5 }}
+                      style={{
+                        fontSize: 12,
+                        lineHeight: 1.5,
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
                     >
                       {n.message}
                     </Text>
@@ -428,7 +467,72 @@ export default function Navbar() {
   ];
 
   return (
-    // ✨ [Outer wrapper — fixed full-width, จัด layout ให้ pill ลอยตรงกลาง]
+    <>
+    {/* ── Notification Preview Modal ── */}
+    <Modal
+      open={!!previewNotif}
+      onCancel={() => setPreviewNotif(null)}
+      footer={
+        <Button type="primary" onClick={() => setPreviewNotif(null)} style={{ background: token.colorPrimary, borderColor: token.colorPrimary }}>
+          ปิด
+        </Button>
+      }
+      width={520}
+      centered
+      title={
+        <Flex align="center" gap={8}>
+          <div style={{ fontSize: 20 }}>{NOTIF_ICON[previewNotif?.type ?? ""] ?? "🔔"}</div>
+          <Text strong style={{ fontSize: 15 }}>{previewNotif?.title}</Text>
+        </Flex>
+      }
+    >
+      {previewNotif && (
+        <Flex vertical gap={0} style={{ marginTop: 4 }}>
+          {/* รูปภาพ */}
+          {previewNotif.imageUrl && (
+            <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 16 }}>
+              <img
+                src={previewNotif.imageUrl}
+                alt="announcement"
+                style={{ width: "100%", maxHeight: 260, objectFit: "cover", display: "block" }}
+              />
+            </div>
+          )}
+
+          {/* เนื้อหา */}
+          {previewNotif.message && (
+            <div
+              style={{
+                padding: "16px 18px",
+                borderRadius: 12,
+                background: token.colorBgLayout,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                borderLeft: `4px solid ${token.colorPrimary}`,
+                marginBottom: 12,
+              }}
+            >
+              <Text style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                {previewNotif.message}
+              </Text>
+            </div>
+          )}
+
+          {/* เวลา */}
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {new Date(previewNotif.createdAt).toLocaleDateString("th-TH", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+        </Flex>
+      )}
+    </Modal>
+
+    {/* ✨ [Outer wrapper — fixed full-width, จัด layout ให้ pill ลอยตรงกลาง] */}
     <div
       style={{
         position: "fixed",
@@ -839,5 +943,6 @@ export default function Navbar() {
         </Space>
       </div>
     </div>
+    </>
   );
 }

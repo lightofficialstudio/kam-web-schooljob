@@ -8,6 +8,7 @@ export const broadcastSchema = z.object({
   target_role: z.enum(["ALL", "EMPLOYEE", "EMPLOYER"]),
   type: z.string().default("system"),
   reference_id: z.string().optional(),
+  image_url: z.string().url().optional().nullable(),
 });
 
 export type BroadcastInput = z.infer<typeof broadcastSchema>;

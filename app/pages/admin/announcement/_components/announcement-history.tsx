@@ -75,22 +75,37 @@ export function AnnouncementHistory({ adminUserId }: Props) {
           className="hover:shadow-md"
         >
           <Flex gap={14} align="flex-start">
-            {/* ✨ Icon */}
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: "rgba(17,182,245,0.12)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                border: "1px solid rgba(17,182,245,0.2)",
-              }}
-            >
-              <BellOutlined style={{ color: "#11b6f5", fontSize: 16 }} />
-            </div>
+            {/* ✨ Thumbnail รูปภาพ (ถ้ามี) หรือ Icon fallback */}
+            {item.imageUrl ? (
+              <img
+                src={item.imageUrl}
+                alt="announcement"
+                style={{
+                  width: 64,
+                  height: 64,
+                  objectFit: "cover",
+                  borderRadius: 10,
+                  flexShrink: 0,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: "rgba(17,182,245,0.12)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  border: "1px solid rgba(17,182,245,0.2)",
+                }}
+              >
+                <BellOutlined style={{ color: "#11b6f5", fontSize: 16 }} />
+              </div>
+            )}
 
             {/* ✨ Content */}
             <Flex vertical gap={4} style={{ flex: 1, minWidth: 0 }}>

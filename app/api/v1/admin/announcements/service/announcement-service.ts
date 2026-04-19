@@ -37,6 +37,7 @@ export const broadcastAnnouncementService = async (data: BroadcastInput) => {
         type: data.type,
         title: data.title,
         message: data.message,
+        imageUrl: data.image_url ?? null,
         referenceId: data.reference_id ?? null,
         // ✨ ใช้ prefix "broadcast:" เพื่อไม่ชน entity reference อื่น ('job', 'blog', ฯลฯ)
         referenceType: `${BROADCAST_PREFIX}${data.target_role}`,
@@ -62,9 +63,9 @@ const parseTargetRole = (referenceType: string | null): "ALL" | "EMPLOYEE" | "EM
 export const getAnnouncementHistoryService = async (page: number) => {
   const skip = (page - 1) * PAGE_SIZE;
 
-  // ✨ groupBy โดยไม่รวม profileId — timestamp เดียวกันทุก batch จึงรวมเป็น 1 row
+  // ✨ groupBy เพิ่ม imageUrl เข้า group key เพื่อให้ select ออกมาได้
   const groups = await prisma.notification.groupBy({
-    by: ["title", "message", "type", "referenceType", "createdAt"],
+    by: ["title", "message", "imageUrl", "type", "referenceType", "createdAt"],
     where: { type: "system", referenceType: { startsWith: BROADCAST_PREFIX } },
     _count: { id: true },
     orderBy: { createdAt: "desc" },
@@ -78,7 +79,7 @@ export const getAnnouncementHistoryService = async (page: number) => {
       ? groups.length
       : await prisma.notification
           .groupBy({
-            by: ["title", "message", "type", "referenceType", "createdAt"],
+            by: ["title", "message", "imageUrl", "type", "referenceType", "createdAt"],
             where: { type: "system", referenceType: { startsWith: BROADCAST_PREFIX } },
             _count: { id: true },
           })
@@ -88,6 +89,7 @@ export const getAnnouncementHistoryService = async (page: number) => {
     items: groups.map((g) => ({
       title: g.title,
       message: g.message ?? "",
+      imageUrl: g.imageUrl ?? null,
       type: g.type,
       targetRole: parseTargetRole(g.referenceType),
       sentCount: g._count.id,

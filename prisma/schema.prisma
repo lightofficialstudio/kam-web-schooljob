@@ -476,6 +476,7 @@ model Notification {
   type          String // application_update, new_job, system, interview
   title         String // หัวข้อ notification
   message       String? // เนื้อหา
+  imageUrl      String?  @map("image_url") // รูปภาพประกอบ (optional)
   isRead        Boolean  @default(false) @map("is_read")
   referenceId   String?  @map("reference_id") // id ของ entity ที่เกี่ยวข้อง (optional)
   referenceType String?  @map("reference_type") // 'application', 'job', 'blog' (optional)

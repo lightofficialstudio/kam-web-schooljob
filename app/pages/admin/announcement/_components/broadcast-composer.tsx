@@ -3,8 +3,10 @@
 // ✨ Broadcast Composer — ฟอร์มสร้าง Announcement + Preview + Confirm before send
 import {
   BellOutlined,
+  CloseCircleFilled,
   EyeOutlined,
   LoadingOutlined,
+  PictureOutlined,
   SendOutlined,
   TeamOutlined,
   UserOutlined,
@@ -15,16 +17,22 @@ import {
   Button,
   Card,
   Flex,
+  Image,
   Input,
   Modal,
   Radio,
   Tag,
+  Tooltip,
   Typography,
+  Upload,
   theme,
 } from "antd";
+import type { RcFile } from "antd/es/upload";
+import { useState } from "react";
+import axios from "axios";
 import { useAnnouncementStore } from "../_state/announcement-store";
 import { TargetRole } from "../_api/announcement-api";
-import { useEffect, useState } from "react";
+import { useAuthStore } from "@/app/stores/auth-store";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -51,6 +59,9 @@ const TARGET_CONFIG: Record<TargetRole, { label: string; color: string; icon: Re
   },
 };
 
+const MAX_IMAGE_MB = 5;
+const MAX_IMAGE_BYTES = MAX_IMAGE_MB * 1024 * 1024;
+
 interface Props {
   onSend: () => void;
   isSending: boolean;
@@ -58,37 +69,68 @@ interface Props {
 
 export function BroadcastComposer({ onSend, isSending }: Props) {
   const { token } = theme.useToken();
+  const { user } = useAuthStore();
   const {
     title,
     message,
+    imageUrl,
     targetRole,
     setTitle,
     setMessage,
+    setImageUrl,
     setTargetRole,
     recipientCount,
     isCountingRecipients,
-    fetchRecipientCount,
   } = useAnnouncementStore();
 
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const cfg = TARGET_CONFIG[targetRole];
   const isValid = title.trim().length > 0 && message.trim().length > 0;
 
-  // ✨ โหลด count ครั้งแรกเมื่อ mount — ใช้ targetRole ปัจจุบันจาก store
-  useEffect(() => {
-    fetchRecipientCount(targetRole);
-  }, [fetchRecipientCount, targetRole]);
+  // ✨ อัปโหลดรูปไป Supabase Storage (announcements bucket)
+  const handleBeforeUpload = (file: RcFile): boolean => {
+    setUploadError(null);
 
-  // ✨ กดปุ่ม Send — count พร้อมแล้ว (update แบบ real-time) เปิด Modal ได้ทันที
-  const handleOpenConfirm = () => {
-    setConfirmOpen(true);
-  };
+    if (!file.type.startsWith("image/")) {
+      setUploadError("รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, WebP)");
+      return false;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setUploadError(`ขนาดไฟล์ไม่เกิน ${MAX_IMAGE_MB} MB`);
+      return false;
+    }
+    if (!user?.user_id) {
+      setUploadError("ไม่พบข้อมูลผู้ใช้");
+      return false;
+    }
 
-  // ✨ ยืนยันส่งจริง
-  const handleConfirm = () => {
-    setConfirmOpen(false);
-    onSend();
+    (async () => {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("bucket", "announcements");
+        formData.append("user_id", user.user_id);
+        const res = await axios.post<{ status_code: number; data: { url: string } }>(
+          "/api/v1/storage/upload",
+          formData
+        );
+        if (res.data.status_code === 200 && res.data.data?.url) {
+          setImageUrl(res.data.data.url);
+        } else {
+          setUploadError("อัปโหลดไม่สำเร็จ กรุณาลองใหม่");
+        }
+      } catch {
+        setUploadError("อัปโหลดไม่สำเร็จ กรุณาลองใหม่");
+      } finally {
+        setIsUploading(false);
+      }
+    })();
+
+    return false;
   };
 
   return (
@@ -187,13 +229,67 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
             />
           </div>
 
+          {/* ── Image Upload ── */}
+          <div style={{ marginBottom: 20 }}>
+            <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 6 }}>
+              รูปภาพประกอบ (ไม่บังคับ · สูงสุด {MAX_IMAGE_MB} MB)
+            </Text>
+
+            {imageUrl ? (
+              // ✨ แสดงรูปที่อัปโหลดแล้ว + ปุ่มลบ
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <Image
+                  src={imageUrl}
+                  alt="announcement image"
+                  width={240}
+                  height={135}
+                  style={{ objectFit: "cover", borderRadius: 10, display: "block" }}
+                  preview={false}
+                />
+                <Tooltip title="ลบรูปภาพ">
+                  <Button
+                    shape="circle"
+                    size="small"
+                    icon={<CloseCircleFilled />}
+                    danger
+                    style={{ position: "absolute", top: -8, right: -8, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+                    onClick={() => { setImageUrl(null); setUploadError(null); }}
+                  />
+                </Tooltip>
+              </div>
+            ) : (
+              <Upload
+                accept="image/jpeg,image/png,image/webp"
+                showUploadList={false}
+                beforeUpload={handleBeforeUpload}
+                multiple={false}
+                disabled={isUploading}
+              >
+                <Button
+                  icon={isUploading ? <LoadingOutlined /> : <PictureOutlined />}
+                  loading={isUploading}
+                  disabled={isUploading}
+                  style={{ borderRadius: 8, height: 40, borderStyle: "dashed" }}
+                >
+                  {isUploading ? "กำลังอัปโหลด..." : "เลือกรูปภาพ"}
+                </Button>
+              </Upload>
+            )}
+
+            {uploadError && (
+              <Text type="danger" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
+                {uploadError}
+              </Text>
+            )}
+          </div>
+
           {/* ── Send Button → เปิด Confirm Modal ── */}
           <Button
             type="primary"
             size="large"
             icon={<SendOutlined />}
             disabled={!isValid || isSending}
-            onClick={handleOpenConfirm}
+            onClick={() => setConfirmOpen(true)}
             style={{
               width: "100%",
               borderRadius: 10,
@@ -240,32 +336,42 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
           {/* ✨ Mock notification card */}
           <div
             style={{
-              padding: "14px 16px",
               borderRadius: 12,
               background: token.colorBgLayout,
               border: `1px solid ${token.colorBorderSecondary}`,
               borderLeft: `4px solid #11b6f5`,
+              overflow: "hidden",
             }}
           >
-            <Flex gap={10} align="flex-start">
-              <Avatar
-                icon={<BellOutlined />}
-                size={36}
-                style={{ background: "rgba(17,182,245,0.15)", color: "#11b6f5", flexShrink: 0 }}
+            {/* รูปภาพ (ถ้ามี) */}
+            {imageUrl && (
+              <img
+                src={imageUrl}
+                alt="preview"
+                style={{ width: "100%", maxHeight: 160, objectFit: "cover", display: "block" }}
               />
-              <Flex vertical gap={3} style={{ flex: 1, minWidth: 0 }}>
-                <Text strong style={{ fontSize: 13, lineHeight: 1.4 }}>
-                  {title || <span style={{ color: token.colorTextQuaternary }}>หัวข้อ Announcement</span>}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                  {message || <span style={{ color: token.colorTextQuaternary }}>เนื้อหาจะแสดงที่นี่...</span>}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 10, marginTop: 4 }}>เพิ่งส่งมา · Admin</Text>
+            )}
+            <div style={{ padding: "14px 16px" }}>
+              <Flex gap={10} align="flex-start">
+                <Avatar
+                  icon={<BellOutlined />}
+                  size={36}
+                  style={{ background: "rgba(17,182,245,0.15)", color: "#11b6f5", flexShrink: 0 }}
+                />
+                <Flex vertical gap={3} style={{ flex: 1, minWidth: 0 }}>
+                  <Text strong style={{ fontSize: 13, lineHeight: 1.4 }}>
+                    {title || <span style={{ color: token.colorTextQuaternary }}>หัวข้อ Announcement</span>}
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                    {message || <span style={{ color: token.colorTextQuaternary }}>เนื้อหาจะแสดงที่นี่...</span>}
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 10, marginTop: 4 }}>เพิ่งส่งมา · Admin</Text>
+                </Flex>
               </Flex>
-            </Flex>
+            </div>
           </div>
 
-          {/* ✨ Recipient Count Preview — แสดงแบบ real-time ตามที่เลือก role */}
+          {/* ✨ Recipient Count Preview */}
           <div
             style={{
               marginTop: 14,
@@ -281,15 +387,12 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
                   <span style={{ color: cfg.color, fontSize: 13 }}>{cfg.icon}</span>
                   <Text style={{ fontSize: 12, color: cfg.color, fontWeight: 700 }}>{cfg.label}</Text>
                 </Flex>
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  {cfg.desc}
-                </Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>{cfg.desc}</Text>
                 <Text type="secondary" style={{ fontSize: 10, marginTop: 2 }}>
                   Notification ปรากฏใน In-app bell icon
                 </Text>
               </Flex>
 
-              {/* ✨ ตัวเลขผู้รับ */}
               <div
                 style={{
                   padding: "8px 16px",
@@ -336,7 +439,7 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
       <Modal
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}
-        onOk={handleConfirm}
+        onOk={() => { setConfirmOpen(false); onSend(); }}
         confirmLoading={isSending}
         okText="ยืนยัน ส่งเลย"
         cancelText="ยกเลิก"
@@ -352,6 +455,13 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
         }
         width={480}
       >
+        {/* ✨ รูปภาพ (ถ้ามี) */}
+        {imageUrl && (
+          <div style={{ marginBottom: 12, marginTop: 4, borderRadius: 10, overflow: "hidden" }}>
+            <img src={imageUrl} alt="announcement" style={{ width: "100%", maxHeight: 180, objectFit: "cover", display: "block" }} />
+          </div>
+        )}
+
         {/* ✨ สรุป Announcement ที่จะส่ง */}
         <div
           style={{
@@ -360,7 +470,7 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
             background: token.colorFillQuaternary,
             border: `1px solid ${token.colorBorderSecondary}`,
             marginBottom: 16,
-            marginTop: 4,
+            marginTop: imageUrl ? 0 : 4,
           }}
         >
           <Text type="secondary" style={{ fontSize: 11, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>
@@ -400,7 +510,6 @@ export function BroadcastComposer({ onSend, isSending }: Props) {
               </Flex>
             </Flex>
 
-            {/* ✨ จำนวนผู้รับ */}
             <div
               style={{
                 padding: "6px 14px",

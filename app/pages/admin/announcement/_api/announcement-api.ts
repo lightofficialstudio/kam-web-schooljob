@@ -11,11 +11,13 @@ export interface BroadcastPayload {
   type?: string;
   reference_id?: string;
   reference_type?: string;
+  image_url?: string | null;
 }
 
 export interface AnnouncementHistoryItem {
   title: string;
   message: string;
+  imageUrl?: string | null;
   type: string;
   targetRole: "ALL" | "EMPLOYEE" | "EMPLOYER";
   sentCount: number;
