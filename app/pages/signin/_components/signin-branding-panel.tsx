@@ -1,6 +1,7 @@
 "use client";
 
 // ✨ Branding Panel — ฝั่งซ้าย Minimal + Animated orbs + icon-based features
+// ✨ keyframes (floatOrb, fadeSlideUp) อยู่ใน globals.css
 import {
   BankOutlined,
   CheckCircleOutlined,
@@ -80,16 +81,7 @@ export const SigninBrandingPanel = () => {
         justifyContent: "space-between",
       }}
     >
-      <style>{`
-        @keyframes floatOrb {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-14px) scale(1.04); }
-        }
-        @keyframes fadeSlideUp {
-          from { opacity: 0; transform: translateY(18px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      {/* ✨ keyframes อยู่ใน globals.css แล้ว */}
 
       {/* ✨ Orbs */}
       <div style={orb(220, "-80px", "-80px", "0s", 0.5)} />
@@ -167,15 +159,15 @@ export const SigninBrandingPanel = () => {
         </Flex>
       </Flex>
 
-      {/* ✨ Bottom: Feature list + footer */}
+      {/* ✨ Bottom: Feature list + footer — animation class จาก globals.css */}
       <Flex
         vertical
         gap={20}
         style={{
           position: "relative",
           zIndex: 1,
-          animation: "fadeSlideUp 0.7s ease 0.2s both",
         }}
+        className="signin-branding-bottom"
       >
         <div
           style={{
@@ -216,7 +208,7 @@ export const SigninBrandingPanel = () => {
         </Flex>
 
         <Text style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>
-          © 2025 School Board · All rights reserved
+          © {new Date().getFullYear()} School Board · All rights reserved
         </Text>
       </Flex>
     </Col>

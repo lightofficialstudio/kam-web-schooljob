@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { SchoolCard } from "./_components/school-card";
 import { SchoolJobsDrawer } from "./_components/school-jobs-drawer";
 import { SchoolSearch } from "./_components/school-search";
-import { useSchoolStore } from "./_stores/school-store";
+import { QUICK_FILTER_TYPES, useSchoolStore } from "./_stores/school-store";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
@@ -39,32 +39,23 @@ export default function SchoolDirectoryPage() {
     fetchProvinces,
   } = useSchoolStore();
 
-  // ✨ ดึงจังหวัดและโรงเรียนครั้งแรกตอน mount
+  // ✨ โหลดจังหวัด + โรงเรียนครั้งเดียวตอน mount
   useEffect(() => {
     fetchProvinces();
-    fetchSchoolList();
   }, []);
 
-  // ✨ ดึงโรงเรียนใหม่เมื่อ filter เปลี่ยน (ไม่รวม mount)
+  // ✨ fetch ใหม่ทุกครั้งที่ filter หรือ sort เปลี่ยน — API เป็นคนกรองและเรียงทั้งหมด
   useEffect(() => {
     fetchSchoolList();
-  }, [searchQuery, provinceFilter, typeFilter]);
+  }, [searchQuery, provinceFilter, typeFilter, sortBy]);
 
-  // Quick Filter Tags — toggle เมื่อกดซ้ำจะ clear
+  // ✨ Quick Filter toggle — กดซ้ำ = clear
   const handleQuickType = (value: string) =>
     setTypeFilter(typeFilter === value ? null : value);
   const handleQuickProvince = (value: string) =>
     setProvinceFilter(provinceFilter === value ? null : value);
 
-  // ✨ sort จาก data ที่ได้จาก API (filter ทำโดย API แล้ว)
-  const sortedSchools = [...schools].sort((a, b) => {
-    if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
-    return 0; // "latest" — API คืนมาเรียงตาม createdAt desc อยู่แล้ว
-  });
-
-  // ✨ Quick Filter ประเภทโรงเรียนที่ใช้บ่อย
-  const QUICK_TYPES = ["โรงเรียนนานาชาติ", "โรงเรียนรัฐบาล", "โรงเรียนเอกชน", "สถาบันกวดวิชา"];
-  // ✨ Quick Filter จังหวัด — ใช้ 2 จังหวัดแรกจาก provinceOptions ที่โหลดจาก API
+  // ✨ จังหวัด Quick Filter — 2 แรกจาก provinceOptions ที่ดึงจาก GitHub API
   const quickProvinces = provinceOptions.slice(0, 2).map((p) => p.value);
 
   return (
@@ -155,7 +146,7 @@ export default function SchoolDirectoryPage() {
                 กรองด่วน:
               </Text>
               {/* ✨ ประเภทโรงเรียน — static */}
-              {QUICK_TYPES.map((label) => {
+              {QUICK_FILTER_TYPES.map((label) => {
                 const isActive = typeFilter === label;
                 return (
                   <Tag
@@ -211,7 +202,7 @@ export default function SchoolDirectoryPage() {
                       color={token.colorPrimary}
                       style={{ borderRadius: 4, transform: "translateY(-1px)" }}
                     >
-                      {sortedSchools.length}
+                      {schools.length}
                     </Tag>
                   </Space>
                 </Col>
@@ -239,8 +230,8 @@ export default function SchoolDirectoryPage() {
                     </Card>
                   </Col>
                 ))
-              ) : sortedSchools.length > 0 ? (
-                sortedSchools.map((school) => (
+              ) : schools.length > 0 ? (
+                schools.map((school) => (
                   <Col xs={24} key={school.id}>
                     <SchoolCard {...school} />
                   </Col>
@@ -268,7 +259,7 @@ export default function SchoolDirectoryPage() {
                       </Flex>
                       {/* ✨ Empty state Quick Filter — ใช้ตัวแปรเดียวกับด้านบน */}
                       <Flex gap={8} wrap="wrap" justify="center">
-                        {QUICK_TYPES.map((label) => (
+                        {QUICK_FILTER_TYPES.map((label) => (
                           <Tag
                             key={label}
                             style={{
