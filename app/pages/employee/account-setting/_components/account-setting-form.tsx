@@ -12,7 +12,7 @@ import {
   Space,
   Typography,
 } from "antd";
-import { useAccountSettingStore } from "../stores/account-setting-store";
+import { useAccountSettingStore } from "../_stores/account-setting-store";
 
 const { Title, Text } = Typography;
 

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchBlogs } from "../_api/blog-api";
+import { fetchBlogCategories, fetchBlogs } from "../_api/blog-api";
 
 export interface BlogItem {
   id: string;
@@ -18,22 +18,39 @@ interface BlogListState {
   blogs: BlogItem[];
   total: number;
   isLoading: boolean;
+  // ✨ categories มาจาก API — ไม่ hardcode ใน UI
+  categories: string[];
+  isCategoriesLoading: boolean;
   activeTab: string;
   searchText: string;
   setActiveTab: (tab: string) => void;
   setSearchText: (text: string) => void;
   fetchBlogList: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
 }
 
 export const useBlogStore = create<BlogListState>((set, get) => ({
   blogs: [],
   total: 0,
   isLoading: false,
+  categories: [],
+  isCategoriesLoading: false,
   activeTab: "all",
   searchText: "",
 
   setActiveTab: (activeTab) => set({ activeTab }),
   setSearchText: (searchText) => set({ searchText }),
+
+  // ✨ ดึงหมวดหมู่จาก API
+  fetchCategories: async () => {
+    set({ isCategoriesLoading: true });
+    try {
+      const categories = await fetchBlogCategories();
+      set({ categories, isCategoriesLoading: false });
+    } catch {
+      set({ isCategoriesLoading: false });
+    }
+  },
 
   // ✨ ดึงบทความจาก API
   fetchBlogList: async () => {

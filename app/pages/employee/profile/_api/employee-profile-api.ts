@@ -34,3 +34,107 @@ export const requestUpdateEmployeeProfile = async (
     throw err;
   }
 };
+
+// ✨ === Basic Info ===
+export const patchBasicInfo = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.patch("/api/v1/employee/profile/basic", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+// ✨ === Summary ===
+export const patchSummary = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.patch("/api/v1/employee/profile/summary", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+// ✨ === Work Experiences ===
+export const postWorkExperience = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.post("/api/v1/employee/work-experiences", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const putWorkExperience = async (id: string, userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.put(`/api/v1/employee/work-experiences/${id}`, payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const deleteWorkExperience = async (id: string, userId: string) => {
+  const { data } = await axios.delete(`/api/v1/employee/work-experiences/${id}`, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+// ✨ === Educations ===
+export const postEducation = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.post("/api/v1/employee/educations", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const putEducation = async (id: string, userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.put(`/api/v1/employee/educations/${id}`, payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const deleteEducation = async (id: string, userId: string) => {
+  const { data } = await axios.delete(`/api/v1/employee/educations/${id}`, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+// ✨ === Resumes ===
+export const postResume = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.post("/api/v1/employee/resumes", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const putResume = async (id: string, userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.put(`/api/v1/employee/resumes/${id}`, payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const deleteResume = async (id: string, userId: string) => {
+  const { data } = await axios.delete(`/api/v1/employee/resumes/${id}`, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+// ✨ === Licenses (ใบประกอบวิชาชีพ) ===
+export const postLicense = async (userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.post("/api/v1/employee/licenses", payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const putLicense = async (id: string, userId: string, payload: Record<string, unknown>) => {
+  const { data } = await axios.put(`/api/v1/employee/licenses/${id}`, payload, {
+    params: { user_id: userId },
+  });
+  return data;
+};
+
+export const deleteLicense = async (id: string, userId: string) => {
+  const { data } = await axios.delete(`/api/v1/employee/licenses/${id}`, {
+    params: { user_id: userId },
+  });
+  return data;
+};

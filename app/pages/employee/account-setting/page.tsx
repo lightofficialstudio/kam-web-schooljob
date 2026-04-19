@@ -2,7 +2,7 @@
 
 import { HomeOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
 import { Breadcrumb, Col, Layout, Row, Space, Typography } from "antd";
-import AccountSettingForm from "./components/account-setting-form";
+import AccountSettingForm from "./_components/account-setting-form";
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;

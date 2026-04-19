@@ -18,3 +18,11 @@ export const fetchBlogById = async (blogId: string) => {
   const response = await axios.get(`/api/v1/blogs/${blogId}`);
   return response.data;
 };
+
+// ✨ ดึงหมวดหมู่ที่มีบทความเผยแพร่แล้วจาก DB
+export const fetchBlogCategories = async (): Promise<string[]> => {
+  const response = await axios.get<{ status_code: number; data: string[] }>(
+    "/api/v1/blogs/categories",
+  );
+  return response.data.status_code === 200 ? response.data.data : [];
+};
