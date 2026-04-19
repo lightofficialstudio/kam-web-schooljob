@@ -73,58 +73,6 @@ type TeacherFields = CommonFields & { _role: "teacher" };
 type SchoolFields = CommonFields & { _role: "school" };
 type SignupFormValues = TeacherFields | SchoolFields;
 
-// ✨ Progress bar — แสดงความก้าวหน้า 2 ขั้นตอน
-const StepProgressBar = ({ step }: { step: 1 | 2 }) => {
-  const { token } = antTheme.useToken();
-  const pct = step === 1 ? 50 : 100;
-
-  return (
-    <div className="w-full">
-      {/* ✨ labels */}
-      <Flex justify="space-between" style={{ marginBottom: 6 }}>
-        <Text
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            color: token.colorPrimary,
-          }}
-        >
-          ขั้นตอนที่ {step} / 2
-        </Text>
-        <Text style={{ fontSize: 11, color: token.colorTextTertiary }}>
-          {step === 1 ? "เลือกประเภท" : "กรอกข้อมูล"}
-        </Text>
-      </Flex>
-
-      {/* ✨ track */}
-      <div
-        style={{
-          width: "100%",
-          height: 4,
-          borderRadius: 99,
-          background: token.colorFillTertiary,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          key={step}
-          className="signup-progress-bar"
-          style={{
-            height: "100%",
-            borderRadius: 99,
-            background: `linear-gradient(90deg, #0d8fd4, #11b6f5)`,
-            // ✨ CSS var ให้ keyframe อ่าน
-            ["--progress-to" as string]: `${pct}%`,
-            width: `${pct}%`,
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
 // ✨ Step 1 — เลือก role ก่อนสมัคร
 const RoleSelectStep = () => {
   const { token } = antTheme.useToken();
@@ -145,33 +93,24 @@ const RoleSelectStep = () => {
       <Flex vertical gap={28}>
         {/* ✨ Header */}
         <Flex vertical gap={4}>
-          <Title level={3} style={{ margin: 0 }}>
-            สมัครสมาชิก
-          </Title>
-          <Text type="secondary" style={{ fontSize: 14 }}>
-            มีบัญชีอยู่แล้ว?{" "}
-            <Link
-              href="/pages/signin"
-              className="transition-opacity hover:opacity-70"
-              style={{ fontWeight: 600, color: token.colorPrimary }}
-            >
-              เข้าสู่ระบบ
-            </Link>
-          </Text>
-        </Flex>
-
-        {/* ✨ progress */}
-        <StepProgressBar step={1} />
-
-        {/* ✨ title */}
-        <Flex vertical gap={4}>
-          <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
+          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
             คุณต้องการสมัครในฐานะอะไร?
           </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          <Text type="secondary" style={{ fontSize: 14 }}>
             เลือกประเภทบัญชีที่ตรงกับคุณ เพื่อประสบการณ์ที่เหมาะสมที่สุด
           </Text>
         </Flex>
+
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          มีบัญชีอยู่แล้ว?{" "}
+          <Link
+            href="/pages/signin"
+            className="transition-opacity hover:opacity-70"
+            style={{ fontWeight: 600, color: token.colorPrimary }}
+          >
+            เข้าสู่ระบบ
+          </Link>
+        </Text>
 
         {/* ✨ role cards */}
         <Flex vertical gap={14}>
@@ -332,50 +271,44 @@ const DetailsFormStep = () => {
           </button>
 
           {/* ✨ header */}
-          <Flex vertical gap={10}>
+          <Flex vertical gap={6}>
             <Flex align="center" gap={12}>
               {selectedRole && (
-                <div
+                <Flex
+                  align="center"
+                  justify="center"
                   style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 10,
+                    width: 42,
+                    height: 42,
+                    borderRadius: 12,
                     background: selectedRole.gradient,
                     color: "#fff",
-                    fontSize: 16,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    fontSize: 18,
                     flexShrink: 0,
                     boxShadow: `0 4px 14px rgba(0,0,0,0.14)`,
                   }}
                 >
                   {selectedRole.icon}
-                </div>
+                </Flex>
               )}
-              <Title level={3} style={{ margin: 0 }}>
-                สร้างบัญชี
-                {selectedRole?.label ? (
-                  <span style={{ color: token.colorPrimary }}>
-                    {" "}— {selectedRole.label}
-                  </span>
-                ) : null}
-              </Title>
+              <Flex vertical gap={1}>
+                <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
+                  สร้างบัญชี{selectedRole?.label ? (
+                    <span style={{ color: token.colorPrimary }}> — {selectedRole.label}</span>
+                  ) : null}
+                </Title>
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  มีบัญชีอยู่แล้ว?{" "}
+                  <Link
+                    href="/pages/signin"
+                    className="transition-opacity hover:opacity-70"
+                    style={{ fontWeight: 600, color: token.colorPrimary }}
+                  >
+                    เข้าสู่ระบบ
+                  </Link>
+                </Text>
+              </Flex>
             </Flex>
-
-            {/* ✨ progress */}
-            <StepProgressBar step={2} />
-
-            <Text type="secondary" style={{ fontSize: 13 }}>
-              มีบัญชีอยู่แล้ว?{" "}
-              <Link
-                href="/pages/signin"
-                className="transition-opacity hover:opacity-70"
-                style={{ fontWeight: 600, color: token.colorPrimary }}
-              >
-                เข้าสู่ระบบ
-              </Link>
-            </Text>
           </Flex>
 
           {/* ✨ form */}
