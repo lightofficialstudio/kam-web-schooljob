@@ -1,35 +1,50 @@
 "use client";
 
-import { HomeOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
-import { Breadcrumb, Col, Layout, Row, Space, Typography } from "antd";
-import AccountSettingForm from "./_components/account-setting-form";
+import {
+  HomeOutlined,
+  SafetyCertificateOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Breadcrumb, Col, Layout, Row, Space, Typography, theme } from "antd";
+import { AccountSettingForm } from "./_components/account-setting-form";
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
+const { useToken } = theme;
 
-const EmployeeAccountSettingPage = () => {
+export default function EmployeeAccountSettingPage() {
+  const { token } = useToken();
+
   return (
-    <Content style={{ padding: "40px 24px", minHeight: "100vh" }}>
+    <Content
+      style={{
+        padding: "40px 24px",
+        minHeight: "100vh",
+        backgroundColor: token.colorBgLayout,
+      }}
+    >
       <Row justify="center">
-        <Col xs={24} sm={22} md={18} lg={14} xl={12}>
-          <Space orientation="vertical" size={32} style={{ width: "100%" }}>
-            {/* Header Section */}
-            <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+        <Col xs={24} sm={22} md={20} lg={16} xl={14}>
+          <Space direction="vertical" size={32} style={{ width: "100%" }}>
+            {/* ── Header ─── */}
+            <Space direction="vertical" size={20} style={{ width: "100%" }}>
               <Breadcrumb
                 items={[
                   {
                     href: "/pages/landing",
                     title: (
                       <Space size={4}>
-                        <HomeOutlined style={{ fontSize: "14px" }} />
+                        <HomeOutlined />
                         <span>หน้าแรก</span>
                       </Space>
                     ),
                   },
                   {
+                    href: "/pages/employee/profile",
                     title: (
                       <Space size={4}>
-                        <UserOutlined style={{ fontSize: "14px" }} />
+                        <UserOutlined />
                         <span>โปรไฟล์ผู้สมัคร</span>
                       </Space>
                     ),
@@ -37,7 +52,7 @@ const EmployeeAccountSettingPage = () => {
                   {
                     title: (
                       <Space size={4}>
-                        <SettingOutlined style={{ fontSize: "14px" }} />
+                        <SettingOutlined />
                         <span style={{ fontWeight: 500 }}>ตั้งค่าบัญชี</span>
                       </Space>
                     ),
@@ -45,40 +60,68 @@ const EmployeeAccountSettingPage = () => {
                 ]}
               />
 
-              <Row align="middle" justify="space-between">
-                <Col>
-                  <Title
-                    level={2}
-                    style={{
-                      margin: 0,
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    ตั้งค่าบัญชี
-                  </Title>
-                  <Paragraph
-                    type="secondary"
-                    style={{ margin: "4px 0 0 0", fontSize: "15px" }}
-                  >
-                    จัดการข้อมูลส่วนตัว ความปลอดภัย และการเข้าถึงระบบของคุณ
-                  </Paragraph>
-                </Col>
-                <Col>
-                  <SettingOutlined
-                    style={{ fontSize: "48px", color: "rgba(0,0,0,0.06)" }}
-                  />
-                </Col>
-              </Row>
+              {/* ✨ Hero header — gradient banner */}
+              <div
+                style={{
+                  borderRadius: 20,
+                  padding: "32px 36px",
+                  background: `linear-gradient(135deg, ${token.colorPrimary} 0%, #0d8fd4 100%)`,
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* dot pattern */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    opacity: 0.07,
+                    backgroundImage:
+                      "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+                    backgroundSize: "24px 24px",
+                  }}
+                />
+                <Row
+                  align="middle"
+                  justify="space-between"
+                  style={{ position: "relative", zIndex: 1 }}
+                >
+                  <Col>
+                    <Title
+                      level={2}
+                      style={{
+                        margin: 0,
+                        fontWeight: 800,
+                        color: "#fff",
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      ตั้งค่าบัญชี
+                    </Title>
+                    <Paragraph
+                      style={{
+                        margin: "6px 0 0 0",
+                        fontSize: 15,
+                        color: "rgba(255,255,255,0.85)",
+                      }}
+                    >
+                      จัดการความปลอดภัยและการเข้าถึงระบบของคุณ
+                    </Paragraph>
+                  </Col>
+                  <Col>
+                    <SafetyCertificateOutlined
+                      style={{ fontSize: 56, color: "rgba(255,255,255,0.15)" }}
+                    />
+                  </Col>
+                </Row>
+              </div>
             </Space>
 
-            {/* Main Content Area */}
+            {/* ── Main content ─── */}
             <AccountSettingForm />
           </Space>
         </Col>
       </Row>
     </Content>
   );
-};
-
-export default EmployeeAccountSettingPage;
+}

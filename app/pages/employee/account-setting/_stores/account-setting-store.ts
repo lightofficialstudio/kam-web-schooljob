@@ -3,11 +3,12 @@
 import { create } from "zustand";
 
 interface AccountSettingState {
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
+  // ✨ loading แยกต่างหากต่อ action
+  isPasswordLoading: boolean;
+  setPasswordLoading: (v: boolean) => void;
 }
 
 export const useAccountSettingStore = create<AccountSettingState>((set) => ({
-  loading: false,
-  setLoading: (loading) => set({ loading }),
+  isPasswordLoading: false,
+  setPasswordLoading: (v) => set({ isPasswordLoading: v }),
 }));
