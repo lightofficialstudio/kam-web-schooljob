@@ -405,16 +405,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       profile: { ...state.profile, activeResumeId: id },
     })),
 
-  // ✨ ลบ resume ออกจาก DB โดยส่ง is_deleted: true แล้วค่อย removeResume ออกจาก store
-  deleteResumeFromDB: async (resumeId: string, userId: string) => {
-    const realId = toUuidOrUndefined(resumeId);
-    if (realId) {
-      // มี UUID จริง → ส่ง is_deleted: true ไปยัง API
-      await requestUpdateEmployeeProfile(userId, {
-        resumes: [{ id: realId, file_name: "", file_url: "", is_active: false, is_deleted: true }],
-      });
-    }
-    // ลบออกจาก store ทั้งสองกรณี (UUID จริง หรือ id ชั่วคราว)
+  // ✨ ลบ resume ออกจาก store (ใช้ deleteResume API จาก _api/ แทน)
+  deleteResumeFromDB: async (resumeId: string, _userId: string) => {
     set((state) => {
       const remaining = (state.profile.resumes ?? []).filter((r) => r.id !== resumeId);
       const newActiveId =
@@ -449,16 +441,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       profile: { ...state.profile, licenseStatus: status },
     })),
 
-  // ✨ ลบไฟล์แนบใบประกอบฯ ออกจาก DB (licenses table) แล้วค่อยลบออกจาก store
-  deleteLicenseAttachmentFromDB: async (attachmentId: string, userId: string) => {
-    const realId = toUuidOrUndefined(attachmentId);
-    if (realId) {
-      // มี UUID จริง → soft-delete ใน DB ผ่าน licenses array
-      await requestUpdateEmployeeProfile(userId, {
-        licenses: [{ id: realId, license_name: "", is_deleted: true }],
-      });
-    }
-    // ลบออกจาก store
+  // ✨ ลบไฟล์แนบใบประกอบฯ ออกจาก store (ใช้ deleteLicense API จาก _api/ แทน)
+  deleteLicenseAttachmentFromDB: async (attachmentId: string, _userId: string) => {
     set((state) => ({
       profile: {
         ...state.profile,
@@ -607,7 +591,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             lastName: d.lastName ?? "",
             phoneNumber: d.phoneNumber ?? "",
             gender: d.gender ?? "",
-            dateOfBirth: d.dateOfBirth ? new Date(d.dateOfBirth).toISOString().split("T")[0] : "",
+            // ✨ ใช้ UTC date string โดยตรงเพื่อป้องกัน timezone off-by-one
+            dateOfBirth: d.dateOfBirth ? d.dateOfBirth.toString().split("T")[0] : "",
             nationality: d.nationality ?? "",
             profileImageUrl: d.profileImageUrl ?? "",
             profileVisibility: d.profileVisibility ?? "public",
@@ -650,7 +635,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             })) ?? [],
             // ✨ licenses ที่มี fileUrl → map กลับเป็น licenseAttachments ด้วย
             licenses: (d.licenses ?? [])
-              .filter((lic: { fileUrl: string | null }) => !lic.fileUrl) // license record ที่ไม่มีไฟล์แนบ
+              .filter((lic: { fileUrl: string | null | undefined }) => lic.fileUrl == null) // license record ที่ไม่มีไฟล์แนบ
               .map((lic: {
                 id: string; licenseName: string; issuer: string | null;
                 licenseNumber: string | null; issueDate: string | null;
@@ -666,7 +651,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
               })),
             // ✨ licenses ที่มี fileUrl → map เป็น licenseAttachments (ไฟล์แนบใบประกอบฯ)
             licenseAttachments: (d.licenses ?? [])
-              .filter((lic: { fileUrl: string | null }) => !!lic.fileUrl)
+              .filter((lic: { fileUrl: string | null | undefined }) => lic.fileUrl != null && lic.fileUrl !== "")
               .map((lic: {
                 id: string; licenseName: string; fileSize?: number | null;
                 fileUrl: string; uploadedAt?: string; createdAt?: string;

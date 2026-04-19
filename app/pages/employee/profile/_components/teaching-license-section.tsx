@@ -28,7 +28,7 @@ import type { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
 import type { ResumeEntry } from "../_stores/profile-store";
 import { useProfileStore } from "../_stores/profile-store";
-import { postLicense, deleteLicense } from "../_api/employee-profile-api";
+import { postLicense, deleteLicense, patchSummary } from "../_api/employee-profile-api";
 
 const { Text } = Typography;
 
@@ -257,7 +257,16 @@ export const TeachingLicenseSection: React.FC = () => {
                   key={opt.value}
                   align="center"
                   gap={12}
-                  onClick={() => setLicenseStatus(opt.value)}
+                  onClick={async () => {
+                    setLicenseStatus(opt.value);
+                    if (user?.user_id) {
+                      try {
+                        await patchSummary(user.user_id, { license_status: opt.value });
+                      } catch {
+                        // ✨ silent fail — store อัปเดตแล้ว จะ sync ครั้งถัดไปตอน fetchProfile
+                      }
+                    }
+                  }}
                   style={{
                     padding: "12px 16px",
                     borderRadius: token.borderRadius,
@@ -350,7 +359,7 @@ export const TeachingLicenseSection: React.FC = () => {
                         danger
                         icon={<DeleteOutlined />}
                         loading={deletingId === file.id}
-                        disabled={deletingId !== null}
+                        disabled={deletingId === file.id}
                         onClick={() => {
                           setPendingDelete(file);
                           setModal({

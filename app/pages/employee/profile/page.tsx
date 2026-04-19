@@ -244,8 +244,9 @@ export default function EmployeeProfilePage() {
         ...profile,
         ...rest,
         ...(dobStr !== undefined ? { dateOfBirth: dobStr } : {}),
+        // ✨ languageAndItSkills รวม language + IT ไว้ด้วยกัน — เก็บทั้งหมดใน languagesSpoken
         ...(languageAndItSkills !== undefined
-          ? { languagesSpoken: languageAndItSkills, itSkills: [] }
+          ? { languagesSpoken: languageAndItSkills }
           : {}),
       };
       setProfile(merged);
@@ -284,8 +285,8 @@ export default function EmployeeProfilePage() {
           await saveProfile(user.user_id);
         }
 
-        // ✨ re-fetch profileStrength หลัง save เพื่ออัปเดต % ความสมบูรณ์
-        fetchProfile(user.user_id, user.email);
+        // ✨ re-fetch profileStrength หลัง save เพื่ออัปเดต % ความสมบูรณ์ (fire-and-forget)
+        void fetchProfile(user.user_id, user.email);
       }
 
       // ✨ sync รูปโปรไฟล์กลับไปที่ authStore
@@ -636,7 +637,13 @@ export default function EmployeeProfilePage() {
                             try {
                               await patchBasicInfo(user.user_id, { profile_visibility: newVisibility });
                             } catch {
-                              console.error("❌ บันทึกการมองเห็นโปรไฟล์ไม่สำเร็จ");
+                              // ✨ rollback store ถ้า API fail
+                              updateField("profileVisibility", profile.profileVisibility ?? "public");
+                              openNotification({
+                                type: "error",
+                                mainTitle: "บันทึกไม่สำเร็จ",
+                                description: "ไม่สามารถเปลี่ยนการมองเห็นโปรไฟล์ได้ กรุณาลองใหม่",
+                              });
                             }
                           }
                         }}
