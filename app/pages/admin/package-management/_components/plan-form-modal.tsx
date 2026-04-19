@@ -2,7 +2,6 @@
 
 // ✨ Modal สร้าง/แก้ไข Package Plan — Admin จัดการได้ครบทุก field
 import {
-  DeleteOutlined,
   MinusCircleOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
@@ -317,55 +316,3 @@ export const PlanFormModal: React.FC<PlanFormModalProps> = ({
   );
 };
 
-// ✨ Modal ยืนยันการลบ Plan
-interface DeletePlanModalProps {
-  open: boolean;
-  plan: PackagePlanItem | null;
-  isDeleting: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
-
-export const DeletePlanModal: React.FC<DeletePlanModalProps> = ({
-  open,
-  plan,
-  isDeleting,
-  onConfirm,
-  onCancel,
-}) => (
-  <Modal
-    open={open}
-    title={
-      <Flex align="center" gap={8}>
-        <DeleteOutlined style={{ color: "#ff4d4f" }} />
-        <span>ลบ Package Plan</span>
-      </Flex>
-    }
-    okText="ยืนยันการลบ"
-    okButtonProps={{ danger: true, loading: isDeleting }}
-    cancelText="ยกเลิก"
-    onOk={onConfirm}
-    onCancel={onCancel}
-  >
-    {plan && (
-      <Flex vertical gap={8} style={{ marginTop: 8 }}>
-        <Text>
-          ต้องการลบ Package Plan{" "}
-          <Tag
-            style={{
-              fontWeight: 700,
-              border: `1.5px solid ${plan.color}`,
-              color: plan.color,
-            }}
-          >
-            {plan.label}
-          </Tag>{" "}
-          ใช่หรือไม่?
-        </Text>
-        <Text type="danger" style={{ fontSize: 12 }}>
-          ⚠️ ไม่สามารถลบได้ถ้ายังมีโรงเรียนใช้ Plan นี้อยู่
-        </Text>
-      </Flex>
-    )}
-  </Modal>
-);

@@ -2,6 +2,7 @@
 
 // ✨ Admin Package Management — CRUD Plan + School Detail + Bulk Change + Revenue + Quota Alert
 import { useAuthStore } from "@/app/stores/auth-store";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import {
   CheckSquareOutlined,
   CrownOutlined,
@@ -18,7 +19,6 @@ import {
   ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
-  App,
   Avatar,
   Breadcrumb,
   Button,
@@ -44,7 +44,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BulkPlanModal } from "./_components/bulk-plan-modal";
-import { DeletePlanModal, PlanFormModal } from "./_components/plan-form-modal";
+import { PlanFormModal } from "./_components/plan-form-modal";
 import { PlanChangeModal } from "./_components/plan-change-modal";
 import { QuotaAlertPanel } from "./_components/quota-alert-panel";
 import { RevenueProjectionPanel } from "./_components/revenue-projection-panel";
@@ -74,9 +74,20 @@ const PlanTag: React.FC<{ plan: string; planDef?: PackagePlanItem }> = ({ plan, 
   );
 };
 
+// ✨ State สำหรับ ModalComponent
+interface StatusModal {
+  open: boolean;
+  type: "success" | "error" | "confirm" | "delete";
+  title: string;
+  description?: string;
+  errorDetails?: unknown;
+  onConfirm?: () => void;
+}
+
+const MODAL_CLOSED: StatusModal = { open: false, type: "success", title: "" };
+
 export default function PackageManagementPage() {
   const { token } = theme.useToken();
-  const { message } = App.useApp();
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
 
@@ -93,6 +104,7 @@ export default function PackageManagementPage() {
 
   const [isMounted, setIsMounted] = useState(false);
   const [searchInput, setSearchInput] = useState(filterKeyword);
+  const [statusModal, setStatusModal] = useState<StatusModal>(MODAL_CLOSED);
 
   // ─── Plan Form Modal ───
   const [planModalOpen, setPlanModalOpen] = useState(false);
@@ -143,27 +155,63 @@ export default function PackageManagementPage() {
     try {
       if (planModalMode === "create") {
         await createPlan(data);
-        message.success(`สร้าง Package Plan "${data.label}" สำเร็จ`);
+        setPlanModalOpen(false);
+        fetchSummary();
+        setStatusModal({
+          open: true, type: "success",
+          title: "สร้าง Package Plan สำเร็จ",
+          description: `Plan "${data.label}" ถูกสร้างและพร้อมใช้งานแล้ว`,
+        });
       } else if (editingPlan) {
         const { plan: _key, ...patchData } = data;
         await patchPlan(editingPlan.plan, patchData);
-        message.success(`อัปเดต Package Plan "${data.label}" สำเร็จ`);
+        setPlanModalOpen(false);
+        fetchSummary();
+        setStatusModal({
+          open: true, type: "success",
+          title: "อัปเดต Package Plan สำเร็จ",
+          description: `Plan "${data.label}" ถูกบันทึกเรียบร้อยแล้ว`,
+        });
       }
+    } catch (err) {
       setPlanModalOpen(false);
-      fetchSummary();
-    } catch { message.error("บันทึก Package Plan ไม่สำเร็จ"); }
+      setStatusModal({
+        open: true, type: "error",
+        title: "บันทึก Package Plan ไม่สำเร็จ",
+        description: "ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
+    }
   };
 
-  const handleDeletePlan = async () => {
-    if (!deletingPlanItem) return;
-    try {
-      await deletePlan(deletingPlanItem.plan);
-      message.success(`ลบ Package Plan "${deletingPlanItem.label}" สำเร็จ`);
-      setDeletingPlanItem(null);
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { message_th?: string } } };
-      message.error(e?.response?.data?.message_th ?? "ลบ Package Plan ไม่สำเร็จ");
-    }
+  // ✨ เปิด modal ยืนยันการลบ (type="delete")
+  const openDeleteConfirm = (plan: PackagePlanItem) => {
+    setDeletingPlanItem(plan);
+    setStatusModal({
+      open: true, type: "delete",
+      title: `ลบ Package Plan "${plan.label}"?`,
+      description: "⚠️ ไม่สามารถลบได้ถ้ายังมีโรงเรียนใช้ Plan นี้อยู่ การกระทำนี้ไม่สามารถย้อนกลับได้",
+      onConfirm: async () => {
+        setStatusModal(MODAL_CLOSED);
+        try {
+          await deletePlan(plan.plan);
+          setStatusModal({
+            open: true, type: "success",
+            title: "ลบ Package Plan สำเร็จ",
+            description: `Plan "${plan.label}" ถูกลบออกจากระบบแล้ว`,
+          });
+        } catch (err) {
+          const e = err as { response?: { data?: { message_th?: string } } };
+          const reason = e?.response?.data?.message_th ?? "ไม่สามารถลบได้ อาจมีโรงเรียนที่ยังใช้ Plan นี้อยู่";
+          setStatusModal({
+            open: true, type: "error",
+            title: "ลบ Package Plan ไม่สำเร็จ",
+            description: reason,
+            errorDetails: err,
+          });
+        }
+      },
+    });
   };
 
   // ─── Single Plan Change ───
@@ -175,11 +223,25 @@ export default function PackageManagementPage() {
 
   const handleConfirmPlan = async (jobQuotaMax: number) => {
     if (!modalSchool || !modalTargetPlan) return;
+    const schoolName = modalSchool.schoolName;
+    const planLabel = modalTargetPlan.label;
+    setModalSchool(null);
+    setModalTargetPlan(null);
     try {
       await updatePlan(modalSchool.id, modalTargetPlan.plan, jobQuotaMax);
-      message.success(`เปลี่ยน Package ของ "${modalSchool.schoolName}" เป็น ${modalTargetPlan.label} สำเร็จ`);
-    } catch { message.error("เปลี่ยน Package ไม่สำเร็จ"); }
-    finally { setModalSchool(null); setModalTargetPlan(null); }
+      setStatusModal({
+        open: true, type: "success",
+        title: "เปลี่ยน Package สำเร็จ",
+        description: `"${schoolName}" ได้รับ Package ${planLabel} เรียบร้อยแล้ว`,
+      });
+    } catch (err) {
+      setStatusModal({
+        open: true, type: "error",
+        title: "เปลี่ยน Package ไม่สำเร็จ",
+        description: `ไม่สามารถเปลี่ยน Package ของ "${schoolName}" ได้ กรุณาลองใหม่`,
+        errorDetails: err,
+      });
+    }
   };
 
   // ─── Detail Drawer → Plan Change ───
@@ -190,19 +252,39 @@ export default function PackageManagementPage() {
 
   // ─── Bulk Plan Change ───
   const openBulkModal = (targetPlan: PackagePlanItem) => {
-    if (selectedIds.length === 0) { message.warning("กรุณาเลือกโรงเรียนก่อน"); return; }
+    if (selectedIds.length === 0) {
+      setStatusModal({
+        open: true, type: "confirm",
+        title: "ยังไม่ได้เลือกโรงเรียน",
+        description: "กรุณาติ๊กเลือกโรงเรียนอย่างน้อย 1 แห่งในตาราง ก่อนกด Bulk Change",
+      });
+      return;
+    }
     setBulkTargetPlan(targetPlan);
     setBulkModalOpen(true);
   };
 
   const handleBulkConfirm = async (quota: number) => {
     if (!bulkTargetPlan) return;
+    const count = selectedIds.length;
+    const planLabel = bulkTargetPlan.label;
+    setBulkModalOpen(false);
+    setBulkTargetPlan(null);
     try {
       await bulkUpdatePlan(bulkTargetPlan.plan, quota);
-      message.success(`เปลี่ยน ${selectedIds.length} โรงเรียน → ${bulkTargetPlan.label} สำเร็จ`);
-      setBulkModalOpen(false);
-      setBulkTargetPlan(null);
-    } catch { message.error("Bulk update ไม่สำเร็จ"); }
+      setStatusModal({
+        open: true, type: "success",
+        title: "Bulk Update สำเร็จ",
+        description: `เปลี่ยน ${count} โรงเรียน → Package ${planLabel} เรียบร้อยแล้ว`,
+      });
+    } catch (err) {
+      setStatusModal({
+        open: true, type: "error",
+        title: "Bulk Update ไม่สำเร็จ",
+        description: "ไม่สามารถอัปเดตโรงเรียนบางส่วนหรือทั้งหมดได้ กรุณาลองใหม่หรือทำทีละรายการ",
+        errorDetails: err,
+      });
+    }
   };
 
   if (!isMounted) return null;
@@ -353,11 +435,11 @@ export default function PackageManagementPage() {
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", position: "relative" }}>
           <Breadcrumb style={{ marginBottom: 20 }} items={[
             { title: <Link href="/pages/admin" style={{ color: "rgba(255,255,255,0.65)" }}>แดชบอร์ด</Link> },
-            { title: <span style={{ color: "white" }}>จัดการ Package</span> },
+            { title: <span style={{ color: "white" }}>แพ็กเกจสมาชิก</span> },
           ]} />
           <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>
             <Flex vertical gap={4}>
-              <Title level={2} style={{ margin: 0, color: "white" }}>จัดการ Package</Title>
+              <Title level={2} style={{ margin: 0, color: "white" }}>แพ็กเกจสมาชิก</Title>
               <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
                 สร้าง/แก้ไข Plan · Revenue Intelligence · Quota Alert · Bulk Update
               </Text>
@@ -435,7 +517,7 @@ export default function PackageManagementPage() {
                           <Button type="text" size="small" icon={<EditOutlined />} onClick={() => openEditPlan(plan)} style={{ color: plan.color }} />
                         </Tooltip>
                         <Tooltip title="ลบ Plan">
-                          <Button type="text" size="small" danger icon={<DeleteOutlined />} loading={isDeletingPlan === plan.plan} onClick={() => setDeletingPlanItem(plan)} />
+                          <Button type="text" size="small" danger icon={<DeleteOutlined />} loading={isDeletingPlan === plan.plan} onClick={() => openDeleteConfirm(plan)} />
                         </Tooltip>
                       </Flex>
                     }
@@ -560,8 +642,6 @@ export default function PackageManagementPage() {
       {/* ─── Modals & Drawers ─── */}
       <PlanFormModal open={planModalOpen} mode={planModalMode} editingPlan={editingPlan} plans={plans} isSaving={isSavingPlan} onSubmit={handlePlanSubmit} onCancel={() => setPlanModalOpen(false)} />
 
-      <DeletePlanModal open={!!deletingPlanItem} plan={deletingPlanItem} isDeleting={isDeletingPlan === deletingPlanItem?.plan} onConfirm={handleDeletePlan} onCancel={() => setDeletingPlanItem(null)} />
-
       <PlanChangeModal school={modalSchool} targetPlan={modalTargetPlan} currentPlanDef={modalSchool ? getPlanDef(modalSchool.accountPlan) : null} open={!!modalSchool && !!modalTargetPlan} isUpdating={isUpdating === modalSchool?.id} onConfirm={handleConfirmPlan} onCancel={() => { setModalSchool(null); setModalTargetPlan(null); }} />
 
       {/* ─── Feature 1: School Detail Drawer ─── */}
@@ -578,6 +658,22 @@ export default function PackageManagementPage() {
         plans={plans}
         onConfirm={handleBulkConfirm}
         onCancel={() => { setBulkModalOpen(false); setBulkTargetPlan(null); }}
+      />
+
+      {/* ─── Status Modal (ModalComponent) — รายงานผล success/error/confirm/delete ─── */}
+      <ModalComponent
+        open={statusModal.open}
+        type={statusModal.type}
+        title={statusModal.title}
+        description={statusModal.description}
+        errorDetails={statusModal.errorDetails}
+        loading={
+          statusModal.type === "delete"
+            ? isDeletingPlan !== null
+            : false
+        }
+        onClose={() => { setStatusModal(MODAL_CLOSED); setDeletingPlanItem(null); }}
+        onConfirm={statusModal.onConfirm}
       />
     </div>
   );
