@@ -811,6 +811,81 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       };
 
       await requestUpdateEmployeeProfile(userId, payload);
+
+      // ✨ silent re-fetch เพื่อ sync UUID จริงจาก DB กลับมา store
+      // ป้องกัน temp id ค้างใน store ซึ่งจะทำให้ save ครั้งถัดไป create record ซ้ำ
+      const email = get().profile.email;
+      const res = await responseEmployeeProfile(userId, email);
+      if (res.status_code === 200 && res.data) {
+        const d = res.data;
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            profileStrength: d.profileStrength ?? state.profile.profileStrength,
+            workExperiences: d.workExperiences?.map((exp: {
+              id: string; jobTitle: string; companyName: string;
+              startDate: string; endDate: string | null; inPresent: boolean;
+              description: string | null; workYear: number | null;
+            }) => ({
+              id: exp.id,
+              jobTitle: exp.jobTitle,
+              companyName: exp.companyName,
+              startDate: exp.startDate ? new Date(exp.startDate).toISOString().split("T")[0] : "",
+              endDate: exp.endDate ? new Date(exp.endDate).toISOString().split("T")[0] : "",
+              inPresent: exp.inPresent,
+              description: exp.description ?? "",
+              workYear: exp.workYear ?? undefined,
+            })) ?? state.profile.workExperiences,
+            educations: d.educations?.map((edu: {
+              id: string; level: string; institution: string; major: string;
+              graduationYear: number | null; gpa: number | null;
+              startDate: string | null; endDate: string | null;
+            }) => ({
+              id: edu.id,
+              level: edu.level,
+              institution: edu.institution,
+              major: edu.major,
+              graduationYear: edu.graduationYear ?? undefined,
+              gpa: edu.gpa ?? undefined,
+              startDate: edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : undefined,
+              endDate: edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : undefined,
+            })) ?? state.profile.educations,
+            licenses: (d.licenses ?? []).filter((lic: { fileUrl: string | null }) => !lic.fileUrl).map((lic: {
+              id: string; licenseName: string; issuer: string | null;
+              licenseNumber: string | null; issueDate: string | null;
+              expiryDate: string | null; credentialUrl: string | null;
+            }) => ({
+              id: lic.id,
+              licenseName: lic.licenseName,
+              issuer: lic.issuer ?? undefined,
+              licenseNumber: lic.licenseNumber ?? undefined,
+              issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
+              expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
+              credentialUrl: lic.credentialUrl ?? undefined,
+            })),
+            licenseAttachments: (d.licenses ?? []).filter((lic: { fileUrl: string | null }) => !!lic.fileUrl).map((lic: {
+              id: string; licenseName: string; fileSize?: number | null;
+              fileUrl: string; createdAt?: string;
+            }) => ({
+              id: lic.id,
+              fileName: lic.licenseName,
+              fileSize: lic.fileSize ?? 0,
+              uploadedAt: lic.createdAt ? new Date(lic.createdAt).toLocaleDateString("th-TH") : "",
+              url: lic.fileUrl,
+            })),
+            resumes: (d.resumes ?? []).map((r: {
+              id: string; fileName: string; fileSize: number | null; uploadedAt: string; fileUrl: string;
+            }) => ({
+              id: r.id,
+              fileName: r.fileName,
+              fileSize: r.fileSize ?? 0,
+              uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
+              url: r.fileUrl,
+            })),
+            activeResumeId: d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ?? d.activeResumeId ?? state.profile.activeResumeId,
+          },
+        }));
+      }
     } catch (err) {
       console.error("❌ saveProfile error:", err);
       throw err;
