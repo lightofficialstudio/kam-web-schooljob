@@ -71,7 +71,7 @@ export default function EmployeeProfilePage() {
   const { token } = antTheme.useToken();
   const { profile, setProfile, updateField, setMockupData, fetchProfile, saveProfile, isLoading, isSaving } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, updateUser } = useAuthStore();
   const router = useRouter();
   const [form] = Form.useForm();
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +86,8 @@ export default function EmployeeProfilePage() {
       // ✨ updateField เป็น synchronous — store อัปเดตทันทีก่อน saveProfile อ่านค่า
       updateField("profileImageUrl", result.url);
       await saveProfile(user.user_id);
+      // ✨ sync รูปโปรไฟล์กลับไปที่ authStore เพื่อให้ Navbar แสดงผลถูกต้องทันที
+      updateUser({ profile_image_url: result.url });
       console.log("✅ [Avatar] อัปโหลดและบันทึกรูปโปรไฟล์สำเร็จ:", result.url);
     } catch (err) {
       console.error("❌ [Avatar] upload error:", err);
@@ -120,6 +122,15 @@ export default function EmployeeProfilePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMounted, user?.user_id]);
+
+  // ✨ sync รูปโปรไฟล์จาก profileStore → authStore เมื่อโหลดเสร็จ (Navbar จะอัปเดตทันที)
+  useEffect(() => {
+    if (!profile.profileImageUrl) return;
+    if (profile.profileImageUrl !== user?.profile_image_url) {
+      updateUser({ profile_image_url: profile.profileImageUrl });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.profileImageUrl]);
 
   const [isMockupModalOpen, setIsMockupModalOpen] = useState(false);
 
@@ -239,6 +250,11 @@ export default function EmployeeProfilePage() {
       // ✨ บันทึกไปยัง API จริงถ้ามี userId จาก auth-store
       if (user?.user_id) {
         await saveProfile(user.user_id);
+      }
+
+      // ✨ sync รูปโปรไฟล์กลับไปที่ authStore ถ้ามีการเปลี่ยนแปลง (เช่น GenderDobPhotoSection)
+      if (merged.profileImageUrl && merged.profileImageUrl !== user?.profile_image_url) {
+        updateUser({ profile_image_url: merged.profileImageUrl });
       }
 
       openNotification({
