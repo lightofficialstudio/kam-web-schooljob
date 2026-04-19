@@ -112,6 +112,9 @@ interface EmployeeProfile {
   // การมองเห็นโปรไฟล์
   profileVisibility: "public" | "apply_only";
 
+  // ความสมบูรณ์ของโปรไฟล์ — คำนวณโดย API
+  profileStrength?: { score: number; missingFields: string[] };
+
   // Resume — รองรับหลายไฟล์ + เลือก active
   resumes: ResumeEntry[];
   activeResumeId: string | null; // id ของเรซูเม่ที่กำลังใช้งาน
@@ -697,6 +700,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             })),
             // ✨ activeResumeId — ดึงจาก resume ที่ isActive = true
             activeResumeId: d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ?? d.activeResumeId ?? null,
+            // ✨ profileStrength — คำนวณโดย API service แล้ว
+            profileStrength: d.profileStrength ?? undefined,
           },
         });
       }

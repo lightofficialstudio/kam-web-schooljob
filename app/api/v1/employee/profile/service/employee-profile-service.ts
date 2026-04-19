@@ -45,6 +45,49 @@ export const getEmployeeProfileService = async (userId: string) => {
   return profile;
 };
 
+// ✨ คำนวณความสมบูรณ์โปรไฟล์ — คืน score (0-100) และรายการที่ยังขาด
+export const computeProfileStrength = (profile: {
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  profileImageUrl?: string | null;
+  specialActivities?: string | null;
+  specializations?: unknown[];
+  workExperiences?: unknown[];
+  educations?: unknown[];
+  preferredProvinces?: unknown[];
+  licenseStatus?: string | null;
+  resumes?: unknown[];
+}) => {
+  type MissingItem = { label: string; weight: number };
+  const missing: MissingItem[] = [];
+  let score = 0;
+
+  const check = (condition: boolean, label: string, weight: number) => {
+    if (condition) {
+      score += weight;
+    } else {
+      missing.push({ label, weight });
+    }
+  };
+
+  check(!!profile.firstName, "ชื่อ", 10);
+  check(!!profile.lastName, "นามสกุล", 10);
+  check(!!profile.phoneNumber, "เบอร์โทรศัพท์", 5);
+  check(!!profile.profileImageUrl, "รูปโปรไฟล์", 10);
+  check(!!profile.specialActivities, "แนะนำตัวเอง", 10);
+  check((profile.specializations?.length ?? 0) > 0, "วิชาที่เชี่ยวชาญ", 15);
+  check((profile.workExperiences?.length ?? 0) > 0, "ประวัติการทำงาน", 15);
+  check((profile.educations?.length ?? 0) > 0, "ประวัติการศึกษา", 10);
+  check((profile.preferredProvinces?.length ?? 0) > 0, "จังหวัดที่ต้องการทำงาน", 10);
+  check(!!profile.licenseStatus && profile.licenseStatus !== "", "สถานะใบประกอบวิชาชีพ", 5);
+
+  return {
+    score: Math.min(score, 100),
+    missingFields: missing.map((m) => m.label),
+  };
+};
+
 // ✨ Auto-create profile ถ้ายังไม่มีใน DB (กรณี user สมัครก่อนระบบ sync พร้อม)
 // ดึง email จาก Supabase Auth metadata ถ้าส่งมาด้วย
 export const ensureEmployeeProfileService = async (

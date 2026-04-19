@@ -2,6 +2,7 @@ import { getProfileQuerySchema } from "../validation/employee-profile-schema";
 import {
   getEmployeeProfileService,
   ensureEmployeeProfileService,
+  computeProfileStrength,
 } from "../service/employee-profile-service";
 
 // ✨ GET /api/v1/employee-profile/read?user_id=xxx&email=xxx
@@ -47,12 +48,14 @@ export async function GET(request: Request) {
       );
     }
 
+    const profileStrength = computeProfileStrength(profile);
+
     return Response.json(
       {
         status_code: 200,
         message_th: "ดึงข้อมูลโปรไฟล์สำเร็จ",
         message_en: "Profile fetched successfully",
-        data: profile,
+        data: { ...profile, profileStrength },
       },
       { status: 200 }
     );
