@@ -1,11 +1,10 @@
 "use client";
 
-// ✨ Section แพ็คเกจ — แสดงแผนปัจจุบัน, quota, ตาราง plan, CTA upgrade
+// ✨ Section แพ็คเกจ — แสดงแผนปัจจุบัน, quota, ตาราง plan จาก Admin DB, CTA upgrade
 import {
-  PACKAGE_DEFINITIONS,
-  PLAN_LIST,
-  PlanType,
-} from "@/app/api/v1/admin/packages/validation/package-schema";
+  requestGetAllPlans,
+  requestGetEmployerPackage,
+} from "@/app/pages/employer/account-setting/_api/account-setting-api";
 import {
   CheckCircleOutlined,
   CrownOutlined,
@@ -24,14 +23,13 @@ import {
   theme,
   Typography,
 } from "antd";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 
-// ✨ ข้อมูล Package ที่ได้จาก API
+// ✨ ข้อมูล Package ปัจจุบันจาก /api/v1/employer/package/read
 interface PackageData {
-  plan: PlanType;
+  plan: string;
   planLabel: string;
   planColor: string;
   planPrice: number;
@@ -44,19 +42,26 @@ interface PackageData {
   isNearLimit: boolean;
 }
 
-// ✨ สร้าง PLAN_TABLE จาก PACKAGE_DEFINITIONS — Admin แก้ที่เดียว กระทบทุกที่
-const PLAN_TABLE = PLAN_LIST.map((key) => {
-  const def = PACKAGE_DEFINITIONS[key];
-  return { key, ...def };
-});
+// ✨ ข้อมูล Plan จาก /api/v1/admin/packages/plans
+interface PlanRow {
+  plan: string;
+  label: string;
+  color: string;
+  price: number;
+  job_quota: number;
+  features: string[];
+  badge_icon: "default" | "crown" | "thunder";
+  sort_order: number;
+  is_active: boolean;
+}
 
-// ✨ icon ตาม badgeIcon — ค่ามาจาก PACKAGE_DEFINITIONS (Admin config)
+// ✨ icon ตาม badge_icon
 const PlanIcon = ({
   badgeIcon,
   color,
   size = 18,
 }: {
-  badgeIcon: "default" | "thunder" | "crown";
+  badgeIcon: "default" | "crown" | "thunder";
   color: string;
   size?: number;
 }) => {
@@ -67,7 +72,7 @@ const PlanIcon = ({
   return <CheckCircleOutlined style={{ color, fontSize: size }} />;
 };
 
-// ✨ SectionCard — Card พร้อม top accent bar (ดู dark mode ด้วย token)
+// ✨ SectionCard — Card พร้อม top accent bar
 const SectionCard: React.FC<{
   children: React.ReactNode;
   accentColor: string;
@@ -139,7 +144,7 @@ const getProgressStatus = (
   return "normal";
 };
 
-const getProgressStrokeColor = (
+const getProgressStroke = (
   isAtLimit: boolean,
   isNearLimit: boolean,
   token: ReturnType<typeof theme.useToken>["token"],
@@ -155,25 +160,33 @@ const getProgressStrokeColor = (
 export default function PackageSection({ userId }: { userId: string }) {
   const { token } = theme.useToken();
   const [data, setData] = useState<PackageData | null>(null);
+  const [plans, setPlans] = useState<PlanRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✨ ดึงข้อมูล Package จาก API
+  // ✨ ดึงข้อมูล Package ปัจจุบัน + รายการ Plan ทั้งหมดจาก Admin DB พร้อมกัน
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    axios
-      .get(`/api/v1/employer/package/read?user_id=${userId}`)
-      .then((res) => {
-        if (res.data?.data) setData(res.data.data);
+    Promise.all([
+      requestGetEmployerPackage(userId),
+      requestGetAllPlans(),
+    ])
+      .then(([pkgRes, plansRes]) => {
+        if (pkgRes.data?.data) setData(pkgRes.data.data);
+        if (Array.isArray(plansRes.data?.data)) {
+          const sorted = [...plansRes.data.data].sort(
+            (a: PlanRow, b: PlanRow) => a.sort_order - b.sort_order,
+          );
+          setPlans(sorted);
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [userId]);
 
-  // ✨ Skeleton ขณะโหลด
   if (loading) {
     return (
-      <SectionCard accentColor="#722ed1">
+      <SectionCard accentColor="#11b6f5">
         <Skeleton active paragraph={{ rows: 6 }} />
       </SectionCard>
     );
@@ -181,25 +194,22 @@ export default function PackageSection({ userId }: { userId: string }) {
 
   if (!data) {
     return (
-      <SectionCard accentColor="#722ed1">
+      <SectionCard accentColor="#11b6f5">
         <Alert
           type="error"
-          title="ไม่สามารถโหลดข้อมูลแพ็คเกจได้ กรุณาลองใหม่"
           showIcon
+          message="ไม่สามารถโหลดข้อมูลแพ็คเกจได้ กรุณาลองใหม่"
         />
       </SectionCard>
     );
   }
 
-  const currentPlanDef =
-    PLAN_TABLE.find((p) => p.key === data.plan) ?? PLAN_TABLE[0];
   const progressStatus = getProgressStatus(data.isAtLimit, data.isNearLimit);
-  const progressStroke = getProgressStrokeColor(
-    data.isAtLimit,
-    data.isNearLimit,
-    token,
-  );
-  const isEnterprise = data.plan === "enterprise";
+  const progressStroke = getProgressStroke(data.isAtLimit, data.isNearLimit, token);
+  const currentPlan = plans.find((p) => p.plan === data.plan);
+  const currentPlanIndex = plans.findIndex((p) => p.plan === data.plan);
+  const isTopPlan =
+    currentPlanIndex !== -1 && currentPlanIndex === plans.length - 1;
 
   return (
     <Flex vertical gap={20}>
@@ -208,7 +218,7 @@ export default function PackageSection({ userId }: { userId: string }) {
         <SectionHeader
           icon={
             <PlanIcon
-              badgeIcon={currentPlanDef.badgeIcon}
+              badgeIcon={currentPlan?.badge_icon ?? "default"}
               color={data.planColor}
             />
           }
@@ -233,7 +243,7 @@ export default function PackageSection({ userId }: { userId: string }) {
                 }}
               >
                 <PlanIcon
-                  badgeIcon={currentPlanDef.badgeIcon}
+                  badgeIcon={currentPlan?.badge_icon ?? "default"}
                   color={data.planColor}
                   size={15}
                 />
@@ -347,170 +357,169 @@ export default function PackageSection({ userId }: { userId: string }) {
         </Flex>
       </SectionCard>
 
-      {/* ─── 3. Plan comparison table ─── */}
-      <SectionCard accentColor="#722ed1">
-        <SectionHeader
-          icon={<CrownOutlined />}
-          title="เปรียบเทียบแผน"
-          desc="ดูความแตกต่างของแต่ละแผนและเลือกที่เหมาะกับโรงเรียนของคุณ"
-          color="#722ed1"
-        />
+      {/* ─── 3. Plan comparison table (ดึงจาก Admin DB) ─── */}
+      {plans.length > 0 && (
+        <SectionCard accentColor="#11b6f5">
+          <SectionHeader
+            icon={<CrownOutlined />}
+            title="เปรียบเทียบแผน"
+            desc="ดูความแตกต่างของแต่ละแผนและเลือกที่เหมาะกับโรงเรียนของคุณ"
+            color="#11b6f5"
+          />
 
-        <Row gutter={[16, 16]}>
-          {PLAN_TABLE.map((plan) => {
-            const isCurrent = plan.key === data.plan;
-            // ✨ ระบุว่า plan นี้ tier ต่ำกว่า current หรือไม่ — ใช้ index จาก PLAN_LIST
-            const isLower =
-              PLAN_LIST.indexOf(plan.key as PlanType) <
-              PLAN_LIST.indexOf(data.plan);
+          <Row gutter={[16, 16]}>
+            {plans.map((plan, index) => {
+              const isCurrent = plan.plan === data.plan;
+              const isLower = index < currentPlanIndex;
 
-            return (
-              <Col key={plan.key} xs={24} sm={8}>
-                <div
-                  style={{
-                    borderRadius: 14,
-                    border: `2px solid ${isCurrent ? plan.color : token.colorBorderSecondary}`,
-                    background: isCurrent
-                      ? `${plan.color}0a`
-                      : token.colorBgContainer,
-                    padding: "20px 18px",
-                    opacity: isLower ? 0.5 : 1,
-                    transition: "all 0.2s",
-                    position: "relative",
-                    height: "100%",
-                  }}
-                >
-                  {/* ✨ Badge current */}
-                  {isCurrent && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: -12,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      <Tag
-                        color={plan.color}
+              return (
+                <Col key={plan.plan} xs={24} sm={Math.max(8, Math.floor(24 / plans.length))}>
+                  <div
+                    style={{
+                      borderRadius: 14,
+                      border: `2px solid ${isCurrent ? plan.color : token.colorBorderSecondary}`,
+                      background: isCurrent
+                        ? `${plan.color}0a`
+                        : token.colorBgContainer,
+                      padding: "20px 18px",
+                      opacity: isLower ? 0.5 : 1,
+                      transition: "all 0.2s",
+                      position: "relative",
+                      height: "100%",
+                    }}
+                  >
+                    {/* ✨ Badge current */}
+                    {isCurrent && (
+                      <div
                         style={{
-                          fontWeight: 700,
-                          fontSize: 11,
-                          border: "none",
+                          position: "absolute",
+                          top: -12,
+                          left: "50%",
+                          transform: "translateX(-50%)",
                         }}
                       >
-                        แผนปัจจุบัน
-                      </Tag>
-                    </div>
-                  )}
+                        <Tag
+                          color={plan.color}
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 11,
+                            border: "none",
+                          }}
+                        >
+                          แผนปัจจุบัน
+                        </Tag>
+                      </div>
+                    )}
 
-                  <Flex vertical gap={12}>
-                    {/* Plan name */}
-                    <Flex align="center" gap={8}>
-                      <PlanIcon
-                        badgeIcon={plan.badgeIcon}
-                        color={plan.color}
-                        size={16}
-                      />
-                      <Text
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 16,
-                          color: plan.color,
-                        }}
-                      >
-                        {plan.label}
-                      </Text>
-                    </Flex>
-
-                    {/* ราคา */}
-                    <Flex align="baseline" gap={4}>
-                      <Text
-                        style={{
-                          fontSize: 22,
-                          fontWeight: 800,
-                          color: isCurrent ? plan.color : token.colorText,
-                        }}
-                      >
-                        {plan.price === 0
-                          ? "ฟรี"
-                          : `฿${plan.price.toLocaleString()}`}
-                      </Text>
-                      {plan.price > 0 && (
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          /เดือน
+                    <Flex vertical gap={12}>
+                      {/* Plan name */}
+                      <Flex align="center" gap={8}>
+                        <PlanIcon
+                          badgeIcon={plan.badge_icon}
+                          color={plan.color}
+                          size={16}
+                        />
+                        <Text
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 16,
+                            color: plan.color,
+                          }}
+                        >
+                          {plan.label}
                         </Text>
-                      )}
-                    </Flex>
+                      </Flex>
 
-                    {/* Quota */}
-                    <Tag
-                      color={isCurrent ? plan.color : "default"}
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      {plan.quota === 999
-                        ? "ไม่จำกัดตำแหน่ง"
-                        : `${plan.quota} ตำแหน่ง`}
-                    </Tag>
-
-                    {/* Features */}
-                    <Flex vertical gap={6}>
-                      {plan.features.map((f) => (
-                        <Flex key={f} align="flex-start" gap={7}>
-                          <CheckCircleOutlined
-                            style={{
-                              color: isCurrent
-                                ? plan.color
-                                : token.colorTextTertiary,
-                              fontSize: 12,
-                              marginTop: 3,
-                              flexShrink: 0,
-                            }}
-                          />
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              color: isLower
-                                ? token.colorTextTertiary
-                                : token.colorText,
-                            }}
-                          >
-                            {f}
+                      {/* ราคา */}
+                      <Flex align="baseline" gap={4}>
+                        <Text
+                          style={{
+                            fontSize: 22,
+                            fontWeight: 800,
+                            color: isCurrent ? plan.color : token.colorText,
+                          }}
+                        >
+                          {plan.price === 0
+                            ? "ฟรี"
+                            : `฿${plan.price.toLocaleString()}`}
+                        </Text>
+                        {plan.price > 0 && (
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            /เดือน
                           </Text>
-                        </Flex>
-                      ))}
+                        )}
+                      </Flex>
+
+                      {/* Quota */}
+                      <Tag
+                        color={isCurrent ? plan.color : "default"}
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        {plan.job_quota === 999
+                          ? "ไม่จำกัดตำแหน่ง"
+                          : `${plan.job_quota} ตำแหน่ง`}
+                      </Tag>
+
+                      {/* Features */}
+                      <Flex vertical gap={6}>
+                        {plan.features.map((f) => (
+                          <Flex key={f} align="flex-start" gap={7}>
+                            <CheckCircleOutlined
+                              style={{
+                                color: isCurrent
+                                  ? plan.color
+                                  : token.colorTextTertiary,
+                                fontSize: 12,
+                                marginTop: 3,
+                                flexShrink: 0,
+                              }}
+                            />
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                color: isLower
+                                  ? token.colorTextTertiary
+                                  : token.colorText,
+                              }}
+                            >
+                              {f}
+                            </Text>
+                          </Flex>
+                        ))}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </div>
-              </Col>
-            );
-          })}
-        </Row>
-      </SectionCard>
+                  </div>
+                </Col>
+              );
+            })}
+          </Row>
+        </SectionCard>
+      )}
 
       {/* ─── 4. Upgrade CTA ─── */}
-      <SectionCard accentColor={isEnterprise ? token.colorSuccess : "#11b6f5"}>
+      <SectionCard accentColor={isTopPlan ? token.colorSuccess : "#11b6f5"}>
         <SectionHeader
-          icon={isEnterprise ? <CheckCircleOutlined /> : <CrownOutlined />}
-          title={isEnterprise ? "คุณอยู่ในแผนสูงสุดแล้ว" : "อัปเกรดแผน"}
+          icon={isTopPlan ? <CheckCircleOutlined /> : <CrownOutlined />}
+          title={isTopPlan ? "คุณอยู่ในแผนสูงสุดแล้ว" : "อัปเกรดแผน"}
           desc={
-            isEnterprise
+            isTopPlan
               ? "ขอบคุณที่ไว้วางใจเรา — คุณได้รับสิทธิ์ทุกอย่างครบถ้วนแล้ว"
               : "ติดต่อทีมงานเพื่ออัปเกรดแผน หรือรอ Payment Gateway ที่กำลังพัฒนา"
           }
-          color={isEnterprise ? token.colorSuccess : "#11b6f5"}
+          color={isTopPlan ? token.colorSuccess : "#11b6f5"}
         />
 
-        {isEnterprise ? (
+        {isTopPlan ? (
           <Alert
             type="success"
             showIcon
             icon={<CrownOutlined />}
-            title="Enterprise Plan — แผนสูงสุด"
-            description="คุณได้รับสิทธิ์ทุกอย่างครบถ้วน รวมถึง API Access, Custom branding และ Dedicated support"
+            message={`${data.planLabel} — แผนสูงสุด`}
+            description="คุณได้รับสิทธิ์ทุกอย่างครบถ้วน รวมถึงทุก feature ที่ Admin กำหนด"
             style={{ borderRadius: 12 }}
           />
         ) : (
@@ -519,7 +528,7 @@ export default function PackageSection({ userId }: { userId: string }) {
               type="info"
               showIcon
               icon={<ThunderboltOutlined />}
-              title="Payment Gateway กำลังพัฒนา"
+              message="Payment Gateway กำลังพัฒนา"
               description="ระบบชำระเงินออนไลน์อยู่ระหว่างการพัฒนา — กรุณาติดต่อทีมงานโดยตรงเพื่ออัปเกรดแผน"
               style={{ borderRadius: 12 }}
             />

@@ -18,3 +18,11 @@ export const requestChangePassword = (userId: string, newPassword: string) =>
   axios.put(`/api/v1/employer/account-setting/change-password?user_id=${userId}`, {
     new_password: newPassword,
   });
+
+// ✨ ดึงข้อมูล Package ปัจจุบันของ Employer (quota, features, plan)
+export const requestGetEmployerPackage = (userId: string) =>
+  axios.get(`/api/v1/employer/package/read?user_id=${userId}`);
+
+// ✨ ดึงรายการ Package Plan ทั้งหมดที่ Admin กำหนด (สำหรับตารางเปรียบเทียบ)
+export const requestGetAllPlans = () =>
+  axios.get(`/api/v1/admin/packages/plans?include_inactive=false`);
