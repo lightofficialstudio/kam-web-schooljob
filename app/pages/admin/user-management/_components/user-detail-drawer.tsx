@@ -276,7 +276,7 @@ export function UserDetailDrawer() {
     <Drawer
       open={drawerOpen}
       onClose={closeDrawer}
-      width={720}
+      size="large"
       title={
         d ? (
           <Flex align="center" gap={12}>

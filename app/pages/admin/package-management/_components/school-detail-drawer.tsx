@@ -60,7 +60,7 @@ export function SchoolDetailDrawer({ plans, onChangePlan }: Props) {
       open={open}
       onClose={closeDrawer}
       title={null}
-      width={480}
+      size="default"
       styles={{
         body: { padding: 0, display: "flex", flexDirection: "column" },
         wrapper: { boxShadow: "-8px 0 40px rgba(0,0,0,0.12)" },

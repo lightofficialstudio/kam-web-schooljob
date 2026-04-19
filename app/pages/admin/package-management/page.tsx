@@ -18,6 +18,7 @@ import {
   ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Avatar,
   Breadcrumb,
   Button,
@@ -26,7 +27,6 @@ import {
   Col,
   Empty,
   Flex,
-  message,
   Pagination,
   Progress,
   Row,
@@ -76,6 +76,7 @@ const PlanTag: React.FC<{ plan: string; planDef?: PackagePlanItem }> = ({ plan, 
 
 export default function PackageManagementPage() {
   const { token } = theme.useToken();
+  const { message } = App.useApp();
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
 

@@ -17,7 +17,7 @@ function isBypassed(pathname: string): boolean {
   return BYPASS_PATHS.some((p) => pathname.startsWith(p));
 }
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ✨ ข้าม paths ที่ระบุ (admin, signin, API system, static files)
