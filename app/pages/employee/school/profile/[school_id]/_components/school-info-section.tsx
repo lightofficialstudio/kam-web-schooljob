@@ -6,21 +6,20 @@ import {
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Typography, theme as antTheme } from "antd";
+import { Flex, Typography, theme as antTheme } from "antd";
 import type { SchoolProfileDetail } from "../_api/school-profile-api";
 
-const { Text, Paragraph } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
 interface SchoolInfoSectionProps {
   school: SchoolProfileDetail;
 }
 
-// ✨ แสดงรายละเอียดเกี่ยวกับโรงเรียน (เกี่ยวกับเรา + ตัวเลขสถิติ)
+// ✨ แสดงรายละเอียดเกี่ยวกับโรงเรียน — เกี่ยวกับเรา + สถิติ
 export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
   const { token } = antTheme.useToken();
 
-  // foundedYear ใน DB เก็บเป็น พ.ศ. อยู่แล้ว — ไม่ต้องบวก 543
-  // ✨ ใช้ token แทน hardcode สีทั้งหมด
+  // ✨ foundedYear ใน DB เก็บเป็น พ.ศ. อยู่แล้ว — ไม่ต้องบวก 543
   const stats = [
     school.foundedYear && {
       icon: <CalendarOutlined />,
@@ -34,14 +33,14 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       color: token.colorSuccess,
       bg: token.colorSuccessBg,
       label: "นักเรียน",
-      value: school.studentCount.toLocaleString(),
+      value: `${school.studentCount.toLocaleString()} คน`,
     },
     school.teacherCount != null && {
       icon: <TeamOutlined />,
       color: token.colorWarning,
       bg: token.colorWarningBg,
       label: "ครู/บุคลากร",
-      value: school.teacherCount.toLocaleString(),
+      value: `${school.teacherCount.toLocaleString()} คน`,
     },
     school.schoolType && {
       icon: <BankOutlined />,
@@ -62,32 +61,50 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
 
   return (
     <div
-      className="rounded-[28px] overflow-hidden border"
       style={{
+        borderRadius: 20,
+        border: `1px solid ${token.colorBorderSecondary}`,
         backgroundColor: token.colorBgContainer,
-        borderColor: token.colorBorderSecondary,
+        overflow: "hidden",
       }}
     >
       {/* ── Header ── */}
-      <div className="px-6 pt-6 pb-4 flex items-center gap-3">
-        <div
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-sm"
-          style={{ backgroundColor: token.colorPrimaryBg, color: token.colorPrimary }}
-        >
-          <BankOutlined />
-        </div>
-        <Text className="font-black text-base tracking-tight" style={{ color: token.colorTextHeading }}>
-          เกี่ยวกับสถาบัน
-        </Text>
+      <div
+        style={{
+          padding: "20px 24px 16px",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          background: `linear-gradient(135deg, rgba(17,182,245,0.04) 0%, transparent 100%)`,
+        }}
+      >
+        <Flex align="center" gap={10}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 12,
+              background: `linear-gradient(135deg, rgba(17,182,245,0.15) 0%, rgba(17,182,245,0.05) 100%)`,
+              border: `1px solid rgba(17,182,245,0.2)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: token.colorPrimary,
+              fontSize: 16,
+            }}
+          >
+            <BankOutlined />
+          </div>
+          <Title level={5} style={{ margin: 0, fontSize: 15, fontWeight: 800, color: token.colorTextHeading }}>
+            เกี่ยวกับสถาบัน
+          </Title>
+        </Flex>
       </div>
 
       {/* ── Description ── */}
       {school.description && (
-        <div className="px-6 pb-4">
+        <div style={{ padding: "16px 24px", borderBottom: stats.length > 0 ? `1px solid ${token.colorBorderSecondary}` : "none" }}>
           <Paragraph
-            className="m-0! text-sm leading-relaxed"
-            style={{ color: token.colorTextSecondary }}
-            ellipsis={{ rows: 4, expandable: true, symbol: "อ่านเพิ่ม" }}
+            style={{ margin: 0, fontSize: 13, lineHeight: 1.8, color: token.colorTextSecondary }}
+            ellipsis={{ rows: 4, expandable: true, symbol: "อ่านเพิ่มเติม" }}
           >
             {school.description}
           </Paragraph>
@@ -97,39 +114,73 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       {/* ── Stats Grid ── */}
       {stats.length > 0 && (
         <div
-          className="grid gap-px"
           style={{
+            display: "grid",
             gridTemplateColumns: `repeat(${Math.min(stats.length, 2)}, 1fr)`,
-            backgroundColor: token.colorBorderSecondary,
-            borderTop: `1px solid ${token.colorBorderSecondary}`,
           }}
         >
           {stats.map((stat, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 px-5 py-4"
-              style={{ backgroundColor: token.colorBgContainer }}
+              style={{
+                padding: "16px 20px",
+                borderRight: i % 2 === 0 && i < stats.length - 1 ? `1px solid ${token.colorBorderSecondary}` : "none",
+                borderBottom: i < stats.length - 2 ? `1px solid ${token.colorBorderSecondary}` : "none",
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.background = `rgba(17,182,245,0.03)`;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.background = "transparent";
+              }}
             >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm"
-                style={{ backgroundColor: stat.bg, color: stat.color }}
-              >
-                {stat.icon}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <Text
-                  className="text-[10px] font-bold uppercase tracking-widest leading-none mb-0.5"
-                  style={{ color: token.colorTextQuaternary }}
+              <Flex align="center" gap={12}>
+                {/* ✨ Icon badge */}
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    backgroundColor: stat.bg,
+                    color: stat.color,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 15,
+                    flexShrink: 0,
+                  }}
                 >
-                  {stat.label}
-                </Text>
-                <Text
-                  className="text-sm font-black leading-tight truncate"
-                  style={{ color: token.colorTextHeading }}
-                >
-                  {stat.value}
-                </Text>
-              </div>
+                  {stat.icon}
+                </div>
+                <Flex vertical gap={1} style={{ minWidth: 0 }}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: token.colorTextQuaternary,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {stat.label}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 800,
+                      color: token.colorTextHeading,
+                      lineHeight: 1.3,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {stat.value}
+                  </Text>
+                </Flex>
+              </Flex>
             </div>
           ))}
         </div>
