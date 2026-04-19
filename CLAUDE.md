@@ -48,9 +48,18 @@ UI ภาษาไทย, ฟอนต์ Kanit, comments ภาษาไทย
 bun dev            # dev server
 bun build          # production build — รันทุกครั้งหลังแก้โค้ด
 bun lint           # ESLint
-bunx prisma db push        # push schema → DB
+bun run seed       # seed ข้อมูลตัวอย่างลง DB
+
+bunx prisma db push        # push schema → DB (ใช้ DIRECT_URL เสมอ)
 bunx prisma generate       # re-generate client
 bunx prisma studio         # GUI
+
+# E2E Tests (Playwright — starts dev server automatically)
+bunx playwright test                             # รัน test ทั้งหมด
+bunx playwright test tests/auth/auth-flow.spec.ts  # รัน test file เดียว
+bunx playwright test -g "Employee.*Signup"       # รัน test เดียวโดยชื่อ
+bunx playwright test --ui                        # interactive UI mode
+bunx playwright show-report                      # ดู HTML report
 ```
 
 ---
@@ -276,15 +285,20 @@ prisma/
 ## Environment Variables
 
 ```env
-DATABASE_URL
-DIRECT_URL
+DATABASE_URL          # port 6543 — PgBouncer Transaction Pooler (runtime)
+DIRECT_URL            # port 5432 — direct connection (prisma db push/migrate เท่านั้น)
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_MAILER_HOST   # SMTP สำหรับ Nodemailer (email notifications)
+NEXT_PUBLIC_MAILER_PORT
+NEXT_PUBLIC_MAILER_USER
+NEXT_PUBLIC_MAILER_PASS
 ```
 
 ## Build Notes
 
 - `ignoreBuildErrors: true` ใน next.config.ts (TypeScript errors ไม่หยุด build)
-- Remote images: unsplash.com, dicebear.com
+- Remote images: unsplash.com, dicebear.com, supabase.co storage
 - `optimizePackageImports` สำหรับ Ant Design
+- Prisma ใช้ `@prisma/adapter-pg` กับ PgBouncer — connection pool max: 2 (Supabase free tier)

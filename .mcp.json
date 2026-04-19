@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "antd-docs": {
+      "command": "bun",
+      "args": ["run", "mcp-servers/antd-docs/index.ts"],
+      "description": "Ant Design Documentation Server — ดึง docs ล่าสุดจาก ant.design เพื่อป้องกันการใช้ deprecated API"
+    }
+  }
+}
