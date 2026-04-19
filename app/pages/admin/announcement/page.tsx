@@ -21,6 +21,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BroadcastComposer } from "./_components/broadcast-composer";
 import { AnnouncementHistory } from "./_components/announcement-history";
 import { useAnnouncementStore } from "./_state/announcement-store";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
 
 const { Title, Text } = Typography;
 
@@ -86,29 +87,12 @@ export default function AnnouncementPage() {
 
         {/* ── Header ── */}
         <Col xs={24}>
-          <div
-            style={{
-              padding: "24px 28px",
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #0d47a1 0%, #0a4a8a 50%, #11b6f5 100%)",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* ✨ decoration circles */}
-            <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
-            <div style={{ position: "absolute", bottom: -30, right: 80, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
-
-            <div style={{ position: "relative" }}>
-              <BellOutlined style={{ fontSize: 28, color: "rgba(255,255,255,0.9)", marginBottom: 10, display: "block" }} />
-              <Title level={3} style={{ margin: 0, color: "#fff", lineHeight: 1.3 }}>
-                Announcement & Broadcast
-              </Title>
-              <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, marginTop: 4, display: "block" }}>
-                ส่ง In-app Notification ถึงผู้ใช้งาน — เลือก Target เป็น ครู / โรงเรียน / ทุกคน
-              </Text>
-            </div>
-          </div>
+          <AdminHeader
+            title="Announcement & Broadcast"
+            description="ส่ง In-app Notification ถึงผู้ใช้งาน — เลือก Target เป็น ครู / โรงเรียน / ทุกคน"
+            icon={<BellOutlined style={{ fontSize: 22, color: "#fff" }} />}
+            gradient="linear-gradient(135deg, #0d47a1 0%, #0a4a8a 50%, #11b6f5 100%)"
+          />
         </Col>
 
         {/* ── Tabs: Compose | History ── */}

@@ -6,6 +6,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { AlertTriangle, CheckCircle, Eye, Globe, Power, Settings, WrenchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -75,31 +76,12 @@ export default function MenuManagementPage() {
   return (
     <div style={{ padding: "24px 24px 48px" }}>
       {/* 🔷 Header */}
-      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <Flex align="center" gap={12} style={{ marginBottom: 8 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              background: `linear-gradient(135deg, ${token.colorPrimary} 0%, #0d8fd4 100%)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Settings size={22} color="#fff" />
-          </div>
-          <div>
-            <Title level={4} style={{ margin: 0, color: token.colorText }}>
-              จัดการเมนูและระบบ
-            </Title>
-            <Text style={{ color: token.colorTextSecondary, fontSize: 13 }}>
-              ควบคุมการเข้าถึงและสถานะของระบบ
-            </Text>
-          </div>
-        </Flex>
-      </motion.div>
+      <AdminHeader
+        title="จัดการเมนูและระบบ"
+        description="ควบคุมการเข้าถึงและสถานะของระบบ"
+        icon={<Settings size={22} color="#fff" />}
+        style={{ marginBottom: 8 }}
+      />
 
       <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
         {/* 🔧 Maintenance Mode Card */}
