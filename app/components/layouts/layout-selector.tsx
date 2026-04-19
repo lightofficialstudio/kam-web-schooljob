@@ -56,7 +56,7 @@ export function LayoutSelector({ children }: LayoutSelectorProps) {
     // ถ้า ADMIN อยู่นอก admin route (เช่น signin/signup) → พา redirect กลับ /pages/admin
     const isAuthPage = pathname.startsWith("/pages/signin") || pathname.startsWith("/pages/signup");
     if (user?.role === "ADMIN" && isAuthPage) {
-      router.replace("/pages/admin");
+      router.replace("/pages/admin/dashboard");
     }
   }, [isMounted, isAdminRoute, user, pathname, router]);
 

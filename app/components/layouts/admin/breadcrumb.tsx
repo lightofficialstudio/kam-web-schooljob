@@ -22,7 +22,7 @@ export function AdminBreadcrumb() {
     const breadcrumbs: BreadcrumbItem[] = [
       {
         title: "แดชบอร์ด",
-        href: "/pages/admin",
+        href: "/pages/admin/dashboard",
       },
     ];
 

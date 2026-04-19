@@ -434,7 +434,7 @@ export default function PackageManagementPage() {
         <div style={{ position: "absolute", bottom: -40, left: "30%", width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", position: "relative" }}>
           <Breadcrumb style={{ marginBottom: 20 }} items={[
-            { title: <Link href="/pages/admin" style={{ color: "rgba(255,255,255,0.65)" }}>แดชบอร์ด</Link> },
+            { title: <Link href="/pages/admin/dashboard" style={{ color: "rgba(255,255,255,0.65)" }}>แดชบอร์ด</Link> },
             { title: <span style={{ color: "white" }}>แพ็กเกจสมาชิก</span> },
           ]} />
           <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>

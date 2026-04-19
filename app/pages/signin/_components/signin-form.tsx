@@ -44,7 +44,7 @@ export const SigninForm = () => {
     const ROLE_HOME: Record<string, string> = {
       EMPLOYEE: "/pages/employee/profile",
       EMPLOYER: "/pages/employer/profile",
-      ADMIN: "/pages/admin",
+      ADMIN: "/pages/admin/dashboard",
     };
 
     const dest = ROLE_HOME[user?.role ?? ""] ?? "/";
@@ -81,7 +81,7 @@ export const SigninForm = () => {
       const ROLE_HOME: Record<string, string> = {
         EMPLOYEE: "/pages/employee/profile",
         EMPLOYER: "/pages/employer/profile",
-        ADMIN: "/pages/admin",
+        ADMIN: "/pages/admin/dashboard",
       };
       const dest = ROLE_HOME[user.role ?? ""] ?? "/";
       router.push(dest);

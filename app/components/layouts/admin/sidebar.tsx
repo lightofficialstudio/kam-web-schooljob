@@ -52,10 +52,10 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
   const navItems: NavItem[] = [
     {
       type: "leaf",
-      key: "/pages/admin",
+      key: "/pages/admin/dashboard",
       label: "ภาพรวมระบบ",
       icon: <DashboardOutlined />,
-      href: "/pages/admin",
+      href: "/pages/admin/dashboard",
     },
     {
       type: "leaf",
@@ -132,7 +132,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
     allLeaves
       .slice()
       .sort((a, b) => b.key.length - a.key.length)
-      .find((item) => pathname.startsWith(item.key))?.key ?? "/pages/admin";
+      .find((item) => pathname.startsWith(item.key))?.key ?? "/pages/admin/dashboard";
 
   // ── กลุ่มที่ควร auto-open เมื่อ path ตรง ──
   const defaultOpenGroups = navItems

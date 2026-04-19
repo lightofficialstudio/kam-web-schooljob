@@ -362,7 +362,7 @@ export default function AdminBlogPage() {
               {
                 title: (
                   <Link
-                    href="/pages/admin"
+                    href="/pages/admin/dashboard"
                     style={{ color: "rgba(255,255,255,0.65)" }}
                   >
                     แดชบอร์ด

@@ -78,7 +78,7 @@ export default function AnnouncementPage() {
         <Col xs={24}>
           <Breadcrumb
             items={[
-              { title: <Link href="/pages/admin">Admin</Link> },
+              { title: <Link href="/pages/admin/dashboard">แดชบอร์ด</Link> },
               { title: "Announcement" },
             ]}
           />

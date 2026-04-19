@@ -192,7 +192,7 @@ export default function AdminEditJobPage() {
         <Flex vertical gap={16} style={{ maxWidth: 1152, margin: "0 auto", padding: "0 24px", width: "100%" }}>
           <Breadcrumb
             items={[
-              { title: <Link href="/pages/admin">Admin</Link> },
+              { title: <Link href="/pages/admin/dashboard">แดชบอร์ด</Link> },
               { title: <Link href="/pages/admin/job-management/read">จัดการประกาศงาน</Link> },
               { title: "แก้ไขประกาศงาน" },
             ]}

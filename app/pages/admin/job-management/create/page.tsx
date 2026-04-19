@@ -229,7 +229,7 @@ export default function AdminCreateJobPage() {
         >
           <Breadcrumb
             items={[
-              { title: <Link href="/pages/admin">Admin</Link> },
+              { title: <Link href="/pages/admin/dashboard">แดชบอร์ด</Link> },
               {
                 title: (
                   <Link href="/pages/admin/job-management">จัดการงาน</Link>
