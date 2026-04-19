@@ -12,7 +12,13 @@ import { Col, Flex, Typography } from "antd";
 const { Text } = Typography;
 
 // ✨ floating orb helper
-const orb = (size: number, top: string, left: string, delay: string, opacity: number): React.CSSProperties => ({
+const orb = (
+  size: number,
+  top: string,
+  left: string,
+  delay: string,
+  opacity: number,
+): React.CSSProperties => ({
   position: "absolute",
   width: size,
   height: size,
@@ -29,19 +35,31 @@ const orb = (size: number, top: string, left: string, delay: string, opacity: nu
 // ✨ Feature items — icon-based เท่านั้น ไม่มี hardcode ตัวเลข
 const FEATURES = [
   {
-    icon: <SearchOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    icon: (
+      <SearchOutlined
+        style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }}
+      />
+    ),
     text: "ค้นหางานตามวิชาเอกและพื้นที่",
   },
   {
-    icon: <BankOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    icon: (
+      <BankOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />
+    ),
     text: "สถานศึกษาคุณภาพทั่วประเทศ",
   },
   {
-    icon: <UserOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    icon: (
+      <UserOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />
+    ),
     text: "โปรไฟล์ครูพร้อมระบบสมัครงานในที่เดียว",
   },
   {
-    icon: <CheckCircleOutlined style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }} />,
+    icon: (
+      <CheckCircleOutlined
+        style={{ fontSize: 14, color: "rgba(255,255,255,0.9)" }}
+      />
+    ),
     text: "ติดตามสถานะใบสมัครแบบ real-time",
   },
 ];
@@ -52,7 +70,8 @@ export const SigninBrandingPanel = () => {
       xs={0}
       md={10}
       style={{
-        background: "linear-gradient(150deg, #0a85c2 0%, #11b6f5 60%, #38c5f7 100%)",
+        background:
+          "linear-gradient(150deg, #0a85c2 0%, #11b6f5 60%, #38c5f7 100%)",
         padding: "52px 40px",
         position: "relative",
         overflow: "hidden",
@@ -79,7 +98,15 @@ export const SigninBrandingPanel = () => {
       <div style={orb(60, "15%", "72%", "2s", 0.2)} />
 
       {/* ✨ Top: Logo + Headline */}
-      <Flex vertical gap={28} style={{ position: "relative", zIndex: 1, animation: "fadeSlideUp 0.7s ease both" }}>
+      <Flex
+        vertical
+        gap={28}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          animation: "fadeSlideUp 0.7s ease both",
+        }}
+      >
         {/* Logo mark */}
         <Flex align="center" gap={10}>
           <div
@@ -94,20 +121,48 @@ export const SigninBrandingPanel = () => {
               justifyContent: "center",
             }}
           >
-            <Text strong style={{ color: "#fff", fontSize: 16, lineHeight: 1 }}>S</Text>
+            <Text strong style={{ color: "#fff", fontSize: 16, lineHeight: 1 }}>
+              S
+            </Text>
           </div>
-          <Text style={{ color: "rgba(255,255,255,0.92)", fontWeight: 700, fontSize: 13, letterSpacing: "1.5px" }}>
-            SCHOOLJOB
+          <Text
+            style={{
+              color: "rgba(255,255,255,0.92)",
+              fontWeight: 700,
+              fontSize: 13,
+              letterSpacing: "1.5px",
+            }}
+          >
+            SCHOOL BOARD
           </Text>
         </Flex>
 
         {/* Headline */}
         <Flex vertical gap={10}>
-          <Text style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.25, display: "block" }}>
-            ยินดีต้อนรับ<br />กลับมา
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 28,
+              fontWeight: 800,
+              lineHeight: 1.25,
+              display: "block",
+            }}
+          >
+            ยินดีต้อนรับ
+            <br />
+            กลับมา
           </Text>
-          <Text style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, display: "block" }}>
-            แพลตฟอร์มเชื่อมครูคุณภาพ<br />กับสถานศึกษาทั่วประเทศ
+          <Text
+            style={{
+              color: "rgba(255,255,255,0.72)",
+              fontSize: 14,
+              lineHeight: 1.7,
+              display: "block",
+            }}
+          >
+            แพลตฟอร์มเชื่อมครูคุณภาพ
+            <br />
+            กับสถานศึกษาทั่วประเทศ
           </Text>
         </Flex>
       </Flex>
@@ -122,7 +177,13 @@ export const SigninBrandingPanel = () => {
           animation: "fadeSlideUp 0.7s ease 0.2s both",
         }}
       >
-        <div style={{ height: 1, background: "rgba(255,255,255,0.18)", borderRadius: 1 }} />
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.18)",
+            borderRadius: 1,
+          }}
+        />
 
         {/* ✨ Icon-based feature list */}
         <Flex vertical gap={12}>
@@ -141,7 +202,13 @@ export const SigninBrandingPanel = () => {
               >
                 {f.icon}
               </Flex>
-              <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.4 }}>
+              <Text
+                style={{
+                  color: "rgba(255,255,255,0.8)",
+                  fontSize: 13,
+                  lineHeight: 1.4,
+                }}
+              >
                 {f.text}
               </Text>
             </Flex>

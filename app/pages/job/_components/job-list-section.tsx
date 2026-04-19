@@ -8,7 +8,6 @@ import {
   Flex,
   Row,
   Skeleton,
-  Space,
   Typography,
   theme as antTheme,
 } from "antd";
@@ -77,18 +76,18 @@ export const JobListSection = () => {
 
       {/* Initial Loading Skeleton */}
       {isLoading && (
-        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+        <Flex vertical gap={16}>
           {Array.from({ length: 5 }).map((_, idx) => (
             <Card key={idx} style={{ borderRadius: token.borderRadiusLG }}>
               <Skeleton active paragraph={{ rows: 3 }} />
             </Card>
           ))}
-        </Space>
+        </Flex>
       )}
 
       {/* Job Cards */}
       {!isLoading && (
-        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+        <Flex vertical gap={16}>
           {jobs.length > 0 ? (
             jobs.map((job) => <JobCard key={job.id} job={job} />)
           ) : (
@@ -112,12 +111,12 @@ export const JobListSection = () => {
               </Flex>
             </Card>
           )}
-        </Space>
+        </Flex>
       )}
 
       {/* Load More Skeleton (inline) */}
       {isLoadingMore && (
-        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+        <Flex vertical gap={16}>
           {Array.from({ length: 3 }).map((_, idx) => (
             <Card
               key={`more-${idx}`}
@@ -126,7 +125,7 @@ export const JobListSection = () => {
               <Skeleton active paragraph={{ rows: 2 }} />
             </Card>
           ))}
-        </Space>
+        </Flex>
       )}
 
       {/* Sentinel div — trigger IntersectionObserver */}

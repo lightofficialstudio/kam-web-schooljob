@@ -10,6 +10,7 @@ export async function GET(request: Request) {
       keyword: searchParams.get("keyword") ?? undefined,
       province: searchParams.get("province") ?? undefined,
       school_type: searchParams.get("school_type") ?? undefined,
+      sort_by: searchParams.get("sort_by") ?? undefined,
     };
 
     const parsed = schoolSearchQuerySchema.safeParse(rawQuery);

@@ -11,7 +11,7 @@ const licenseMap: Record<LicenseRequired, string> = {
 
 // ✨ ดึงรายชื่อโรงเรียนที่มีงาน OPEN พร้อม jobs ในโรงเรียนนั้น
 export const searchSchoolsService = async (query: SchoolSearchQuery) => {
-  const { keyword, province, school_type } = query;
+  const { keyword, province, school_type, sort_by } = query;
 
   const schools = await prisma.schoolProfile.findMany({
     where: {
@@ -43,9 +43,17 @@ export const searchSchoolsService = async (query: SchoolSearchQuery) => {
           jobSubjects: { select: { subject: true } },
         },
       },
+      // ✨ นับงาน OPEN เพื่อใช้เรียงลำดับ most_jobs ฝั่ง DB
+      _count: { select: { jobs: { where: { status: JobStatus.OPEN } } } },
     },
+    // ✨ latest = createdAt desc (default), most_jobs = เรียงโดย _count ใน memory หลัง query
     orderBy: { createdAt: "desc" },
   });
+
+  // ✨ เรียงตาม most_jobs หลัง query (Prisma ไม่รองรับ orderBy _count relation โดยตรง)
+  if (sort_by === "most_jobs") {
+    schools.sort((a, b) => b._count.jobs - a._count.jobs);
+  }
 
   // ✨ แปลงโครงสร้างให้ตรงกับ School interface ฝั่ง frontend
   return schools.map((school) => ({

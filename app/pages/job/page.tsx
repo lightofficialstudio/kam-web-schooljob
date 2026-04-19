@@ -1,9 +1,10 @@
 "use client";
 
+import { useAuthStore } from "@/app/stores/auth-store";
 import { FileSearchOutlined } from "@ant-design/icons";
 import { Badge, Button, Col, Layout, Row, Tooltip } from "antd";
-import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 import { ApplicationTrackerDrawer } from "./_components/application-tracker-drawer";
 import { JobDetailDrawer } from "./_components/job-detail-drawer";
 import { JobListSection } from "./_components/job-list-section";
@@ -11,28 +12,28 @@ import { SearchFilterSection } from "./_components/search-filter-section";
 import { SidebarSection } from "./_components/sidebar-section";
 import { useApplicationTrackerStore } from "./_state/application-tracker-store";
 import { useJobSearchStore } from "./_state/job-search-store";
-import { useAuthStore } from "@/app/stores/auth-store";
 
 // Inner component ที่ใช้ useSearchParams (ต้องอยู่ใน Suspense)
 function JobSearchPageContent() {
   const searchParams = useSearchParams();
   const { setFilters, fetchAndOpenJob } = useJobSearchStore();
-  const { applications, setIsTrackerOpen, fetchApplications } = useApplicationTrackerStore();
+  const { applications, setIsTrackerOpen, fetchApplications } =
+    useApplicationTrackerStore();
   const { user } = useAuthStore();
 
   // จำนวนใบสมัครที่ยังอยู่ระหว่างดำเนินการ
   const activeApplicationCount = applications.filter(
-    (a) => a.status !== "accepted" && a.status !== "rejected"
+    (a) => a.status !== "accepted" && a.status !== "rejected",
   ).length;
 
   // ✨ Sync URL params → store เมื่อ mount
   useEffect(() => {
-    const keyword  = searchParams.get("keyword");
+    const keyword = searchParams.get("keyword");
     const province = searchParams.get("province");
     const category = searchParams.get("category");
 
     const partial: Parameters<typeof setFilters>[0] = {};
-    if (keyword)  partial.keyword  = keyword;
+    if (keyword) partial.keyword = keyword;
     if (province) partial.location = province;
 
     // ✨ category จาก URL คือ JSON ของ string[][] เช่น [["general_subject","thai_teacher"]]
@@ -54,14 +55,14 @@ function JobSearchPageContent() {
   useEffect(() => {
     const jobId = searchParams.get("job_id");
     if (jobId) fetchAndOpenJob(jobId);
-  }, [searchParams]);
+  }, [searchParams, fetchAndOpenJob]);
 
   // ✨ ดึงใบสมัครของ Employee เมื่อ login แล้ว
   useEffect(() => {
     if (user?.user_id && user?.role === "EMPLOYEE") {
       fetchApplications(user.user_id);
     }
-  }, [user?.user_id]);
+  }, [user?.user_id, fetchApplications]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

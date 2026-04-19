@@ -34,6 +34,9 @@ dayjs.locale("th");
 
 const { Title, Text } = Typography;
 
+// ✨ ระดับการศึกษาที่ถือว่า "วุฒิสูง" สำหรับแสดง tag เน้นวุฒิสูง
+const HIGH_EDUCATION_LEVELS = ["ปริญญาโท", "ปริญญาเอก"];
+
 interface JobCardProps {
   job: Job;
 }
@@ -62,10 +65,16 @@ export const JobCard = ({ job }: JobCardProps) => {
       <Row gutter={24}>
         <Col flex="auto">
           <Flex vertical gap={8}>
-            <Title level={3} style={{ margin: 0, color: token.colorPrimary, fontSize: 22 }}>
+            <Title
+              level={3}
+              style={{ margin: 0, color: token.colorPrimary, fontSize: 22 }}
+            >
               {job.title}
             </Title>
-            <Text strong style={{ color: token.colorTextSecondary, fontSize: 17 }}>
+            <Text
+              strong
+              style={{ color: token.colorTextSecondary, fontSize: 17 }}
+            >
               {job.schoolName}
             </Text>
 
@@ -73,22 +82,44 @@ export const JobCard = ({ job }: JobCardProps) => {
               {job.isNew && (
                 <Tag
                   color="success"
-                  style={{ borderRadius: token.borderRadiusSM, margin: 0, padding: "4px 12px", fontSize: 14, fontWeight: 600, border: "none" }}
+                  style={{
+                    borderRadius: token.borderRadiusSM,
+                    margin: 0,
+                    padding: "4px 12px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    border: "none",
+                  }}
                 >
                   มาใหม่
                 </Tag>
               )}
-              {job.educationLevel.includes("ปริญญาโท") && (
+              {HIGH_EDUCATION_LEVELS.some((l) =>
+                job.educationLevel.includes(l),
+              ) && (
                 <Tag
                   color="processing"
-                  style={{ borderRadius: token.borderRadiusSM, margin: 0, padding: "4px 12px", fontSize: 14, fontWeight: 600, border: "none" }}
+                  style={{
+                    borderRadius: token.borderRadiusSM,
+                    margin: 0,
+                    padding: "4px 12px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    border: "none",
+                  }}
                 >
                   เน้นวุฒิสูง
                 </Tag>
               )}
               <Tag
                 color="default"
-                style={{ borderRadius: token.borderRadiusSM, margin: 0, padding: "4px 12px", fontSize: 13, border: "none" }}
+                style={{
+                  borderRadius: token.borderRadiusSM,
+                  margin: 0,
+                  padding: "4px 12px",
+                  fontSize: 13,
+                  border: "none",
+                }}
               >
                 {job.schoolType}
               </Tag>
@@ -96,16 +127,27 @@ export const JobCard = ({ job }: JobCardProps) => {
 
             <Flex vertical gap={8}>
               <Space size={12} align="center">
-                <ClockCircleOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
-                <Text style={{ fontSize: 16 }}>งานเต็มเวลา</Text>
+                <ClockCircleOutlined
+                  style={{ color: token.colorPrimary, fontSize: 18 }}
+                />
+                <Text style={{ fontSize: 16 }}>
+                  {job.jobType ?? "เต็มเวลา"}
+                </Text>
               </Space>
               <Space size={12} align="center">
-                <EnvironmentOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
+                <EnvironmentOutlined
+                  style={{ color: token.colorPrimary, fontSize: 18 }}
+                />
                 <Text style={{ fontSize: 16 }}>{job.address}</Text>
               </Space>
               <Space size={12} align="center">
-                <DollarCircleOutlined style={{ color: token.colorSuccess, fontSize: 20 }} />
-                <Text strong style={{ fontSize: 18, color: token.colorSuccess }}>
+                <DollarCircleOutlined
+                  style={{ color: token.colorSuccess, fontSize: 20 }}
+                />
+                <Text
+                  strong
+                  style={{ fontSize: 18, color: token.colorSuccess }}
+                >
                   {job.salaryType === "ระบุเงินเดือน"
                     ? `฿${job.salaryMin?.toLocaleString()} - ฿${job.salaryMax?.toLocaleString()} ต่อเดือน`
                     : "ตามประสบการณ์ / ไม่ระบุ"}
@@ -116,13 +158,28 @@ export const JobCard = ({ job }: JobCardProps) => {
             <Card
               size="small"
               variant="borderless"
-              style={{ backgroundColor: token.colorBgLayout, borderRadius: token.borderRadiusLG }}
+              style={{
+                backgroundColor: token.colorBgLayout,
+                borderRadius: token.borderRadiusLG,
+              }}
               styles={{ body: { padding: 16 } }}
             >
               <ul style={{ paddingLeft: 20, margin: 0, lineHeight: 1.8 }}>
-                <li><Text style={{ fontSize: 15 }}>รับทั้งสิ้น <Text strong>{job.vacancyCount}</Text> อัตรา</Text></li>
-                <li><Text style={{ fontSize: 15 }}>ประสบการณ์: <Text strong>{job.teachingExperience}</Text></Text></li>
-                <li><Text style={{ fontSize: 15 }}>ใบอนุญาต: <Text strong>{job.licenseRequired}</Text></Text></li>
+                <li>
+                  <Text style={{ fontSize: 15 }}>
+                    รับทั้งสิ้น <Text strong>{job.vacancyCount}</Text> อัตรา
+                  </Text>
+                </li>
+                <li>
+                  <Text style={{ fontSize: 15 }}>
+                    ประสบการณ์: <Text strong>{job.teachingExperience}</Text>
+                  </Text>
+                </li>
+                <li>
+                  <Text style={{ fontSize: 15 }}>
+                    ใบอนุญาต: <Text strong>{job.licenseRequired}</Text>
+                  </Text>
+                </li>
               </ul>
             </Card>
           </Flex>
@@ -135,7 +192,7 @@ export const JobCard = ({ job }: JobCardProps) => {
             style={{
               border: `1px solid ${token.colorBorderSecondary}`,
               borderRadius: 12,
-              background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+              background: token.colorPrimary,
               fontSize: 32,
               fontWeight: 700,
               color: "#fff",
@@ -163,7 +220,9 @@ export const JobCard = ({ job }: JobCardProps) => {
               size="large"
               icon={
                 saved ? (
-                  <HeartFilled style={{ color: token.colorError, fontSize: 20 }} />
+                  <HeartFilled
+                    style={{ color: token.colorError, fontSize: 20 }}
+                  />
                 ) : (
                   <HeartOutlined style={{ fontSize: 20 }} />
                 )
@@ -174,7 +233,11 @@ export const JobCard = ({ job }: JobCardProps) => {
               }}
               title={saved ? "ยกเลิกการบันทึก" : "บันทึกงานนี้"}
             />
-            <Button type="primary" size="large" style={{ fontWeight: 600, padding: "0 32px" }}>
+            <Button
+              type="primary"
+              size="large"
+              style={{ fontWeight: 600, padding: "0 32px" }}
+            >
               รายละเอียดงาน
             </Button>
           </Space>

@@ -31,13 +31,21 @@ export default function SchoolDirectoryPage() {
     provinceFilter,
     typeFilter,
     sortBy,
+    provinceOptions,
     setTypeFilter,
     setProvinceFilter,
     setSortBy,
     fetchSchoolList,
+    fetchProvinces,
   } = useSchoolStore();
 
-  // ✨ ดึงข้อมูลโรงเรียนเมื่อ filter เปลี่ยน
+  // ✨ ดึงจังหวัดและโรงเรียนครั้งแรกตอน mount
+  useEffect(() => {
+    fetchProvinces();
+    fetchSchoolList();
+  }, []);
+
+  // ✨ ดึงโรงเรียนใหม่เมื่อ filter เปลี่ยน (ไม่รวม mount)
   useEffect(() => {
     fetchSchoolList();
   }, [searchQuery, provinceFilter, typeFilter]);
@@ -53,6 +61,11 @@ export default function SchoolDirectoryPage() {
     if (sortBy === "most_jobs") return b.jobCount - a.jobCount;
     return 0; // "latest" — API คืนมาเรียงตาม createdAt desc อยู่แล้ว
   });
+
+  // ✨ Quick Filter ประเภทโรงเรียนที่ใช้บ่อย
+  const QUICK_TYPES = ["โรงเรียนนานาชาติ", "โรงเรียนรัฐบาล", "โรงเรียนเอกชน", "สถาบันกวดวิชา"];
+  // ✨ Quick Filter จังหวัด — ใช้ 2 จังหวัดแรกจาก provinceOptions ที่โหลดจาก API
+  const quickProvinces = provinceOptions.slice(0, 2).map((p) => p.value);
 
   return (
     <Layout
@@ -141,20 +154,13 @@ export default function SchoolDirectoryPage() {
               <Text type="secondary" style={{ lineHeight: "28px", fontSize: 13 }}>
                 กรองด่วน:
               </Text>
-              {[
-                { label: "โรงเรียนนานาชาติ", kind: "type" },
-                { label: "โรงเรียนรัฐบาล", kind: "type" },
-                { label: "โรงเรียนเอกชน", kind: "type" },
-                { label: "สถาบันกวดวิชา", kind: "type" },
-                { label: "กรุงเทพมหานคร", kind: "province" },
-                { label: "เชียงใหม่", kind: "province" },
-              ].map(({ label, kind }) => {
-                const isActive =
-                  kind === "type" ? typeFilter === label : provinceFilter === label;
+              {/* ✨ ประเภทโรงเรียน — static */}
+              {QUICK_TYPES.map((label) => {
+                const isActive = typeFilter === label;
                 return (
                   <Tag
                     key={label}
-                    color={isActive ? "#11b6f5" : undefined}
+                    color={isActive ? token.colorPrimary : undefined}
                     style={{
                       cursor: "pointer",
                       borderRadius: 100,
@@ -164,11 +170,29 @@ export default function SchoolDirectoryPage() {
                       border: isActive ? "none" : `1px solid ${token.colorBorder}`,
                       backgroundColor: isActive ? undefined : token.colorBgContainer,
                     }}
-                    onClick={() =>
-                      kind === "type"
-                        ? handleQuickType(label)
-                        : handleQuickProvince(label)
-                    }
+                    onClick={() => handleQuickType(label)}
+                  >
+                    {label}
+                  </Tag>
+                );
+              })}
+              {/* ✨ จังหวัด — 2 แรกจาก provinceOptions ที่ดึงจาก GitHub API */}
+              {quickProvinces.map((label) => {
+                const isActive = provinceFilter === label;
+                return (
+                  <Tag
+                    key={label}
+                    color={isActive ? token.colorPrimary : undefined}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: 100,
+                      padding: "2px 14px",
+                      fontSize: 13,
+                      fontWeight: isActive ? 600 : 400,
+                      border: isActive ? "none" : `1px solid ${token.colorBorder}`,
+                      backgroundColor: isActive ? undefined : token.colorBgContainer,
+                    }}
+                    onClick={() => handleQuickProvince(label)}
                   >
                     {label}
                   </Tag>
@@ -184,7 +208,7 @@ export default function SchoolDirectoryPage() {
                       โรงเรียนทั้งหมด
                     </Text>
                     <Tag
-                      color="#11b6f5"
+                      color={token.colorPrimary}
                       style={{ borderRadius: 4, transform: "translateY(-1px)" }}
                     >
                       {sortedSchools.length}
@@ -242,15 +266,9 @@ export default function SchoolDirectoryPage() {
                           ลองเลือก Quick Filter ด้านล่างหรือเปลี่ยนตัวกรองใหม่
                         </Text>
                       </Flex>
+                      {/* ✨ Empty state Quick Filter — ใช้ตัวแปรเดียวกับด้านบน */}
                       <Flex gap={8} wrap="wrap" justify="center">
-                        {[
-                          { label: "โรงเรียนนานาชาติ", kind: "type" },
-                          { label: "โรงเรียนรัฐบาล", kind: "type" },
-                          { label: "โรงเรียนเอกชน", kind: "type" },
-                          { label: "สถาบันกวดวิชา", kind: "type" },
-                          { label: "กรุงเทพมหานคร", kind: "province" },
-                          { label: "เชียงใหม่", kind: "province" },
-                        ].map(({ label, kind }) => (
+                        {QUICK_TYPES.map((label) => (
                           <Tag
                             key={label}
                             style={{
@@ -261,11 +279,23 @@ export default function SchoolDirectoryPage() {
                               border: `1px solid ${token.colorBorder}`,
                               backgroundColor: token.colorBgLayout,
                             }}
-                            onClick={() =>
-                              kind === "type"
-                                ? handleQuickType(label)
-                                : handleQuickProvince(label)
-                            }
+                            onClick={() => handleQuickType(label)}
+                          >
+                            {label}
+                          </Tag>
+                        ))}
+                        {quickProvinces.map((label) => (
+                          <Tag
+                            key={label}
+                            style={{
+                              cursor: "pointer",
+                              borderRadius: 100,
+                              padding: "4px 16px",
+                              fontSize: 13,
+                              border: `1px solid ${token.colorBorder}`,
+                              backgroundColor: token.colorBgLayout,
+                            }}
+                            onClick={() => handleQuickProvince(label)}
                           >
                             {label}
                           </Tag>

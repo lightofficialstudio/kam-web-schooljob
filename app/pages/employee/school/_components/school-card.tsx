@@ -103,7 +103,7 @@ export const SchoolCard = ({
                   </Space>
                   <Divider orientation="vertical" />
                   <Tag
-                    color="#11b6f5"
+                    color={token.colorPrimary}
                     variant="filled"
                     style={{
                       borderRadius: 6,

@@ -5,6 +5,7 @@ export interface SchoolSearchParams {
   keyword?: string;
   province?: string;
   school_type?: string;
+  sort_by?: "latest" | "most_jobs";
 }
 
 // ✨ ดึงรายชื่อโรงเรียนที่มีงานเปิดรับสมัคร

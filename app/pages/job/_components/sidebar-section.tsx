@@ -30,49 +30,63 @@ import { useSavedJobsStore } from "../_state/saved-jobs-store";
 
 const { Title, Text } = Typography;
 
-// ✨ รายการเคล็ดลับความปลอดภัยสำหรับผู้สมัครงาน
-const SAFETY_TIPS = [
+// ✨ ประเภทสี token ที่ใช้ใน SAFETY_TIPS
+type SafetyTipToken = {
+  colorWarning: string;
+  colorError: string;
+  colorSuccess: string;
+  colorPrimary: string;
+};
+
+// ✨ รายการเคล็ดลับความปลอดภัย — resolve สีจาก token (ไม่ hardcode hex)
+const getSafetyTips = (token: SafetyTipToken) => [
   {
     icon: <DollarOutlined />,
-    color: "#f59e0b",
-    bgColor: "rgba(245,158,11,0.1)",
+    color: token.colorWarning,
+    bgColor: `${token.colorWarning}1a`,
     title: "อย่าโอนเงิน",
-    detail: "งานที่ถูกต้องตามกฎหมายจะไม่เรียกเก็บค่าสมัคร ค่ามัดจำ หรือค่าอุปกรณ์ใดๆ ล่วงหน้า หากถูกขอเงิน ให้ระวังทันที",
+    detail:
+      "งานที่ถูกต้องตามกฎหมายจะไม่เรียกเก็บค่าสมัคร ค่ามัดจำ หรือค่าอุปกรณ์ใดๆ ล่วงหน้า หากถูกขอเงิน ให้ระวังทันที",
   },
   {
     icon: <IdcardOutlined />,
-    color: "#ef4444",
-    bgColor: "rgba(239,68,68,0.1)",
+    color: token.colorError,
+    bgColor: `${token.colorError}1a`,
     title: "ระวังข้อมูลส่วนตัว",
-    detail: "ห้ามส่งสำเนาบัตรประชาชน หนังสือเดินทาง หรือข้อมูลบัญชีธนาคารก่อนผ่านการสัมภาษณ์จริง",
+    detail:
+      "ห้ามส่งสำเนาบัตรประชาชน หนังสือเดินทาง หรือข้อมูลบัญชีธนาคารก่อนผ่านการสัมภาษณ์จริง",
   },
   {
     icon: <EyeInvisibleOutlined />,
-    color: "#8b5cf6",
+    color: "#8b5cf6", // ไม่มี token เทียบเท่า (purple)
     bgColor: "rgba(139,92,246,0.1)",
     title: "ตรวจสอบตัวตนนายจ้าง",
-    detail: "ค้นหาชื่อโรงเรียนใน Google แผนที่ หรือ เว็บกระทรวงศึกษา ก่อนสมัคร อย่าเชื่อเพียงรูปโลโก้เท่านั้น",
+    detail:
+      "ค้นหาชื่อโรงเรียนใน Google แผนที่ หรือ เว็บกระทรวงศึกษา ก่อนสมัคร อย่าเชื่อเพียงรูปโลโก้เท่านั้น",
   },
   {
     icon: <PhoneOutlined />,
-    color: "#11b6f5",
-    bgColor: "rgba(17,182,245,0.1)",
+    color: token.colorPrimary,
+    bgColor: `${token.colorPrimary}1a`,
     title: "ระวังการติดต่อนอกระบบ",
-    detail: "หากถูกขอให้ติดต่อทาง LINE, WhatsApp ส่วนตัว หรือแอปอื่นนอกแพลตฟอร์มก่อนนัดสัมภาษณ์ ให้ระวังเป็นพิเศษ",
+    detail:
+      "หากถูกขอให้ติดต่อทาง LINE, WhatsApp ส่วนตัว หรือแอปอื่นนอกแพลตฟอร์มก่อนนัดสัมภาษณ์ ให้ระวังเป็นพิเศษ",
   },
   {
     icon: <BankOutlined />,
-    color: "#10b981",
-    bgColor: "rgba(16,185,129,0.1)",
+    color: token.colorSuccess,
+    bgColor: `${token.colorSuccess}1a`,
     title: "สัมภาษณ์ในที่สาธารณะ",
-    detail: "การสัมภาษณ์ครั้งแรกควรทำในสถานที่โรงเรียนจริง หรือผ่านวิดีโอคอล ไม่ใช่สถานที่ลับหรือที่พักส่วนตัว",
+    detail:
+      "การสัมภาษณ์ครั้งแรกควรทำในสถานที่โรงเรียนจริง หรือผ่านวิดีโอคอล ไม่ใช่สถานที่ลับหรือที่พักส่วนตัว",
   },
   {
     icon: <AlertOutlined />,
-    color: "#f43f5e",
+    color: "#f43f5e", // ไม่มี token เทียบเท่า (pink)
     bgColor: "rgba(244,63,94,0.1)",
     title: "รายงานพฤติกรรมน่าสงสัย",
-    detail: "หากพบประกาศงานที่ดูผิดปกติหรือน่าสงสัย สามารถแจ้งทีมงานได้ผ่านปุ่ม 'รายงาน' บนการ์ดงานนั้นๆ",
+    detail:
+      "หากพบประกาศงานที่ดูผิดปกติหรือน่าสงสัย สามารถแจ้งทีมงานได้ผ่านปุ่ม 'รายงาน' บนการ์ดงานนั้นๆ",
   },
 ];
 
@@ -88,11 +102,18 @@ export const SidebarSection = () => {
   // ✨ ดึงข้อมูล Job เต็มจาก store โดยใช้ savedJobIds เป็น key
   const savedJobs = jobs.filter((j) => savedJobIds.includes(j.id));
 
+  // ✨ resolve สี SAFETY_TIPS จาก token (ไม่ hardcode hex)
+  const safetyTips = getSafetyTips(token);
+
   return (
     <Flex vertical gap={24}>
       {/* ─── Saved Jobs ─── */}
       <Card variant="borderless" style={{ borderRadius: token.borderRadiusLG }}>
-        <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
+        <Flex
+          justify="space-between"
+          align="center"
+          style={{ marginBottom: 12 }}
+        >
           <Title level={5} style={{ margin: 0 }}>
             งานที่บันทึกไว้
           </Title>
@@ -100,7 +121,10 @@ export const SidebarSection = () => {
             count={savedJobs.length}
             showZero
             style={{
-              backgroundColor: savedJobs.length > 0 ? "#11b6f5" : token.colorTextQuaternary,
+              backgroundColor:
+                savedJobs.length > 0
+                  ? token.colorPrimary
+                  : token.colorTextQuaternary,
             }}
           />
         </Flex>
@@ -118,8 +142,15 @@ export const SidebarSection = () => {
           <Flex vertical>
             {savedJobs.map((job, index) => (
               <div key={job.id}>
-                <Flex justify="space-between" align="center" style={{ padding: "8px 0" }}>
-                  <Flex vertical style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  style={{ padding: "8px 0" }}
+                >
+                  <Flex
+                    vertical
+                    style={{ flex: 1, minWidth: 0, marginRight: 8 }}
+                  >
                     <Text
                       strong
                       style={{ fontSize: 13, cursor: "pointer" }}
@@ -142,7 +173,9 @@ export const SidebarSection = () => {
                     />
                   </Tooltip>
                 </Flex>
-                {index < savedJobs.length - 1 && <Divider style={{ margin: 0 }} />}
+                {index < savedJobs.length - 1 && (
+                  <Divider style={{ margin: 0 }} />
+                )}
               </div>
             ))}
           </Flex>
@@ -158,7 +191,8 @@ export const SidebarSection = () => {
         {/* Header แบบ gradient */}
         <div
           style={{
-            background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 60%, #5dd5fb 100%)",
+            background:
+              "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 60%, #5dd5fb 100%)",
             padding: "20px 20px 16px",
             position: "relative",
             overflow: "hidden",
@@ -167,26 +201,41 @@ export const SidebarSection = () => {
           {/* dot pattern overlay */}
           <div
             style={{
-              position: "absolute", inset: 0,
-              backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
               backgroundSize: "24px 24px",
               opacity: 0.08,
               pointerEvents: "none",
             }}
           />
-          <Flex align="center" gap={10} style={{ position: "relative", zIndex: 1 }}>
+          <Flex
+            align="center"
+            gap={10}
+            style={{ position: "relative", zIndex: 1 }}
+          >
             <div
               style={{
-                width: 40, height: 40, borderRadius: 10,
+                width: 40,
+                height: 40,
+                borderRadius: 10,
                 background: "rgba(255,255,255,0.2)",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 backdropFilter: "blur(8px)",
               }}
             >
-              <SafetyCertificateOutlined style={{ fontSize: 20, color: "#fff" }} />
+              <SafetyCertificateOutlined
+                style={{ fontSize: 20, color: "#fff" }}
+              />
             </div>
             <div>
-              <Text strong style={{ color: "#fff", fontSize: 15, display: "block" }}>
+              <Text
+                strong
+                style={{ color: "#fff", fontSize: 15, display: "block" }}
+              >
                 ปลอดภัยไว้ก่อน!
               </Text>
               <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}>
@@ -199,10 +248,13 @@ export const SidebarSection = () => {
           <Tag
             icon={<CheckCircleFilled />}
             style={{
-              position: "absolute", top: 14, right: 14,
+              position: "absolute",
+              top: 14,
+              right: 14,
               background: "rgba(255,255,255,0.2)",
               border: "1px solid rgba(255,255,255,0.35)",
-              color: "#fff", fontSize: 11,
+              color: "#fff",
+              fontSize: 11,
               backdropFilter: "blur(4px)",
               borderRadius: 20,
             }}
@@ -213,46 +265,65 @@ export const SidebarSection = () => {
 
         {/* Tips List */}
         <div style={{ padding: "8px 0" }}>
-          {SAFETY_TIPS.map((tip, index) => (
+          {safetyTips.map((tip, index) => (
             <div key={index}>
               <div
-                onClick={() => setExpandedTip(expandedTip === index ? null : index)}
+                onClick={() =>
+                  setExpandedTip(expandedTip === index ? null : index)
+                }
                 style={{
                   padding: "12px 20px",
                   cursor: "pointer",
                   transition: "background 0.15s",
-                  background: expandedTip === index
-                    ? `${tip.bgColor}`
-                    : "transparent",
+                  background:
+                    expandedTip === index ? `${tip.bgColor}` : "transparent",
                 }}
                 onMouseEnter={(e) => {
                   if (expandedTip !== index)
-                    (e.currentTarget as HTMLDivElement).style.background = token.colorBgLayout;
+                    (e.currentTarget as HTMLDivElement).style.background =
+                      token.colorBgLayout;
                 }}
                 onMouseLeave={(e) => {
                   if (expandedTip !== index)
-                    (e.currentTarget as HTMLDivElement).style.background = "transparent";
+                    (e.currentTarget as HTMLDivElement).style.background =
+                      "transparent";
                 }}
               >
                 <Flex align="flex-start" gap={12}>
                   {/* icon bubble */}
                   <div
                     style={{
-                      width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      flexShrink: 0,
                       background: tip.bgColor,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 15, color: tip.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 15,
+                      color: tip.color,
                     }}
                   >
                     {tip.icon}
                   </div>
                   <Flex vertical style={{ flex: 1, minWidth: 0 }}>
                     <Flex justify="space-between" align="center">
-                      <Text strong style={{ fontSize: 13 }}>{tip.title}</Text>
+                      <Text strong style={{ fontSize: 13 }}>
+                        {tip.title}
+                      </Text>
                       <Text
                         type="secondary"
-                        style={{ fontSize: 18, lineHeight: 1, transition: "transform 0.2s", display: "inline-block",
-                          transform: expandedTip === index ? "rotate(180deg)" : "rotate(0deg)" }}
+                        style={{
+                          fontSize: 18,
+                          lineHeight: 1,
+                          transition: "transform 0.2s",
+                          display: "inline-block",
+                          transform:
+                            expandedTip === index
+                              ? "rotate(180deg)"
+                              : "rotate(0deg)",
+                        }}
                       >
                         ›
                       </Text>
@@ -260,7 +331,12 @@ export const SidebarSection = () => {
                     {expandedTip === index && (
                       <Text
                         type="secondary"
-                        style={{ fontSize: 12, lineHeight: 1.7, marginTop: 6, display: "block" }}
+                        style={{
+                          fontSize: 12,
+                          lineHeight: 1.7,
+                          marginTop: 6,
+                          display: "block",
+                        }}
                       >
                         {tip.detail}
                       </Text>
@@ -268,8 +344,10 @@ export const SidebarSection = () => {
                   </Flex>
                 </Flex>
               </div>
-              {index < SAFETY_TIPS.length - 1 && (
-                <Divider style={{ margin: "0 20px", minWidth: "auto", width: "auto" }} />
+              {index < safetyTips.length - 1 && (
+                <Divider
+                  style={{ margin: "0 20px", minWidth: "auto", width: "auto" }}
+                />
               )}
             </div>
           ))}
@@ -284,15 +362,26 @@ export const SidebarSection = () => {
           }}
         >
           <Flex align="center" gap={8}>
-            <WarningFilled style={{ color: "#f59e0b", fontSize: 14 }} />
+            <WarningFilled
+              style={{ color: token.colorWarning, fontSize: 14 }}
+            />
             <Text type="secondary" style={{ fontSize: 12 }}>
               พบพฤติกรรมน่าสงสัย?{" "}
               <Text
-                style={{ color: "#11b6f5", cursor: "pointer", fontSize: 12 }}
+                style={{
+                  color: token.colorPrimary,
+                  cursor: "pointer",
+                  fontSize: 12,
+                }}
                 onClick={() => {
                   const subject = encodeURIComponent("แจ้งประกาศงานน่าสงสัย");
-                  const body = encodeURIComponent("กรุณาระบุ URL ของประกาศงานและรายละเอียดที่น่าสงสัย:");
-                  window.open(`mailto:support@kamjob.com?subject=${subject}&body=${body}`, "_blank");
+                  const body = encodeURIComponent(
+                    "กรุณาระบุ URL ของประกาศงานและรายละเอียดที่น่าสงสัย:",
+                  );
+                  window.open(
+                    `mailto:support@kamjob.com?subject=${subject}&body=${body}`,
+                    "_blank",
+                  );
                 }}
               >
                 แจ้งทีมงาน
@@ -301,7 +390,6 @@ export const SidebarSection = () => {
           </Flex>
         </div>
       </Card>
-
     </Flex>
   );
 };

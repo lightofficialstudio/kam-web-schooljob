@@ -42,6 +42,11 @@ dayjs.locale("th");
 
 const { Title, Text } = Typography;
 
+// ✨ URL base สำหรับ Dicebear avatar (fallback เมื่อไม่มีโลโก้)
+const DICEBEAR_BASE_URL = "https://api.dicebear.com/7.x/initials/svg";
+// ✨ สี dark background สำหรับ banner blur (ออกแบบเพื่อ contrast สูง ไม่ขึ้นกับ theme)
+const BANNER_DARK_BG = "#07101f";
+
 // ✨ ชุด banner สำหรับสุ่มแสดงเมื่อโรงเรียนไม่ได้อัปโหลดรูป
 const BANNER_THEMES = [
   {
@@ -75,7 +80,17 @@ const BANNER_THEMES = [
 ];
 
 // ✨ Banner ของ Drawer — แสดงรูปจริงถ้ามี, ไม่มีสุ่ม banner สำหรับประกาศรับสมัคร
-const JobBanner = ({ job }: { job: { id: string; schoolName: string; logoUrl?: string; subjects: string[]; vacancyCount: number } }) => {
+const JobBanner = ({
+  job,
+}: {
+  job: {
+    id: string;
+    schoolName: string;
+    logoUrl?: string;
+    subjects: string[];
+    vacancyCount: number;
+  };
+}) => {
   // ✨ กำหนด theme ตาม job.id (คงที่ต่อ job ไม่เปลี่ยนทุก render)
   const themeIndex = job.id.charCodeAt(0) % BANNER_THEMES.length;
   const theme = BANNER_THEMES[themeIndex];
@@ -85,109 +100,209 @@ const JobBanner = ({ job }: { job: { id: string; schoolName: string; logoUrl?: s
   const SharedDecorators = () => (
     <>
       {/* grid */}
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-        backgroundSize: "48px 48px",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
       {/* glow top-right */}
-      <div style={{
-        position: "absolute", top: "-30%", right: "-8%", pointerEvents: "none",
-        width: 360, height: 360, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,255,255,0.11) 0%, transparent 65%)",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          top: "-30%",
+          right: "-8%",
+          pointerEvents: "none",
+          width: 360,
+          height: 360,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(255,255,255,0.11) 0%, transparent 65%)",
+        }}
+      />
       {/* glow bottom-left */}
-      <div style={{
-        position: "absolute", bottom: "-40%", left: "-6%", pointerEvents: "none",
-        width: 280, height: 280, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(17,182,245,0.18) 0%, transparent 65%)",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-40%",
+          left: "-6%",
+          pointerEvents: "none",
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(17,182,245,0.18) 0%, transparent 65%)",
+        }}
+      />
       {/* shimmer sweep — CSS keyframe via style tag */}
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.07) 50%, transparent 60%)",
-        backgroundSize: "200% 100%",
-        animation: "bannerShimmer 4s ease-in-out infinite",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.07) 50%, transparent 60%)",
+          backgroundSize: "200% 100%",
+          animation: "bannerShimmer 4s ease-in-out infinite",
+        }}
+      />
       {/* bottom fade → content card ลอยขึ้น smooth */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: 64, pointerEvents: "none",
-        background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.18) 100%)",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 64,
+          pointerEvents: "none",
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.18) 100%)",
+        }}
+      />
     </>
   );
 
   // ✨ มีรูปโรงเรียน → blur เป็น BG + โลโก้ชัดพร้อม glow ring
   if (job.logoUrl) {
     return (
-      <div style={{ height: 240, position: "relative", overflow: "hidden", background: "#07101f" }}>
+      <div
+        style={{
+          height: 240,
+          position: "relative",
+          overflow: "hidden",
+          background: BANNER_DARK_BG,
+        }}
+      >
         {/* รูป blur */}
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(${job.logoUrl})`,
-          backgroundSize: "cover", backgroundPosition: "center",
-          filter: "blur(28px) brightness(0.25) saturate(1.4)",
-          transform: "scale(1.14)",
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url(${job.logoUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(28px) brightness(0.25) saturate(1.4)",
+            transform: "scale(1.14)",
+          }}
+        />
         {/* overlay gradient */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(160deg, rgba(13,143,212,0.25) 0%, rgba(0,15,40,0.7) 100%)",
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(160deg, rgba(13,143,212,0.25) 0%, rgba(0,15,40,0.7) 100%)",
+          }}
+        />
         <SharedDecorators />
 
         {/* content */}
-        <div style={{
-          position: "absolute", inset: 0,
-          display: "flex", alignItems: "center",
-          gap: 20, padding: "0 48px",
-        }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 20,
+            padding: "0 48px",
+          }}
+        >
           {/* logo card + blue ring */}
           <div style={{ position: "relative", flexShrink: 0 }}>
             {/* glow ring */}
-            <div style={{
-              position: "absolute", inset: -4, borderRadius: 20,
-              background: "linear-gradient(135deg, rgba(17,182,245,0.6) 0%, rgba(93,213,251,0.3) 100%)",
-              filter: "blur(6px)",
-            }} />
-            <div style={{
-              position: "relative", width: 80, height: 80, borderRadius: 16,
-              background: "#fff", overflow: "hidden",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px rgba(17,182,245,0.4)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: -4,
+                borderRadius: 20,
+                background:
+                  "linear-gradient(135deg, rgba(17,182,245,0.6) 0%, rgba(93,213,251,0.3) 100%)",
+                filter: "blur(6px)",
+              }}
+            />
+            <div
+              style={{
+                position: "relative",
+                width: 80,
+                height: 80,
+                borderRadius: 16,
+                background: "#fff",
+                overflow: "hidden",
+                boxShadow:
+                  "0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px rgba(17,182,245,0.4)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={job.logoUrl} alt={job.schoolName} style={{ width: 64, height: 64, objectFit: "contain" }} />
+              <img
+                src={job.logoUrl}
+                alt={job.schoolName}
+                style={{ width: 64, height: 64, objectFit: "contain" }}
+              />
             </div>
           </div>
 
           {/* text */}
           <div>
             {/* pill */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 5,
-              background: "rgba(17,182,245,0.25)", backdropFilter: "blur(10px)",
-              border: "1px solid rgba(17,182,245,0.45)",
-              borderRadius: 100, padding: "3px 12px", marginBottom: 10,
-            }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                background: "rgba(17,182,245,0.25)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(17,182,245,0.45)",
+                borderRadius: 100,
+                padding: "3px 12px",
+                marginBottom: 10,
+              }}
+            >
               <BankOutlined style={{ fontSize: 11, color: "#5dd5fb" }} />
-              <Text style={{ color: "#5dd5fb", fontSize: 11, fontWeight: 600, letterSpacing: 0.4 }}>
+              <Text
+                style={{
+                  color: "#5dd5fb",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  letterSpacing: 0.4,
+                }}
+              >
                 เปิดรับสมัคร {job.vacancyCount} อัตรา
               </Text>
             </div>
-            <Title level={3} style={{ color: "#fff", margin: 0, lineHeight: 1.25, textShadow: "0 2px 16px rgba(0,0,0,0.5)" }}>
+            <Title
+              level={3}
+              style={{
+                color: "#fff",
+                margin: 0,
+                lineHeight: 1.25,
+                textShadow: "0 2px 16px rgba(0,0,0,0.5)",
+              }}
+            >
               {job.schoolName}
             </Title>
             {job.subjects.length > 0 && (
-              <Text style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginTop: 4, display: "block" }}>
+              <Text
+                style={{
+                  color: "rgba(255,255,255,0.65)",
+                  fontSize: 13,
+                  marginTop: 4,
+                  display: "block",
+                }}
+              >
                 {job.subjects.slice(0, 3).join(" · ")}
               </Text>
             )}
           </div>
         </div>
 
-        {/* shimmer keyframe */}
-        <style>{`@keyframes bannerShimmer { 0%,100%{background-position:200% 0} 50%{background-position:0% 0} }`}</style>
+        {/* shimmer keyframe — ย้ายไปที่ globals.css เพื่อไม่ inject ซ้ำทุก render */}
       </div>
     );
   }
@@ -197,50 +312,104 @@ const JobBanner = ({ job }: { job: { id: string; schoolName: string; logoUrl?: s
   const sub = theme.sub.replace("{school}", job.schoolName);
 
   return (
-    <div style={{
-      height: 240, background: theme.gradient,
-      position: "relative", overflow: "hidden",
-    }}>
+    <div
+      style={{
+        height: 240,
+        background: theme.gradient,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
       <SharedDecorators />
 
       {/* large ghost icon — bottom-right depth layer */}
-      <Icon style={{
-        position: "absolute", bottom: -20, right: 20, pointerEvents: "none",
-        fontSize: 180, color: "rgba(255,255,255,0.045)",
-        lineHeight: 1,
-      }} />
+      <Icon
+        style={{
+          position: "absolute",
+          bottom: -20,
+          right: 20,
+          pointerEvents: "none",
+          fontSize: 180,
+          color: "rgba(255,255,255,0.045)",
+          lineHeight: 1,
+        }}
+      />
 
       {/* content */}
-      <div style={{
-        position: "relative", zIndex: 1,
-        padding: "0 48px", height: "100%",
-        display: "flex", flexDirection: "column", justifyContent: "center",
-      }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          padding: "0 48px",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
         {/* pill badge */}
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 6, alignSelf: "flex-start",
-          background: "rgba(255,255,255,0.14)", backdropFilter: "blur(12px)",
-          border: "1px solid rgba(255,255,255,0.22)",
-          borderRadius: 100, padding: "5px 14px", marginBottom: 18,
-        }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            alignSelf: "flex-start",
+            background: "rgba(255,255,255,0.14)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.22)",
+            borderRadius: 100,
+            padding: "5px 14px",
+            marginBottom: 18,
+          }}
+        >
           <Icon style={{ fontSize: 11, color: "#fff" }} />
-          <Text style={{ color: "#fff", fontSize: 12, fontWeight: 600, letterSpacing: 0.4 }}>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: 0.4,
+            }}
+          >
             เปิดรับสมัคร {job.vacancyCount} อัตรา
           </Text>
         </div>
 
-        <Title level={2} style={{ color: "#fff", margin: 0, lineHeight: 1.15, fontWeight: 700, letterSpacing: -0.3 }}>
+        <Title
+          level={2}
+          style={{
+            color: "#fff",
+            margin: 0,
+            lineHeight: 1.15,
+            fontWeight: 700,
+            letterSpacing: -0.3,
+          }}
+        >
           {headline}
         </Title>
-        <Title level={5} style={{ color: "rgba(255,255,255,0.82)", margin: "6px 0 0", fontWeight: 400 }}>
+        <Title
+          level={5}
+          style={{
+            color: "rgba(255,255,255,0.82)",
+            margin: "6px 0 0",
+            fontWeight: 400,
+          }}
+        >
           {sub}
         </Title>
-        <Text style={{ color: "rgba(255,255,255,0.48)", fontSize: 11, display: "block", marginTop: 12, letterSpacing: 1.2, fontWeight: 500 }}>
+        <Text
+          style={{
+            color: "rgba(255,255,255,0.48)",
+            fontSize: 11,
+            display: "block",
+            marginTop: 12,
+            letterSpacing: 1.2,
+            fontWeight: 500,
+          }}
+        >
           {theme.accent.toUpperCase()}
         </Text>
       </div>
-
-      <style>{`@keyframes bannerShimmer { 0%,100%{background-position:200% 0} 50%{background-position:0% 0} }`}</style>
     </div>
   );
 };
@@ -320,7 +489,10 @@ export const JobDetailDrawer = () => {
                   <Avatar
                     shape="square"
                     size={80}
-                    src={selectedJob.logoUrl ?? `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(selectedJob.schoolName)}&backgroundColor=0d8fd4`}
+                    src={
+                      selectedJob.logoUrl ??
+                      `${DICEBEAR_BASE_URL}?seed=${encodeURIComponent(selectedJob.schoolName)}&backgroundColor=0d8fd4`
+                    }
                     style={{ borderRadius: 12 }}
                   />
                 </Col>
@@ -333,7 +505,7 @@ export const JobDetailDrawer = () => {
                       {selectedJob.schoolName}
                     </Text>
                     <Badge status="success" />
-                    <Link href="#" style={{ color: "#11b6f5" }}>
+                    <Link href="#" style={{ color: token.colorPrimary }}>
                       ดูงานทั้งหมดจากโรงเรียนนี้
                     </Link>
                   </Space>
@@ -355,7 +527,7 @@ export const JobDetailDrawer = () => {
                   <ClockCircleOutlined
                     style={{ color: token.colorTextSecondary }}
                   />
-                  <Text>งานเต็มเวลา</Text>
+                  <Text>{selectedJob.jobType ?? "เต็มเวลา"}</Text>
                 </Space>
                 <Text type="secondary" style={{ marginTop: 8 }}>
                   โพสต์เมื่อ {dayjs(selectedJob.postedAt).fromNow()} •
@@ -371,8 +543,6 @@ export const JobDetailDrawer = () => {
                     style={{
                       height: 48,
                       padding: "0 40px",
-                      backgroundColor: "#11b6f5",
-                      borderColor: "#11b6f5",
                       fontWeight: 600,
                     }}
                   >
@@ -394,14 +564,24 @@ export const JobDetailDrawer = () => {
                   }}
                   styles={{ body: { padding: "16px 20px" } }}
                 >
-                  <Text style={{ fontSize: 15, lineHeight: 2, whiteSpace: "pre-line" }}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      lineHeight: 2,
+                      whiteSpace: "pre-line",
+                    }}
+                  >
                     {selectedJob.description}
                   </Text>
                   {selectedJob.grades.length > 0 && (
                     <Flex gap={6} wrap="wrap" style={{ marginTop: 12 }}>
-                      <Text type="secondary" style={{ fontSize: 13 }}>ระดับชั้น:</Text>
+                      <Text type="secondary" style={{ fontSize: 13 }}>
+                        ระดับชั้น:
+                      </Text>
                       {selectedJob.grades.map((g) => (
-                        <Tag key={g} style={{ borderRadius: 6 }}>{g}</Tag>
+                        <Tag key={g} style={{ borderRadius: 6 }}>
+                          {g}
+                        </Tag>
                       ))}
                     </Flex>
                   )}
@@ -415,31 +595,58 @@ export const JobDetailDrawer = () => {
               <Flex vertical gap={8}>
                 {selectedJob.educationLevel && (
                   <Flex gap={10} align="flex-start">
-                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <CheckCircleFilled
+                      style={{
+                        color: token.colorPrimary,
+                        marginTop: 3,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Text style={{ fontSize: 15 }}>
-                      วุฒิการศึกษาระดับ <Text strong>{selectedJob.educationLevel}</Text>
+                      วุฒิการศึกษาระดับ{" "}
+                      <Text strong>{selectedJob.educationLevel}</Text>
                     </Text>
                   </Flex>
                 )}
                 {selectedJob.teachingExperience && (
                   <Flex gap={10} align="flex-start">
-                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <CheckCircleFilled
+                      style={{
+                        color: token.colorPrimary,
+                        marginTop: 3,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Text style={{ fontSize: 15 }}>
-                      ประสบการณ์สอน <Text strong>{selectedJob.teachingExperience}</Text>
+                      ประสบการณ์สอน{" "}
+                      <Text strong>{selectedJob.teachingExperience}</Text>
                     </Text>
                   </Flex>
                 )}
                 {selectedJob.licenseRequired && (
                   <Flex gap={10} align="flex-start">
-                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <CheckCircleFilled
+                      style={{
+                        color: token.colorPrimary,
+                        marginTop: 3,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Text style={{ fontSize: 15 }}>
-                      ใบอนุญาตประกอบวิชาชีพครู: <Text strong>{selectedJob.licenseRequired}</Text>
+                      ใบอนุญาตประกอบวิชาชีพครู:{" "}
+                      <Text strong>{selectedJob.licenseRequired}</Text>
                     </Text>
                   </Flex>
                 )}
                 {selectedJob.gender && selectedJob.gender !== "ไม่จำกัด" && (
                   <Flex gap={10} align="flex-start">
-                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <CheckCircleFilled
+                      style={{
+                        color: token.colorPrimary,
+                        marginTop: 3,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Text style={{ fontSize: 15 }}>
                       เพศ <Text strong>{selectedJob.gender}</Text>
                     </Text>
@@ -447,16 +654,26 @@ export const JobDetailDrawer = () => {
                 )}
                 {selectedJob.qualifications && (
                   <Flex gap={10} align="flex-start">
-                    <CheckCircleFilled style={{ color: token.colorPrimary, marginTop: 3, flexShrink: 0 }} />
+                    <CheckCircleFilled
+                      style={{
+                        color: token.colorPrimary,
+                        marginTop: 3,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Text style={{ fontSize: 15, whiteSpace: "pre-line" }}>
                       {selectedJob.qualifications}
                     </Text>
                   </Flex>
                 )}
                 {/* fallback เมื่อยังไม่ได้กรอกข้อมูล */}
-                {!selectedJob.educationLevel && !selectedJob.teachingExperience && !selectedJob.qualifications && (
-                  <Text type="secondary" style={{ fontSize: 14 }}>โรงเรียนยังไม่ได้ระบุคุณสมบัติเพิ่มเติม</Text>
-                )}
+                {!selectedJob.educationLevel &&
+                  !selectedJob.teachingExperience &&
+                  !selectedJob.qualifications && (
+                    <Text type="secondary" style={{ fontSize: 14 }}>
+                      โรงเรียนยังไม่ได้ระบุคุณสมบัติเพิ่มเติม
+                    </Text>
+                  )}
               </Flex>
             </Flex>
 
@@ -510,9 +727,19 @@ export const JobDetailDrawer = () => {
               <Space wrap size={[8, 12]}>
                 {(selectedJob.benefits && selectedJob.benefits.length > 0
                   ? selectedJob.benefits
-                  : ["ประกันสังคม", "ประกันสุขภาพกลุ่ม", "โบนัสประจำปี", "ชุดยูนิฟอร์ม", "อาหารกลางวันฟรี"]
+                  : [
+                      "ประกันสังคม",
+                      "ประกันสุขภาพกลุ่ม",
+                      "โบนัสประจำปี",
+                      "ชุดยูนิฟอร์ม",
+                      "อาหารกลางวันฟรี",
+                    ]
                 ).map((w) => (
-                  <Tag key={w} color="#11b6f5" style={{ padding: "4px 12px", borderRadius: 8 }}>
+                  <Tag
+                    key={w}
+                    color={token.colorPrimary}
+                    style={{ padding: "4px 12px", borderRadius: 8 }}
+                  >
                     {w}
                   </Tag>
                 ))}
@@ -521,7 +748,15 @@ export const JobDetailDrawer = () => {
 
             <Divider style={{ margin: "40px 0" }} />
             <Flex justify="center">
-              <Text style={{ color: "#11b6f5", letterSpacing: 3, fontWeight: 600, fontSize: 13, opacity: 0.7 }}>
+              <Text
+                style={{
+                  color: token.colorPrimary,
+                  letterSpacing: 3,
+                  fontWeight: 600,
+                  fontSize: 13,
+                  opacity: 0.7,
+                }}
+              >
                 SCHOOL JOB BOARD
               </Text>
             </Flex>

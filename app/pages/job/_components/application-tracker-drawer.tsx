@@ -16,13 +16,19 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 import relativeTime from "dayjs/plugin/relativeTime";
-import type { ApplicationStatus, JobApplication } from "../_state/application-tracker-store";
+import type {
+  ApplicationStatus,
+  JobApplication,
+} from "../_state/application-tracker-store";
 import { useApplicationTrackerStore } from "../_state/application-tracker-store";
 
 dayjs.extend(relativeTime);
 dayjs.locale("th");
 
 const { Title, Text } = Typography;
+
+// ✨ URL base สำหรับ Dicebear avatar (fallback เมื่อไม่มีโลโก้)
+const DICEBEAR_BASE_URL = "https://api.dicebear.com/7.x/initials/svg";
 
 // แปลง status → index และ label สำหรับ Steps
 const STATUS_STEP_MAP: Record<ApplicationStatus, number> = {
@@ -34,7 +40,10 @@ const STATUS_STEP_MAP: Record<ApplicationStatus, number> = {
   rejected: 4,
 };
 
-const STATUS_LABEL: Record<ApplicationStatus, { label: string; color: string }> = {
+const STATUS_LABEL: Record<
+  ApplicationStatus,
+  { label: string; color: string }
+> = {
   submitted: { label: "ส่งแล้ว", color: "default" },
   acknowledged: { label: "รับทราบแล้ว", color: "processing" },
   interview: { label: "นัดสัมภาษณ์", color: "warning" },
@@ -69,8 +78,8 @@ const ApplicationCard = ({ app }: ApplicationCardProps) => {
         borderColor: isAccepted
           ? token.colorSuccess
           : isRejected
-          ? token.colorError
-          : token.colorBorderSecondary,
+            ? token.colorError
+            : token.colorBorderSecondary,
         marginBottom: 16,
       }}
       styles={{ body: { padding: 20 } }}
@@ -80,7 +89,7 @@ const ApplicationCard = ({ app }: ApplicationCardProps) => {
         <Avatar
           shape="square"
           size={48}
-          src={`https://api.dicebear.com/7.x/initials/svg?seed=${app.schoolName}&backgroundColor=003366`}
+          src={`${DICEBEAR_BASE_URL}?seed=${app.schoolName}&backgroundColor=003366`}
         />
         <Flex vertical style={{ flex: 1, minWidth: 0 }}>
           <Text strong style={{ fontSize: 15 }} ellipsis>
@@ -90,7 +99,10 @@ const ApplicationCard = ({ app }: ApplicationCardProps) => {
             {app.schoolName}
           </Text>
         </Flex>
-        <Tag color={STATUS_LABEL[app.status].color} style={{ margin: 0, whiteSpace: "nowrap" }}>
+        <Tag
+          color={STATUS_LABEL[app.status].color}
+          style={{ margin: 0, whiteSpace: "nowrap" }}
+        >
           {STATUS_LABEL[app.status].label}
         </Tag>
       </Flex>
@@ -122,10 +134,11 @@ const ApplicationCard = ({ app }: ApplicationCardProps) => {
 // Drawer ติดตามสถานะใบสมัครทั้งหมด
 export const ApplicationTrackerDrawer = () => {
   const { token } = antTheme.useToken();
-  const { applications, isTrackerOpen, setIsTrackerOpen } = useApplicationTrackerStore();
+  const { applications, isTrackerOpen, setIsTrackerOpen } =
+    useApplicationTrackerStore();
 
   const activeCount = applications.filter(
-    (a) => a.status !== "accepted" && a.status !== "rejected"
+    (a) => a.status !== "accepted" && a.status !== "rejected",
   ).length;
 
   return (

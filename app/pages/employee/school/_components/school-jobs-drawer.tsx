@@ -81,7 +81,7 @@ export const SchoolJobsDrawer = () => {
                     </Text>
                   </Space>
                   <Tag
-                    color="#11b6f5"
+                    color={token.colorPrimary}
                     variant="filled"
                     style={{ borderRadius: 6, margin: 0, border: "none" }}
                   >
