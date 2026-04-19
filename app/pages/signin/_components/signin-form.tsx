@@ -60,7 +60,8 @@ export const SigninForm = () => {
     try {
       const response = await requestSignin(values.email, values.password);
       const result = response.data;
-      setUser({
+
+      const user = {
         user_id: result.data.user_id,
         email: result.data.email,
         full_name: result.data.full_name,
@@ -68,12 +69,22 @@ export const SigninForm = () => {
         role: result.data.role,
         is_first_login: result.data.is_first_login || false,
         profile_image_url: result.data.profile_image_url || undefined,
-      });
-      showModal(
-        "success",
-        "เข้าสู่ระบบสำเร็จ",
-        result.message_th || "เข้าสู่ระบบเรียบร้อยแล้ว",
-      );
+      };
+      setUser(user);
+
+      // ✨ redirect ทันทีหลัง login สำเร็จ — ไม่รอ modal confirm
+      if (redirectUrl) {
+        router.push(decodeURIComponent(redirectUrl));
+        return;
+      }
+
+      const ROLE_HOME: Record<string, string> = {
+        EMPLOYEE: "/pages/employee/profile",
+        EMPLOYER: "/pages/employer/profile",
+        ADMIN: "/pages/admin",
+      };
+      const dest = ROLE_HOME[user.role ?? ""] ?? "/";
+      router.push(dest);
     } catch (err: unknown) {
       const message =
         (

@@ -280,6 +280,7 @@ export const WorkExperienceSection: React.FC = () => {
                     `${THAI_MONTHS[value.month()]} ${value.year() + 543}`
                   }
                   placeholder="เลือกเดือน/ปี"
+                  onChange={() => form.validateFields(["endDate"])}
                 />
               </Form.Item>
             </Col>
@@ -288,16 +289,22 @@ export const WorkExperienceSection: React.FC = () => {
               <Form.Item
                 label="จนถึง (เดือน/ปี พ.ศ.)"
                 name="endDate"
-                dependencies={["inPresent"]}
+                dependencies={["inPresent", "startDate"]}
                 rules={[
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (getFieldValue("inPresent") || value) {
-                        return Promise.resolve();
+                      if (getFieldValue("inPresent")) return Promise.resolve();
+                      if (!value)
+                        return Promise.reject(
+                          new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด"),
+                        );
+                      const start = getFieldValue("startDate");
+                      if (start && value.isBefore(start, "month")) {
+                        return Promise.reject(
+                          new Error("วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มงาน"),
+                        );
                       }
-                      return Promise.reject(
-                        new Error("กรุณาเลือกเดือนและปีที่สิ้นสุด"),
-                      );
+                      return Promise.resolve();
                     },
                   }),
                 ]}
