@@ -22,7 +22,11 @@ interface SignupState {
   setStep: (step: 1 | 2) => void;
   setRole: (role: SignupRole) => void;
   setLoading: (loading: boolean) => void;
-  showModal: (type: ModalType, mainTitle: string, description: string | ReactNode) => void;
+  showModal: (
+    type: ModalType,
+    mainTitle: string,
+    description: string | ReactNode,
+  ) => void;
   hideModal: () => void;
 }
 
@@ -43,6 +47,5 @@ export const useSignupStore = create<SignupState>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
   showModal: (type, mainTitle, description) =>
     set({ modal: { open: true, type, mainTitle, description } }),
-  hideModal: () =>
-    set((state) => ({ modal: { ...state.modal, open: false } })),
+  hideModal: () => set((state) => ({ modal: { ...state.modal, open: false } })),
 }));
