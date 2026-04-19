@@ -95,8 +95,9 @@ export const WorkExperienceSection: React.FC = () => {
     addWorkExperience,
     updateWorkExperience,
     removeWorkExperience,
-    isSaving,
   } = useProfileStore();
+  // ✨ local saving state — ป้องกัน double-submit และแสดง loading บนปุ่มจริง
+  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuthStore();
 
   const workExperiences = profile.workExperiences || [];
@@ -169,6 +170,7 @@ export const WorkExperienceSection: React.FC = () => {
       description: values.description,
     };
 
+    setIsSaving(true);
     try {
       const existingId = editingIndex !== null ? profile.workExperiences?.[editingIndex]?.id : undefined;
       const realId = existingId && UUID_REGEX.test(existingId) ? existingId : undefined;
@@ -200,6 +202,8 @@ export const WorkExperienceSection: React.FC = () => {
         axiosErr?.message ||
         "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ กรุณาลองใหม่อีกครั้ง";
       setModal({ open: true, type: "error", title: "บันทึกข้อมูลไม่สำเร็จ", description, errorDetails: err });
+    } finally {
+      setIsSaving(false);
     }
   };
 

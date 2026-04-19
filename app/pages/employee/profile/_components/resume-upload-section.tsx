@@ -251,13 +251,15 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
                         type="default"
                         style={{ fontSize: 12 }}
                         onClick={async () => {
+                          const previousActiveId = activeResumeId;
                           setActiveResume(resume.id);
                           const realId = resume.id && UUID_REGEX.test(resume.id) ? resume.id : undefined;
                           if (realId) {
                             try {
                               await putResume(realId, userId, { is_active: true });
                             } catch {
-                              // ✨ silent fail — store อัปเดตแล้ว จะ sync ครั้งถัดไปตอน fetchProfile
+                              // ✨ rollback ถ้า API fail
+                              setActiveResume(previousActiveId ?? resume.id);
                             }
                           }
                         }}

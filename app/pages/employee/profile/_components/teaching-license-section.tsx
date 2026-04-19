@@ -258,12 +258,14 @@ export const TeachingLicenseSection: React.FC = () => {
                   align="center"
                   gap={12}
                   onClick={async () => {
+                    const previousStatus = profile.licenseStatus;
                     setLicenseStatus(opt.value);
                     if (user?.user_id) {
                       try {
                         await patchSummary(user.user_id, { license_status: opt.value });
                       } catch {
-                        // ✨ silent fail — store อัปเดตแล้ว จะ sync ครั้งถัดไปตอน fetchProfile
+                        // ✨ rollback ถ้า API fail
+                        setLicenseStatus(previousStatus ?? "");
                       }
                     }
                   }}

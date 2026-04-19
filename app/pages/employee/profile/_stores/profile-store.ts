@@ -165,13 +165,13 @@ interface ProfileStore {
   addResume: (resume: ResumeEntry) => void;
   removeResume: (id: string) => void;
   setActiveResume: (id: string) => void;
-  deleteResumeFromDB: (resumeId: string, userId: string) => Promise<void>;
+  deleteResumeFromDB: (resumeId: string) => Promise<void>;
 
   // License attachment helpers
   addLicenseAttachment: (file: ResumeEntry) => void;
   removeLicenseAttachment: (id: string) => void;
   setLicenseStatus: (status: EmployeeProfile["licenseStatus"]) => void;
-  deleteLicenseAttachmentFromDB: (attachmentId: string, userId: string) => Promise<void>;
+  deleteLicenseAttachmentFromDB: (attachmentId: string) => Promise<void>;
 
   // Mockup Data Helper — รองรับ 3 รูปแบบ
   setMockupData: (preset: 1 | 2 | 3) => void;
@@ -406,7 +406,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     })),
 
   // ✨ ลบ resume ออกจาก store (ใช้ deleteResume API จาก _api/ แทน)
-  deleteResumeFromDB: async (resumeId: string, _userId: string) => {
+  deleteResumeFromDB: async (resumeId: string) => {
     set((state) => {
       const remaining = (state.profile.resumes ?? []).filter((r) => r.id !== resumeId);
       const newActiveId =
@@ -442,7 +442,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     })),
 
   // ✨ ลบไฟล์แนบใบประกอบฯ ออกจาก store (ใช้ deleteLicense API จาก _api/ แทน)
-  deleteLicenseAttachmentFromDB: async (attachmentId: string, _userId: string) => {
+  deleteLicenseAttachmentFromDB: async (attachmentId: string) => {
     set((state) => ({
       profile: {
         ...state.profile,

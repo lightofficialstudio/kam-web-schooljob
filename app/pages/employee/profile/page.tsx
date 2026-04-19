@@ -48,7 +48,6 @@ import {
   ProfileSectionWrapper,
   ResumeUploadSection,
   SkillsLocationSection,
-  TeachingInfoSection,
   TeachingLicenseSection,
   TeachingSkillsSection,
   WorkExperienceSection,
@@ -64,7 +63,6 @@ type SectionId =
   | "personal-info"
   | "education"
   | "work-experience"
-  | "teaching"
   | "skills"
   | "teaching-skills"
   | "personal-summary";
@@ -203,19 +201,22 @@ export default function EmployeeProfilePage() {
         gender: profile.gender,
         dateOfBirth: profile.dateOfBirth ? dayjs(profile.dateOfBirth) : null,
       });
-    } else if (sectionId === "teaching") {
-      form.setFieldsValue({
-        specialization: profile.specialization,
-        gradeCanTeach: profile.gradeCanTeach,
-        teachingExperience: profile.teachingExperience,
-      });
-    } else if (sectionId === "skills" || sectionId === "teaching-skills") {
+    } else if (sectionId === "teaching-skills") {
+      // ✨ TeachingSkillsSection ใช้ field: specialization + languageAndItSkills (combined)
       form.setFieldsValue({
         specialization: profile.specialization,
         languageAndItSkills: [
           ...(profile.languagesSpoken ?? []),
           ...(profile.itSkills ?? []),
         ],
+      });
+    } else if (sectionId === "skills") {
+      // ✨ SkillsLocationSection ใช้ field แยก: languagesSpoken, itSkills, preferredProvinces, canRelocate
+      form.setFieldsValue({
+        languagesSpoken: profile.languagesSpoken ?? [],
+        itSkills: profile.itSkills ?? [],
+        preferredProvinces: profile.preferredProvinces ?? [],
+        canRelocate: profile.canRelocate ?? false,
       });
     } else if (sectionId === "personal-summary") {
       form.setFieldsValue({
@@ -264,9 +265,14 @@ export default function EmployeeProfilePage() {
             profile_image_url: merged.profileImageUrl ?? null,
             profile_visibility: merged.profileVisibility,
           });
+        } else if (editSection === "skills") {
+          // ✨ SkillsLocationSection — ส่ง field แยก languagesSpoken, itSkills, preferred_provinces, can_relocate
+          const vals = values as Record<string, unknown>;
+          await patchSummary(user.user_id, {
+            preferred_provinces: (vals.preferredProvinces as string[]) ?? [],
+            can_relocate: vals.canRelocate as boolean ?? false,
+          });
         } else if (
-          editSection === "teaching" ||
-          editSection === "skills" ||
           editSection === "teaching-skills" ||
           editSection === "personal-summary"
         ) {
@@ -281,7 +287,8 @@ export default function EmployeeProfilePage() {
             preferred_provinces: merged.preferredProvinces ?? [],
           });
         } else {
-          // ✨ fallback — section อื่นยังใช้ saveProfile (monolithic)
+          // ✨ fallback สำหรับ section อื่น — log warn เพื่อตรวจสอบ
+          console.warn("⚠️ [handleSave] unknown editSection fallback:", editSection);
           await saveProfile(user.user_id);
         }
 
@@ -788,15 +795,13 @@ export default function EmployeeProfilePage() {
             ? "แก้ไขข้อมูลพื้นฐาน"
             : editSection === "personal-info"
               ? "แก้ไขข้อมูลส่วนตัว"
-              : editSection === "teaching"
-                ? "แก้ไขข้อมูลการสอน"
-                : editSection === "skills"
-                  ? "แก้ไขทักษะและสถานที่ทำงาน"
-                  : editSection === "teaching-skills"
-                    ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
-                    : editSection === "personal-summary"
-                      ? "แก้ไขสรุปข้อมูลส่วนตัว"
-                      : "แก้ไขข้อมูล"
+              : editSection === "skills"
+                ? "แก้ไขทักษะและสถานที่ทำงาน"
+                : editSection === "teaching-skills"
+                  ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
+                  : editSection === "personal-summary"
+                    ? "แก้ไขสรุปข้อมูลส่วนตัว"
+                    : "แก้ไขข้อมูล"
         }
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
@@ -804,7 +809,6 @@ export default function EmployeeProfilePage() {
           {editSection === "personal-info" && (
             <GenderDobPhotoSection form={form} userId={user?.user_id ?? ""} />
           )}
-          {editSection === "teaching" && <TeachingInfoSection form={form} />}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
           {editSection === "teaching-skills" && (
             <TeachingSkillsSection form={form} />

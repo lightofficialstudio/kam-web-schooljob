@@ -64,8 +64,10 @@ export const EducationHistorySection: React.FC = () => {
   // ✨ เก็บ index ที่รอการยืนยันลบ
   const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
 
-  const { profile, addEducation, updateEducation, removeEducation, isSaving } = useProfileStore();
+  const { profile, addEducation, updateEducation, removeEducation } = useProfileStore();
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  // ✨ local saving state — ป้องกัน double-submit
+  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuthStore();
 
   const educations = profile.educations || [];
@@ -130,6 +132,7 @@ export const EducationHistorySection: React.FC = () => {
       gpa: values.gpa,
     };
 
+    setIsSaving(true);
     try {
       const existingId = editingIndex !== null ? profile.educations?.[editingIndex]?.id : undefined;
       const realId = existingId && UUID_REGEX.test(existingId) ? existingId : undefined;
@@ -161,6 +164,8 @@ export const EducationHistorySection: React.FC = () => {
         axiosErr?.message ||
         "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ กรุณาลองใหม่อีกครั้ง";
       setModal({ open: true, type: "error", title: "บันทึกข้อมูลไม่สำเร็จ", description, errorDetails: err });
+    } finally {
+      setIsSaving(false);
     }
   };
 
