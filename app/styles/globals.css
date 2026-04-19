@@ -127,9 +127,15 @@
 .signin-input-row {
   animation: fadeSlideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.signin-input-row:nth-child(1) { animation-delay: 0.08s; }
-.signin-input-row:nth-child(2) { animation-delay: 0.14s; }
-.signin-input-row:nth-child(3) { animation-delay: 0.20s; }
+.signin-input-row:nth-child(1) {
+  animation-delay: 0.08s;
+}
+.signin-input-row:nth-child(2) {
+  animation-delay: 0.14s;
+}
+.signin-input-row:nth-child(3) {
+  animation-delay: 0.2s;
+}
 .signin-btn {
   animation: fadeSlideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.26s both;
 }
@@ -139,8 +145,9 @@
 
 /* ✨ Signin submit button — hover lift effect (CSS แทน onMouseEnter) */
 .signin-submit-btn {
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.25s ease !important;
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease !important;
 }
 .signin-submit-btn:hover:not(:disabled) {
   transform: translateY(-2px) !important;

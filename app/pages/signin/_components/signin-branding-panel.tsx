@@ -96,8 +96,8 @@ export const SigninBrandingPanel = () => {
         style={{
           position: "relative",
           zIndex: 1,
-          animation: "fadeSlideUp 0.7s ease both",
         }}
+        className="signin-branding-top"
       >
         {/* Logo mark */}
         <Flex align="center" gap={10}>
