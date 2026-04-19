@@ -17,7 +17,9 @@ interface WorkLocationSectionProps {
 }
 
 // ✨ แสดงฟอร์ม Work Location แยกจาก SkillsLocationSection อย่างชัดเจน (1:1 concept)
-export const WorkLocationSection: React.FC<WorkLocationSectionProps> = ({ form }) => {
+export const WorkLocationSection: React.FC<WorkLocationSectionProps> = ({
+  form,
+}) => {
   const [provinceOptions, setProvinceOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -58,14 +60,20 @@ export const WorkLocationSection: React.FC<WorkLocationSectionProps> = ({ form }
           >
             <Select
               mode="multiple"
-              placeholder={isLoading ? "กำลังโหลดรายชื่อจังหวัด..." : "เลือกจังหวัด"}
+              placeholder={
+                isLoading ? "กำลังโหลดรายชื่อจังหวัด..." : "เลือกจังหวัด"
+              }
               options={provinceOptions}
               loading={isLoading}
               showSearch
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
               }
-              notFoundContent={isLoading ? <Spin size="small" /> : "ไม่พบจังหวัดที่ค้นหา"}
+              notFoundContent={
+                isLoading ? <Spin size="small" /> : "ไม่พบจังหวัดที่ค้นหา"
+              }
               allowClear
             />
           </Form.Item>

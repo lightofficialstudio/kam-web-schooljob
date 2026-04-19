@@ -1,5 +1,5 @@
-import { updateWorkLocationSchema } from "./validation/work-location-schema";
 import { updateWorkLocationService } from "./service/work-location-service";
+import { updateWorkLocationSchema } from "./validation/work-location-schema";
 
 // ✨ PATCH /api/v1/employee/work-location/update?user_id=xxx — อัปเดตสถานที่ทำงานที่ต้องการ
 export async function PATCH(request: Request) {

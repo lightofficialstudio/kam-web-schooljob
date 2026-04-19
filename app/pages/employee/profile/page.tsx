@@ -878,10 +878,10 @@ export default function EmployeeProfilePage() {
                 : editSection === "work-location"
                   ? "แก้ไขสถานที่ทำงาน"
                   : editSection === "teaching-skills"
-                  ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
-                  : editSection === "personal-summary"
-                    ? "แก้ไขสรุปข้อมูลส่วนตัว"
-                    : "แก้ไขข้อมูล"
+                    ? "แก้ไขความเชี่ยวชาญการสอนและทักษะ"
+                    : editSection === "personal-summary"
+                      ? "แก้ไขสรุปข้อมูลส่วนตัว"
+                      : "แก้ไขข้อมูล"
         }
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
@@ -890,7 +890,9 @@ export default function EmployeeProfilePage() {
             <GenderDobPhotoSection form={form} userId={user?.user_id ?? ""} />
           )}
           {editSection === "skills" && <SkillsLocationSection form={form} />}
-          {editSection === "work-location" && <WorkLocationSection form={form} />}
+          {editSection === "work-location" && (
+            <WorkLocationSection form={form} />
+          )}
           {editSection === "teaching-skills" && (
             <TeachingSkillsSection form={form} />
           )}
