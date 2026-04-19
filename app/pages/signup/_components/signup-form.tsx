@@ -23,19 +23,24 @@ import {
 } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { requestSignup } from "../_api/signup-api";
+import { type SignupPayload, requestSignup } from "../_api/signup-api";
 import { useSignupStore } from "../_state/signup-store";
 
 const { Title, Text } = Typography;
 
-const ROLE_MAP: Record<string, string> = {
-  teacher: "EMPLOYEE",
-  school: "EMPLOYER",
-};
+interface SignupFormValues {
+  firstName: string;
+  lastName: string;
+  role: "teacher" | "school";
+  email: string;
+  password: string;
+  confirm: string;
+  agreement: boolean;
+}
 
-// ฟอร์มสมัครสมาชิก — ใช้ Zustand สำหรับ loading/modal state
+// ✨ ฟอร์มสมัครสมาชิก — ส่งข้อมูลดิบไป API โดยไม่มี logic ใน UI
 export const SignupForm = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<SignupFormValues>();
   const router = useRouter();
   const { token } = antTheme.useToken();
   const { isLoading, modal, setLoading, showModal, hideModal } =
@@ -45,14 +50,16 @@ export const SignupForm = () => {
     if (modal.type === "success") router.push("/pages/signin");
   };
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: SignupFormValues) => {
     setLoading(true);
     try {
-      const payload = {
+      // ✨ ส่ง field ดิบ — backend เป็นคน concat full_name และ map role
+      const payload: SignupPayload = {
         email: values.email,
         password: values.password,
-        full_name: `${values.firstName} ${values.lastName}`.trim(),
-        role: ROLE_MAP[values.role] || values.role.toUpperCase(),
+        first_name: values.firstName,
+        last_name: values.lastName,
+        role: values.role,
       };
 
       await requestSignup(payload);
@@ -60,26 +67,13 @@ export const SignupForm = () => {
       showModal(
         "success",
         "ตรวจสอบอีเมลของคุณ",
-        <Flex vertical align="center" style={{ marginTop: 8 }}>
-          <Text style={{ fontSize: 15, textAlign: "center", marginBottom: 12 }}>
-            School Board ได้ส่งลิงก์ยืนยันไปที่{" "}
-            <Text strong style={{ color: token.colorPrimary }}>
-              {values.email}
-            </Text>
-          </Text>
-          <Text
-            type="secondary"
-            style={{ fontSize: 13, textAlign: "center", lineHeight: "1.7" }}
-          >
-            ไม่พบอีเมล? ตรวจสอบโฟลเดอร์ "สแปม" หรือ "โปรโมชัน" <br />
-            ลิงก์มีอายุ 72 ชั่วโมง
-          </Text>
-        </Flex>,
+        `ได้ส่งลิงก์ยืนยันไปที่ ${values.email} แล้ว — ไม่พบอีเมล? ตรวจสอบโฟลเดอร์ "สแปม" ลิงก์มีอายุ 72 ชั่วโมง`,
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
       const message =
-        err?.response?.data?.message_th ||
-        err?.message ||
+        axiosErr?.response?.data?.message_th ||
+        axiosErr?.message ||
         "เกิดข้อผิดพลาดในการสมัครสมาชิก";
       showModal("error", "เกิดข้อผิดพลาด", message);
     } finally {

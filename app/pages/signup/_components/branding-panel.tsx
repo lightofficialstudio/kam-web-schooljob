@@ -6,7 +6,8 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
-import { Col, Flex, Space, Typography } from "antd";
+import { Col, Flex, Space, Typography, theme as antTheme } from "antd";
+
 
 const { Title, Text } = Typography;
 
@@ -16,20 +17,22 @@ const FEATURES = [
   { icon: <TrophyOutlined />, text: "ลงประกาศงานฟรีสำหรับโรงเรียน" },
 ];
 
-// แผงด้านซ้าย — Gradient branding พร้อมจุดเด่นของแพลตฟอร์ม
+// ✨ แผงด้านซ้าย — Gradient branding พร้อมจุดเด่นของแพลตฟอร์ม
 export const BrandingPanel = () => {
+  const { token } = antTheme.useToken();
+
   return (
     <Col
       xs={0}
       md={9}
       style={{
-        background: "linear-gradient(160deg, #11b6f5 0%, #0a85b8 100%)",
+        background: `linear-gradient(160deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
         padding: "48px 36px",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* วงกลมประดับ */}
+      {/* ✨ วงกลมประดับ */}
       <div
         style={{
           position: "absolute",
@@ -68,16 +71,16 @@ export const BrandingPanel = () => {
               border: "1px solid rgba(255,255,255,0.3)",
             }}
           >
-            <Title level={3} style={{ margin: 0, color: "#fff" }}>
+            <Title level={3} style={{ margin: 0, color: token.colorWhite }}>
               S
             </Title>
           </Flex>
 
           <Flex vertical gap={8}>
-            <Title level={2} style={{ margin: 0, color: "#fff", lineHeight: 1.3 }}>
+            <Title level={2} style={{ margin: 0, color: token.colorWhite, lineHeight: 1.3 }}>
               ก้าวสู่ <br /> อนาคตใหม่
             </Title>
-            <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: 15, lineHeight: 1.6 }}>
+            <Text style={{ color: token.colorWhite, opacity: 0.85, fontSize: 15, lineHeight: 1.6 }}>
               แพลตฟอร์มที่เชื่อมต่อครูคุณภาพ <br />
               กับสถานศึกษาชั้นนำทั่วประเทศ
             </Text>
@@ -88,8 +91,8 @@ export const BrandingPanel = () => {
         <Flex vertical gap={16}>
           {FEATURES.map((item, i) => (
             <Space key={i} size={12} align="start">
-              <CheckCircleFilled style={{ fontSize: 18, color: "rgba(255,255,255,0.9)", marginTop: 2 }} />
-              <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
+              <CheckCircleFilled style={{ fontSize: 18, color: token.colorWhite, opacity: 0.9, marginTop: 2 }} />
+              <Text style={{ color: token.colorWhite, opacity: 0.9, fontSize: 15 }}>
                 {item.text}
               </Text>
             </Space>
@@ -97,7 +100,7 @@ export const BrandingPanel = () => {
         </Flex>
 
         {/* Footer */}
-        <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+        <Text style={{ color: token.colorWhite, opacity: 0.5, fontSize: 12 }}>
           © 2025 School Job Board
         </Text>
       </Flex>

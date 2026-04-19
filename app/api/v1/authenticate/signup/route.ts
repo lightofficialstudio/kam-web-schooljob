@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
           email: user?.email,
           full_name: validatedData.full_name,
           role: validatedData.role,
+          first_name: validatedData.first_name,
+          last_name: validatedData.last_name,
         },
       },
       { status: 201 },
