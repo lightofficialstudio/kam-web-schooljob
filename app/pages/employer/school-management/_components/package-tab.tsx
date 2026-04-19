@@ -43,17 +43,17 @@ interface PackageData {
   isNearLimit: boolean;
 }
 
-// ✨ ข้อมูล Plan จาก Admin DB
+// ✨ ข้อมูล Plan จาก Admin DB (Prisma return camelCase)
 interface PlanRow {
   plan: string;
   label: string;
   color: string;
   price: number;
-  job_quota: number;
+  jobQuota: number;
   features: string[];
-  badge_icon: "default" | "crown" | "thunder";
-  sort_order: number;
-  is_active: boolean;
+  badgeIcon: "default" | "crown" | "thunder";
+  sortOrder: number;
+  isActive: boolean;
 }
 
 // ✨ icon ตาม badge_icon
@@ -170,7 +170,7 @@ export default function PackageTab({ userId }: { userId: string }) {
         if (pkgRes.data?.data) setData(pkgRes.data.data);
         if (Array.isArray(plansRes.data?.data)) {
           const sorted = [...plansRes.data.data].sort(
-            (a: PlanRow, b: PlanRow) => a.sort_order - b.sort_order,
+            (a: PlanRow, b: PlanRow) => a.sortOrder - b.sortOrder,
           );
           setPlans(sorted);
         }
@@ -213,7 +213,7 @@ export default function PackageTab({ userId }: { userId: string }) {
         <SectionHeader
           icon={
             <PlanIcon
-              badgeIcon={currentPlan?.badge_icon ?? "default"}
+              badgeIcon={currentPlan?.badgeIcon ?? "default"}
               color={data.planColor}
             />
           }
@@ -237,7 +237,7 @@ export default function PackageTab({ userId }: { userId: string }) {
               }}
             >
               <PlanIcon
-                badgeIcon={currentPlan?.badge_icon ?? "default"}
+                badgeIcon={currentPlan?.badgeIcon ?? "default"}
                 color={data.planColor}
                 size={15}
               />
@@ -406,7 +406,7 @@ export default function PackageTab({ userId }: { userId: string }) {
                     <Flex vertical gap={12}>
                       <Flex align="center" gap={8}>
                         <PlanIcon
-                          badgeIcon={plan.badge_icon}
+                          badgeIcon={plan.badgeIcon}
                           color={plan.color}
                           size={16}
                         />
@@ -448,9 +448,9 @@ export default function PackageTab({ userId }: { userId: string }) {
                           alignSelf: "flex-start",
                         }}
                       >
-                        {plan.job_quota === 999
+                        {plan.jobQuota === 999
                           ? "ไม่จำกัดตำแหน่ง"
-                          : `${plan.job_quota} ตำแหน่ง`}
+                          : `${plan.jobQuota} ตำแหน่ง`}
                       </Tag>
 
                       <Flex vertical gap={6}>
