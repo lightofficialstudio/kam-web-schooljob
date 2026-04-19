@@ -1,11 +1,10 @@
 "use client";
 
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { uploadFile } from "@/app/lib/storage";
 import { useAuthStore } from "@/app/stores/auth-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
 import {
   CheckCircleFilled,
-  CloseCircleFilled,
   EditOutlined,
   EnvironmentOutlined,
   ExclamationCircleFilled,
@@ -39,6 +38,7 @@ import {
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
 import {
   BasicInfoSection,
   EducationHistorySection,
@@ -53,7 +53,6 @@ import {
   WorkExperienceSection,
 } from "./_components";
 import { useProfileStore } from "./_stores/profile-store";
-import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
 
 const { Title, Text, Link } = Typography;
 const { Content } = Layout;
@@ -78,11 +77,27 @@ export default function EmployeeProfilePage() {
     saveProfile,
     isLoading,
   } = useProfileStore();
-  const { openNotification } = useNotificationModalStore();
   const { user, isAuthenticated, updateUser } = useAuthStore();
   const router = useRouter();
   const [form] = Form.useForm();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // ✨ Modal state มาตรฐาน — ใช้ ModalComponent แทน openNotification ทุกจุด
+  interface ModalState {
+    open: boolean;
+    type: "success" | "error" | "confirm" | "delete";
+    title: string;
+    description: string;
+    errorDetails?: unknown;
+  }
+  const MODAL_CLOSED: ModalState = {
+    open: false,
+    type: "success",
+    title: "",
+    description: "",
+  };
+  const [modal, setModal] = useState<ModalState>(MODAL_CLOSED);
+  const closeModal = () => setModal(MODAL_CLOSED);
 
   // ✨ อัปโหลดรูปโปรไฟล์จากปุ่มดินสอบน Avatar โดยตรง (ไม่เปิด Drawer)
   const handleAvatarFileChange = async (
@@ -97,8 +112,22 @@ export default function EmployeeProfilePage() {
       // ✨ ใช้ patchBasicInfo แทน saveProfile — อัปเดตเฉพาะ profile_image_url
       await patchBasicInfo(user.user_id, { profile_image_url: result.url });
       updateUser({ profile_image_url: result.url });
+      setModal({
+        open: true,
+        type: "success",
+        title: "อัปโหลดรูปโปรไฟล์สำเร็จ",
+        description: "รูปโปรไฟล์ของคุณได้รับการอัปเดตเรียบร้อยแล้ว",
+      });
     } catch (err) {
       console.error("❌ [Avatar] upload error:", err);
+      setModal({
+        open: true,
+        type: "error",
+        title: "อัปโหลดรูปไม่สำเร็จ",
+        description:
+          "ไม่สามารถอัปโหลดรูปโปรไฟล์ได้ กรุณาตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB) และลองใหม่อีกครั้ง",
+        errorDetails: err,
+      });
     }
   };
 
@@ -153,11 +182,11 @@ export default function EmployeeProfilePage() {
   const handleSelectPreset = (preset: 1 | 2 | 3) => {
     setMockupData(preset);
     setIsMockupModalOpen(false);
-    openNotification({
+    setModal({
+      open: true,
       type: "success",
-      mainTitle: "จำลองข้อมูลสำเร็จ",
-      description: `โหลดโปรไฟล์รูปแบบที่ ${preset} เรียบร้อยแล้ว`,
-      icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
+      title: "จำลองข้อมูลสำเร็จ",
+      description: `โหลดโปรไฟล์รูปแบบที่ ${preset} เรียบร้อยแล้ว ข้อมูลที่แสดงเป็นข้อมูลจำลองเท่านั้น`,
     });
   };
 
@@ -250,6 +279,7 @@ export default function EmployeeProfilePage() {
           ? { languagesSpoken: languageAndItSkills, itSkills: [] }
           : {}),
       };
+      // ✨ อัปเดต local state ทันที — ไม่รอ re-fetch (ป้องกัน race condition overwrite)
       setProfile(merged);
 
       if (user?.user_id) {
@@ -270,7 +300,7 @@ export default function EmployeeProfilePage() {
           const vals = values as Record<string, unknown>;
           await patchSummary(user.user_id, {
             preferred_provinces: (vals.preferredProvinces as string[]) ?? [],
-            can_relocate: vals.canRelocate as boolean ?? false,
+            can_relocate: (vals.canRelocate as boolean) ?? false,
           });
         } else if (editSection === "teaching-skills") {
           // ✨ TeachingSkillsSection — languageAndItSkills รวม 2 อย่าง → ส่งเป็น languages_spoken, it_skills=[]
@@ -291,36 +321,59 @@ export default function EmployeeProfilePage() {
             preferred_provinces: merged.preferredProvinces ?? [],
           });
         } else {
-          // ✨ fallback สำหรับ section อื่น — log warn เพื่อตรวจสอบ
-          console.warn("⚠️ [handleSave] unknown editSection fallback:", editSection);
+          // ✨ fallback สำหรับ section อื่น
+          console.warn(
+            "⚠️ [handleSave] unknown editSection fallback:",
+            editSection,
+          );
           await saveProfile(user.user_id);
         }
 
-        // ✨ re-fetch profileStrength หลัง save เพื่ออัปเดต % ความสมบูรณ์ (fire-and-forget)
-        void fetchProfile(user.user_id, user.email);
+        // ✨ re-fetch เฉพาะ profileStrength — ไม่ overwrite profile ทั้งหมด
+        // หมายเหตุ: ไม่ใช้ void fetchProfile ที่นี่เพื่อป้องกัน race condition overwrite local state
       }
 
       // ✨ sync รูปโปรไฟล์กลับไปที่ authStore
-      if (merged.profileImageUrl && merged.profileImageUrl !== user?.profile_image_url) {
+      if (
+        merged.profileImageUrl &&
+        merged.profileImageUrl !== user?.profile_image_url
+      ) {
         updateUser({ profile_image_url: merged.profileImageUrl });
       }
 
-      openNotification({
+      setModal({
+        open: true,
         type: "success",
-        mainTitle: "บันทึกข้อมูลสำเร็จ",
+        title: "บันทึกข้อมูลสำเร็จ",
         description: "ข้อมูลโปรไฟล์ของคุณถูกอัปเดตเรียบร้อยแล้ว",
-        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
       });
       setIsDrawerOpen(false);
       setEditSection(null);
     } catch (err) {
-      console.error("Validation error:", err);
-      openNotification({
-        type: "error",
-        mainTitle: "เกิดข้อผิดพลาด",
-        description: "กรุณาตรวจสอบข้อมูลในฟอร์มให้ถูกต้องอีกครั้ง",
-        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
-      });
+      // ✨ ตรวจว่าเป็น Ant Design validation error (มี errorFields) หรือ API error
+      const isValidationError =
+        err !== null &&
+        typeof err === "object" &&
+        "errorFields" in (err as object);
+
+      if (isValidationError) {
+        setModal({
+          open: true,
+          type: "confirm",
+          title: "ข้อมูลไม่ครบถ้วน",
+          description: "กรุณาตรวจสอบและกรอกข้อมูลในฟอร์มให้ครบถ้วนก่อนบันทึก",
+        });
+      } else {
+        console.error("❌ [handleSave] API error:", err);
+        setModal({
+          open: true,
+          type: "error",
+          title: "บันทึกข้อมูลไม่สำเร็จ",
+          description:
+            "เกิดข้อผิดพลาดขณะบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง หากปัญหายังคงอยู่ กรุณา Capture หน้าจอนี้เพื่อแจ้งทีมงาน",
+          errorDetails: err,
+        });
+      }
     }
   };
 
@@ -646,14 +699,22 @@ export default function EmployeeProfilePage() {
                           updateField("profileVisibility", newVisibility);
                           if (user?.user_id) {
                             try {
-                              await patchBasicInfo(user.user_id, { profile_visibility: newVisibility });
-                            } catch {
+                              await patchBasicInfo(user.user_id, {
+                                profile_visibility: newVisibility,
+                              });
+                            } catch (err) {
                               // ✨ rollback store ถ้า API fail
-                              updateField("profileVisibility", profile.profileVisibility ?? "public");
-                              openNotification({
+                              updateField(
+                                "profileVisibility",
+                                profile.profileVisibility ?? "public",
+                              );
+                              setModal({
+                                open: true,
                                 type: "error",
-                                mainTitle: "บันทึกไม่สำเร็จ",
-                                description: "ไม่สามารถเปลี่ยนการมองเห็นโปรไฟล์ได้ กรุณาลองใหม่",
+                                title: "บันทึกไม่สำเร็จ",
+                                description:
+                                  "ไม่สามารถเปลี่ยนการมองเห็นโปรไฟล์ได้ กรุณาลองใหม่อีกครั้ง",
+                                errorDetails: err,
                               });
                             }
                           }
@@ -890,6 +951,17 @@ export default function EmployeeProfilePage() {
           ))}
         </Flex>
       </Modal>
+
+      {/* ── ModalComponent: รายงานสถานะทุก action ── */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        onClose={closeModal}
+        onConfirm={closeModal}
+      />
     </Layout>
   );
 }
