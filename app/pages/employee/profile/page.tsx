@@ -72,6 +72,7 @@ export default function EmployeeProfilePage() {
     updateField,
     fetchProfile,
     saveProfile,
+    refreshStrength,
     isLoading,
   } = useProfileStore();
   const { user, isAuthenticated, updateUser } = useAuthStore();
@@ -300,6 +301,11 @@ export default function EmployeeProfilePage() {
         merged.profileImageUrl !== user?.profile_image_url
       ) {
         updateUser({ profile_image_url: merged.profileImageUrl });
+      }
+
+      // ✨ refresh profileStrength หลัง save — ไม่ overwrite profile ทั้งหมด
+      if (user?.user_id) {
+        void refreshStrength(user.user_id, user.email);
       }
 
       setModal({
@@ -613,6 +619,52 @@ export default function EmployeeProfilePage() {
                   {/* Resume */}
                   <ProfileSectionWrapper id="resume" title="เรซูเม่ของฉัน">
                     <ResumeUploadSection userId={user?.user_id ?? ""} />
+                  </ProfileSectionWrapper>
+
+                  {/* ✨ สถานที่ทำงาน */}
+                  <ProfileSectionWrapper
+                    title="สถานที่ทำงาน"
+                    onEdit={() => handleOpenEdit("skills")}
+                  >
+                    <Flex vertical gap={16} style={{ width: "100%" }}>
+                      <Flex vertical gap={8}>
+                        <Text strong style={{ display: "block" }}>
+                          จังหวัดที่ต้องการทำงาน
+                        </Text>
+                        <Space size={[8, 8]} wrap>
+                          {profile.preferredProvinces?.length ? (
+                            profile.preferredProvinces.map((p) => (
+                              <Tag
+                                key={p}
+                                icon={<EnvironmentOutlined />}
+                                color="blue"
+                                style={{
+                                  padding: "4px 12px",
+                                  borderRadius: 999,
+                                }}
+                              >
+                                {p}
+                              </Tag>
+                            ))
+                          ) : (
+                            <Text type="secondary" italic>
+                              ยังไม่ได้ระบุ
+                            </Text>
+                          )}
+                        </Space>
+                      </Flex>
+                      <Flex align="center" gap={8}>
+                        <Text type="secondary" style={{ fontSize: 13 }}>
+                          ย้ายที่อยู่ได้:
+                        </Text>
+                        <Tag
+                          color={profile.canRelocate ? "success" : "default"}
+                          style={{ borderRadius: 999, margin: 0 }}
+                        >
+                          {profile.canRelocate ? "ได้" : "ไม่ได้"}
+                        </Tag>
+                      </Flex>
+                    </Flex>
                   </ProfileSectionWrapper>
 
                   {/* ใบประกอบวิชาชีพ */}

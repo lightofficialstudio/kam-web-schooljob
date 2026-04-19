@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import {
-  responseEmployeeProfile,
   requestUpdateEmployeeProfile,
+  responseEmployeeProfile,
 } from "../_api/employee-profile-api";
 
 // Work Experience Type
@@ -60,12 +60,12 @@ export interface SkillEntry {
 
 // Resume Type — รองรับแนบได้หลายไฟล์ และเลือกเรซูเม่ที่กำลังใช้งาน
 export interface ResumeEntry {
-  id: string;           // unique id ของไฟล์
-  fileName: string;     // ชื่อไฟล์
-  fileSize: number;     // ขนาดไฟล์ (bytes)
-  uploadedAt: string;   // วันที่อัพโหลด
-  url?: string;         // URL สำหรับดาวน์โหลด (จาก API)
-  file?: File;          // ไฟล์จริงก่อน upload
+  id: string; // unique id ของไฟล์
+  fileName: string; // ชื่อไฟล์
+  fileSize: number; // ขนาดไฟล์ (bytes)
+  uploadedAt: string; // วันที่อัพโหลด
+  url?: string; // URL สำหรับดาวน์โหลด (จาก API)
+  file?: File; // ไฟล์จริงก่อน upload
 }
 
 interface EmployeeProfile {
@@ -180,11 +180,14 @@ interface ProfileStore {
   isLoading: boolean;
   isSaving: boolean;
   fetchProfile: (userId: string, email?: string) => Promise<void>;
+  // ✨ refresh เฉพาะ profileStrength — ไม่ overwrite profile ทั้งหมด
+  refreshStrength: (userId: string, email?: string) => Promise<void>;
   saveProfile: (userId: string) => Promise<void>;
 }
 
 // ✨ ตรวจว่า string เป็น UUID จริงหรือไม่ (ป้องกัน Zod reject id ชั่วคราว เช่น "resume-xxx", "lic-xxx")
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const toUuidOrUndefined = (id?: string): string | undefined =>
   id && UUID_REGEX.test(id) ? id : undefined;
 
@@ -389,13 +392,19 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   // ลบเรซูเม่ออกจาก list และ reset active ถ้าลบตัวที่ active อยู่
   removeResume: (id) =>
     set((state) => {
-      const remaining = (state.profile.resumes ?? []).filter((r) => r.id !== id);
+      const remaining = (state.profile.resumes ?? []).filter(
+        (r) => r.id !== id,
+      );
       const newActiveId =
         state.profile.activeResumeId === id
           ? (remaining[0]?.id ?? null)
           : state.profile.activeResumeId;
       return {
-        profile: { ...state.profile, resumes: remaining, activeResumeId: newActiveId },
+        profile: {
+          ...state.profile,
+          resumes: remaining,
+          activeResumeId: newActiveId,
+        },
       };
     }),
 
@@ -408,12 +417,20 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   // ✨ ลบ resume ออกจาก store (ใช้ deleteResume API จาก _api/ แทน)
   deleteResumeFromDB: async (resumeId: string) => {
     set((state) => {
-      const remaining = (state.profile.resumes ?? []).filter((r) => r.id !== resumeId);
+      const remaining = (state.profile.resumes ?? []).filter(
+        (r) => r.id !== resumeId,
+      );
       const newActiveId =
         state.profile.activeResumeId === resumeId
           ? (remaining[0]?.id ?? null)
           : state.profile.activeResumeId;
-      return { profile: { ...state.profile, resumes: remaining, activeResumeId: newActiveId } };
+      return {
+        profile: {
+          ...state.profile,
+          resumes: remaining,
+          activeResumeId: newActiveId,
+        },
+      };
     });
   },
 
@@ -431,7 +448,9 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     set((state) => ({
       profile: {
         ...state.profile,
-        licenseAttachments: (state.profile.licenseAttachments ?? []).filter((f) => f.id !== id),
+        licenseAttachments: (state.profile.licenseAttachments ?? []).filter(
+          (f) => f.id !== id,
+        ),
       },
     })),
 
@@ -447,7 +466,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       profile: {
         ...state.profile,
         licenseAttachments: (state.profile.licenseAttachments ?? []).filter(
-          (f) => f.id !== attachmentId
+          (f) => f.id !== attachmentId,
         ),
       },
     }));
@@ -464,33 +483,93 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         gender: "ชาย",
         dateOfBirth: "1995-05-15",
         nationality: "ไทย",
-        profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=thanawat",
+        profileImageUrl:
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=thanawat",
         email: "thanawat.learn@example.com",
         specialActivities:
           "ครูผู้เชี่ยวชาญด้านการสอนภาษาอังกฤษและเทคโนโลยีการศึกษา มีความมุ่งมั่นในการพัฒนาทักษะการเรียนรู้ผ่านนวัตกรรม Active Learning ชอบกิจกรรมจิตอาสาและแนะแนวการศึกษา",
         licenseStatus: "has_license",
         licenseAttachments: [
-          { id: "lic-mock-1", fileName: "ใบประกอบวิชาชีพ_ธนวัฒน์.pdf", fileSize: 1024 * 450, uploadedAt: "01/03/2567" },
+          {
+            id: "lic-mock-1",
+            fileName: "ใบประกอบวิชาชีพ_ธนวัฒน์.pdf",
+            fileSize: 1024 * 450,
+            uploadedAt: "01/03/2567",
+          },
         ],
         resumes: [
-          { id: "res-mock-1", fileName: "Resume_Thanawat_2567.pdf", fileSize: 1024 * 820, uploadedAt: "15/03/2567" },
-          { id: "res-mock-2", fileName: "Resume_Thanawat_Short.pdf", fileSize: 1024 * 310, uploadedAt: "20/03/2567" },
+          {
+            id: "res-mock-1",
+            fileName: "Resume_Thanawat_2567.pdf",
+            fileSize: 1024 * 820,
+            uploadedAt: "15/03/2567",
+          },
+          {
+            id: "res-mock-2",
+            fileName: "Resume_Thanawat_Short.pdf",
+            fileSize: 1024 * 310,
+            uploadedAt: "20/03/2567",
+          },
         ],
         activeResumeId: "res-mock-1",
         workExperiences: [
-          { jobTitle: "ครูสอนภาษาอังกฤษ", companyName: "โรงเรียนนานาชาติเซนต์แมรี่", startDate: "2022-05-01", endDate: "", inPresent: true, description: "สอนภาษาอังกฤษระดับ G10–12 เน้นทักษะการสื่อสาร จัดกิจกรรม English Camp ประจำปี" },
-          { jobTitle: "วิทยากรพิเศษ", companyName: "สถาบันกวดวิชาเอกวิทย์", startDate: "2020-06-01", endDate: "2022-04-30", inPresent: false, description: "ผลิตสื่อวิดีโอเตรียมสอบ TCAS มีนักเรียนติดตามกว่า 500 คนต่อเทอม" },
-          { jobTitle: "ครูอัตราจ้าง", companyName: "โรงเรียนสาธิตพุทธมณฑล", startDate: "2018-05-15", endDate: "2020-04-30", inPresent: false, description: "สอนภาษาอังกฤษมัธยมต้น ดูแลนักเรียนแลกเปลี่ยนต่างชาติ" },
+          {
+            jobTitle: "ครูสอนภาษาอังกฤษ",
+            companyName: "โรงเรียนนานาชาติเซนต์แมรี่",
+            startDate: "2022-05-01",
+            endDate: "",
+            inPresent: true,
+            description:
+              "สอนภาษาอังกฤษระดับ G10–12 เน้นทักษะการสื่อสาร จัดกิจกรรม English Camp ประจำปี",
+          },
+          {
+            jobTitle: "วิทยากรพิเศษ",
+            companyName: "สถาบันกวดวิชาเอกวิทย์",
+            startDate: "2020-06-01",
+            endDate: "2022-04-30",
+            inPresent: false,
+            description:
+              "ผลิตสื่อวิดีโอเตรียมสอบ TCAS มีนักเรียนติดตามกว่า 500 คนต่อเทอม",
+          },
+          {
+            jobTitle: "ครูอัตราจ้าง",
+            companyName: "โรงเรียนสาธิตพุทธมณฑล",
+            startDate: "2018-05-15",
+            endDate: "2020-04-30",
+            inPresent: false,
+            description: "สอนภาษาอังกฤษมัธยมต้น ดูแลนักเรียนแลกเปลี่ยนต่างชาติ",
+          },
         ],
         educations: [
-          { level: "ปริญญาโท", institution: "มหาวิทยาลัยธรรมศาสตร์", major: "ศิลปศาสตรมหาบัณฑิต (การสอนภาษาอังกฤษ)", graduationYear: 2565, gpa: 3.85 },
-          { level: "ปริญญาตรี", institution: "จุฬาลงกรณ์มหาวิทยาลัย", major: "ครุศาสตรบัณฑิต (ภาษาอังกฤษ-ภาษาไทย)", graduationYear: 2562, gpa: 3.75 },
+          {
+            level: "ปริญญาโท",
+            institution: "มหาวิทยาลัยธรรมศาสตร์",
+            major: "ศิลปศาสตรมหาบัณฑิต (การสอนภาษาอังกฤษ)",
+            graduationYear: 2565,
+            gpa: 3.85,
+          },
+          {
+            level: "ปริญญาตรี",
+            institution: "จุฬาลงกรณ์มหาวิทยาลัย",
+            major: "ครุศาสตรบัณฑิต (ภาษาอังกฤษ-ภาษาไทย)",
+            graduationYear: 2562,
+            gpa: 3.75,
+          },
         ],
-        specialization: ["การสอนภาษาอังกฤษ (ESL/EFL)", "การออกแบบบทเรียนออนไลน์", "เทคโนโลยีเพื่อการศึกษา (EdTech)"],
+        specialization: [
+          "การสอนภาษาอังกฤษ (ESL/EFL)",
+          "การออกแบบบทเรียนออนไลน์",
+          "เทคโนโลยีเพื่อการศึกษา (EdTech)",
+        ],
         gradeCanTeach: ["มัธยมศึกษาตอนต้น", "มัธยมศึกษาตอนปลาย"],
         teachingExperience: "5-10 ปี",
         languagesSpoken: ["ไทย (Native)", "อังกฤษ (Fluent)", "เยอรมัน (Basic)"],
-        itSkills: ["Microsoft Office", "Google Classroom", "Canva for Education", "Zoom / MS Teams"],
+        itSkills: [
+          "Microsoft Office",
+          "Google Classroom",
+          "Canva for Education",
+          "Zoom / MS Teams",
+        ],
         preferredProvinces: ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี"],
         canRelocate: true,
         profileVisibility: "public",
@@ -504,24 +583,57 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         gender: "หญิง",
         dateOfBirth: "2000-08-22",
         nationality: "ไทย",
-        profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=supaporn",
+        profileImageUrl:
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=supaporn",
         email: "supaporn.math@example.com",
         specialActivities:
           "ครูรุ่นใหม่ที่หลงรักคณิตศาสตร์และวิทยาศาสตร์ มีความตั้งใจถ่ายทอดความรู้ให้นักเรียนเข้าใจง่ายผ่านสื่อ Visual และ Gamification",
         licenseStatus: "pending",
         licenseAttachments: [
-          { id: "lic-mock-2", fileName: "คำขอใบประกอบวิชาชีพ_สุภาพร.pdf", fileSize: 1024 * 280, uploadedAt: "05/04/2567" },
+          {
+            id: "lic-mock-2",
+            fileName: "คำขอใบประกอบวิชาชีพ_สุภาพร.pdf",
+            fileSize: 1024 * 280,
+            uploadedAt: "05/04/2567",
+          },
         ],
         resumes: [
-          { id: "res-mock-3", fileName: "Resume_Supaporn_2567.pdf", fileSize: 1024 * 640, uploadedAt: "10/04/2567" },
+          {
+            id: "res-mock-3",
+            fileName: "Resume_Supaporn_2567.pdf",
+            fileSize: 1024 * 640,
+            uploadedAt: "10/04/2567",
+          },
         ],
         activeResumeId: "res-mock-3",
         workExperiences: [
-          { jobTitle: "ครูฝึกสอน", companyName: "โรงเรียนสาธิต ม.เกษตรศาสตร์", startDate: "2023-06-01", endDate: "2023-10-31", inPresent: false, description: "ฝึกสอนวิชาคณิตศาสตร์และวิทยาศาสตร์ระดับมัธยมต้น ออกแบบใบงานและสื่อการสอน" },
-          { jobTitle: "ติวเตอร์คณิตศาสตร์", companyName: "ส่วนตัว (Freelance)", startDate: "2022-01-01", endDate: "", inPresent: true, description: "รับสอนพิเศษคณิตศาสตร์และฟิสิกส์สำหรับนักเรียน ม.4–ม.6 เน้นเตรียมสอบ TCAS" },
+          {
+            jobTitle: "ครูฝึกสอน",
+            companyName: "โรงเรียนสาธิต ม.เกษตรศาสตร์",
+            startDate: "2023-06-01",
+            endDate: "2023-10-31",
+            inPresent: false,
+            description:
+              "ฝึกสอนวิชาคณิตศาสตร์และวิทยาศาสตร์ระดับมัธยมต้น ออกแบบใบงานและสื่อการสอน",
+          },
+          {
+            jobTitle: "ติวเตอร์คณิตศาสตร์",
+            companyName: "ส่วนตัว (Freelance)",
+            startDate: "2022-01-01",
+            endDate: "",
+            inPresent: true,
+            description:
+              "รับสอนพิเศษคณิตศาสตร์และฟิสิกส์สำหรับนักเรียน ม.4–ม.6 เน้นเตรียมสอบ TCAS",
+          },
         ],
         educations: [
-          { level: "ปริญญาตรี", institution: "มหาวิทยาลัยเกษตรศาสตร์", major: "ครุศาสตรบัณฑิต (คณิตศาสตร์)", graduationYear: 2566, gpa: 3.55 },
+          {
+            level: "ปริญญาตรี",
+            institution: "มหาวิทยาลัยเกษตรศาสตร์",
+            major: "ครุศาสตรบัณฑิต (คณิตศาสตร์)",
+            graduationYear: 2566,
+            gpa: 3.55,
+          },
         ],
         specialization: ["คณิตศาสตร์", "วิทยาศาสตร์", "ฟิสิกส์"],
         gradeCanTeach: ["มัธยมศึกษาตอนต้น", "มัธยมศึกษาตอนปลาย"],
@@ -541,30 +653,72 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         gender: "หญิง",
         dateOfBirth: "1992-03-10",
         nationality: "ไทย",
-        profileImageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=maneerat",
+        profileImageUrl:
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=maneerat",
         email: "maneerat.kids@example.com",
         specialActivities:
           "ครูปฐมวัยที่มีใจรักเด็กและเชื่อในพลังของการเล่นเพื่อการเรียนรู้ มีประสบการณ์ดูแลเด็กอายุ 2–6 ปี เน้นพัฒนาการด้านอารมณ์ สังคม และทักษะชีวิต",
         licenseStatus: "not_required",
         licenseAttachments: [],
         resumes: [
-          { id: "res-mock-4", fileName: "Resume_Maneerat_ปฐมวัย.pdf", fileSize: 1024 * 520, uploadedAt: "01/01/2567" },
-          { id: "res-mock-5", fileName: "Portfolio_Maneerat.pdf", fileSize: 1024 * 1200, uploadedAt: "15/01/2567" },
+          {
+            id: "res-mock-4",
+            fileName: "Resume_Maneerat_ปฐมวัย.pdf",
+            fileSize: 1024 * 520,
+            uploadedAt: "01/01/2567",
+          },
+          {
+            id: "res-mock-5",
+            fileName: "Portfolio_Maneerat.pdf",
+            fileSize: 1024 * 1200,
+            uploadedAt: "15/01/2567",
+          },
         ],
         activeResumeId: "res-mock-4",
         workExperiences: [
-          { jobTitle: "ครูประจำชั้นอนุบาล 2", companyName: "โรงเรียนอนุบาลสาธิตบ้านหรรษา", startDate: "2020-05-01", endDate: "", inPresent: true, description: "ดูแลนักเรียนอนุบาล จัดกิจกรรม Play-based Learning ทำงานร่วมกับผู้ปกครองอย่างสม่ำเสมอ" },
-          { jobTitle: "พี่เลี้ยงเด็ก", companyName: "ศูนย์เด็กเล็ก เทศบาลนครนนทบุรี", startDate: "2017-06-01", endDate: "2020-04-30", inPresent: false, description: "ดูแลเด็กอายุ 2–4 ปี ส่งเสริมพัฒนาการด้านภาษาและกล้ามเนื้อมัดเล็ก" },
+          {
+            jobTitle: "ครูประจำชั้นอนุบาล 2",
+            companyName: "โรงเรียนอนุบาลสาธิตบ้านหรรษา",
+            startDate: "2020-05-01",
+            endDate: "",
+            inPresent: true,
+            description:
+              "ดูแลนักเรียนอนุบาล จัดกิจกรรม Play-based Learning ทำงานร่วมกับผู้ปกครองอย่างสม่ำเสมอ",
+          },
+          {
+            jobTitle: "พี่เลี้ยงเด็ก",
+            companyName: "ศูนย์เด็กเล็ก เทศบาลนครนนทบุรี",
+            startDate: "2017-06-01",
+            endDate: "2020-04-30",
+            inPresent: false,
+            description:
+              "ดูแลเด็กอายุ 2–4 ปี ส่งเสริมพัฒนาการด้านภาษาและกล้ามเนื้อมัดเล็ก",
+          },
         ],
         educations: [
-          { level: "ปริญญาตรี", institution: "มหาวิทยาลัยราชภัฏพระนคร", major: "ครุศาสตรบัณฑิต (การศึกษาปฐมวัย)", graduationYear: 2558, gpa: 3.2 },
+          {
+            level: "ปริญญาตรี",
+            institution: "มหาวิทยาลัยราชภัฏพระนคร",
+            major: "ครุศาสตรบัณฑิต (การศึกษาปฐมวัย)",
+            graduationYear: 2558,
+            gpa: 3.2,
+          },
         ],
-        specialization: ["การศึกษาปฐมวัย", "Play-based Learning", "การพัฒนาทักษะชีวิตเด็ก"],
+        specialization: [
+          "การศึกษาปฐมวัย",
+          "Play-based Learning",
+          "การพัฒนาทักษะชีวิตเด็ก",
+        ],
         gradeCanTeach: ["อนุบาล"],
         teachingExperience: "3-5 ปี",
         languagesSpoken: ["ไทย (Native)"],
         itSkills: ["Microsoft Office", "Canva", "Line Official"],
-        preferredProvinces: ["กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ"],
+        preferredProvinces: [
+          "กรุงเทพมหานคร",
+          "นนทบุรี",
+          "ปทุมธานี",
+          "สมุทรปราการ",
+        ],
         canRelocate: false,
         profileVisibility: "public",
       };
@@ -592,7 +746,9 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             phoneNumber: d.phoneNumber ?? "",
             gender: d.gender ?? "",
             // ✨ ใช้ UTC date string โดยตรงเพื่อป้องกัน timezone off-by-one
-            dateOfBirth: d.dateOfBirth ? d.dateOfBirth.toString().split("T")[0] : "",
+            dateOfBirth: d.dateOfBirth
+              ? d.dateOfBirth.toString().split("T")[0]
+              : "",
             nationality: d.nationality ?? "",
             profileImageUrl: d.profileImageUrl ?? "",
             profileVisibility: d.profileVisibility ?? "public",
@@ -602,89 +758,158 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
             canRelocate: d.canRelocate ?? false,
             licenseStatus: d.licenseStatus ?? "",
             // Array relations
-            specialization: d.specializations?.map((s: { subject: string }) => s.subject) ?? [],
-            gradeCanTeach: d.gradeCanTeaches?.map((g: { grade: string }) => g.grade) ?? [],
-            preferredProvinces: d.preferredProvinces?.map((p: { province: string }) => p.province) ?? [],
-            workExperiences: d.workExperiences?.map((exp: {
-              id: string; jobTitle: string; companyName: string;
-              startDate: string; endDate: string | null; inPresent: boolean;
-              description: string | null; workYear: number | null;
-            }) => ({
-              id: exp.id,
-              jobTitle: exp.jobTitle,
-              companyName: exp.companyName,
-              startDate: exp.startDate ? new Date(exp.startDate).toISOString().split("T")[0] : "",
-              endDate: exp.endDate ? new Date(exp.endDate).toISOString().split("T")[0] : "",
-              inPresent: exp.inPresent,
-              description: exp.description ?? "",
-              workYear: exp.workYear ?? undefined,
-            })) ?? [],
-            educations: d.educations?.map((edu: {
-              id: string; level: string; institution: string; major: string;
-              graduationYear: number | null; gpa: number | null;
-              startDate: string | null; endDate: string | null;
-            }) => ({
-              id: edu.id,
-              level: edu.level,
-              institution: edu.institution,
-              major: edu.major,
-              graduationYear: edu.graduationYear ?? undefined,
-              gpa: edu.gpa ?? undefined,
-              startDate: edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : undefined,
-              endDate: edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : undefined,
-            })) ?? [],
+            specialization:
+              d.specializations?.map((s: { subject: string }) => s.subject) ??
+              [],
+            gradeCanTeach:
+              d.gradeCanTeaches?.map((g: { grade: string }) => g.grade) ?? [],
+            preferredProvinces:
+              d.preferredProvinces?.map(
+                (p: { province: string }) => p.province,
+              ) ?? [],
+            workExperiences:
+              d.workExperiences?.map(
+                (exp: {
+                  id: string;
+                  jobTitle: string;
+                  companyName: string;
+                  startDate: string;
+                  endDate: string | null;
+                  inPresent: boolean;
+                  description: string | null;
+                  workYear: number | null;
+                }) => ({
+                  id: exp.id,
+                  jobTitle: exp.jobTitle,
+                  companyName: exp.companyName,
+                  startDate: exp.startDate
+                    ? new Date(exp.startDate).toISOString().split("T")[0]
+                    : "",
+                  endDate: exp.endDate
+                    ? new Date(exp.endDate).toISOString().split("T")[0]
+                    : "",
+                  inPresent: exp.inPresent,
+                  description: exp.description ?? "",
+                  workYear: exp.workYear ?? undefined,
+                }),
+              ) ?? [],
+            educations:
+              d.educations?.map(
+                (edu: {
+                  id: string;
+                  level: string;
+                  institution: string;
+                  major: string;
+                  graduationYear: number | null;
+                  gpa: number | null;
+                  startDate: string | null;
+                  endDate: string | null;
+                }) => ({
+                  id: edu.id,
+                  level: edu.level,
+                  institution: edu.institution,
+                  major: edu.major,
+                  graduationYear: edu.graduationYear ?? undefined,
+                  gpa: edu.gpa ?? undefined,
+                  startDate: edu.startDate
+                    ? new Date(edu.startDate).toISOString().split("T")[0]
+                    : undefined,
+                  endDate: edu.endDate
+                    ? new Date(edu.endDate).toISOString().split("T")[0]
+                    : undefined,
+                }),
+              ) ?? [],
             // ✨ licenses ที่มี fileUrl → map กลับเป็น licenseAttachments ด้วย
             licenses: (d.licenses ?? [])
-              .filter((lic: { fileUrl: string | null | undefined }) => lic.fileUrl == null) // license record ที่ไม่มีไฟล์แนบ
-              .map((lic: {
-                id: string; licenseName: string; issuer: string | null;
-                licenseNumber: string | null; issueDate: string | null;
-                expiryDate: string | null; credentialUrl: string | null;
-              }) => ({
-                id: lic.id,
-                licenseName: lic.licenseName,
-                issuer: lic.issuer ?? undefined,
-                licenseNumber: lic.licenseNumber ?? undefined,
-                issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
-                expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
-                credentialUrl: lic.credentialUrl ?? undefined,
-              })),
+              .filter(
+                (lic: { fileUrl: string | null | undefined }) =>
+                  lic.fileUrl == null,
+              ) // license record ที่ไม่มีไฟล์แนบ
+              .map(
+                (lic: {
+                  id: string;
+                  licenseName: string;
+                  issuer: string | null;
+                  licenseNumber: string | null;
+                  issueDate: string | null;
+                  expiryDate: string | null;
+                  credentialUrl: string | null;
+                }) => ({
+                  id: lic.id,
+                  licenseName: lic.licenseName,
+                  issuer: lic.issuer ?? undefined,
+                  licenseNumber: lic.licenseNumber ?? undefined,
+                  issueDate: lic.issueDate
+                    ? new Date(lic.issueDate).toISOString().split("T")[0]
+                    : undefined,
+                  expiryDate: lic.expiryDate
+                    ? new Date(lic.expiryDate).toISOString().split("T")[0]
+                    : undefined,
+                  credentialUrl: lic.credentialUrl ?? undefined,
+                }),
+              ),
             // ✨ licenses ที่มี fileUrl → map เป็น licenseAttachments (ไฟล์แนบใบประกอบฯ)
             licenseAttachments: (d.licenses ?? [])
-              .filter((lic: { fileUrl: string | null | undefined }) => lic.fileUrl != null && lic.fileUrl !== "")
-              .map((lic: {
-                id: string; licenseName: string; fileSize?: number | null;
-                fileUrl: string; uploadedAt?: string; createdAt?: string;
-              }) => ({
-                id: lic.id,
-                fileName: lic.licenseName,
-                fileSize: lic.fileSize ?? 0,
-                uploadedAt: lic.createdAt ? new Date(lic.createdAt).toLocaleDateString("th-TH") : "",
-                url: lic.fileUrl,
-              })),
-            languages: d.languages?.map((lang: {
-              id: string; languageName: string; proficiency: string | null;
-            }) => ({
-              id: lang.id,
-              languageName: lang.languageName,
-              proficiency: lang.proficiency ?? undefined,
-            })) ?? [],
-            skills: d.skills?.map((sk: { id: string; skillName: string }) => ({
-              id: sk.id,
-              skillName: sk.skillName,
-            })) ?? [],
+              .filter(
+                (lic: { fileUrl: string | null | undefined }) =>
+                  lic.fileUrl != null && lic.fileUrl !== "",
+              )
+              .map(
+                (lic: {
+                  id: string;
+                  licenseName: string;
+                  fileSize?: number | null;
+                  fileUrl: string;
+                  uploadedAt?: string;
+                  createdAt?: string;
+                }) => ({
+                  id: lic.id,
+                  fileName: lic.licenseName,
+                  fileSize: lic.fileSize ?? 0,
+                  uploadedAt: lic.createdAt
+                    ? new Date(lic.createdAt).toLocaleDateString("th-TH")
+                    : "",
+                  url: lic.fileUrl,
+                }),
+              ),
+            languages:
+              d.languages?.map(
+                (lang: {
+                  id: string;
+                  languageName: string;
+                  proficiency: string | null;
+                }) => ({
+                  id: lang.id,
+                  languageName: lang.languageName,
+                  proficiency: lang.proficiency ?? undefined,
+                }),
+              ) ?? [],
+            skills:
+              d.skills?.map((sk: { id: string; skillName: string }) => ({
+                id: sk.id,
+                skillName: sk.skillName,
+              })) ?? [],
             // ✨ resumes จาก DB → map กลับใส่ store พร้อม url
-            resumes: (d.resumes ?? []).map((r: {
-              id: string; fileName: string; fileSize: number | null; uploadedAt: string; fileUrl: string;
-            }) => ({
-              id: r.id,
-              fileName: r.fileName,
-              fileSize: r.fileSize ?? 0,
-              uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
-              url: r.fileUrl,
-            })),
+            resumes: (d.resumes ?? []).map(
+              (r: {
+                id: string;
+                fileName: string;
+                fileSize: number | null;
+                uploadedAt: string;
+                fileUrl: string;
+              }) => ({
+                id: r.id,
+                fileName: r.fileName,
+                fileSize: r.fileSize ?? 0,
+                uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
+                url: r.fileUrl,
+              }),
+            ),
             // ✨ activeResumeId — ดึงจาก resume ที่ isActive = true
-            activeResumeId: d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ?? d.activeResumeId ?? null,
+            activeResumeId:
+              d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ??
+              d.activeResumeId ??
+              null,
             // ✨ profileStrength — คำนวณโดย API service แล้ว
             profileStrength: d.profileStrength ?? undefined,
           },
@@ -698,6 +923,23 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   },
 
   // ✨ บันทึกโปรไฟล์ปัจจุบันใน store ไปยัง API
+  refreshStrength: async (userId: string, email?: string) => {
+    // ✨ เรียก API เดิมแต่ update เฉพาะ profileStrength — ไม่ set profile ทั้งหมด
+    try {
+      const res = await responseEmployeeProfile(userId, email);
+      if (res.status_code === 200 && res.data?.profileStrength) {
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            profileStrength: res.data.profileStrength,
+          },
+        }));
+      }
+    } catch (err) {
+      console.error("❌ refreshStrength error:", err);
+    }
+  },
+
   saveProfile: async (userId: string) => {
     set({ isSaving: true });
     try {
@@ -716,7 +958,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
         special_activities: p.specialActivities,
         can_relocate: p.canRelocate,
         license_status: p.licenseStatus || null,
-        active_resume_id: toUuidOrUndefined(p.activeResumeId ?? undefined) ?? null,
+        active_resume_id:
+          toUuidOrUndefined(p.activeResumeId ?? undefined) ?? null,
         // Array relations
         specializations: p.specialization ?? [],
         grade_can_teaches: p.gradeCanTeach ?? [],
@@ -807,67 +1050,121 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
           profile: {
             ...state.profile,
             profileStrength: d.profileStrength ?? state.profile.profileStrength,
-            workExperiences: d.workExperiences?.map((exp: {
-              id: string; jobTitle: string; companyName: string;
-              startDate: string; endDate: string | null; inPresent: boolean;
-              description: string | null; workYear: number | null;
-            }) => ({
-              id: exp.id,
-              jobTitle: exp.jobTitle,
-              companyName: exp.companyName,
-              startDate: exp.startDate ? new Date(exp.startDate).toISOString().split("T")[0] : "",
-              endDate: exp.endDate ? new Date(exp.endDate).toISOString().split("T")[0] : "",
-              inPresent: exp.inPresent,
-              description: exp.description ?? "",
-              workYear: exp.workYear ?? undefined,
-            })) ?? state.profile.workExperiences,
-            educations: d.educations?.map((edu: {
-              id: string; level: string; institution: string; major: string;
-              graduationYear: number | null; gpa: number | null;
-              startDate: string | null; endDate: string | null;
-            }) => ({
-              id: edu.id,
-              level: edu.level,
-              institution: edu.institution,
-              major: edu.major,
-              graduationYear: edu.graduationYear ?? undefined,
-              gpa: edu.gpa ?? undefined,
-              startDate: edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : undefined,
-              endDate: edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : undefined,
-            })) ?? state.profile.educations,
-            licenses: (d.licenses ?? []).filter((lic: { fileUrl: string | null }) => !lic.fileUrl).map((lic: {
-              id: string; licenseName: string; issuer: string | null;
-              licenseNumber: string | null; issueDate: string | null;
-              expiryDate: string | null; credentialUrl: string | null;
-            }) => ({
-              id: lic.id,
-              licenseName: lic.licenseName,
-              issuer: lic.issuer ?? undefined,
-              licenseNumber: lic.licenseNumber ?? undefined,
-              issueDate: lic.issueDate ? new Date(lic.issueDate).toISOString().split("T")[0] : undefined,
-              expiryDate: lic.expiryDate ? new Date(lic.expiryDate).toISOString().split("T")[0] : undefined,
-              credentialUrl: lic.credentialUrl ?? undefined,
-            })),
-            licenseAttachments: (d.licenses ?? []).filter((lic: { fileUrl: string | null }) => !!lic.fileUrl).map((lic: {
-              id: string; licenseName: string; fileSize?: number | null;
-              fileUrl: string; createdAt?: string;
-            }) => ({
-              id: lic.id,
-              fileName: lic.licenseName,
-              fileSize: lic.fileSize ?? 0,
-              uploadedAt: lic.createdAt ? new Date(lic.createdAt).toLocaleDateString("th-TH") : "",
-              url: lic.fileUrl,
-            })),
-            resumes: (d.resumes ?? []).map((r: {
-              id: string; fileName: string; fileSize: number | null; uploadedAt: string; fileUrl: string;
-            }) => ({
-              id: r.id,
-              fileName: r.fileName,
-              fileSize: r.fileSize ?? 0,
-              uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
-              url: r.fileUrl,
-            })),
-            activeResumeId: d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ?? d.activeResumeId ?? state.profile.activeResumeId,
+            workExperiences:
+              d.workExperiences?.map(
+                (exp: {
+                  id: string;
+                  jobTitle: string;
+                  companyName: string;
+                  startDate: string;
+                  endDate: string | null;
+                  inPresent: boolean;
+                  description: string | null;
+                  workYear: number | null;
+                }) => ({
+                  id: exp.id,
+                  jobTitle: exp.jobTitle,
+                  companyName: exp.companyName,
+                  startDate: exp.startDate
+                    ? new Date(exp.startDate).toISOString().split("T")[0]
+                    : "",
+                  endDate: exp.endDate
+                    ? new Date(exp.endDate).toISOString().split("T")[0]
+                    : "",
+                  inPresent: exp.inPresent,
+                  description: exp.description ?? "",
+                  workYear: exp.workYear ?? undefined,
+                }),
+              ) ?? state.profile.workExperiences,
+            educations:
+              d.educations?.map(
+                (edu: {
+                  id: string;
+                  level: string;
+                  institution: string;
+                  major: string;
+                  graduationYear: number | null;
+                  gpa: number | null;
+                  startDate: string | null;
+                  endDate: string | null;
+                }) => ({
+                  id: edu.id,
+                  level: edu.level,
+                  institution: edu.institution,
+                  major: edu.major,
+                  graduationYear: edu.graduationYear ?? undefined,
+                  gpa: edu.gpa ?? undefined,
+                  startDate: edu.startDate
+                    ? new Date(edu.startDate).toISOString().split("T")[0]
+                    : undefined,
+                  endDate: edu.endDate
+                    ? new Date(edu.endDate).toISOString().split("T")[0]
+                    : undefined,
+                }),
+              ) ?? state.profile.educations,
+            licenses: (d.licenses ?? [])
+              .filter((lic: { fileUrl: string | null }) => !lic.fileUrl)
+              .map(
+                (lic: {
+                  id: string;
+                  licenseName: string;
+                  issuer: string | null;
+                  licenseNumber: string | null;
+                  issueDate: string | null;
+                  expiryDate: string | null;
+                  credentialUrl: string | null;
+                }) => ({
+                  id: lic.id,
+                  licenseName: lic.licenseName,
+                  issuer: lic.issuer ?? undefined,
+                  licenseNumber: lic.licenseNumber ?? undefined,
+                  issueDate: lic.issueDate
+                    ? new Date(lic.issueDate).toISOString().split("T")[0]
+                    : undefined,
+                  expiryDate: lic.expiryDate
+                    ? new Date(lic.expiryDate).toISOString().split("T")[0]
+                    : undefined,
+                  credentialUrl: lic.credentialUrl ?? undefined,
+                }),
+              ),
+            licenseAttachments: (d.licenses ?? [])
+              .filter((lic: { fileUrl: string | null }) => !!lic.fileUrl)
+              .map(
+                (lic: {
+                  id: string;
+                  licenseName: string;
+                  fileSize?: number | null;
+                  fileUrl: string;
+                  createdAt?: string;
+                }) => ({
+                  id: lic.id,
+                  fileName: lic.licenseName,
+                  fileSize: lic.fileSize ?? 0,
+                  uploadedAt: lic.createdAt
+                    ? new Date(lic.createdAt).toLocaleDateString("th-TH")
+                    : "",
+                  url: lic.fileUrl,
+                }),
+              ),
+            resumes: (d.resumes ?? []).map(
+              (r: {
+                id: string;
+                fileName: string;
+                fileSize: number | null;
+                uploadedAt: string;
+                fileUrl: string;
+              }) => ({
+                id: r.id,
+                fileName: r.fileName,
+                fileSize: r.fileSize ?? 0,
+                uploadedAt: new Date(r.uploadedAt).toLocaleDateString("th-TH"),
+                url: r.fileUrl,
+              }),
+            ),
+            activeResumeId:
+              d.resumes?.find((r: { isActive: boolean }) => r.isActive)?.id ??
+              d.activeResumeId ??
+              state.profile.activeResumeId,
           },
         }));
       }

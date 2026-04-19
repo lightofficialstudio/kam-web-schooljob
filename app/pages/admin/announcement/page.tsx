@@ -27,7 +27,7 @@ const { Title, Text } = Typography;
 export default function AnnouncementPage() {
   const { token } = theme.useToken();
   const { user } = useAuthStore();
-  const adminUserId = user?.id ?? "";
+  const adminUserId = user?.user_id ?? "";
 
   const {
     isSending,
