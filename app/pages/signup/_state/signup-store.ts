@@ -14,13 +14,15 @@ interface ModalState {
 }
 
 interface SignupState {
-  // ✨ ขั้นตอนการสมัคร: 1 = เลือก role, 2 = กรอกข้อมูล
-  step: 1 | 2;
+  // ✨ ขั้นตอนการสมัคร: 1 = เลือก role, 2 = กรอกข้อมูล, 3 = สำเร็จ (เช็คอีเมล)
+  step: 1 | 2 | 3;
   role: SignupRole | null;
+  registeredEmail: string;
   isLoading: boolean;
   modal: ModalState;
-  setStep: (step: 1 | 2) => void;
+  setStep: (step: 1 | 2 | 3) => void;
   setRole: (role: SignupRole) => void;
+  setRegisteredEmail: (email: string) => void;
   setLoading: (loading: boolean) => void;
   showModal: (
     type: ModalType,
@@ -40,10 +42,12 @@ const DEFAULT_MODAL: ModalState = {
 export const useSignupStore = create<SignupState>((set) => ({
   step: 1,
   role: null,
+  registeredEmail: "",
   isLoading: false,
   modal: DEFAULT_MODAL,
   setStep: (step) => set({ step }),
   setRole: (role) => set({ role }),
+  setRegisteredEmail: (registeredEmail) => set({ registeredEmail }),
   setLoading: (isLoading) => set({ isLoading }),
   showModal: (type, mainTitle, description) =>
     set({ modal: { open: true, type, mainTitle, description } }),

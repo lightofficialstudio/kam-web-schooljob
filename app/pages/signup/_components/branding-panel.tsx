@@ -9,6 +9,7 @@ const { Title, Text } = Typography;
 const STEPS = [
   { step: 1, label: "ขั้นตอนที่ 1", title: "เลือกประเภท" },
   { step: 2, label: "ขั้นตอนที่ 2", title: "กรอกข้อมูล" },
+  { step: 3, label: "ขั้นตอนที่ 3", title: "เสร็จสมบูรณ์" },
 ] as const;
 
 // ✨ แผงซ้าย — gradient + step indicator แทน features list
@@ -21,7 +22,8 @@ export const BrandingPanel = () => {
       xs={0}
       md={9}
       style={{
-        background: "linear-gradient(160deg, #0d8fd4 0%, #11b6f5 55%, #5dd5fb 100%)",
+        background:
+          "linear-gradient(160deg, #0d8fd4 0%, #11b6f5 55%, #5dd5fb 100%)",
         padding: "48px 36px",
         position: "relative",
         overflow: "hidden",
@@ -131,12 +133,11 @@ export const BrandingPanel = () => {
                         width: 38,
                         height: 38,
                         borderRadius: "50%",
-                        background: isActive || isDone
-                          ? "#fff"
-                          : "transparent",
-                        border: isActive || isDone
-                          ? "none"
-                          : "2px solid rgba(255,255,255,0.45)",
+                        background: isActive || isDone ? "#fff" : "transparent",
+                        border:
+                          isActive || isDone
+                            ? "none"
+                            : "2px solid rgba(255,255,255,0.45)",
                         transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
                         boxShadow: isActive
                           ? "0 4px 16px rgba(0,0,0,0.18)"
@@ -145,7 +146,12 @@ export const BrandingPanel = () => {
                     >
                       {isDone ? (
                         // ✨ checkmark เมื่อผ่านแล้ว
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                        >
                           <path
                             d="M3 8.5L6.5 12L13 5"
                             stroke="#11b6f5"
@@ -159,7 +165,9 @@ export const BrandingPanel = () => {
                           strong
                           style={{
                             fontSize: 14,
-                            color: isActive ? "#11b6f5" : "rgba(255,255,255,0.6)",
+                            color: isActive
+                              ? "#11b6f5"
+                              : "rgba(255,255,255,0.6)",
                             lineHeight: 1,
                           }}
                         >
@@ -187,7 +195,11 @@ export const BrandingPanel = () => {
                   </Flex>
 
                   {/* ✨ text */}
-                  <Flex vertical gap={1} style={{ paddingBottom: isLast ? 0 : 36 }}>
+                  <Flex
+                    vertical
+                    gap={1}
+                    style={{ paddingBottom: isLast ? 0 : 36 }}
+                  >
                     <Text
                       style={{
                         fontSize: 10,
@@ -206,9 +218,10 @@ export const BrandingPanel = () => {
                       strong
                       style={{
                         fontSize: 15,
-                        color: isActive || isDone
-                          ? "#fff"
-                          : "rgba(255,255,255,0.45)",
+                        color:
+                          isActive || isDone
+                            ? "#fff"
+                            : "rgba(255,255,255,0.45)",
                         letterSpacing: "0.01em",
                         transition: "color 0.3s",
                       }}

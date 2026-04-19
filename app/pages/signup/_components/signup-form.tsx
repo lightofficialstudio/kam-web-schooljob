@@ -4,6 +4,7 @@ import { ModalComponent } from "@/app/components/modal/modal.component";
 import {
   ArrowLeftOutlined,
   BankOutlined,
+  CheckCircleOutlined,
   LockOutlined,
   MailOutlined,
   UserOutlined,
@@ -21,7 +22,6 @@ import {
   theme as antTheme,
 } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type SignupPayload, requestSignup } from "../_api/signup-api";
 import type { SignupRole } from "../_state/signup-store";
 import { useSignupStore } from "../_state/signup-store";
@@ -119,7 +119,12 @@ const RoleSelectStep = () => {
               key={opt.value}
               onClick={() => handleSelect(opt.value)}
               className="signup-role-card"
-              style={{ all: "unset", cursor: "pointer", display: "block", width: "100%" }}
+              style={{
+                all: "unset",
+                cursor: "pointer",
+                display: "block",
+                width: "100%",
+              }}
             >
               <Flex
                 align="center"
@@ -166,7 +171,10 @@ const RoleSelectStep = () => {
                   <Text strong style={{ fontSize: 15, color: token.colorText }}>
                     {opt.label}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: 13, lineHeight: 1.55 }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 13, lineHeight: 1.55 }}
+                  >
                     {opt.description}
                   </Text>
                 </Flex>
@@ -174,7 +182,11 @@ const RoleSelectStep = () => {
                 {/* ✨ arrow */}
                 <span
                   className="signup-role-arrow"
-                  style={{ color: token.colorTextTertiary, fontSize: 18, lineHeight: 1 }}
+                  style={{
+                    color: token.colorTextTertiary,
+                    fontSize: 18,
+                    lineHeight: 1,
+                  }}
                 >
                   →
                 </span>
@@ -190,16 +202,19 @@ const RoleSelectStep = () => {
 // ✨ Step 2 — กรอกข้อมูล (แยกตาม role ในอนาคตได้ที่นี่)
 const DetailsFormStep = () => {
   const [form] = Form.useForm<SignupFormValues>();
-  const router = useRouter();
   const { token } = antTheme.useToken();
-  const { role, isLoading, modal, setLoading, setStep, showModal, hideModal } =
-    useSignupStore();
+  const {
+    role,
+    isLoading,
+    modal,
+    setLoading,
+    setStep,
+    setRegisteredEmail,
+    showModal,
+    hideModal,
+  } = useSignupStore();
 
   const selectedRole = ROLE_OPTIONS.find((o) => o.value === role);
-
-  const handleModalConfirm = () => {
-    if (modal.type === "success") router.push("/pages/signin");
-  };
 
   const onFinish = async (values: SignupFormValues) => {
     setLoading(true);
@@ -212,11 +227,8 @@ const DetailsFormStep = () => {
         role: role!,
       };
       await requestSignup(payload);
-      showModal(
-        "success",
-        "ตรวจสอบอีเมลของคุณ",
-        `ได้ส่งลิงก์ยืนยันไปที่ ${values.email} แล้ว — ไม่พบอีเมล? ตรวจสอบโฟลเดอร์ "สแปม" ลิงก์มีอายุ 72 ชั่วโมง`,
-      );
+      setRegisteredEmail(values.email);
+      setStep(3);
     } catch (err: unknown) {
       const axiosErr = err as {
         response?: { data?: { message_th?: string } };
@@ -240,7 +252,7 @@ const DetailsFormStep = () => {
         title={modal.mainTitle}
         description={modal.description}
         onClose={hideModal}
-        onConfirm={modal.type === "success" ? handleModalConfirm : undefined}
+        onConfirm={undefined}
         confirmLabel="ตกลง"
       />
 
@@ -293,8 +305,12 @@ const DetailsFormStep = () => {
               )}
               <Flex vertical gap={1}>
                 <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
-                  สร้างบัญชี{selectedRole?.label ? (
-                    <span style={{ color: token.colorPrimary }}> — {selectedRole.label}</span>
+                  สร้างบัญชี
+                  {selectedRole?.label ? (
+                    <span style={{ color: token.colorPrimary }}>
+                      {" "}
+                      — {selectedRole.label}
+                    </span>
                   ) : null}
                 </Title>
                 <Text type="secondary" style={{ fontSize: 13 }}>
@@ -322,7 +338,9 @@ const DetailsFormStep = () => {
                     rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
                   >
                     <Input
-                      prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                      prefix={
+                        <UserOutlined style={{ color: token.colorPrimary }} />
+                      }
                       placeholder="ชื่อของคุณ"
                     />
                   </Form.Item>
@@ -334,7 +352,9 @@ const DetailsFormStep = () => {
                     rules={[{ required: true, message: "กรุณาระบุนามสกุล" }]}
                   >
                     <Input
-                      prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                      prefix={
+                        <UserOutlined style={{ color: token.colorPrimary }} />
+                      }
                       placeholder="นามสกุลของคุณ"
                     />
                   </Form.Item>
@@ -360,7 +380,9 @@ const DetailsFormStep = () => {
                 ]}
               >
                 <Input
-                  prefix={<MailOutlined style={{ color: token.colorPrimary }} />}
+                  prefix={
+                    <MailOutlined style={{ color: token.colorPrimary }} />
+                  }
                   placeholder="example@email.com"
                 />
               </Form.Item>
@@ -378,7 +400,9 @@ const DetailsFormStep = () => {
                     ]}
                   >
                     <Input.Password
-                      prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                      prefix={
+                        <LockOutlined style={{ color: token.colorPrimary }} />
+                      }
                       placeholder="อย่างน้อย 8 ตัวอักษร"
                     />
                   </Form.Item>
@@ -400,7 +424,9 @@ const DetailsFormStep = () => {
                     ]}
                   >
                     <Input.Password
-                      prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                      prefix={
+                        <LockOutlined style={{ color: token.colorPrimary }} />
+                      }
                       placeholder="กรอกรหัสผ่านอีกครั้ง"
                     />
                   </Form.Item>
@@ -417,18 +443,26 @@ const DetailsFormStep = () => {
                     validator: (_, value) =>
                       value
                         ? Promise.resolve()
-                        : Promise.reject(new Error("กรุณายอมรับข้อกำหนดและนโยบาย")),
+                        : Promise.reject(
+                            new Error("กรุณายอมรับข้อกำหนดและนโยบาย"),
+                          ),
                   },
                 ]}
                 style={{ marginBottom: 20 }}
               >
                 <Checkbox style={{ fontSize: 13 }}>
                   ฉันยอมรับ{" "}
-                  <Link href="/terms" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                  <Link
+                    href="/terms"
+                    style={{ color: token.colorPrimary, fontWeight: 600 }}
+                  >
                     ข้อกำหนดการใช้บริการ
                   </Link>{" "}
                   และ{" "}
-                  <Link href="/privacy" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                  <Link
+                    href="/privacy"
+                    style={{ color: token.colorPrimary, fontWeight: 600 }}
+                  >
                     นโยบายความเป็นส่วนตัว
                   </Link>
                 </Checkbox>
@@ -461,10 +495,152 @@ const DetailsFormStep = () => {
   );
 };
 
+// ✨ Step 3 — สำเร็จ! ย้ำเตือนให้เช็กอีเมล
+const SuccessStep = () => {
+  const { token } = antTheme.useToken();
+  const { registeredEmail, role } = useSignupStore();
+  const selectedRole = ROLE_OPTIONS.find((o) => o.value === role);
+
+  return (
+    <Col
+      xs={24}
+      md={15}
+      className="signup-step-2"
+      style={{ padding: "40px 48px" }}
+    >
+      <Flex
+        vertical
+        align="center"
+        justify="center"
+        gap={0}
+        style={{ minHeight: 400, textAlign: "center" }}
+      >
+        {/* ✨ success icon */}
+        <div
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 8px 32px rgba(17,182,245,0.35)",
+            marginBottom: 28,
+            animation: "signupCardPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both",
+          }}
+        >
+          <CheckCircleOutlined style={{ fontSize: 40, color: "#fff" }} />
+        </div>
+
+        {/* ✨ title */}
+        <Flex vertical gap={8} align="center" style={{ marginBottom: 28 }}>
+          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
+            สมัครสำเร็จ 🎉
+          </Title>
+          {selectedRole && (
+            <span
+              style={{
+                display: "inline-block",
+                padding: "3px 14px",
+                borderRadius: 99,
+                background: selectedRole.gradient,
+                color: "#fff",
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              {selectedRole.label}
+            </span>
+          )}
+          <Text
+            type="secondary"
+            style={{ fontSize: 14, lineHeight: 1.6, maxWidth: 360 }}
+          >
+            บัญชีของคุณถูกสร้างเรียบร้อยแล้ว
+          </Text>
+        </Flex>
+
+        {/* ✨ email reminder card */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 380,
+            padding: "20px 24px",
+            borderRadius: token.borderRadiusLG + 4,
+            border: `1.5px solid ${token.colorPrimaryBorder}`,
+            background: token.colorPrimaryBg,
+            marginBottom: 32,
+            textAlign: "left",
+          }}
+        >
+          <Flex gap={12} align="flex-start">
+            <MailOutlined
+              style={{
+                fontSize: 20,
+                color: token.colorPrimary,
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+            <Flex vertical gap={4}>
+              <Text strong style={{ fontSize: 14, color: token.colorText }}>
+                ตรวจสอบอีเมลของคุณ
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: token.colorPrimary,
+                  fontWeight: 600,
+                }}
+              >
+                {registeredEmail}
+              </Text>
+              <Text
+                type="secondary"
+                style={{ fontSize: 12, lineHeight: 1.6, marginTop: 2 }}
+              >
+                เราได้ส่งลิงก์ยืนยันไปแล้ว —
+                กรุณาคลิกลิงก์ในอีเมลเพื่อยืนยันตัวตน{" "}
+                <Text strong style={{ fontSize: 12, color: token.colorText }}>
+                  ไม่พบอีเมล?
+                </Text>{" "}
+                ตรวจโฟลเดอร์ “สแปม” ลิงก์มีอายุ 72 ชั่วโมง
+              </Text>
+            </Flex>
+          </Flex>
+        </div>
+
+        {/* ✨ login button */}
+        <div style={{ width: "100%", maxWidth: 380 }}>
+          <Link href="/pages/signin" style={{ display: "block" }}>
+            <Button
+              type="primary"
+              block
+              size="large"
+              className="signup-submit-btn"
+              style={{
+                height: 52,
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 16,
+                boxShadow: `0 6px 20px ${token.colorPrimary}40`,
+              }}
+            >
+              เข้าสู่ระบบ
+            </Button>
+          </Link>
+        </div>
+      </Flex>
+    </Col>
+  );
+};
+
 // ✨ ฟอร์มสมัครสมาชิก — สองขั้นตอน: เลือก role → กรอกข้อมูล
 export const SignupForm = () => {
   const { step } = useSignupStore();
 
   if (step === 1) return <RoleSelectStep />;
+  if (step === 3) return <SuccessStep />;
   return <DetailsFormStep />;
 };
