@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "@/app/contexts/theme-context";
 import { useAuthStore } from "@/app/stores/auth-store";
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import {
@@ -27,11 +28,9 @@ import { useJobReadStore } from "./_state/job-read-store";
 const { Title, Text } = Typography;
 const { Content } = Layout;
 
-const PRIMARY = "#11b6f5";
-const PRIMARY_DARK = "#0878a8";
-
 // หน้าจัดการประกาศรับสมัครครู — สำหรับฝ่ายบุคลากรของโรงเรียน
 export default function MyJobsPage() {
+  const { mode } = useTheme();
   const { jobs, isLoading, fetchJobs, fetchPipelineData } = useJobReadStore();
   const { openNewApplicantsDrawer } = useApplicantDrawerStore();
   const { token } = theme.useToken();
@@ -58,7 +57,10 @@ export default function MyJobsPage() {
       <Flex
         vertical
         style={{
-          background: `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY_DARK} 100%)`,
+          background: mode === "dark" 
+            ? token.colorBgBase 
+            : `linear-gradient(135deg, ${token.colorPrimary} 0%, #0878a8 100%)`,
+          borderBottom: mode === "dark" ? `1px solid ${token.colorBorder}` : "none",
           padding: "32px 0 56px",
         }}
       >
@@ -78,7 +80,7 @@ export default function MyJobsPage() {
                 title: (
                   <Link
                     href="/pages/employer"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
+                    style={{ color: mode === "dark" ? token.colorTextSecondary : "rgba(255,255,255,0.65)" }}
                   >
                     แดชบอร์ด
                   </Link>
@@ -86,7 +88,7 @@ export default function MyJobsPage() {
               },
               {
                 title: (
-                  <span style={{ color: "rgba(255,255,255,0.9)" }}>
+                  <span style={{ color: mode === "dark" ? token.colorText : "rgba(255,255,255,0.9)" }}>
                     ประกาศรับสมัครครู
                   </span>
                 ),
@@ -104,21 +106,21 @@ export default function MyJobsPage() {
                   width: 56,
                   height: 56,
                   borderRadius: 14,
-                  background: "rgba(255,255,255,0.2)",
-                  border: "1px solid rgba(255,255,255,0.3)",
+                  background: mode === "dark" ? token.colorBgContainer : "rgba(255,255,255,0.2)",
+                  border: `1px solid ${mode === "dark" ? token.colorBorder : "rgba(255,255,255,0.3)"}`,
                   flexShrink: 0,
                 }}
               >
-                <TeamOutlined style={{ fontSize: 26, color: "#fff" }} />
+                <TeamOutlined style={{ fontSize: 26, color: mode === "dark" ? token.colorPrimary : "#fff" }} />
               </Flex>
               <Flex vertical gap={3}>
                 <Title
                   level={2}
-                  style={{ margin: 0, color: "#fff", lineHeight: 1.2 }}
+                  style={{ margin: 0, color: mode === "dark" ? token.colorText : "#fff", lineHeight: 1.2 }}
                 >
                   ประกาศรับสมัครครู
                 </Title>
-                <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>
+                <Text style={{ color: mode === "dark" ? token.colorTextSecondary : "rgba(255,255,255,0.75)", fontSize: 14 }}>
                   จัดการและติดตามประกาศรับสมัครบุคลากรของโรงเรียน
                 </Text>
               </Flex>
@@ -137,9 +139,9 @@ export default function MyJobsPage() {
                     onClick={() => openNewApplicantsDrawer(user?.user_id ?? "")}
                     style={{
                       borderRadius: 10,
-                      background: "rgba(255,255,255,0.15)",
-                      border: "1px solid rgba(255,255,255,0.35)",
-                      color: "#fff",
+                      background: mode === "dark" ? token.colorBgElevated : "rgba(255,255,255,0.15)",
+                      border: `1px solid ${mode === "dark" ? token.colorBorder : "rgba(255,255,255,0.35)"}`,
+                      color: mode === "dark" ? token.colorText : "#fff",
                       fontWeight: 600,
                     }}
                   >
@@ -151,13 +153,14 @@ export default function MyJobsPage() {
                 <Button
                   size="large"
                   icon={<PlusOutlined />}
+                  type={mode === "dark" ? "primary" : "default"}
                   style={{
                     borderRadius: 10,
-                    background: "#fff",
-                    color: PRIMARY,
+                    background: mode === "dark" ? token.colorPrimary : "#fff",
+                    color: mode === "dark" ? "#fff" : token.colorPrimary,
                     border: "none",
                     fontWeight: 700,
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+                    boxShadow: mode === "dark" ? "none" : "0 4px 16px rgba(0,0,0,0.15)",
                   }}
                 >
                   ลงประกาศงานใหม่

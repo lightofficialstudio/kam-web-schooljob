@@ -52,6 +52,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import PackageTab from "./_components/package-tab";
 import { RbacTab } from "./_components/rbac-tab";
 import type { OrgInvite, OrgMember } from "./_state/org-store";
 import { useOrgStore } from "./_state/org-store";
@@ -347,7 +348,7 @@ export default function SchoolManagementPage() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [editMember, setEditMember] = useState<OrgMember | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "members" | "invites" | "rbac" | "settings"
+    "members" | "invites" | "rbac" | "settings" | "package"
   >("members");
 
   useEffect(() => setIsMounted(true), []);
@@ -770,6 +771,7 @@ export default function SchoolManagementPage() {
       ),
     },
     { key: "settings", label: "ตั้งค่าองค์กร", icon: <SettingOutlined /> },
+    { key: "package", label: "แพ็คเกจ", icon: <CrownOutlined /> },
   ] as const;
 
   return (
@@ -1233,6 +1235,9 @@ export default function SchoolManagementPage() {
             </Col>
           </Row>
         )}
+
+        {/* ─── Tab: แพ็คเกจ ──────────────────────────────────────────── */}
+        {activeTab === "package" && <PackageTab userId={user.user_id} />}
       </div>
 
       {/* ─── Modals ────────────────────────────────────────────────────── */}
