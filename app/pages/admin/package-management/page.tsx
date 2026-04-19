@@ -50,11 +50,12 @@ import { QuotaAlertPanel } from "./_components/quota-alert-panel";
 import { RevenueProjectionPanel } from "./_components/revenue-projection-panel";
 import { SchoolDetailDrawer } from "./_components/school-detail-drawer";
 import {
-  PackagePlanItem,
-  PlanFormData,
   SchoolPackageItem,
   usePackageStore,
 } from "./_state/package-store";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
+import { SummaryCard } from "@/app/components/admin/card/summary-card.component";
 
 const { Title, Text } = Typography;
 
@@ -427,51 +428,45 @@ export default function PackageManagementPage() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: token.colorBgLayout }}>
-      {/* ─── Hero Banner ─── */}
-      <div style={{ background: "linear-gradient(135deg, #001e45 0%, #0a4a8a 55%, #11b6f5 100%)", padding: "40px 0 80px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -60, right: -60, width: 280, height: 280, borderRadius: "50%", background: "rgba(17,182,245,0.12)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -40, left: "30%", width: 180, height: 180, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", position: "relative" }}>
-          <Breadcrumb style={{ marginBottom: 20 }} items={[
-            { title: <Link href="/pages/admin/dashboard" style={{ color: "rgba(255,255,255,0.65)" }}>แดชบอร์ด</Link> },
-            { title: <span style={{ color: "white" }}>แพ็กเกจสมาชิก</span> },
-          ]} />
-          <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>
-            <Flex vertical gap={4}>
-              <Title level={2} style={{ margin: 0, color: "white" }}>แพ็กเกจสมาชิก</Title>
-              <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
-                สร้าง/แก้ไข Plan · Revenue Intelligence · Quota Alert · Bulk Update
-              </Text>
-            </Flex>
-            <Flex align="center" gap={10} style={{ padding: "10px 16px", borderRadius: 12, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)", backdropFilter: "blur(8px)" }}>
-              <ThunderboltOutlined style={{ color: "#fadb14", fontSize: 16 }} />
-              <Flex vertical gap={1}>
-                <Text style={{ color: "white", fontSize: 12, fontWeight: 600 }}>Payment Gateway Ready</Text>
-                <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 11 }}>PUT /api/v1/admin/packages/update → ลูกค้าได้รับ Plan ทันที</Text>
-              </Flex>
-              <Tooltip title="เชื่อม Omise / Stripe / PromptPay โดยเรียก endpoint นี้หลังชำระเงินสำเร็จ">
-                <LinkOutlined style={{ color: "rgba(255,255,255,0.6)", cursor: "help" }} />
-              </Tooltip>
-            </Flex>
+    <div style={{ padding: "24px 24px 48px", minHeight: "100vh", background: token.colorBgLayout }}>
+      {/* 1. Breadcrumb */}
+      <AdminBreadcrumb
+        items={[
+          { title: "แดชบอร์ด", path: "/pages/admin/dashboard" },
+          { title: "แพ็กเกจสมาชิก" }
+        ]}
+      />
+
+      {/* 2. Header */}
+      <AdminHeader
+        title="จัดการแพ็กเกจสมาชิก (Package Management)"
+        description="สร้างแผนสมาชิก จัดการความต้องการ และตรวจสอบรายได้ของระบบ"
+        icon={<CrownOutlined style={{ fontSize: 22, color: "#fff" }} />}
+        style={{ marginBottom: 24 }}
+        action={
+          <Flex align="center" gap={10} style={{ padding: "8px 14px", borderRadius: 12, background: `${token.colorPrimary}12`, border: `1px solid ${token.colorPrimary}25` }}>
+            <ThunderboltOutlined style={{ color: token.colorPrimary, fontSize: 16 }} />
+            <Text style={{ fontSize: 12, fontWeight: 600 }}>Payment Gateway Ready</Text>
           </Flex>
-        </div>
-      </div>
+        }
+      />
 
       {/* ─── Main Content ─── */}
-      <div style={{ maxWidth: 1280, margin: "-40px auto 0", padding: "0 24px 80px", position: "relative" }}>
-
-        {/* ─── Summary Stats ─── */}
+      <div style={{ position: "relative" }}>
+        {/* 3. Summary Stats */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {statsCards.map((s) => (
             <Col xs={12} sm={6} key={s.key}>
-              <Card variant="borderless" style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.06)", cursor: s.key !== "all" ? "pointer" : "default", border: filterPlan === s.key ? `2px solid ${s.color}` : "2px solid transparent", transition: "all 0.2s" }} onClick={() => setFilterPlan(s.key)}>
-                <Flex vertical align="center" gap={6}>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{s.label}</Text>
-                  <Text strong style={{ fontSize: 32, lineHeight: 1, color: s.color }}>{s.value}</Text>
-                  <Text type="secondary" style={{ fontSize: 11 }}>โรงเรียน</Text>
-                </Flex>
-              </Card>
+              <SummaryCard
+                title={s.label}
+                value={s.value}
+                unit="โรงเรียน"
+                color={s.color}
+                icon={<DatabaseOutlined />}
+                onClick={() => setFilterPlan(s.key)}
+                size="md"
+                isLoading={isLoading}
+              />
             </Col>
           ))}
         </Row>

@@ -21,6 +21,7 @@ import {
   theme,
 } from "antd";
 import { useUserManagementStore } from "../_state/user-management-store";
+import { SummaryCard } from "@/app/components/admin/card/summary-card.component";
 
 const { Text } = Typography;
 
@@ -70,38 +71,17 @@ export function StatsSection() {
     <Row gutter={[12, 12]}>
       {stats.map((s) => (
         <Col xs={12} sm={8} md={24 / stats.length} key={s.title}>
-          <Card
-            style={{
-              background: token.colorBgContainer,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              borderRadius: token.borderRadiusLG,
-              borderTop: `3px solid ${s.color}`,
-            }}
-            styles={{ body: { padding: "14px 18px" } }}
-          >
-            {isLoading ? (
-              <Flex vertical gap={6}>
-                <Skeleton.Input active size="small" style={{ width: 80, height: 14 }} />
-                <Skeleton.Input active size="large" style={{ width: 100, height: 32 }} />
-              </Flex>
-            ) : (
-              <Flex vertical gap={4}>
-                <Flex align="center" gap={6}>
-                  <Text style={{ color: s.color, fontSize: 16 }}>{s.icon}</Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{s.title}</Text>
-                </Flex>
-                <Statistic
-                  value={s.value}
-                  styles={{ content: { fontSize: 26, fontWeight: 700, color: s.color } }}
-                />
-                <Tooltip title={s.sub}>
-                  <Text type="secondary" style={{ fontSize: 11 }} ellipsis>
-                    {s.sub}
-                  </Text>
-                </Tooltip>
-              </Flex>
-            )}
-          </Card>
+          <SummaryCard
+            title={s.title}
+            value={s.value}
+            unit="คน"
+            icon={s.icon}
+            color={s.color}
+            subtitle={s.sub}
+            tooltip={s.sub}
+            isLoading={isLoading}
+            size="md"
+          />
         </Col>
       ))}
 

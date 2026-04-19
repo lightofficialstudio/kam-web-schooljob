@@ -60,7 +60,6 @@ import type { OrgMember, OrgRole } from "../_state/org-store";
 import { useOrgStore } from "../_state/org-store";
 
 const { Text, Title } = Typography;
-const PRIMARY = "#11b6f5";
 
 // ─── RBAC Types ───────────────────────────────────────────────────────────────
 
@@ -190,7 +189,8 @@ const getIconByValue = (value: string): string => value;
 // ─── Risk Badge ───────────────────────────────────────────────────────────────
 
 const RiskBadge = ({ risk }: { risk: "low" | "medium" | "high" }) => {
-  const COLOR = { low: "#10B981", medium: "#F59E0B", high: "#EF4444" };
+  const { token } = theme.useToken();
+  const COLOR = { low: token.colorSuccess, medium: token.colorWarning, high: token.colorError };
   const LABEL = { low: "ต่ำ", medium: "กลาง", high: "สูง" };
   return (
     <span style={{ fontSize: 10, color: COLOR[risk], fontWeight: 600 }}>
@@ -267,7 +267,7 @@ const RoleFormModal = ({
               width: 36,
               height: 36,
               borderRadius: 9,
-              background: `linear-gradient(135deg, ${PRIMARY} 0%, #0878a8 100%)`,
+              background: `linear-gradient(135deg, #11b6f5 0%, #0878a8 100%)`,
             }}
           >
             <SafetyCertificateOutlined
@@ -429,7 +429,7 @@ const PermissionMatrix = ({
     return (
       <Flex align="center" justify="center" style={{ padding: "40px 0" }}>
         <Flex vertical align="center" gap={12}>
-          <CrownOutlined style={{ fontSize: 32, color: "#F59E0B" }} />
+          <CrownOutlined style={{ fontSize: 32, color: token.colorWarning }} />
           <Text strong>Owner มีสิทธิ์ทุกอย่างโดย default</Text>
           <Text type="secondary" style={{ fontSize: 13 }}>
             ไม่สามารถจำกัดหรือแก้ไขสิทธิ์ของ Owner ได้
@@ -494,7 +494,7 @@ const PermissionMatrix = ({
               disabled={role.isSystem}
             />
             <Flex align="center" gap={6}>
-              <span style={{ color: PRIMARY, fontSize: 14 }}>{res.icon}</span>
+              <span style={{ color: token.colorPrimary, fontSize: 14 }}>{res.icon}</span>
               <Flex vertical gap={1}>
                 <Text style={{ fontSize: 13, fontWeight: 500 }}>
                   {res.label}
@@ -567,7 +567,7 @@ const PermissionMatrix = ({
               <Text
                 style={{
                   fontSize: 12,
-                  color: count > 0 ? PRIMARY : token.colorTextQuaternary,
+                  color: count > 0 ? token.colorPrimary : token.colorTextQuaternary,
                 }}
               >
                 {count}/{RESOURCES.length}
@@ -636,7 +636,7 @@ const MemberRolePanel = ({
             <Avatar
               size={36}
               src={m.profile.profileImageUrl}
-              style={{ backgroundColor: PRIMARY, fontSize: 13, flexShrink: 0 }}
+              style={{ backgroundColor: token.colorPrimary, fontSize: 13, flexShrink: 0 }}
             >
               {displayName.charAt(0)}
             </Avatar>
@@ -769,7 +769,7 @@ const MemberRolePanel = ({
                   {RESOURCES.map((res) => (
                     <>
                       <Flex key={`${res.key}-label`} align="center" gap={4}>
-                        <span style={{ color: PRIMARY, fontSize: 12 }}>
+                        <span style={{ color: token.colorPrimary, fontSize: 12 }}>
                           {res.icon}
                         </span>
                         <Text style={{ fontSize: 12 }}>{res.label}</Text>
@@ -780,7 +780,7 @@ const MemberRolePanel = ({
                           <Flex key={key} justify="center" align="center">
                             {perms.has(key) ? (
                               <CheckCircleFilled
-                                style={{ color: "#10B981", fontSize: 14 }}
+                                style={{ color: token.colorSuccess, fontSize: 14 }}
                               />
                             ) : (
                               <CloseCircleOutlined
@@ -976,7 +976,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
         <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
           <Flex vertical gap={4}>
             <Flex align="center" gap={8}>
-              <LockOutlined style={{ color: PRIMARY, fontSize: 18 }} />
+              <LockOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
               <Title level={5} style={{ margin: 0 }}>
                 Role-Based Access Control (RBAC)
               </Title>
@@ -1026,13 +1026,13 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                 border: "none",
                 borderBottom:
                   section === t.key
-                    ? `2px solid ${PRIMARY}`
+                    ? `2px solid ${token.colorPrimary}`
                     : "2px solid transparent",
                 background: "transparent",
                 cursor: "pointer",
                 fontSize: 13,
                 fontWeight: section === t.key ? 600 : 400,
-                color: section === t.key ? PRIMARY : token.colorTextSecondary,
+                color: section === t.key ? token.colorPrimary : token.colorTextSecondary,
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -1062,7 +1062,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
             styles={{ body: { padding: 0 } }}
             title={
               <Flex align="center" gap={6}>
-                <SafetyCertificateOutlined style={{ color: PRIMARY }} />
+                <SafetyCertificateOutlined style={{ color: token.colorPrimary }} />
                 <Text strong style={{ fontSize: 14 }}>
                   Roles ({roles.length})
                 </Text>
@@ -1084,11 +1084,11 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                       cursor: "pointer",
                       backgroundColor:
                         selectedRoleId === role.id
-                          ? PRIMARY + "14"
+                          ? "rgba(17,182,245,0.08)"
                           : "transparent",
                       borderLeft:
                         selectedRoleId === role.id
-                          ? `3px solid ${PRIMARY}`
+                          ? `3px solid ${token.colorPrimary}`
                           : "3px solid transparent",
                       borderBottom:
                         i < roles.length - 1
@@ -1122,7 +1122,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                                 fontSize: 13,
                                 color:
                                   selectedRoleId === role.id
-                                    ? PRIMARY
+                                    ? token.colorPrimary
                                     : token.colorText,
                               }}
                             >
@@ -1252,9 +1252,9 @@ export const RbacTab = ({ userId }: { userId: string }) => {
                   ระดับความเสี่ยง:
                 </Text>
                 {[
-                  { color: "#10B981", label: "ต่ำ — อ่านข้อมูล" },
-                  { color: "#F59E0B", label: "กลาง — แก้ไข / ส่งออก" },
-                  { color: "#EF4444", label: "สูง — ลบ / จัดการเต็ม" },
+                  { color: token.colorSuccess, label: "ต่ำ — อ่านข้อมูล" },
+                  { color: token.colorWarning, label: "กลาง — แก้ไข / ส่งออก" },
+                  { color: token.colorError, label: "สูง — ลบ / จัดการเต็ม" },
                 ].map((item) => (
                   <Flex key={item.label} align="center" gap={5}>
                     <span
@@ -1293,7 +1293,7 @@ export const RbacTab = ({ userId }: { userId: string }) => {
               }}
               title={
                 <Flex align="center" gap={8}>
-                  <TeamOutlined style={{ color: PRIMARY }} />
+                  <TeamOutlined style={{ color: token.colorPrimary }} />
                   <Text strong style={{ fontSize: 15 }}>
                     กำหนด Role ให้สมาชิก
                   </Text>

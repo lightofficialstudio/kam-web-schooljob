@@ -111,9 +111,10 @@ export const useOrgStore = create<OrgState>((set, get) => ({
     set({ isLoadingMembers: true });
     try {
       const data = await fetchOrgMembers(userId);
-      set({ members: data as OrgMember[] });
+      set({ members: Array.isArray(data) ? (data as OrgMember[]) : [] });
     } catch (err) {
       console.error("❌ [org-store] fetchMembers:", err);
+      set({ members: [] });
     } finally {
       set({ isLoadingMembers: false });
     }
@@ -148,9 +149,10 @@ export const useOrgStore = create<OrgState>((set, get) => ({
     set({ isLoadingInvites: true });
     try {
       const data = await fetchPendingInvites(userId);
-      set({ invites: data as OrgInvite[] });
+      set({ invites: Array.isArray(data) ? (data as OrgInvite[]) : [] });
     } catch (err) {
       console.error("❌ [org-store] fetchInvites:", err);
+      set({ invites: [] });
     } finally {
       set({ isLoadingInvites: false });
     }
@@ -167,9 +169,10 @@ export const useOrgStore = create<OrgState>((set, get) => ({
     set({ isLoadingRoles: true });
     try {
       const data = await fetchOrgRoles(userId);
-      set({ roles: data as OrgRole[] });
+      set({ roles: Array.isArray(data) ? (data as OrgRole[]) : [] });
     } catch (err) {
       console.error("❌ [org-store] fetchRoles:", err);
+      set({ roles: [] });
     } finally {
       set({ isLoadingRoles: false });
     }

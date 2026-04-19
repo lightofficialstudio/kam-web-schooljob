@@ -160,14 +160,17 @@ export default function PackageTab({ userId }: { userId: string }) {
   const [data, setData] = useState<PackageData | null>(null);
   const [plans, setPlans] = useState<PlanRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   // ✨ ดึงข้อมูล Package + Plan พร้อมกัน
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
+    setFetchError(false);
     Promise.all([requestGetEmployerPackage(userId), requestGetAllPlans()])
       .then(([pkgRes, plansRes]) => {
         if (pkgRes.data?.data) setData(pkgRes.data.data);
+        else setFetchError(true);
         if (Array.isArray(plansRes.data?.data)) {
           const sorted = [...plansRes.data.data].sort(
             (a: PlanRow, b: PlanRow) => a.sortOrder - b.sortOrder,
@@ -175,7 +178,7 @@ export default function PackageTab({ userId }: { userId: string }) {
           setPlans(sorted);
         }
       })
-      .catch(() => {})
+      .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
   }, [userId]);
 
@@ -187,13 +190,14 @@ export default function PackageTab({ userId }: { userId: string }) {
     );
   }
 
-  if (!data) {
+  if (fetchError || !data) {
     return (
-      <SectionCard accentColor={token.colorPrimary}>
+      <SectionCard accentColor={token.colorError}>
         <Alert
           type="error"
           showIcon
-          message="ไม่สามารถโหลดข้อมูลแพ็คเกจได้ กรุณาลองใหม่"
+          message="ไม่สามารถโหลดข้อมูลแพ็คเกจได้"
+          description="กรุณาลองรีเฟรชหน้าใหม่ หรือติดต่อทีมงาน"
         />
       </SectionCard>
     );
@@ -327,11 +331,7 @@ export default function PackageTab({ userId }: { userId: string }) {
           </Flex>
 
           <Progress
-            percent={
-              data.jobQuotaMax === 999
-                ? Math.min(data.jobQuotaUsed, 100)
-                : data.quotaUsagePercent
-            }
+            percent={data.jobQuotaMax === 999 ? 0 : data.quotaUsagePercent}
             status={progressStatus}
             strokeColor={progressStroke}
             railColor={token.colorFillSecondary}

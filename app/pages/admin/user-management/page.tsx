@@ -2,11 +2,13 @@
 
 // ✨ [Orchestrator — User Management Page with Audit Log + Deep Analytics]
 import { ModalComponent } from "@/app/components/modal/modal.component";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
+import { UserOutlined } from "@ant-design/icons";
 import { Col, Row } from "antd";
 import { useEffect } from "react";
 import { BulkActionSection } from "./_components/bulk-action-section";
 import { FilterSection } from "./_components/filter-section";
-import { HeaderSection } from "./_components/header-section";
 import { StatsSection } from "./_components/stats-section";
 import { UserDetailDrawer } from "./_components/user-detail-drawer";
 import { UserTable } from "./_components/user-table";
@@ -34,11 +36,24 @@ export default function UserManagementPage() {
   }, [filterRole, filterStatus, filterKeyword, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <>
+    <div style={{ padding: "24px 24px 48px" }}>
+      {/* 1. Breadcrumb */}
+      <AdminBreadcrumb
+        items={[
+          { title: "แดชบอร์ด", path: "/pages/admin/dashboard" },
+          { title: "จัดการผู้ใช้" }
+        ]}
+      />
+
+      {/* 2. Header */}
+      <AdminHeader
+        title="จัดการผู้ใช้ (User Management)"
+        description="ตรวจสอบสถานะ แบน/ปลดแบน และจัดการข้อมูลผู้ใช้ทั้งระบบ"
+        icon={<UserOutlined style={{ fontSize: 22, color: "#fff" }} />}
+        style={{ marginBottom: 24 }}
+      />
+
       <Row gutter={[16, 16]}>
-        <Col xs={24}>
-          <HeaderSection />
-        </Col>
         <Col xs={24}>
           <StatsSection />
         </Col>
@@ -67,8 +82,7 @@ export default function UserManagementPage() {
         confirmLabel={modal.confirmLabel}
         cancelLabel={modal.cancelLabel}
         onClose={hideModal}
-        onConfirm={modal.onConfirm}
       />
-    </>
+    </div>
   );
 }
