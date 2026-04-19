@@ -35,20 +35,26 @@ const ROLE_OPTIONS: {
   label: string;
   description: string;
   gradient: string;
+  hoverBorder: string;
+  hoverShadow: string;
 }[] = [
   {
     value: "teacher",
-    icon: <UserOutlined style={{ fontSize: 28 }} />,
+    icon: <UserOutlined style={{ fontSize: 26 }} />,
     label: "ครูผู้สอน",
     description: "ค้นหางาน สมัครตำแหน่ง และสร้างโปรไฟล์ครูมืออาชีพ",
     gradient: "linear-gradient(135deg, #0d8fd4 0%, #11b6f5 100%)",
+    hoverBorder: "#11b6f5",
+    hoverShadow: "0 8px 32px rgba(17,182,245,0.22)",
   },
   {
     value: "school",
-    icon: <BankOutlined style={{ fontSize: 28 }} />,
+    icon: <BankOutlined style={{ fontSize: 26 }} />,
     label: "สถานศึกษา",
     description: "ประกาศรับสมัครครู จัดการโปรไฟล์โรงเรียน และคัดกรองผู้สมัคร",
     gradient: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+    hoverBorder: "#a855f7",
+    hoverShadow: "0 8px 32px rgba(168,85,247,0.22)",
   },
 ];
 
@@ -67,6 +73,58 @@ type TeacherFields = CommonFields & { _role: "teacher" };
 type SchoolFields = CommonFields & { _role: "school" };
 type SignupFormValues = TeacherFields | SchoolFields;
 
+// ✨ Progress bar — แสดงความก้าวหน้า 2 ขั้นตอน
+const StepProgressBar = ({ step }: { step: 1 | 2 }) => {
+  const { token } = antTheme.useToken();
+  const pct = step === 1 ? 50 : 100;
+
+  return (
+    <div className="w-full">
+      {/* ✨ labels */}
+      <Flex justify="space-between" style={{ marginBottom: 6 }}>
+        <Text
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: "0.07em",
+            textTransform: "uppercase",
+            color: token.colorPrimary,
+          }}
+        >
+          ขั้นตอนที่ {step} / 2
+        </Text>
+        <Text style={{ fontSize: 11, color: token.colorTextTertiary }}>
+          {step === 1 ? "เลือกประเภท" : "กรอกข้อมูล"}
+        </Text>
+      </Flex>
+
+      {/* ✨ track */}
+      <div
+        style={{
+          width: "100%",
+          height: 4,
+          borderRadius: 99,
+          background: token.colorFillTertiary,
+          overflow: "hidden",
+        }}
+      >
+        <div
+          key={step}
+          className="signup-progress-bar"
+          style={{
+            height: "100%",
+            borderRadius: 99,
+            background: `linear-gradient(90deg, #0d8fd4, #11b6f5)`,
+            // ✨ CSS var ให้ keyframe อ่าน
+            ["--progress-to" as string]: `${pct}%`,
+            width: `${pct}%`,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 // ✨ Step 1 — เลือก role ก่อนสมัคร
 const RoleSelectStep = () => {
   const { token } = antTheme.useToken();
@@ -78,9 +136,14 @@ const RoleSelectStep = () => {
   };
 
   return (
-    <Col xs={24} md={15} style={{ padding: "40px 48px" }}>
-      <Flex vertical gap={32}>
-        {/* Header */}
+    <Col
+      xs={24}
+      md={15}
+      className="signup-step-1"
+      style={{ padding: "40px 48px" }}
+    >
+      <Flex vertical gap={28}>
+        {/* ✨ Header */}
         <Flex vertical gap={4}>
           <Title level={3} style={{ margin: 0 }}>
             สมัครสมาชิก
@@ -89,6 +152,7 @@ const RoleSelectStep = () => {
             มีบัญชีอยู่แล้ว?{" "}
             <Link
               href="/pages/signin"
+              className="transition-opacity hover:opacity-70"
               style={{ fontWeight: 600, color: token.colorPrimary }}
             >
               เข้าสู่ระบบ
@@ -96,19 +160,11 @@ const RoleSelectStep = () => {
           </Text>
         </Flex>
 
-        {/* ✨ step indicator */}
+        {/* ✨ progress */}
+        <StepProgressBar step={1} />
+
+        {/* ✨ title */}
         <Flex vertical gap={4}>
-          <Text
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: token.colorTextTertiary,
-            }}
-          >
-            ขั้นตอนที่ 1 / 2
-          </Text>
           <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
             คุณต้องการสมัครในฐานะอะไร?
           </Title>
@@ -118,52 +174,50 @@ const RoleSelectStep = () => {
         </Flex>
 
         {/* ✨ role cards */}
-        <Flex vertical gap={16}>
+        <Flex vertical gap={14}>
           {ROLE_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => handleSelect(opt.value)}
-              style={{
-                all: "unset",
-                cursor: "pointer",
-                display: "block",
-                width: "100%",
-              }}
+              className="signup-role-card"
+              style={{ all: "unset", cursor: "pointer", display: "block", width: "100%" }}
             >
               <Flex
                 align="center"
                 gap={20}
+                className="signup-role-card-inner"
                 style={{
-                  padding: "20px 24px",
-                  borderRadius: token.borderRadiusLG,
+                  padding: "18px 22px",
+                  borderRadius: token.borderRadiusLG + 4,
                   border: `1.5px solid ${token.colorBorderSecondary}`,
                   background: token.colorBgContainer,
-                  transition: "border-color 0.2s, box-shadow 0.2s, transform 0.15s",
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
-                  el.style.borderColor = token.colorPrimaryBorder;
-                  el.style.boxShadow = `0 6px 24px ${token.colorPrimaryBg}`;
-                  el.style.transform = "translateY(-2px)";
+                  el.style.borderColor = opt.hoverBorder;
+                  el.style.boxShadow = opt.hoverShadow;
+                  el.style.background = token.colorBgLayout;
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
                   el.style.borderColor = token.colorBorderSecondary;
                   el.style.boxShadow = "none";
-                  el.style.transform = "translateY(0)";
+                  el.style.background = token.colorBgContainer;
                 }}
               >
-                {/* ✨ icon circle */}
+                {/* ✨ icon */}
                 <Flex
                   align="center"
                   justify="center"
+                  className="signup-role-icon"
                   style={{
-                    width: 56,
-                    height: 56,
+                    width: 54,
+                    height: 54,
                     borderRadius: 14,
                     background: opt.gradient,
                     color: "#fff",
                     flexShrink: 0,
+                    boxShadow: `0 4px 14px rgba(0,0,0,0.14)`,
                   }}
                 >
                   {opt.icon}
@@ -173,15 +227,18 @@ const RoleSelectStep = () => {
                   <Text strong style={{ fontSize: 15, color: token.colorText }}>
                     {opt.label}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: 13, lineHeight: 1.5 }}>
+                  <Text type="secondary" style={{ fontSize: 13, lineHeight: 1.55 }}>
                     {opt.description}
                   </Text>
                 </Flex>
 
                 {/* ✨ arrow */}
-                <Text style={{ color: token.colorTextTertiary, fontSize: 18 }}>
+                <span
+                  className="signup-role-arrow"
+                  style={{ color: token.colorTextTertiary, fontSize: 18, lineHeight: 1 }}
+                >
                   →
-                </Text>
+                </span>
               </Flex>
             </button>
           ))}
@@ -215,9 +272,7 @@ const DetailsFormStep = () => {
         last_name: values.lastName,
         role: role!,
       };
-
       await requestSignup(payload);
-
       showModal(
         "success",
         "ตรวจสอบอีเมลของคุณ",
@@ -250,194 +305,203 @@ const DetailsFormStep = () => {
         confirmLabel="ตกลง"
       />
 
-      <Col xs={24} md={15} style={{ padding: "40px 48px" }}>
-        <Flex vertical gap={24}>
-          {/* ✨ back + header */}
-          <Flex vertical gap={4}>
-            <button
-              onClick={() => setStep(1)}
-              style={{
-                all: "unset",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                color: token.colorTextTertiary,
-                fontSize: 13,
-                marginBottom: 8,
-                width: "fit-content",
-              }}
-            >
-              <ArrowLeftOutlined />
-              เปลี่ยนประเภทบัญชี
-            </button>
+      <Col
+        xs={24}
+        md={15}
+        className="signup-step-2"
+        style={{ padding: "40px 48px" }}
+      >
+        <Flex vertical gap={20}>
+          {/* ✨ back button */}
+          <button
+            onClick={() => setStep(1)}
+            className="signup-back-btn"
+            style={{
+              all: "unset",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              color: token.colorTextTertiary,
+              fontSize: 13,
+              width: "fit-content",
+            }}
+          >
+            <ArrowLeftOutlined />
+            เปลี่ยนประเภทบัญชี
+          </button>
 
-            <Flex align="center" gap={10}>
-              {/* ✨ role badge */}
+          {/* ✨ header */}
+          <Flex vertical gap={10}>
+            <Flex align="center" gap={12}>
               {selectedRole && (
-                <Flex
-                  align="center"
-                  justify="center"
+                <div
                   style={{
-                    width: 36,
-                    height: 36,
+                    width: 38,
+                    height: 38,
                     borderRadius: 10,
                     background: selectedRole.gradient,
                     color: "#fff",
                     fontSize: 16,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     flexShrink: 0,
+                    boxShadow: `0 4px 14px rgba(0,0,0,0.14)`,
                   }}
                 >
                   {selectedRole.icon}
-                </Flex>
+                </div>
               )}
               <Title level={3} style={{ margin: 0 }}>
-                สร้างบัญชี{selectedRole?.label ? ` — ${selectedRole.label}` : ""}
+                สร้างบัญชี
+                {selectedRole?.label ? (
+                  <span style={{ color: token.colorPrimary }}>
+                    {" "}— {selectedRole.label}
+                  </span>
+                ) : null}
               </Title>
             </Flex>
 
-            <Flex align="center" gap={8}>
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  color: token.colorTextTertiary,
-                }}
+            {/* ✨ progress */}
+            <StepProgressBar step={2} />
+
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              มีบัญชีอยู่แล้ว?{" "}
+              <Link
+                href="/pages/signin"
+                className="transition-opacity hover:opacity-70"
+                style={{ fontWeight: 600, color: token.colorPrimary }}
               >
-                ขั้นตอนที่ 2 / 2
-              </Text>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                มีบัญชีอยู่แล้ว?{" "}
-                <Link
-                  href="/pages/signin"
-                  style={{ fontWeight: 600, color: token.colorPrimary }}
-                >
-                  เข้าสู่ระบบ
-                </Link>
-              </Text>
-            </Flex>
+                เข้าสู่ระบบ
+              </Link>
+            </Text>
           </Flex>
 
+          {/* ✨ form */}
           <Form form={form} layout="vertical" onFinish={onFinish} size="large">
-            {/* ชื่อ - นามสกุล */}
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="firstName"
-                  label="ชื่อ"
-                  rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
-                >
-                  <Input
-                    prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="ชื่อของคุณ"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="lastName"
-                  label="นามสกุล"
-                  rules={[{ required: true, message: "กรุณาระบุนามสกุล" }]}
-                >
-                  <Input
-                    prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="นามสกุลของคุณ"
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
+            <div className="signup-field">
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="firstName"
+                    label="ชื่อ"
+                    rules={[{ required: true, message: "กรุณาระบุชื่อ" }]}
+                  >
+                    <Input
+                      prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                      placeholder="ชื่อของคุณ"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="lastName"
+                    label="นามสกุล"
+                    rules={[{ required: true, message: "กรุณาระบุนามสกุล" }]}
+                  >
+                    <Input
+                      prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
+                      placeholder="นามสกุลของคุณ"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-            <Divider style={{ margin: "4px 0 20px" }}>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                อีเมลและรหัสผ่าน
-              </Text>
-            </Divider>
+            <div className="signup-field">
+              <Divider style={{ margin: "4px 0 20px" }}>
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  อีเมลและรหัสผ่าน
+                </Text>
+              </Divider>
+            </div>
 
-            {/* Email */}
-            <Form.Item
-              name="email"
-              label="อีเมล"
-              rules={[
-                { required: true, message: "กรุณาระบุอีเมล" },
-                { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง" },
-              ]}
-            >
-              <Input
-                prefix={<MailOutlined style={{ color: token.colorPrimary }} />}
-                placeholder="example@email.com"
-              />
-            </Form.Item>
+            <div className="signup-field">
+              <Form.Item
+                name="email"
+                label="อีเมล"
+                rules={[
+                  { required: true, message: "กรุณาระบุอีเมล" },
+                  { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง" },
+                ]}
+              >
+                <Input
+                  prefix={<MailOutlined style={{ color: token.colorPrimary }} />}
+                  placeholder="example@email.com"
+                />
+              </Form.Item>
+            </div>
 
-            {/* Password */}
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="password"
-                  label="รหัสผ่าน"
-                  rules={[
-                    { required: true, message: "กรุณาระบุรหัสผ่าน" },
-                    { min: 8, message: "อย่างน้อย 8 ตัวอักษร" },
-                  ]}
-                >
-                  <Input.Password
-                    prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="อย่างน้อย 8 ตัวอักษร"
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="confirm"
-                  label="ยืนยันรหัสผ่าน"
-                  dependencies={["password"]}
-                  rules={[
-                    { required: true, message: "กรุณายืนยันรหัสผ่าน" },
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        if (!value || getFieldValue("password") === value)
-                          return Promise.resolve();
-                        return Promise.reject(new Error("รหัสผ่านไม่ตรงกัน"));
-                      },
-                    }),
-                  ]}
-                >
-                  <Input.Password
-                    prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
-                    placeholder="กรอกรหัสผ่านอีกครั้ง"
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
+            <div className="signup-field">
+              <Row gutter={16}>
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    name="password"
+                    label="รหัสผ่าน"
+                    rules={[
+                      { required: true, message: "กรุณาระบุรหัสผ่าน" },
+                      { min: 8, message: "อย่างน้อย 8 ตัวอักษร" },
+                    ]}
+                  >
+                    <Input.Password
+                      prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                      placeholder="อย่างน้อย 8 ตัวอักษร"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    name="confirm"
+                    label="ยืนยันรหัสผ่าน"
+                    dependencies={["password"]}
+                    rules={[
+                      { required: true, message: "กรุณายืนยันรหัสผ่าน" },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value)
+                            return Promise.resolve();
+                          return Promise.reject(new Error("รหัสผ่านไม่ตรงกัน"));
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password
+                      prefix={<LockOutlined style={{ color: token.colorPrimary }} />}
+                      placeholder="กรอกรหัสผ่านอีกครั้ง"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
-            {/* Agreement */}
-            <Form.Item
-              name="agreement"
-              valuePropName="checked"
-              rules={[
-                {
-                  validator: (_, value) =>
-                    value
-                      ? Promise.resolve()
-                      : Promise.reject(new Error("กรุณายอมรับข้อกำหนดและนโยบาย")),
-                },
-              ]}
-              style={{ marginBottom: 20 }}
-            >
-              <Checkbox style={{ fontSize: 13 }}>
-                ฉันยอมรับ{" "}
-                <Link href="/terms" style={{ color: token.colorPrimary, fontWeight: 600 }}>
-                  ข้อกำหนดการใช้บริการ
-                </Link>{" "}
-                และ{" "}
-                <Link href="/privacy" style={{ color: token.colorPrimary, fontWeight: 600 }}>
-                  นโยบายความเป็นส่วนตัว
-                </Link>
-              </Checkbox>
-            </Form.Item>
+            <div className="signup-field">
+              <Form.Item
+                name="agreement"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value
+                        ? Promise.resolve()
+                        : Promise.reject(new Error("กรุณายอมรับข้อกำหนดและนโยบาย")),
+                  },
+                ]}
+                style={{ marginBottom: 20 }}
+              >
+                <Checkbox style={{ fontSize: 13 }}>
+                  ฉันยอมรับ{" "}
+                  <Link href="/terms" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                    ข้อกำหนดการใช้บริการ
+                  </Link>{" "}
+                  และ{" "}
+                  <Link href="/privacy" style={{ color: token.colorPrimary, fontWeight: 600 }}>
+                    นโยบายความเป็นส่วนตัว
+                  </Link>
+                </Checkbox>
+              </Form.Item>
+            </div>
 
-            {/* Submit */}
             <Form.Item style={{ marginBottom: 0 }}>
               <Button
                 type="primary"
@@ -445,6 +509,7 @@ const DetailsFormStep = () => {
                 block
                 loading={isLoading}
                 size="large"
+                className="signup-submit-btn"
                 style={{
                   height: 52,
                   borderRadius: 10,
