@@ -128,30 +128,32 @@ const InfoItem: React.FC<{
 // ─── SectionTitle ─────────────────────────────────────────────────────────────
 const SectionTitle: React.FC<{
   icon: React.ReactNode;
-  color: string;
   text: string;
-}> = ({ icon, color, text }) => (
-  <Flex align="center" gap={10} style={{ marginBottom: 16 }}>
-    <Flex
-      align="center"
-      justify="center"
-      style={{
-        background: color,
-        width: 36,
-        height: 36,
-        borderRadius: 8,
-        color: "white",
-        fontSize: 16,
-        flexShrink: 0,
-      }}
-    >
-      {icon}
+}> = ({ icon, text }) => {
+  const { token } = theme.useToken();
+  return (
+    <Flex align="center" gap={10} style={{ marginBottom: 16 }}>
+      <Flex
+        align="center"
+        justify="center"
+        style={{
+          background: token.colorFillTertiary,
+          width: 32,
+          height: 32,
+          borderRadius: 8,
+          color: token.colorTextSecondary,
+          fontSize: 15,
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </Flex>
+      <Title level={5} style={{ margin: 0, fontWeight: 600 }}>
+        {text}
+      </Title>
     </Flex>
-    <Title level={4} style={{ margin: 0 }}>
-      {text}
-    </Title>
-  </Flex>
-);
+  );
+};
 
 interface SchoolInfoTabProps {
   profile: SchoolProfile;
@@ -190,11 +192,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
       {/* ─── เกี่ยวกับเรา + วิสัยทัศน์ ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle
-          icon={<SafetyCertificateOutlined />}
-          color={token.colorPrimary}
-          text="เกี่ยวกับเรา"
-        />
+        <SectionTitle icon={<SafetyCertificateOutlined />} text="เกี่ยวกับเรา" />
         {profile.description ? (
           <Paragraph style={{ fontSize: 15, lineHeight: 1.9, marginBottom: 0 }}>
             {profile.description}
@@ -214,11 +212,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
           }}
         />
 
-        <SectionTitle
-          icon={<ThunderboltOutlined />}
-          color={token.colorPrimary}
-          text="วิสัยทัศน์"
-        />
+        <SectionTitle icon={<ThunderboltOutlined />} text="วิสัยทัศน์" />
         {profile.vision ? (
           <div
             style={{
@@ -249,11 +243,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
       {/* ─── สวัสดิการ ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle
-          icon={<MedicineBoxOutlined />}
-          color={token.colorPrimary}
-          text="สวัสดิการและจุดเด่น"
-        />
+        <SectionTitle icon={<MedicineBoxOutlined />} text="สวัสดิการและจุดเด่น" />
         {hasBenefits ? (
           <Row gutter={[16, 8]}>
             {profile.benefits!.map((benefit) => (
@@ -277,11 +267,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
       {/* ─── ข้อมูลเพิ่มเติม ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle
-          icon={<InfoCircleOutlined />}
-          color={token.colorPrimary}
-          text="ข้อมูลเพิ่มเติม"
-        />
+        <SectionTitle icon={<InfoCircleOutlined />} text="ข้อมูลเพิ่มเติม" />
         <Row gutter={[16, 16]}>
           {profile.type && (
             <Col xs={24} sm={12}>
@@ -359,11 +345,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
       {/* ─── ที่ตั้งโรงเรียน ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle
-          icon={<EnvironmentOutlined />}
-          color={token.colorPrimary}
-          text="ที่ตั้งโรงเรียน"
-        />
+        <SectionTitle icon={<EnvironmentOutlined />} text="ที่ตั้งโรงเรียน" />
         <Row gutter={[16, 16]}>
           <Col span={24}>
             {profile.address ? (

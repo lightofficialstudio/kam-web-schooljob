@@ -1,10 +1,9 @@
 "use client";
 
 // ✨ [Orchestrator] Admin Config Page — จัดการตัวเลือก Dropdown ในระบบ
-import { SummaryCard } from "@/app/components/card/summary-card.component";
 import { ModalComponent } from "@/app/components/modal/modal.component";
 import { PlusOutlined, SettingOutlined } from "@ant-design/icons";
-import { Button, Col, Flex, Row, Typography, theme } from "antd";
+import { Button, Col, Row, Typography, theme } from "antd";
 import { useEffect } from "react";
 import { AddOptionModal } from "./_components/add-option-modal";
 import { ConfigTable } from "./_components/config-table";
@@ -14,6 +13,9 @@ import {
   getAllGroups,
   useConfigStore,
 } from "./_state/config-store";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
+import { SummaryCard } from "@/app/components/admin/card/summary-card.component";
 
 const { Title, Text } = Typography;
 
@@ -38,47 +40,37 @@ export default function AdminConfigPage() {
   const allGroups = getAllGroups(options);
 
   return (
-    <>
-      <Flex vertical gap={24}>
-        {/* ─── Header ─── */}
-        <Flex align="center" justify="space-between">
-          <Flex align="center" gap={12}>
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: token.colorPrimaryBg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <SettingOutlined
-                style={{ color: token.colorPrimary, fontSize: 18 }}
-              />
-            </div>
-            <Flex vertical gap={0}>
-              <Title level={4} style={{ margin: 0 }}>
-                จัดการตัวเลือก Dropdown
-              </Title>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                ประเภทโรงเรียน, ระดับชั้น, หมวดหมู่งาน และอื่นๆ
-                ที่แสดงในฟอร์มระบบ
-              </Text>
-            </Flex>
-          </Flex>
+    <div style={{ padding: "24px 24px 48px", minHeight: "100vh", background: token.colorBgLayout }}>
+      {/* 1. Breadcrumb */}
+      <AdminBreadcrumb
+        items={[
+          { title: "แดชบอร์ด", path: "/pages/admin/dashboard" },
+          { title: "จัดการตัวเลือกระบบ" }
+        ]}
+      />
+
+      {/* 2. Header */}
+      <AdminHeader
+        title="จัดการตัวเลือกระบบ (System Configuration)"
+        description="ปรับแต่งประเภทโรงเรียน, ระดับชั้น และหมวดหมู่งานที่แสดงในระบบ"
+        icon={<SettingOutlined style={{ fontSize: 22, color: "#fff" }} />}
+        style={{ marginBottom: 24 }}
+        action={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => openAddModal()}
+            style={{ fontWeight: 600, borderRadius: 10 }}
           >
             เพิ่มตัวเลือก
           </Button>
-        </Flex>
+        }
+      />
 
-        {/* ─── Summary Cards — แสดงสถิติและคลิกเพื่อสลับ group ─── */}
-        <Row gutter={[16, 16]}>
+      {/* ─── Main Content ─── */}
+      <div style={{ position: "relative" }}>
+        {/* 3. Summary Cards — แสดงสถิติและคลิกเพื่อสลับ group ─── */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {allGroups.map((g) => {
             const count = options.filter((o) => o.group === g).length;
             const activeCount = options.filter(
@@ -92,7 +84,8 @@ export default function AdminConfigPage() {
                     outline: isSelected
                       ? `2px solid ${token.colorPrimary}`
                       : "2px solid transparent",
-                    borderRadius: 16,
+                    outlineOffset: 1,
+                    borderRadius: 15,
                     transition: "outline-color 0.2s",
                   }}
                 >
@@ -112,9 +105,9 @@ export default function AdminConfigPage() {
           })}
         </Row>
 
-        {/* ─── Table ─── */}
+        {/* 4. Content (Table) */}
         <ConfigTable />
-      </Flex>
+      </div>
 
       {/* ─── Modals ─── */}
       <AddOptionModal />
@@ -131,6 +124,6 @@ export default function AdminConfigPage() {
         confirmLabel={modal.confirmLabel}
         cancelLabel={modal.cancelLabel}
       />
-    </>
+    </div>
   );
 }
