@@ -62,11 +62,11 @@ interface AppNotification {
 // ✨ แปลง type → icon emoji
 const NOTIF_ICON: Record<string, string> = {
   application_submitted: "📋",
-  application_status:    "✅",
-  invite_sent:           "✉️",
-  invite_accepted:       "🎉",
-  job_posted:            "💼",
-  system:                "📣",
+  application_status: "✅",
+  invite_sent: "✉️",
+  invite_accepted: "🎉",
+  job_posted: "💼",
+  system: "📣",
 };
 
 export default function Navbar() {
@@ -79,11 +79,13 @@ export default function Navbar() {
   // ✨ [ตรวจสอบ scroll position เพื่อเปลี่ยนเป็น Floating Pill Navbar]
   const [scrolled, setScrolled] = useState(false);
   // ✨ [Delegated schools จาก DB]
-  const [delegatedSchools, setDelegatedSchools] = useState<DelegatedSchool[]>([]);
+  const [delegatedSchools, setDelegatedSchools] = useState<DelegatedSchool[]>(
+    [],
+  );
   // ✨ [Notifications]
-  const [notifications, setNotifications]       = useState<AppNotification[]>([]);
-  const [unreadCount, setUnreadCount]            = useState(0);
-  const [notifOpen, setNotifOpen]                = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -101,16 +103,19 @@ export default function Navbar() {
           setDelegatedSchools(res.data.data);
         }
       })
-      .catch(() => {/* ไม่แสดง error บน Navbar */});
+      .catch(() => {
+        /* ไม่แสดง error บน Navbar */
+      });
   }, [user?.user_id, user?.role]);
 
   // ✨ ดึง notifications + unread count — เฉพาะเมื่อ login แล้ว
   const fetchNotifications = () => {
     if (!user?.user_id) return;
     axios
-      .get<{ status_code: number; data: { notifications: AppNotification[]; unreadCount: number } }>(
-        `/api/v1/notifications/read?user_id=${user.user_id}`,
-      )
+      .get<{
+        status_code: number;
+        data: { notifications: AppNotification[]; unreadCount: number };
+      }>(`/api/v1/notifications/read?user_id=${user.user_id}`)
       .then((res) => {
         if (res.data.status_code === 200) {
           setNotifications(res.data.data.notifications);
@@ -125,7 +130,7 @@ export default function Navbar() {
     // ✨ polling ทุก 30 วินาทีเพื่ออัปเดต badge โดยไม่ต้อง refresh
     const interval = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.user_id]);
 
   // ✨ mark อ่านแล้ว + refresh list
@@ -162,13 +167,22 @@ export default function Navbar() {
       <Flex
         align="center"
         justify="space-between"
-        style={{ padding: "14px 16px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}
+        style={{
+          padding: "14px 16px",
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+        }}
       >
         <Flex align="center" gap={8}>
           <BellOutlined style={{ color: token.colorPrimary, fontSize: 15 }} />
-          <Text strong style={{ fontSize: 14 }}>การแจ้งเตือน</Text>
+          <Text strong style={{ fontSize: 14 }}>
+            การแจ้งเตือน
+          </Text>
           {unreadCount > 0 && (
-            <Badge count={unreadCount} size="small" color={token.colorPrimary} />
+            <Badge
+              count={unreadCount}
+              size="small"
+              color={token.colorPrimary}
+            />
           )}
         </Flex>
         {unreadCount > 0 && (
@@ -177,7 +191,11 @@ export default function Navbar() {
             size="small"
             icon={<CheckOutlined />}
             onClick={handleMarkAllRead}
-            style={{ fontSize: 12, padding: 0, color: token.colorTextSecondary }}
+            style={{
+              fontSize: 12,
+              padding: 0,
+              color: token.colorTextSecondary,
+            }}
           >
             อ่านทั้งหมด
           </Button>
@@ -187,15 +205,27 @@ export default function Navbar() {
       {/* List */}
       <div style={{ maxHeight: 360, overflowY: "auto" }}>
         {notifications.length === 0 ? (
-          <Flex vertical align="center" justify="center" style={{ padding: "40px 0" }} gap={8}>
-            <BellOutlined style={{ fontSize: 28, color: token.colorTextQuaternary }} />
-            <Text type="secondary" style={{ fontSize: 13 }}>ยังไม่มีการแจ้งเตือน</Text>
+          <Flex
+            vertical
+            align="center"
+            justify="center"
+            style={{ padding: "40px 0" }}
+            gap={8}
+          >
+            <BellOutlined
+              style={{ fontSize: 28, color: token.colorTextQuaternary }}
+            />
+            <Text type="secondary" style={{ fontSize: 13 }}>
+              ยังไม่มีการแจ้งเตือน
+            </Text>
           </Flex>
         ) : (
           notifications.map((n) => (
             <div
               key={n.id}
-              onClick={() => { if (!n.isRead) handleMarkRead(n.id); }}
+              onClick={() => {
+                if (!n.isRead) handleMarkRead(n.id);
+              }}
               style={{
                 padding: "12px 16px",
                 borderBottom: `1px solid ${token.colorBorderSecondary}`,
@@ -210,7 +240,9 @@ export default function Navbar() {
                     width: 36,
                     height: 36,
                     borderRadius: 10,
-                    backgroundColor: n.isRead ? token.colorBgLayout : token.colorPrimaryBg,
+                    backgroundColor: n.isRead
+                      ? token.colorBgLayout
+                      : token.colorPrimaryBg,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -224,21 +256,42 @@ export default function Navbar() {
                   <Flex align="center" justify="space-between" gap={4}>
                     <Text
                       strong={!n.isRead}
-                      style={{ fontSize: 13, color: n.isRead ? token.colorTextSecondary : token.colorText }}
+                      style={{
+                        fontSize: 13,
+                        color: n.isRead
+                          ? token.colorTextSecondary
+                          : token.colorText,
+                      }}
                     >
                       {n.title}
                     </Text>
                     {!n.isRead && (
-                      <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: token.colorPrimary, flexShrink: 0 }} />
+                      <div
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          backgroundColor: token.colorPrimary,
+                          flexShrink: 0,
+                        }}
+                      />
                     )}
                   </Flex>
                   {n.message && (
-                    <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.5 }}>
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 12, lineHeight: 1.5 }}
+                    >
                       {n.message}
                     </Text>
                   )}
                   <Text type="secondary" style={{ fontSize: 11, marginTop: 2 }}>
-                    {new Date(n.createdAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    {new Date(n.createdAt).toLocaleDateString("th-TH", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </Text>
                 </Flex>
               </Flex>
@@ -315,10 +368,17 @@ export default function Navbar() {
       type: "group" as const,
       label: (
         <Flex align="center" gap={6}>
-          <SwapOutlined style={{ color: token.colorTextSecondary, fontSize: 12 }} />
+          <SwapOutlined
+            style={{ color: token.colorTextSecondary, fontSize: 12 }}
+          />
           <Text
             type="secondary"
-            style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
           >
             เข้าถึงในฐานะ
           </Text>
@@ -338,7 +398,8 @@ export default function Navbar() {
                 flexShrink: 0,
               }}
             >
-              {!item.schoolProfile.logoUrl && item.schoolProfile.schoolName?.charAt(0)}
+              {!item.schoolProfile.logoUrl &&
+                item.schoolProfile.schoolName?.charAt(0)}
             </Avatar>
             <Flex vertical gap={1}>
               <Text style={{ fontSize: 13, fontWeight: 500 }}>
@@ -688,7 +749,8 @@ export default function Navbar() {
                     src={user.profile_image_url || undefined}
                     style={{ backgroundColor: token.colorPrimary }}
                   >
-                    {!user.profile_image_url && user.full_name.charAt(0).toUpperCase()}
+                    {!user.profile_image_url &&
+                      user.full_name.charAt(0).toUpperCase()}
                   </Avatar>
                   <Flex vertical gap={0}>
                     <Text strong style={{ fontSize: 13 }}>
@@ -697,7 +759,7 @@ export default function Navbar() {
                     {/* ✨ EMPLOYER: แสดงชื่อโรงเรียน / EMPLOYEE: แสดง role / ADMIN: ผู้ดูแลระบบ */}
                     <Text type="secondary" style={{ fontSize: 11 }}>
                       {user.role === "EMPLOYER"
-                        ? (user.school_name || "โรงเรียน")
+                        ? user.school_name || "โรงเรียน"
                         : user.role === "EMPLOYEE"
                           ? delegatedSchools.length > 0
                             ? delegatedSchools[0].schoolProfile.schoolName
@@ -719,7 +781,8 @@ export default function Navbar() {
                     flexShrink: 0,
                   }}
                 >
-                  {!user.profile_image_url && user.full_name.charAt(0).toUpperCase()}
+                  {!user.profile_image_url &&
+                    user.full_name.charAt(0).toUpperCase()}
                 </Avatar>
               )}
 
@@ -768,7 +831,7 @@ export default function Navbar() {
                     transition: "all 0.4s ease",
                   }}
                 >
-                  สมัครงานครู
+                  สมัครสมาชิก
                 </Button>
               </Link>
             </>
