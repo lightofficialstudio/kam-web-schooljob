@@ -1,14 +1,8 @@
 "use client";
 
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { useAuthStore } from "@/app/stores/auth-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
-import {
-  CheckCircleFilled,
-  CloseCircleFilled,
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -19,7 +13,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Modal,
   Row,
   Select,
   Space,
@@ -31,7 +24,7 @@ import { EducationEntry, useProfileStore } from "../_stores/profile-store";
 
 const { Title, Text } = Typography;
 
-// [Fix #1] ปรับ Dropdown ให้ตรงตาม Requirement ครบทุก Option
+// ✨ ตัวเลือกระดับการศึกษา
 const EDUCATION_LEVELS = [
   { value: "ต่ำกว่ามัธยมศึกษา", label: "ต่ำกว่ามัธยมศึกษา" },
   { value: "มัธยมศึกษาตอนต้น", label: "มัธยมศึกษาตอนต้น" },
@@ -46,46 +39,52 @@ const EDUCATION_LEVELS = [
 ];
 
 const MAX_EDUCATIONS = 3;
-
-// ปีพุทธศักราชต่ำสุดและสูงสุดที่ยอมรับ
 const YEAR_MIN = 2500;
-const YEAR_MAX = new Date().getFullYear() + 543; // ปัจจุบัน พ.ศ.
+const YEAR_MAX = new Date().getFullYear() + 543;
+
+// ✨ โครงสร้าง local modal state
+interface ModalState {
+  open: boolean;
+  type: "success" | "error" | "confirm" | "delete";
+  title: string;
+  description: string;
+  errorDetails?: unknown;
+  loading?: boolean;
+}
+
+const MODAL_CLOSED: ModalState = { open: false, type: "success", title: "", description: "" };
 
 export const EducationHistorySection: React.FC = () => {
   const { token } = antTheme.useToken();
   const [form] = Form.useForm();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const {
-    profile,
-    addEducation,
-    updateEducation,
-    removeEducation,
-    saveProfile,
-    isSaving,
-  } = useProfileStore();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [modal, setModal] = useState<ModalState>(MODAL_CLOSED);
+  // ✨ เก็บ index ที่รอการยืนยันลบ
+  const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
+
+  const { profile, addEducation, updateEducation, removeEducation, saveProfile, isSaving } = useProfileStore();
   const { user } = useAuthStore();
-  const { openNotification } = useNotificationModalStore();
 
   const educations = profile.educations || [];
+  const closeModal = () => setModal(MODAL_CLOSED);
 
-  // [Fix #3] ตรวจสอบจำนวนก่อนเปิด Drawer เพิ่มใหม่
+  // ✨ ตรวจสอบจำนวนก่อนเปิด Drawer
   const handleAddNew = () => {
     if (educations.length >= MAX_EDUCATIONS) {
-      openNotification({
+      setModal({
+        open: true,
         type: "error",
-        mainTitle: "ไม่สามารถเพิ่มได้",
-        description: `สามารถเพิ่มประวัติการศึกษาได้สูงสุด ${MAX_EDUCATIONS} รายการ`,
-        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
+        title: "ไม่สามารถเพิ่มได้",
+        description: `สามารถเพิ่มประวัติการศึกษาได้สูงสุด ${MAX_EDUCATIONS} รายการเท่านั้น กรุณาลบรายการเก่าออกก่อนเพิ่มใหม่`,
       });
       return;
     }
     form.resetFields();
     setEditingIndex(null);
-    setIsAddingNew(true);
+    setIsDrawerOpen(true);
   };
 
-  // เปิด Drawer สำหรับแก้ไข พร้อม set ค่าเดิมลงฟอร์ม
   const handleEdit = (index: number) => {
     const education = educations[index];
     form.setFieldsValue({
@@ -96,300 +95,332 @@ export const EducationHistorySection: React.FC = () => {
       gpa: education.gpa,
     });
     setEditingIndex(index);
-    setIsAddingNew(true);
+    setIsDrawerOpen(true);
   };
 
-  // [Fix #4] handleSave เรียก updateEducation จริงๆ เมื่อเป็น Edit mode
+  // ✨ บันทึก — ครอบ try/catch ทุกกรณี
   const handleSave = async () => {
+    // ✨ validate form fields ก่อน — ถ้า fail AntD จะแสดง inline error เองอยู่แล้ว
+    let values: ReturnType<typeof form.getFieldsValue>;
     try {
-      const values = await form.validateFields();
+      values = await form.validateFields();
+    } catch {
+      return;
+    }
 
-      const entry: EducationEntry = {
-        level: values.level,
-        institution: values.institution,
-        major: values.major,
-        graduationYear: values.graduationYear,
-        gpa: values.gpa,
-      };
+    const entry: EducationEntry = {
+      level: values.level,
+      institution: values.institution,
+      major: values.major,
+      graduationYear: values.graduationYear,
+      gpa: values.gpa,
+    };
 
+    try {
       if (editingIndex !== null) {
-        // ✨ เก็บ id เดิมไว้เพื่อให้ backend รู้ว่า update record ไหน
         const existingId = profile.educations?.[editingIndex]?.id;
         updateEducation(editingIndex, { ...entry, id: existingId });
       } else {
         addEducation(entry);
       }
 
-      // ✨ บันทึกลง DB ทันที — saveProfile อ่านค่าจาก store ที่อัปเดตแล้ว
-      if (user?.user_id) {
-        await saveProfile(user.user_id);
+      if (!user?.user_id) {
+        setModal({
+          open: true,
+          type: "error",
+          title: "ไม่พบข้อมูลผู้ใช้",
+          description: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
+        });
+        return;
       }
 
-      openNotification({
+      await saveProfile(user.user_id);
+
+      setModal({
+        open: true,
         type: "success",
-        mainTitle:
-          editingIndex !== null ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มข้อมูลสำเร็จ",
+        title: editingIndex !== null ? "อัปเดตข้อมูลสำเร็จ" : "เพิ่มข้อมูลสำเร็จ",
         description: "ข้อมูลการศึกษาถูกบันทึกลงฐานข้อมูลเรียบร้อยแล้ว",
-        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
       });
 
       form.resetFields();
-      setIsAddingNew(false);
+      setIsDrawerOpen(false);
       setEditingIndex(null);
-    } catch (error) {
-      openNotification({
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
+      const description =
+        axiosErr?.response?.data?.message_th ||
+        axiosErr?.message ||
+        "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ กรุณาลองใหม่อีกครั้ง";
+      setModal({
+        open: true,
         type: "error",
-        mainTitle: "เกิดข้อผิดพลาด",
-        description: "กรุณาตรวจสอบข้อมูลให้ถูกต้อง",
-        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
+        title: "บันทึกข้อมูลไม่สำเร็จ",
+        description,
+        errorDetails: err,
       });
     }
   };
 
-  const handleCancel = () => {
+  const handleDrawerClose = () => {
     form.resetFields();
-    setIsAddingNew(false);
+    setIsDrawerOpen(false);
     setEditingIndex(null);
   };
 
-  const handleDelete = (index: number) => {
-    Modal.confirm({
-      title: "ลบข้อมูล",
-      content: "คุณแน่ใจว่าต้องการลบข้อมูลนี้?",
-      okText: "ลบ",
-      cancelText: "ยกเลิก",
-      okButtonProps: { danger: true },
-      async onOk() {
-        removeEducation(index);
-        // ✨ บันทึกลง DB ทันทีหลังลบรายการ
-        if (user?.user_id) {
-          await saveProfile(user.user_id);
-        }
-        openNotification({
-          type: "success",
-          mainTitle: "ลบข้อมูลสำเร็จ",
-          description: "ข้อมูลการศึกษาถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว",
-          icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
-        });
-      },
+  // ✨ เปิด confirm modal แทน Modal.confirm เดิม
+  const handleDeleteRequest = (index: number) => {
+    const edu = educations[index];
+    setPendingDeleteIndex(index);
+    setModal({
+      open: true,
+      type: "confirm",
+      title: "ยืนยันการลบ",
+      description: `ต้องการลบข้อมูลการศึกษาระดับ "${edu.level}" จาก ${edu.institution} ออกจากโปรไฟล์? การกระทำนี้ไม่สามารถย้อนกลับได้`,
     });
   };
 
+  // ✨ callback เมื่อกด "ยืนยัน" บน confirm modal
+  const handleDeleteConfirm = async () => {
+    if (pendingDeleteIndex === null) return;
+    setModal((prev) => ({ ...prev, loading: true }));
+    try {
+      removeEducation(pendingDeleteIndex);
+      if (!user?.user_id) throw new Error("ไม่พบข้อมูลผู้ใช้");
+      await saveProfile(user.user_id);
+      setModal({
+        open: true,
+        type: "success",
+        title: "ลบข้อมูลสำเร็จ",
+        description: "ข้อมูลการศึกษาถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว",
+      });
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
+      const description =
+        axiosErr?.response?.data?.message_th ||
+        axiosErr?.message ||
+        "เกิดข้อผิดพลาดขณะลบข้อมูล กรุณาลองใหม่อีกครั้ง";
+      setModal({
+        open: true,
+        type: "error",
+        title: "ลบข้อมูลไม่สำเร็จ",
+        description,
+        errorDetails: err,
+      });
+    } finally {
+      setPendingDeleteIndex(null);
+    }
+  };
+
   return (
-    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
-      {/* 1. Add/Edit Drawer */}
-      <Drawer
-        open={isAddingNew}
-        onClose={handleCancel}
-        size="large"
-        title={
-          <Title level={4} style={{ margin: 0 }}>
-            {editingIndex !== null
-              ? "แก้ไขข้อมูลการศึกษา"
-              : "เพิ่มข้อมูลการศึกษา"}
-          </Title>
-        }
-        placement="right"
-        footer={
-          <Flex justify="end" gap={12} style={{ padding: "8px 0" }}>
-            <Button
-              onClick={handleCancel}
-              size="large"
-              style={{ minWidth: 100 }}
+    <>
+      {/* ✨ Modal กลาง — ทุก state รายงานผ่านนี้ */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        loading={modal.loading}
+        onClose={closeModal}
+        onConfirm={modal.type === "confirm" ? handleDeleteConfirm : undefined}
+        confirmLabel={modal.type === "confirm" ? "ยืนยันลบ" : "ตกลง"}
+        cancelLabel="ยกเลิก"
+      />
+
+      <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+        {/* 1. Add/Edit Drawer */}
+        <Drawer
+          open={isDrawerOpen}
+          onClose={handleDrawerClose}
+          size="large"
+          title={
+            <Title level={4} style={{ margin: 0 }}>
+              {editingIndex !== null ? "แก้ไขข้อมูลการศึกษา" : "เพิ่มข้อมูลการศึกษา"}
+            </Title>
+          }
+          placement="right"
+          footer={
+            <Flex justify="end" gap={12} style={{ padding: "8px 0" }}>
+              <Button onClick={handleDrawerClose} size="large" style={{ minWidth: 100 }}>
+                ยกเลิก
+              </Button>
+              <Button
+                type="primary"
+                onClick={handleSave}
+                size="large"
+                loading={isSaving}
+                style={{ minWidth: 100 }}
+              >
+                บันทึก
+              </Button>
+            </Flex>
+          }
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item
+              label="ระดับการศึกษา"
+              name="level"
+              rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
             >
-              ยกเลิก
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleSave}
-              size="large"
-              loading={isSaving}
-              style={{ minWidth: 100 }}
+              <Select options={EDUCATION_LEVELS} placeholder="เลือกระดับการศึกษา" size="large" />
+            </Form.Item>
+
+            <Form.Item
+              label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
+              name="institution"
+              rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
             >
-              บันทึก
-            </Button>
-          </Flex>
-        }
-      >
-        <Form form={form} layout="vertical">
-          {/* [Fix #1] Dropdown ครบตาม Requirement */}
-          <Form.Item
-            label="ระดับการศึกษา"
-            name="level"
-            rules={[{ required: true, message: "กรุณาเลือกระดับการศึกษา" }]}
-          >
-            <Select
-              options={EDUCATION_LEVELS}
-              placeholder="เลือกระดับการศึกษา"
-              size="large"
-            />
-          </Form.Item>
+              <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
+            </Form.Item>
 
-          <Form.Item
-            label="สถาบัน / โรงเรียน / มหาวิทยาลัย"
-            name="institution"
-            rules={[{ required: true, message: "กรุณากรอกสถาบัน" }]}
-          >
-            <Input placeholder="เช่น มหาวิทยาลัยจุฬาลงกรณ์" size="large" />
-          </Form.Item>
-
-          <Form.Item
-            label="สาขาวิชา"
-            name="major"
-            rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
-          >
-            <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" size="large" />
-          </Form.Item>
-
-          {/* [Fix #2] เพิ่ม field ปีที่สำเร็จการศึกษา (พ.ศ.) */}
-          <Form.Item
-            label="ปีที่สำเร็จการศึกษา (พ.ศ.)"
-            name="graduationYear"
-            rules={[
-              { required: true, message: "กรุณากรอกปีที่สำเร็จการศึกษา" },
-              {
-                type: "number",
-                min: YEAR_MIN,
-                max: YEAR_MAX,
-                message: `กรุณากรอกปี พ.ศ. ระหว่าง ${YEAR_MIN} - ${YEAR_MAX}`,
-              },
-            ]}
-          >
-            <InputNumber
-              placeholder={`เช่น ${YEAR_MAX}`}
-              min={YEAR_MIN}
-              max={YEAR_MAX}
-              size="large"
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="เกรดเฉลี่ย (GPA)"
-            name="gpa"
-            rules={[
-              {
-                type: "number",
-                min: 0,
-                max: 4,
-                message: "GPA ต้องเป็นตัวเลขระหว่าง 0.00 - 4.00",
-              },
-            ]}
-          >
-            <InputNumber
-              placeholder="เช่น 3.50"
-              step={0.01}
-              min={0}
-              max={4}
-              size="large"
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-        </Form>
-      </Drawer>
-
-      {/* 2. รายการประวัติการศึกษา */}
-      <Space orientation="vertical" size={16} style={{ width: "100%" }}>
-        {educations.length > 0 ? (
-          educations.map((education, index) => (
-            <Card
-              key={index}
-              hoverable
-              style={{
-                borderRadius: token.borderRadiusLG,
-                border: `1px solid ${token.colorBorderSecondary}`,
-              }}
-              styles={{ body: { padding: "20px" } }}
+            <Form.Item
+              label="สาขาวิชา"
+              name="major"
+              rules={[{ required: true, message: "กรุณากรอกสาขาวิชา" }]}
             >
-              <Row justify="space-between" align="top">
-                <Col flex="auto">
-                  <Space orientation="vertical" size={2}>
-                    <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
-                      {education.level}
-                    </Title>
-                    <Text strong style={{ color: token.colorTextSecondary }}>
-                      {education.institution}
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: "14px" }}>
-                      {education.major}
-                    </Text>
-                    <Flex gap={8} style={{ marginTop: "8px" }} wrap="wrap">
-                      {education.graduationYear && (
-                        <Text
-                          style={{
-                            display: "inline-block",
-                            padding: "2px 8px",
-                            backgroundColor: token.colorFillAlter,
-                            borderRadius: token.borderRadiusSM,
-                            fontSize: "13px",
-                          }}
-                        >
-                          สำเร็จการศึกษา พ.ศ. {education.graduationYear}
-                        </Text>
-                      )}
-                      {education.gpa && (
-                        <Text
-                          style={{
-                            display: "inline-block",
-                            padding: "2px 8px",
-                            backgroundColor: token.colorFillAlter,
-                            borderRadius: token.borderRadiusSM,
-                            fontSize: "13px",
-                          }}
-                        >
-                          GPA: {education.gpa}
-                        </Text>
-                      )}
-                    </Flex>
-                  </Space>
-                </Col>
-                <Col>
-                  <Space>
-                    <Button
-                      type="text"
-                      shape="circle"
-                      icon={
-                        <EditOutlined style={{ color: token.colorPrimary }} />
-                      }
-                      onClick={() => handleEdit(index)}
-                    />
-                    <Button
-                      type="text"
-                      shape="circle"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDelete(index)}
-                    />
-                  </Space>
-                </Col>
-              </Row>
-            </Card>
-          ))
-        ) : (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="ยังไม่มีข้อมูลการศึกษา"
-          />
-        )}
+              <Input placeholder="เช่น ครุศาสตร์ สาขาภาษาอังกฤษ" size="large" />
+            </Form.Item>
+
+            <Form.Item
+              label="ปีที่สำเร็จการศึกษา (พ.ศ.)"
+              name="graduationYear"
+              rules={[
+                { required: true, message: "กรุณากรอกปีที่สำเร็จการศึกษา" },
+                {
+                  type: "number",
+                  min: YEAR_MIN,
+                  max: YEAR_MAX,
+                  message: `กรุณากรอกปี พ.ศ. ระหว่าง ${YEAR_MIN} - ${YEAR_MAX}`,
+                },
+              ]}
+            >
+              <InputNumber
+                placeholder={`เช่น ${YEAR_MAX}`}
+                min={YEAR_MIN}
+                max={YEAR_MAX}
+                size="large"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="เกรดเฉลี่ย (GPA)"
+              name="gpa"
+              rules={[
+                {
+                  type: "number",
+                  min: 0,
+                  max: 4,
+                  message: "GPA ต้องเป็นตัวเลขระหว่าง 0.00 - 4.00",
+                },
+              ]}
+            >
+              <InputNumber
+                placeholder="เช่น 3.50"
+                step={0.01}
+                min={0}
+                max={4}
+                size="large"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Form>
+        </Drawer>
+
+        {/* 2. รายการประวัติการศึกษา */}
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+          {educations.length > 0 ? (
+            educations.map((education, index) => (
+              <Card
+                key={index}
+                hoverable
+                style={{
+                  borderRadius: token.borderRadiusLG,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                }}
+                styles={{ body: { padding: "20px" } }}
+              >
+                <Row justify="space-between" align="top">
+                  <Col flex="auto">
+                    <Space orientation="vertical" size={2}>
+                      <Title level={5} style={{ margin: 0, fontSize: "17px" }}>
+                        {education.level}
+                      </Title>
+                      <Text strong style={{ color: token.colorTextSecondary }}>
+                        {education.institution}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: "14px" }}>
+                        {education.major}
+                      </Text>
+                      <Flex gap={8} style={{ marginTop: "8px" }} wrap="wrap">
+                        {education.graduationYear && (
+                          <Text
+                            style={{
+                              display: "inline-block",
+                              padding: "2px 8px",
+                              backgroundColor: token.colorFillAlter,
+                              borderRadius: token.borderRadiusSM,
+                              fontSize: "13px",
+                            }}
+                          >
+                            สำเร็จการศึกษา พ.ศ. {education.graduationYear}
+                          </Text>
+                        )}
+                        {education.gpa && (
+                          <Text
+                            style={{
+                              display: "inline-block",
+                              padding: "2px 8px",
+                              backgroundColor: token.colorFillAlter,
+                              borderRadius: token.borderRadiusSM,
+                              fontSize: "13px",
+                            }}
+                          >
+                            GPA: {education.gpa}
+                          </Text>
+                        )}
+                      </Flex>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Space>
+                      <Button
+                        type="text"
+                        shape="circle"
+                        icon={<EditOutlined style={{ color: token.colorPrimary }} />}
+                        onClick={() => handleEdit(index)}
+                      />
+                      <Button
+                        type="text"
+                        shape="circle"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteRequest(index)}
+                      />
+                    </Space>
+                  </Col>
+                </Row>
+              </Card>
+            ))
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="ยังไม่มีข้อมูลการศึกษา" />
+          )}
+        </Space>
+
+        {/* 3. ปุ่มเพิ่ม */}
+        <Button
+          type="dashed"
+          icon={<PlusOutlined />}
+          block
+          onClick={handleAddNew}
+          size="large"
+          disabled={educations.length >= MAX_EDUCATIONS}
+          style={{ height: "54px", borderRadius: token.borderRadiusLG, fontSize: "16px", fontWeight: 600 }}
+        >
+          เพิ่มข้อมูลการศึกษา ({educations.length}/{MAX_EDUCATIONS})
+        </Button>
       </Space>
-
-      {/* 3. ปุ่มเพิ่ม — แสดงจำนวน/จำกัดเพื่อให้ User รู้ */}
-      <Button
-        type="dashed"
-        icon={<PlusOutlined />}
-        block
-        onClick={handleAddNew}
-        size="large"
-        disabled={educations.length >= MAX_EDUCATIONS}
-        style={{
-          height: "54px",
-          borderRadius: token.borderRadiusLG,
-          fontSize: "16px",
-          fontWeight: 600,
-        }}
-      >
-        เพิ่มข้อมูลการศึกษา ({educations.length}/{MAX_EDUCATIONS})
-      </Button>
-    </Space>
+    </>
   );
 };

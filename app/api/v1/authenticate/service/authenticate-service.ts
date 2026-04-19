@@ -6,7 +6,7 @@ import { SigninInput, SignupInput } from "../validation/authenticate-schema";
 export class AuthenticateService {
   // ✨ [สมัครสมาชิกด้วย Supabase Auth SDK]
   async signup(input: SignupInput) {
-    const { email, password, full_name, role } = input;
+    const { email, password, full_name, first_name, last_name, role } = input;
 
     console.log("📝 [SIGNUP] Starting signup process...");
     console.log(`   📧 Email: ${email}`);
@@ -57,13 +57,15 @@ export class AuthenticateService {
             where: { userId: authData.user.id },
             update: {
               email,
-              firstName: full_name,
+              firstName: first_name,
+              lastName: last_name,
               role: role as UserRole,
             },
             create: {
               userId: authData.user.id,
               email,
-              firstName: full_name,
+              firstName: first_name,
+              lastName: last_name,
               role: role as UserRole,
               password: "", // ❌ ไม่เก็บ password - Supabase จัดการแล้ว
             },

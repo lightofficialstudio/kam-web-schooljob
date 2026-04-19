@@ -1,8 +1,4 @@
-import BaseModal from "@/app/components/layouts/modal/base-modal";
-import {
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { Button, Col, Form, Row } from "antd";
 import React, { useState } from "react";
 
@@ -24,46 +20,50 @@ export const SectionForm: React.FC<SectionFormProps> = ({
   onReset,
 }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState({
-    mainTitle: "",
+  // ✨ โครงสร้าง local modal state
+  interface ModalState {
+    open: boolean;
+    type: "success" | "error" | "confirm" | "delete";
+    title: string;
+    description: string;
+    errorDetails?: unknown;
+  }
+  const MODAL_CLOSED: ModalState = {
+    open: false,
+    type: "success",
+    title: "",
     description: "",
-    icon: null as React.ReactNode,
-    type: "success" as "success" | "error" | "warning" | "info",
-  });
+  };
+
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState<ModalState>(MODAL_CLOSED);
 
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
       await onSubmit(values);
-
-      setModalContent({
-        mainTitle: "สำเร็จ",
-        description: `บันทึก${title}เรียบร้อยแล้ว`,
-        icon: (
-          <CheckCircleOutlined style={{ color: "#22c55e", fontSize: "48px" }} />
-        ),
+      setModal({
+        open: true,
         type: "success",
+        title: "บันทึกสำเร็จ",
+        description: `บันทึก${title}เรียบร้อยแล้ว`,
       });
-      setModalVisible(true);
-
-      setTimeout(() => {
-        setModalVisible(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Error saving data:", error);
-      setModalContent({
-        mainTitle: "ข้อผิดพลาด",
-        description: `ไม่สามารถบันทึก${title}ได้ กรุณาลองใหม่`,
-        icon: (
-          <ExclamationCircleOutlined
-            style={{ color: "#ef4444", fontSize: "48px" }}
-          />
-        ),
+    } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: { data?: { message_th?: string } };
+        message?: string;
+      };
+      const description =
+        axiosErr?.response?.data?.message_th ||
+        axiosErr?.message ||
+        `ไม่สามารถบันทึก${title}ได้ กรุณาลองใหม่`;
+      setModal({
+        open: true,
         type: "error",
+        title: "บันทึกไม่สำเร็จ",
+        description,
+        errorDetails: err,
       });
-      setModalVisible(true);
     } finally {
       setLoading(false);
     }
@@ -153,14 +153,15 @@ export const SectionForm: React.FC<SectionFormProps> = ({
         </div>
       </div>
 
-      {/* Notification Modal */}
-      <BaseModal
-        open={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        mainTitle={modalContent.mainTitle}
-        description={modalContent.description}
-        icon={modalContent.icon}
-        type={modalContent.type}
+      {/* ✨ Modal กลาง — ทุก state รายงานผ่านนี้ */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        onClose={() => setModal(MODAL_CLOSED)}
+        confirmLabel="ตกลง"
       />
     </>
   );

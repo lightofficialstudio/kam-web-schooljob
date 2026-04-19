@@ -1,9 +1,9 @@
 "use client";
 
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import {
   CheckCircleFilled,
   DeleteOutlined,
-  ExclamationCircleFilled,
   FilePdfOutlined,
   PlusOutlined,
   WarningFilled,
@@ -11,7 +11,6 @@ import {
 import {
   Button,
   Flex,
-  Modal,
   Tag,
   Tooltip,
   Typography,
@@ -25,7 +24,6 @@ import { useProfileStore } from "../_stores/profile-store";
 import type { ResumeEntry } from "../_stores/profile-store";
 
 // ✨ parse storage path จาก Supabase public URL
-// URL รูปแบบ: .../storage/v1/object/public/resumes/{userId}/{filename}
 const parseStoragePath = (url: string, bucket: string): string | null => {
   try {
     const marker = `/object/public/${bucket}/`;
@@ -41,84 +39,114 @@ const { Text } = Typography;
 const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
-// แปลงขนาดไฟล์ bytes → KB / MB อ่านง่าย
 const formatFileSize = (bytes: number): string => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+// ✨ โครงสร้าง local modal state
+interface ModalState {
+  open: boolean;
+  type: "success" | "error" | "confirm" | "delete";
+  title: string;
+  description: string;
+  errorDetails?: unknown;
+  loading?: boolean;
+}
+
+const MODAL_CLOSED: ModalState = { open: false, type: "success", title: "", description: "" };
+
 interface ResumeUploadSectionProps {
   userId: string;
 }
 
-// Section แนบเรซูเม่ — รองรับหลายไฟล์ และเลือกไฟล์ที่กำลังใช้งาน
 export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId }) => {
   const { token } = theme.useToken();
-  const { profile, addResume, removeResume, setActiveResume, saveProfile, deleteResumeFromDB } = useProfileStore();
+  const { profile, addResume, removeResume, setActiveResume, saveProfile, deleteResumeFromDB } =
+    useProfileStore();
 
   const resumes = profile.resumes ?? [];
   const activeResumeId = profile.activeResumeId ?? null;
 
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [modal, setModal] = useState<ModalState>(MODAL_CLOSED);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmTarget, setConfirmTarget] = useState<ResumeEntry | null>(null);
+  // ✨ เก็บ resume ที่รอการยืนยันลบ
+  const [pendingDelete, setPendingDelete] = useState<ResumeEntry | null>(null);
 
-  // ✨ ลบเรซูเม่จริง: ลบออกจาก Storage + soft-delete ใน DB แล้วค่อยลบออกจาก store
-  const handleDeleteConfirmed = async () => {
-    if (!confirmTarget) return;
-    const resume = confirmTarget;
-    setConfirmTarget(null);
+  const closeModal = () => setModal(MODAL_CLOSED);
+
+  // ✨ callback เมื่อกด "ยืนยันลบ"
+  const handleDeleteConfirm = async () => {
+    if (!pendingDelete) return;
+    const resume = pendingDelete;
+    setPendingDelete(null);
     setDeletingId(resume.id);
+    setModal((prev) => ({ ...prev, open: false }));
     try {
-      // 1. ลบไฟล์จาก Supabase Storage
       if (resume.url) {
         const path = parseStoragePath(resume.url, "resumes");
         if (path) await deleteFile("resumes", path);
       }
-      // 2. soft-delete ใน DB + ลบออกจาก store (deleteResumeFromDB ทำทั้งสองอย่าง)
       await deleteResumeFromDB(resume.id, userId);
-      setUploadError(null);
-      console.log("✅ [ResumeUploadSection] ลบเรซูเม่สำเร็จ:", resume.fileName);
-    } catch (err) {
-      console.error("❌ [ResumeUploadSection] ลบเรซูเม่ไม่สำเร็จ:", err);
-      setUploadError(`ลบไฟล์ "${resume.fileName}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
+      setModal({
+        open: true,
+        type: "success",
+        title: "ลบเรซูเม่สำเร็จ",
+        description: `ไฟล์ "${resume.fileName}" ถูกลบออกจากระบบเรียบร้อยแล้ว`,
+      });
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
+      const description =
+        axiosErr?.response?.data?.message_th ||
+        axiosErr?.message ||
+        "เกิดข้อผิดพลาดขณะลบไฟล์ กรุณาลองใหม่อีกครั้ง";
+      setModal({ open: true, type: "error", title: "ลบเรซูเม่ไม่สำเร็จ", description, errorDetails: err });
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleBeforeUpload = (file: RcFile): boolean => {
-    setUploadError(null);
-
     // 🔐 ตรวจประเภทไฟล์
     if (file.type !== "application/pdf") {
-      setUploadError("ประเภทไฟล์ไม่ถูกต้อง — รองรับเฉพาะไฟล์ PDF เท่านั้น");
+      setModal({
+        open: true,
+        type: "error",
+        title: "ประเภทไฟล์ไม่ถูกต้อง",
+        description: "รองรับเฉพาะไฟล์ PDF เท่านั้น กรุณาเลือกไฟล์ใหม่",
+      });
       return false;
     }
 
     // 🔐 ตรวจขนาดไฟล์ ≤ 10 MB
     if (file.size > MAX_FILE_BYTES) {
       const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-      setUploadError(
-        `ไฟล์ "${file.name}" มีขนาด ${sizeMB} MB — เกินขีดจำกัด ${MAX_FILE_MB} MB กรุณาบีบอัดไฟล์แล้วลองใหม่`
-      );
+      setModal({
+        open: true,
+        type: "error",
+        title: "ไฟล์มีขนาดใหญ่เกินไป",
+        description: `ไฟล์ "${file.name}" มีขนาด ${sizeMB} MB เกินขีดจำกัด ${MAX_FILE_MB} MB กรุณาบีบอัดไฟล์แล้วลองใหม่`,
+      });
       return false;
     }
 
     // 🔐 ป้องกันไฟล์ซ้ำ
     if (resumes.some((r) => r.fileName === file.name)) {
-      setUploadError(`ไฟล์ "${file.name}" ถูกแนบไปแล้ว`);
+      setModal({
+        open: true,
+        type: "error",
+        title: "ไฟล์ซ้ำ",
+        description: `ไฟล์ "${file.name}" ถูกแนบไปแล้ว กรุณาเลือกไฟล์อื่น`,
+      });
       return false;
     }
 
-    // ✨ Upload จริงไป Supabase Storage แล้ว save ลง DB ผ่าน saveProfile
+    // ✨ Upload จริงไป Supabase Storage แล้ว save ลง DB
     (async () => {
       setIsUploading(true);
       try {
         const result = await uploadFile("resumes", userId, file);
-
-        // ✅ เพิ่ม resume entry ใน store พร้อม url จาก Storage (synchronous)
         const newResume: ResumeEntry = {
           id: `resume-${Date.now()}`,
           fileName: file.name,
@@ -127,13 +155,20 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
           url: result.url,
         };
         addResume(newResume);
-
-        // ✅ บันทึก resumes ลง DB ทันที
         await saveProfile(userId);
-        console.log("✅ [ResumeUploadSection] อัปโหลดและบันทึกเรซูเม่สำเร็จ:", result.url);
-      } catch (err) {
-        console.error("❌ [ResumeUploadSection] upload error:", err);
-        setUploadError(`อัปโหลดไฟล์ "${file.name}" ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง`);
+        setModal({
+          open: true,
+          type: "success",
+          title: "แนบเรซูเม่สำเร็จ",
+          description: `ไฟล์ "${file.name}" ถูกอัปโหลดและบันทึกเรียบร้อยแล้ว`,
+        });
+      } catch (err: unknown) {
+        const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
+        const description =
+          axiosErr?.response?.data?.message_th ||
+          axiosErr?.message ||
+          "เกิดข้อผิดพลาดขณะอัปโหลดไฟล์ กรุณาลองใหม่อีกครั้ง";
+        setModal({ open: true, type: "error", title: "อัปโหลดเรซูเม่ไม่สำเร็จ", description, errorDetails: err });
       } finally {
         setIsUploading(false);
       }
@@ -143,211 +178,151 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
   };
 
   return (
-    <Flex vertical gap={16}>
-      {/* ─── คำเตือน Error (แสดงเมื่อมี error) ─── */}
-      {uploadError && (
-        <Flex
-          align="flex-start"
-          gap={10}
-          style={{
-            padding: "12px 16px",
-            borderRadius: token.borderRadius,
-            border: `1.5px solid ${token.colorError}`,
-            backgroundColor: token.colorErrorBg,
-          }}
-        >
-          <ExclamationCircleFilled
-            style={{ color: token.colorError, fontSize: 16, marginTop: 1, flexShrink: 0 }}
-          />
-          <Flex vertical gap={2}>
-            <Text
-              strong
-              style={{ color: token.colorError, fontSize: 13 }}
-            >
-              ไม่สามารถแนบไฟล์ได้
-            </Text>
-            <Text style={{ color: token.colorError, fontSize: 12 }}>
-              {uploadError}
-            </Text>
-          </Flex>
-          <Button
-            type="text"
-            size="small"
-            style={{ marginLeft: "auto", color: token.colorError, flexShrink: 0, padding: "0 4px" }}
-            onClick={() => setUploadError(null)}
-          >
-            ✕
-          </Button>
-        </Flex>
-      )}
+    <>
+      {/* ✨ Modal กลาง — ทุก state รายงานผ่านนี้ */}
+      <ModalComponent
+        open={modal.open}
+        type={modal.type}
+        title={modal.title}
+        description={modal.description}
+        errorDetails={modal.errorDetails}
+        loading={modal.loading}
+        onClose={closeModal}
+        onConfirm={modal.type === "confirm" ? handleDeleteConfirm : undefined}
+        confirmLabel={modal.type === "confirm" ? "ยืนยันลบ" : "ตกลง"}
+        cancelLabel="ยกเลิก"
+      />
 
-      {/* ─── รายการเรซูเม่ที่แนบแล้ว ─── */}
-      {resumes.length > 0 && (
-        <Flex vertical gap={10}>
-          {resumes.map((resume) => {
-            const isActive = resume.id === activeResumeId;
-            return (
-              <Flex
-                key={resume.id}
-                align="center"
-                justify="space-between"
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: token.borderRadius,
-                  border: `1.5px solid ${isActive ? token.colorPrimary : token.colorBorderSecondary}`,
-                  backgroundColor: isActive
-                    ? `${token.colorPrimary}0d`
-                    : token.colorFillQuaternary,
-                }}
-              >
-                <Flex align="center" gap={10}>
-                  <FilePdfOutlined
-                    style={{ fontSize: 22, color: "#ff4d4f", flexShrink: 0 }}
-                  />
-                  <Flex vertical gap={2}>
-                    <Flex align="center" gap={8}>
-                      <Text strong style={{ fontSize: 13 }}>
-                        {resume.fileName}
+      <Flex vertical gap={16}>
+        {/* ─── รายการเรซูเม่ที่แนบแล้ว ─── */}
+        {resumes.length > 0 && (
+          <Flex vertical gap={10}>
+            {resumes.map((resume) => {
+              const isActive = resume.id === activeResumeId;
+              return (
+                <Flex
+                  key={resume.id}
+                  align="center"
+                  justify="space-between"
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: token.borderRadius,
+                    border: `1.5px solid ${isActive ? token.colorPrimary : token.colorBorderSecondary}`,
+                    backgroundColor: isActive ? `${token.colorPrimary}0d` : token.colorFillQuaternary,
+                  }}
+                >
+                  <Flex align="center" gap={10}>
+                    <FilePdfOutlined style={{ fontSize: 22, color: "#ff4d4f", flexShrink: 0 }} />
+                    <Flex vertical gap={2}>
+                      <Flex align="center" gap={8}>
+                        <Text strong style={{ fontSize: 13 }}>
+                          {resume.fileName}
+                        </Text>
+                        {isActive && (
+                          <Tag
+                            icon={<CheckCircleFilled />}
+                            color="processing"
+                            style={{ fontSize: 11, margin: 0 }}
+                          >
+                            กำลังใช้งาน
+                          </Tag>
+                        )}
+                      </Flex>
+                      <Text type="secondary" style={{ fontSize: 11 }}>
+                        {formatFileSize(resume.fileSize)} · อัพโหลด {resume.uploadedAt}
                       </Text>
-                      {isActive && (
-                        <Tag
-                          icon={<CheckCircleFilled />}
-                          color="processing"
-                          style={{ fontSize: 11, margin: 0 }}
-                        >
-                          กำลังใช้งาน
-                        </Tag>
-                      )}
                     </Flex>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      {formatFileSize(resume.fileSize)} · อัพโหลด {resume.uploadedAt}
-                    </Text>
+                  </Flex>
+
+                  <Flex gap={8} align="center">
+                    {!isActive && (
+                      <Button
+                        size="small"
+                        type="default"
+                        style={{ fontSize: 12 }}
+                        onClick={() => setActiveResume(resume.id)}
+                      >
+                        ตั้งเป็นที่ใช้งาน
+                      </Button>
+                    )}
+                    <Tooltip title="ลบไฟล์นี้">
+                      <Button
+                        size="small"
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        loading={deletingId === resume.id}
+                        disabled={deletingId === resume.id}
+                        onClick={() => {
+                          setPendingDelete(resume);
+                          setModal({
+                            open: true,
+                            type: "confirm",
+                            title: "ยืนยันการลบเรซูเม่",
+                            description: `ต้องการลบไฟล์ "${resume.fileName}" ออกจากระบบ? ไฟล์จะถูกลบถาวรและไม่สามารถกู้คืนได้`,
+                          });
+                        }}
+                      />
+                    </Tooltip>
                   </Flex>
                 </Flex>
+              );
+            })}
+          </Flex>
+        )}
 
-                <Flex gap={8} align="center">
-                  {!isActive && (
-                    <Button
-                      size="small"
-                      type="default"
-                      style={{ fontSize: 12 }}
-                      onClick={() => setActiveResume(resume.id)}
-                    >
-                      ตั้งเป็นที่ใช้งาน
-                    </Button>
-                  )}
-                  <Tooltip title="ลบไฟล์นี้">
-                    <Button
-                      size="small"
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      loading={deletingId === resume.id}
-                      disabled={deletingId === resume.id}
-                      onClick={() => setConfirmTarget(resume)}
-                    />
-                  </Tooltip>
-                </Flex>
-              </Flex>
-            );
-          })}
-        </Flex>
-      )}
-
-      {/* ─── ปุ่มเพิ่มเรซูเม่ ─── */}
-      <Upload
-        accept=".pdf"
-        showUploadList={false}
-        beforeUpload={handleBeforeUpload}
-        multiple={false}
-        disabled={isUploading}
-      >
-        <Button
-          icon={<PlusOutlined />}
-          type="dashed"
-          block
-          loading={isUploading}
+        {/* ─── ปุ่มเพิ่มเรซูเม่ ─── */}
+        <Upload
+          accept=".pdf"
+          showUploadList={false}
+          beforeUpload={handleBeforeUpload}
+          multiple={false}
           disabled={isUploading}
-          style={{ height: 44 }}
-          onClick={() => setUploadError(null)}
         >
-          {isUploading ? "กำลังอัปโหลด..." : "แนบเรซูเม่ (PDF)"}
-        </Button>
-      </Upload>
-
-      {/* ─── ข้อกำหนดไฟล์ ─── */}
-      <Flex
-        vertical
-        gap={4}
-        style={{
-          padding: "10px 14px",
-          borderRadius: token.borderRadius,
-          backgroundColor: token.colorFillQuaternary,
-          border: `1px solid ${token.colorBorderSecondary}`,
-        }}
-      >
-        <Flex align="center" gap={6}>
-          <WarningFilled style={{ color: token.colorWarning, fontSize: 12 }} />
-          <Text strong style={{ fontSize: 12, color: token.colorTextSecondary }}>
-            ข้อกำหนดการอัปโหลด
-          </Text>
-        </Flex>
-        <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
-          • รองรับเฉพาะไฟล์ <Text strong style={{ color: token.colorText }}>PDF</Text> เท่านั้น
-        </Text>
-        <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
-          • ขนาดไฟล์สูงสุด{" "}
-          <Text strong style={{ color: token.colorError }}>
-            {MAX_FILE_MB} MB
-          </Text>{" "}
-          ต่อไฟล์
-        </Text>
-        <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
-          • สามารถแนบได้หลายไฟล์ และเลือกเรซูเม่ที่กำลังใช้งาน
-        </Text>
-      </Flex>
-
-      {/* ─── Modal ยืนยันการลบเรซูเม่ ─── */}
-      <Modal
-        open={!!confirmTarget}
-        onCancel={() => setConfirmTarget(null)}
-        onOk={handleDeleteConfirmed}
-        okText="ลบไฟล์"
-        cancelText="ยกเลิก"
-        okButtonProps={{ danger: true, loading: deletingId !== null }}
-        title={
-          <Flex align="center" gap={8}>
-            <DeleteOutlined style={{ color: token.colorError }} />
-            <span>ยืนยันการลบเรซูเม่</span>
-          </Flex>
-        }
-        width={420}
-      >
-        <Flex vertical gap={8} style={{ padding: "8px 0" }}>
-          <Text>คุณต้องการลบไฟล์นี้ใช่หรือไม่?</Text>
-          <Flex
-            align="center"
-            gap={10}
-            style={{
-              padding: "10px 14px",
-              borderRadius: token.borderRadius,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              backgroundColor: token.colorFillQuaternary,
-            }}
+          <Button
+            icon={<PlusOutlined />}
+            type="dashed"
+            block
+            loading={isUploading}
+            disabled={isUploading}
+            style={{ height: 44 }}
           >
-            <FilePdfOutlined style={{ fontSize: 20, color: "#ff4d4f", flexShrink: 0 }} />
-            <Flex vertical gap={2}>
-              <Text strong style={{ fontSize: 13 }}>{confirmTarget?.fileName}</Text>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                {confirmTarget ? formatFileSize(confirmTarget.fileSize) : ""}
-              </Text>
-            </Flex>
+            {isUploading ? "กำลังอัปโหลด..." : "แนบเรซูเม่ (PDF)"}
+          </Button>
+        </Upload>
+
+        {/* ─── ข้อกำหนดไฟล์ ─── */}
+        <Flex
+          vertical
+          gap={4}
+          style={{
+            padding: "10px 14px",
+            borderRadius: token.borderRadius,
+            backgroundColor: token.colorFillQuaternary,
+            border: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
+          <Flex align="center" gap={6}>
+            <WarningFilled style={{ color: token.colorWarning, fontSize: 12 }} />
+            <Text strong style={{ fontSize: 12, color: token.colorTextSecondary }}>
+              ข้อกำหนดการอัปโหลด
+            </Text>
           </Flex>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            ไฟล์จะถูกลบออกจากระบบทั้งหมดและไม่สามารถกู้คืนได้
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+            • รองรับเฉพาะไฟล์ <Text strong style={{ color: token.colorText }}>PDF</Text> เท่านั้น
+          </Text>
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+            • ขนาดไฟล์สูงสุด{" "}
+            <Text strong style={{ color: token.colorError }}>
+              {MAX_FILE_MB} MB
+            </Text>{" "}
+            ต่อไฟล์
+          </Text>
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+            • สามารถแนบได้หลายไฟล์ และเลือกเรซูเม่ที่กำลังใช้งาน
           </Text>
         </Flex>
-      </Modal>
-    </Flex>
+      </Flex>
+    </>
   );
 };
