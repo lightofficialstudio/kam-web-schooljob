@@ -20,32 +20,33 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
   const { token } = antTheme.useToken();
 
   // foundedYear ใน DB เก็บเป็น พ.ศ. อยู่แล้ว — ไม่ต้องบวก 543
+  // ✨ ใช้ token แทน hardcode สีทั้งหมด
   const stats = [
     school.foundedYear && {
       icon: <CalendarOutlined />,
       color: token.colorPrimary,
-      bg: "#EDF6FF",
+      bg: token.colorPrimaryBg,
       label: "ก่อตั้งเมื่อ",
       value: `พ.ศ. ${school.foundedYear}`,
     },
     school.studentCount != null && {
       icon: <UserOutlined />,
       color: token.colorSuccess,
-      bg: "#F0FFF4",
+      bg: token.colorSuccessBg,
       label: "นักเรียน",
       value: school.studentCount.toLocaleString(),
     },
     school.teacherCount != null && {
       icon: <TeamOutlined />,
       color: token.colorWarning,
-      bg: "#FFFBEB",
+      bg: token.colorWarningBg,
       label: "ครู/บุคลากร",
       value: school.teacherCount.toLocaleString(),
     },
     school.schoolType && {
       icon: <BankOutlined />,
       color: token.colorInfo,
-      bg: "#EFF6FF",
+      bg: token.colorInfoBg,
       label: "ประเภท",
       value: school.schoolType,
     },
@@ -71,11 +72,11 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
       <div className="px-6 pt-6 pb-4 flex items-center gap-3">
         <div
           className="w-8 h-8 rounded-xl flex items-center justify-center text-sm"
-          style={{ backgroundColor: "#EDF6FF", color: token.colorPrimary }}
+          style={{ backgroundColor: token.colorPrimaryBg, color: token.colorPrimary }}
         >
           <BankOutlined />
         </div>
-        <Text className="font-black text-base tracking-tight" style={{ color: "#0F172A" }}>
+        <Text className="font-black text-base tracking-tight" style={{ color: token.colorTextHeading }}>
           เกี่ยวกับสถาบัน
         </Text>
       </div>
@@ -124,7 +125,7 @@ export const SchoolInfoSection = ({ school }: SchoolInfoSectionProps) => {
                 </Text>
                 <Text
                   className="text-sm font-black leading-tight truncate"
-                  style={{ color: "#0F172A" }}
+                  style={{ color: token.colorTextHeading }}
                 >
                   {stat.value}
                 </Text>

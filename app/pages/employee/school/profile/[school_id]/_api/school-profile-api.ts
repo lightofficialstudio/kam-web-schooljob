@@ -1,18 +1,18 @@
 import axios from "axios";
 
-// ✨ โครงสร้างตำแหน่งงานที่โรงเรียนเปิดรับ
+// ✨ โครงสร้างตำแหน่งงานที่โรงเรียนเปิดรับ — backend คำนวณ salaryText, isDeadlineSoon แล้ว
 export interface SchoolOpenJob {
   id: string;
   title: string;
   jobType: string | null;
   positionsAvailable: number;
-  salaryMin: number | null;
-  salaryMax: number | null;
+  salaryText: string;
   salaryNegotiable: boolean;
   licenseRequired: string;
   deadline: string | null;
   postedAt: string;
   isNew: boolean;
+  isDeadlineSoon: boolean;
   applicantCount: number;
   subjects: string[];
   grades: string[];
@@ -40,6 +40,7 @@ export interface SchoolProfileDetail {
   totalJobsPosted: number;
   benefits: string[];
   openJobCount: number;
+  websiteDisplay: string | null;
   jobs: SchoolOpenJob[];
 }
 

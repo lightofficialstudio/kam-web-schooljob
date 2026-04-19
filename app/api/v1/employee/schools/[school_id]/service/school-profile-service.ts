@@ -65,22 +65,48 @@ export const getSchoolProfileService = async (schoolId: string) => {
     totalJobsPosted,
     benefits: school.schoolBenefits.map((b) => b.benefit),
     openJobCount: school.jobs.length,
-    jobs: school.jobs.map((job) => ({
-      id: job.id,
-      title: job.title,
-      jobType: job.jobType ?? null,
-      positionsAvailable: job.positionsAvailable,
-      salaryMin: job.salaryMin ?? null,
-      salaryMax: job.salaryMax ?? null,
-      salaryNegotiable: job.salaryNegotiable,
-      licenseRequired: licenseMap[job.licenseRequired],
-      deadline: job.deadline?.toISOString() ?? null,
-      postedAt: job.createdAt.toISOString(),
-      isNew: Date.now() - job.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000,
-      applicantCount: job._count.applications,
-      subjects: job.jobSubjects.map((s) => s.subject),
-      grades: job.jobGrades.map((g) => g.grade),
-      benefits: job.jobBenefits.map((b) => b.benefit),
-    })),
+    jobs: school.jobs.map((job) => {
+      // ✨ salaryText — คำนวณฝั่ง backend ไม่ให้ UI ทำเอง
+      const salaryText = job.salaryNegotiable
+        ? "ตามประสบการณ์"
+        : job.salaryMin && job.salaryMax
+          ? `฿${job.salaryMin.toLocaleString("th-TH")} – ฿${job.salaryMax.toLocaleString("th-TH")}`
+          : job.salaryMin
+            ? `฿${job.salaryMin.toLocaleString("th-TH")}+`
+            : "ไม่ระบุ";
+
+      // ✨ isNew — งานประกาศภายใน 7 วัน
+      const isNew = Date.now() - job.createdAt.getTime() < 7 * 24 * 60 * 60 * 1000;
+
+      // ✨ isDeadlineSoon — deadline เหลือ <= 7 วัน และยังไม่หมดอายุ
+      const deadlineMs = job.deadline ? job.deadline.getTime() : null;
+      const now = Date.now();
+      const isDeadlineSoon =
+        deadlineMs !== null &&
+        deadlineMs > now &&
+        deadlineMs - now <= 7 * 24 * 60 * 60 * 1000;
+
+      return {
+        id: job.id,
+        title: job.title,
+        jobType: job.jobType ?? null,
+        positionsAvailable: job.positionsAvailable,
+        salaryText,
+        salaryNegotiable: job.salaryNegotiable,
+        licenseRequired: licenseMap[job.licenseRequired],
+        deadline: job.deadline?.toISOString() ?? null,
+        postedAt: job.createdAt.toISOString(),
+        isNew,
+        isDeadlineSoon,
+        applicantCount: job._count.applications,
+        subjects: job.jobSubjects.map((s) => s.subject),
+        grades: job.jobGrades.map((g) => g.grade),
+        benefits: job.jobBenefits.map((b) => b.benefit),
+      };
+    }),
+    // ✨ websiteDisplay — ตัด protocol ออกฝั่ง backend
+    websiteDisplay: school.website
+      ? school.website.replace(/^https?:\/\//, "")
+      : null,
   };
 };

@@ -28,13 +28,16 @@ export const SchoolBenefitsSection = ({
       styles={{ body: { padding: 32 } }}
     >
       <div className="flex items-center gap-4 mb-8">
-        <div className="p-3 rounded-2xl bg-gold-50 text-gold-600">
+        <div
+          className="p-3 rounded-2xl"
+          style={{ backgroundColor: token.colorWarningBg, color: token.colorWarning }}
+        >
           <GiftOutlined className="text-xl" />
         </div>
         <Title
           level={4}
           className="m-0! font-black text-2xl tracking-tight"
-          style={{ color: "#0F172A" }}
+          style={{ color: token.colorTextHeading }}
         >
           สวัสดิการและจุดเด่น
         </Title>
@@ -44,13 +47,19 @@ export const SchoolBenefitsSection = ({
         {benefits.map((benefit, i) => (
           <Col span={24} key={i}>
             <div
-              className="px-6 py-4 rounded-2xl flex items-center gap-4 border border-slate-50 dark:border-slate-800 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300 group"
-              style={{ background: token.colorBgLayout }}
+              className="px-6 py-4 rounded-2xl flex items-center gap-4 transition-all duration-300 group"
+              style={{
+                background: token.colorBgLayout,
+                border: `1px solid ${token.colorBorderSecondary}`,
+              }}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-[#437FC7] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
+                style={{ backgroundColor: token.colorPrimaryBg, color: token.colorPrimary }}
+              >
                 <CheckCircleFilled className="text-sm" />
               </div>
-              <Text className="text-slate-600 dark:text-slate-300 font-bold text-base">
+              <Text className="font-bold text-base" style={{ color: token.colorText }}>
                 {benefit}
               </Text>
             </div>
