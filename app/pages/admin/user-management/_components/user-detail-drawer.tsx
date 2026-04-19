@@ -478,8 +478,7 @@ export function UserDetailDrawer() {
               size="small"
               bordered
               column={2}
-              labelStyle={{ fontWeight: 600, fontSize: 12, width: 140 }}
-              contentStyle={{ fontSize: 12 }}
+              styles={{ label: { fontWeight: 600, fontSize: 12, width: 140 }, content: { fontSize: 12 } }}
             >
               <Descriptions.Item label="User ID" span={2}>
                 <Text code style={{ fontSize: 11 }}>
@@ -557,8 +556,7 @@ export function UserDetailDrawer() {
                 size="small"
                 bordered
                 column={2}
-                labelStyle={{ fontWeight: 600, fontSize: 12, width: 140 }}
-                contentStyle={{ fontSize: 12 }}
+                styles={{ label: { fontWeight: 600, fontSize: 12, width: 140 }, content: { fontSize: 12 } }}
               >
                 <Descriptions.Item label="ชื่อ-นามสกุล">
                   {d.profile.fullName || <Text type="secondary">—</Text>}
@@ -678,8 +676,7 @@ export function UserDetailDrawer() {
                 size="small"
                 bordered
                 column={2}
-                labelStyle={{ fontWeight: 600, fontSize: 12, width: 140 }}
-                contentStyle={{ fontSize: 12 }}
+                styles={{ label: { fontWeight: 600, fontSize: 12, width: 140 }, content: { fontSize: 12 } }}
               >
                 <Descriptions.Item label="ชื่อโรงเรียน" span={2}>
                   {d.schoolProfile.schoolName}
@@ -804,11 +801,11 @@ export function UserDetailDrawer() {
               }}
             >
               <Timeline
-                mode="left"
+                mode="start"
                 items={d.auditTimeline.map((item) => ({
                   color: auditColor[item.type] ?? "gray",
-                  dot: auditIcon[item.type],
-                  label: (
+                  icon: auditIcon[item.type],
+                  title: (
                     <Text
                       type="secondary"
                       style={{ fontSize: 11, whiteSpace: "nowrap" }}
@@ -816,7 +813,7 @@ export function UserDetailDrawer() {
                       {formatThai(item.timestamp)}
                     </Text>
                   ),
-                  children: (
+                  content: (
                     <Flex vertical gap={2}>
                       <Text strong style={{ fontSize: 13 }}>
                         {item.event}
