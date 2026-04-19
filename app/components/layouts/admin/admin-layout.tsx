@@ -2,7 +2,8 @@
 
 import { Layout, theme } from "antd";
 import { ReactNode, useState } from "react";
-import { AdminBreadcrumb } from "./breadcrumb";
+import { usePathname } from "next/navigation";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
 import { AdminNavbar } from "./navbar";
 import { AdminSidebar } from "./sidebar";
 
@@ -16,6 +17,30 @@ interface AdminLayoutProps {
 export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { token } = useToken();
+  const pathname = usePathname();
+
+  // ✨ [Determine breadcrumb items based on path - fallback for generic pages]
+  const getBreadcrumbItems = () => {
+    const items = [{ title: "แดชบอร์ด", path: "/pages/admin/dashboard" }];
+    const path = pathname || "";
+
+    if (path.includes("/user-management")) {
+      items.push({ title: "จัดการผู้ใช้" });
+    } else if (path.includes("/package-management")) {
+      items.push({ title: "แพ็กเกจสมาชิก" });
+    } else if (path.includes("/menu-management")) {
+      items.push({ title: "จัดการเมนู" });
+    } else if (path.includes("/announcement")) {
+      items.push({ title: "จัดการข่าวสาร" });
+    }
+
+    return items;
+  };
+
+  // Note: We show layout breadcrumb only if the pathname is not one of the pages that 
+  // handle their own breadcrumbs (1-2-3-4 layout rule). 
+  // However, following user instruction to "use" it here.
+  const breadcrumbItems = getBreadcrumbItems();
 
   return (
     <Layout
@@ -57,8 +82,11 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
             background: token.colorBgLayout,
           }}
         >
-          {/* ✨ [Breadcrumb Navigation] */}
-          <AdminBreadcrumb />
+          {/* ✨ [Breadcrumb Navigation - Fallback] */}
+          {/* Note: If the page already has its own breadcrumb (1-2-3-4 layout), this may be redundant */}
+          {!["/dashboard", "/user-management", "/package-management"].some(p => pathname?.includes(p)) && (
+             <AdminBreadcrumb items={breadcrumbItems} />
+          )}
 
           {/* ✨ [Page Children] */}
           {children}

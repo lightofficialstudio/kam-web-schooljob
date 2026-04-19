@@ -196,7 +196,7 @@ export default function PackageTab({ userId }: { userId: string }) {
         <Alert
           type="error"
           showIcon
-          message="ไม่สามารถโหลดข้อมูลแพ็คเกจได้"
+          title="ไม่สามารถโหลดข้อมูลแพ็คเกจได้"
           description="กรุณาลองรีเฟรชหน้าใหม่ หรือติดต่อทีมงาน"
         />
       </SectionCard>
@@ -506,7 +506,7 @@ export default function PackageTab({ userId }: { userId: string }) {
             type="success"
             showIcon
             icon={<CrownOutlined />}
-            message={`${data.planLabel} — แผนสูงสุด`}
+            title={`${data.planLabel} — แผนสูงสุด`}
             description="คุณได้รับสิทธิ์ทุกอย่างครบถ้วน รวมถึงทุก feature ที่ Admin กำหนด"
             style={{ borderRadius: 12 }}
           />
@@ -516,7 +516,7 @@ export default function PackageTab({ userId }: { userId: string }) {
               type="info"
               showIcon
               icon={<ThunderboltOutlined />}
-              message="Payment Gateway กำลังพัฒนา"
+              title="Payment Gateway กำลังพัฒนา"
               description="ระบบชำระเงินออนไลน์อยู่ระหว่างการพัฒนา — กรุณาติดต่อทีมงานโดยตรงเพื่ออัปเกรดแผน"
               style={{ borderRadius: 12 }}
             />

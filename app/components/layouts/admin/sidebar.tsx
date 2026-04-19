@@ -132,14 +132,14 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
     allLeaves
       .slice()
       .sort((a, b) => b.key.length - a.key.length)
-      .find((item) => pathname.startsWith(item.key))?.key ?? "/pages/admin/dashboard";
+      .find((item) => pathname?.startsWith(item.key))?.key ?? "/pages/admin/dashboard";
 
   // ── กลุ่มที่ควร auto-open เมื่อ path ตรง ──
   const defaultOpenGroups = navItems
     .filter(
       (item): item is NavGroup =>
         item.type === "group" &&
-        item.children.some((child) => pathname.startsWith(child.key)),
+        item.children.some((child) => pathname?.startsWith(child.key)),
     )
     .map((item) => item.key);
 
@@ -151,7 +151,7 @@ export function AdminSidebar({ collapsed, onCollapse }: AdminSidebarProps) {
       .filter(
         (item): item is NavGroup =>
           item.type === "group" &&
-          item.children.some((child) => pathname.startsWith(child.key)),
+          item.children.some((child) => pathname?.startsWith(child.key)),
       )
       .map((item) => item.key);
     setOpenGroups((prev) => Array.from(new Set([...prev, ...autoOpen])));

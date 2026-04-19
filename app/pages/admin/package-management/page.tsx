@@ -50,6 +50,8 @@ import { QuotaAlertPanel } from "./_components/quota-alert-panel";
 import { RevenueProjectionPanel } from "./_components/revenue-projection-panel";
 import { SchoolDetailDrawer } from "./_components/school-detail-drawer";
 import {
+  PackagePlanItem,
+  PlanFormData,
   SchoolPackageItem,
   usePackageStore,
 } from "./_state/package-store";
