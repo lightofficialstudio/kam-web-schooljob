@@ -58,7 +58,6 @@ import type { OrgInvite, OrgMember } from "./_state/org-store";
 import { useOrgStore } from "./_state/org-store";
 
 const { Title, Text } = Typography;
-const PRIMARY = "#11b6f5";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -125,7 +124,7 @@ const InviteModal = ({
               width: 36,
               height: 36,
               borderRadius: 9,
-              background: `linear-gradient(135deg, ${PRIMARY} 0%, #0878a8 100%)`,
+              background: `linear-gradient(135deg, #11b6f5 0%, #0878a8 100%)`,
             }}
           >
             <UserAddOutlined style={{ color: "#fff", fontSize: 16 }} />
@@ -236,6 +235,7 @@ const EditMemberModal = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { token } = theme.useToken();
 
   useEffect(() => {
     if (member) {
@@ -261,7 +261,7 @@ const EditMemberModal = ({
         <Flex align="center" gap={10}>
           <Avatar
             size={36}
-            style={{ backgroundColor: PRIMARY, fontSize: 14, flexShrink: 0 }}
+            style={{ backgroundColor: token.colorPrimary, fontSize: 14, flexShrink: 0 }}
           >
             {displayName.charAt(0)}
           </Avatar>
@@ -442,7 +442,7 @@ export default function SchoolManagementPage() {
 
   const handleCopyInviteLink = (email: string) => {
     navigator.clipboard?.writeText(
-      `https://schooljob.th/invite?email=${email}`,
+      `${window.location.origin}/invite?email=${email}`,
     );
     api.success({ message: "คัดลอกลิงก์เชิญแล้ว" });
   };
@@ -473,7 +473,7 @@ export default function SchoolManagementPage() {
     },
     {
       label: "รอยืนยัน",
-      value: pendingMembers + invites.length,
+      value: pendingMembers,
       unit: "คน",
       icon: <MailOutlined style={{ fontSize: 20 }} />,
       color: token.colorWarning,
@@ -483,7 +483,7 @@ export default function SchoolManagementPage() {
       value: invites.length,
       unit: "รายการ",
       icon: <KeyOutlined style={{ fontSize: 20 }} />,
-      color: "#6366F1",
+      color: token.colorInfo,
     },
   ];
 
@@ -510,7 +510,7 @@ export default function SchoolManagementPage() {
             <Avatar
               size={40}
               src={record.profile.profileImageUrl}
-              style={{ backgroundColor: PRIMARY, fontSize: 15, flexShrink: 0 }}
+              style={{ backgroundColor: token.colorPrimary, fontSize: 15, flexShrink: 0 }}
             >
               {displayName.charAt(0)}
             </Avatar>
@@ -766,7 +766,7 @@ export default function SchoolManagementPage() {
       label: "จัดการสิทธิ์",
       icon: (
         <KeyOutlined
-          style={{ color: activeTab === "rbac" ? PRIMARY : undefined }}
+          style={{ color: activeTab === "rbac" ? token.colorPrimary : undefined }}
         />
       ),
     },
@@ -894,7 +894,7 @@ export default function SchoolManagementPage() {
                 border: "none",
                 borderBottom:
                   activeTab === tab.key
-                    ? `2px solid ${PRIMARY}`
+                    ? `2px solid ${token.colorPrimary}`
                     : "2px solid transparent",
                 background: "transparent",
                 cursor: "pointer",
@@ -902,7 +902,7 @@ export default function SchoolManagementPage() {
                 fontSize: 14,
                 fontWeight: activeTab === tab.key ? 600 : 400,
                 color:
-                  activeTab === tab.key ? PRIMARY : token.colorTextSecondary,
+                  activeTab === tab.key ? token.colorPrimary : token.colorTextSecondary,
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -917,7 +917,7 @@ export default function SchoolManagementPage() {
                   style={{
                     backgroundColor:
                       activeTab === tab.key
-                        ? PRIMARY
+                        ? token.colorPrimary
                         : token.colorFillSecondary,
                     color:
                       activeTab === tab.key ? "#fff" : token.colorTextSecondary,
@@ -951,7 +951,7 @@ export default function SchoolManagementPage() {
                 style={{ padding: "4px 0" }}
               >
                 <Flex align="center" gap={8}>
-                  <TeamOutlined style={{ color: PRIMARY }} />
+                  <TeamOutlined style={{ color: token.colorPrimary }} />
                   <Text strong style={{ fontSize: 15 }}>
                     สมาชิกในทีม
                   </Text>
@@ -1092,7 +1092,7 @@ export default function SchoolManagementPage() {
                 }}
                 title={
                   <Flex align="center" gap={8}>
-                    <BankOutlined style={{ color: PRIMARY }} />
+                    <BankOutlined style={{ color: token.colorPrimary }} />
                     <Text strong>ข้อมูลองค์กร</Text>
                   </Flex>
                 }

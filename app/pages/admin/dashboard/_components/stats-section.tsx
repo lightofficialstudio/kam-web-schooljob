@@ -22,6 +22,7 @@ import {
   theme,
 } from "antd";
 import { useDashboardStore } from "../_state/dashboard-store";
+import { SummaryCard } from "@/app/components/card/summary-card.component";
 
 const { Text } = Typography;
 
@@ -118,61 +119,18 @@ export function StatsSection() {
     <Row gutter={[12, 12]}>
       {cards.map((c) => (
         <Col xs={12} sm={8} md={6} key={c.title}>
-          <Card
-            className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
-            style={{
-              background: token.colorBgContainer,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              borderRadius: token.borderRadiusLG,
-              borderTop: `3px solid ${c.color}`,
-            }}
-            styles={{ body: { padding: "14px 18px" } }}
-          >
-            {isLoading ? (
-              <Flex vertical gap={6}>
-                <Skeleton.Input
-                  active
-                  size="small"
-                  style={{ width: 80, height: 14 }}
-                />
-                <Skeleton.Input
-                  active
-                  size="large"
-                  style={{ width: 100, height: 30 }}
-                />
-                <Skeleton.Input
-                  active
-                  size="small"
-                  style={{ width: 120, height: 12 }}
-                />
-              </Flex>
-            ) : (
-              <Flex vertical gap={4}>
-                <Flex align="center" gap={6}>
-                  <Text style={{ color: c.color, fontSize: 15 }}>{c.icon}</Text>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {c.title}
-                  </Text>
-                </Flex>
-                <Statistic
-                  value={c.value}
-                  suffix={
-                    <Text style={{ fontSize: 13, color: c.color }}>
-                      {c.suffix}
-                    </Text>
-                  }
-                  styles={{
-                    content: { fontSize: 26, fontWeight: 700, color: c.color },
-                  }}
-                />
-                <Tooltip title={c.sub}>
-                  <Text style={{ fontSize: 11, color: c.subColor }} ellipsis>
-                    {c.sub}
-                  </Text>
-                </Tooltip>
-              </Flex>
-            )}
-          </Card>
+          {/* 3. Summary Card */}
+          <SummaryCard
+            title={c.title}
+            value={c.value}
+            unit={c.suffix}
+            icon={c.icon}
+            color={c.color}
+            subtitle={c.sub}
+            tooltip={c.sub}
+            isLoading={isLoading}
+            size="md"
+          />
         </Col>
       ))}
     </Row>

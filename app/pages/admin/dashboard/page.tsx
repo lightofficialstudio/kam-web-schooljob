@@ -11,6 +11,8 @@ import {
 } from "@ant-design/icons";
 import { Col, Row, theme } from "antd";
 import { useEffect } from "react";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
 import { ApplicationFunnelChart } from "./_components/application-funnel-chart";
 import { DeadlineJobsPanel } from "./_components/deadline-jobs-panel";
 import { InactiveSchoolsPanel } from "./_components/inactive-schools-panel";
@@ -39,9 +41,21 @@ export default function AdminDashboardPage() {
   }, [fetchDashboard]);
 
   return (
-    <>
-      <Row gutter={[16, 16]}>
+    <div style={{ padding: "24px 24px 48px" }}>
+      {/* 1. Breadcrumb */}
+      <AdminBreadcrumb
+        items={[{ title: "แดชบอร์ดระบบ" }]}
+      />
 
+      {/* 2. Header */}
+      <AdminHeader
+        title="ภาพรวมระบบ (Dashboard)"
+        description="สรุปข้อมูลสถิติและการทำงานของระบบแบบ Real-time"
+        icon={<DashboardOutlined style={{ fontSize: 22, color: "#fff" }} />}
+        style={{ marginBottom: 24 }}
+      />
+
+      <Row gutter={[16, 16]}>
         {/* ══════════════════════════════════════════════
             SECTION 0 — Welcome + Quick Stats
         ══════════════════════════════════════════════ */}
@@ -165,7 +179,7 @@ export default function AdminDashboardPage() {
 
       </Row>
 
-      {/* ✨ Modal รายงานสถานะ */}
+      {/* ✨ Modal รายงานสถานะ (5) */}
       <ModalComponent
         open={modal.open}
         type={modal.type}
@@ -177,6 +191,6 @@ export default function AdminDashboardPage() {
         confirmLabel={modal.confirmLabel}
         cancelLabel={modal.cancelLabel}
       />
-    </>
+    </div>
   );
 }
