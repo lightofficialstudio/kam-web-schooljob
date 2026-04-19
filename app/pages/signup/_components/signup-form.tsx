@@ -17,7 +17,6 @@ import {
   Input,
   Radio,
   Row,
-  Space,
   Typography,
   theme as antTheme,
 } from "antd";
@@ -153,58 +152,35 @@ export const SignupForm = () => {
             >
               <Radio.Group style={{ width: "100%" }}>
                 <Row gutter={12}>
-                  <Col span={12}>
-                    <Radio.Button
-                      value="teacher"
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        padding: "16px 0",
-                        textAlign: "center",
-                        borderRadius: 12,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderWidth: 2,
-                      }}
-                    >
-                      <Space orientation="vertical" size={6}>
-                        <UserOutlined
-                          style={{ fontSize: 28, color: token.colorPrimary }}
-                        />
-                        <Text strong style={{ fontSize: 14 }}>
-                          ครูผู้สอน
+                  {[
+                    { value: "teacher", icon: <UserOutlined />, label: "ครูผู้สอน" },
+                    { value: "school", icon: <BankOutlined />, label: "สถานศึกษา" },
+                  ].map(({ value, icon, label }) => (
+                    <Col span={12} key={value}>
+                      <Radio.Button
+                        value={value}
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          padding: "10px 0",
+                          textAlign: "center",
+                          borderRadius: 10,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 12,
+                          borderWidth: 2,
+                        }}
+                      >
+                        <span style={{ fontSize: 16, color: token.colorPrimary, lineHeight: 1, marginRight: 8 }}>
+                          {icon}
+                        </span>
+                        <Text strong style={{ fontSize: 13 }}>
+                          {label}
                         </Text>
-                      </Space>
-                    </Radio.Button>
-                  </Col>
-                  <Col span={12}>
-                    <Radio.Button
-                      value="school"
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        padding: "16px 0",
-                        textAlign: "center",
-                        borderRadius: 12,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderWidth: 2,
-                      }}
-                    >
-                      <Space orientation="vertical" size={6}>
-                        <BankOutlined
-                          style={{ fontSize: 28, color: token.colorPrimary }}
-                        />
-                        <Text strong style={{ fontSize: 14 }}>
-                          สถานศึกษา
-                        </Text>
-                      </Space>
-                    </Radio.Button>
-                  </Col>
+                      </Radio.Button>
+                    </Col>
+                  ))}
                 </Row>
               </Radio.Group>
             </Form.Item>
