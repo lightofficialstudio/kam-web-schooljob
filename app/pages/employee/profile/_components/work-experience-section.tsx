@@ -27,6 +27,7 @@ import {
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { WorkExperienceEntry, useProfileStore } from "../_stores/profile-store";
+import { postWorkExperience, putWorkExperience, deleteWorkExperience } from "../_api/employee-profile-api";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -94,7 +95,6 @@ export const WorkExperienceSection: React.FC = () => {
     addWorkExperience,
     updateWorkExperience,
     removeWorkExperience,
-    saveProfile,
     isSaving,
   } = useProfileStore();
   const { user } = useAuthStore();
@@ -134,16 +134,31 @@ export const WorkExperienceSection: React.FC = () => {
     setIsDrawerOpen(true);
   };
 
-  // ✨ บันทึก — ครอบ try/catch ทุกกรณี
+  // ✨ UUID regex สำหรับตรวจสอบ id จริง
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  // ✨ บันทึก — ใช้ POST (สร้าง) หรือ PUT (อัปเดต) แบบ 1:1
   const handleSave = async () => {
-    // ✨ validate form fields ก่อน — ถ้า fail จะ throw และไม่ต้องแสดง modal
     let values: ReturnType<typeof form.getFieldsValue>;
     try {
       values = await form.validateFields();
     } catch {
-      // ✨ Form validation error — AntD จะแสดง inline error เองอยู่แล้ว
       return;
     }
+
+    if (!user?.user_id) {
+      setModal({ open: true, type: "error", title: "ไม่พบข้อมูลผู้ใช้", description: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง" });
+      return;
+    }
+
+    const payload = {
+      job_title: values.jobTitle,
+      company_name: values.companyName,
+      start_date: values.startDate.format("YYYY-MM-DD"),
+      end_date: values.inPresent ? null : values.endDate?.format("YYYY-MM-DD") || null,
+      in_present: values.inPresent || false,
+      description: values.description || null,
+    };
 
     const entry: WorkExperienceEntry = {
       jobTitle: values.jobTitle,
@@ -155,24 +170,18 @@ export const WorkExperienceSection: React.FC = () => {
     };
 
     try {
-      if (editingIndex !== null) {
-        const existingId = profile.workExperiences?.[editingIndex]?.id;
-        updateWorkExperience(editingIndex, { ...entry, id: existingId });
+      const existingId = editingIndex !== null ? profile.workExperiences?.[editingIndex]?.id : undefined;
+      const realId = existingId && UUID_REGEX.test(existingId) ? existingId : undefined;
+
+      if (editingIndex !== null && realId) {
+        // ✨ PUT — อัปเดต record เดิม
+        const res = await putWorkExperience(realId, user.user_id, payload);
+        updateWorkExperience(editingIndex, { ...entry, id: res.data?.id ?? realId });
       } else {
-        addWorkExperience(entry);
+        // ✨ POST — สร้าง record ใหม่
+        const res = await postWorkExperience(user.user_id, payload);
+        addWorkExperience({ ...entry, id: res.data?.id });
       }
-
-      if (!user?.user_id) {
-        setModal({
-          open: true,
-          type: "error",
-          title: "ไม่พบข้อมูลผู้ใช้",
-          description: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
-        });
-        return;
-      }
-
-      await saveProfile(user.user_id);
 
       setModal({
         open: true,
@@ -190,15 +199,7 @@ export const WorkExperienceSection: React.FC = () => {
         axiosErr?.response?.data?.message_th ||
         axiosErr?.message ||
         "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ กรุณาลองใหม่อีกครั้ง";
-
-      setModal({
-        open: true,
-        type: "error",
-        title: "บันทึกข้อมูลไม่สำเร็จ",
-        description,
-        // ✨ ส่ง errorDetails ให้ Modal แสดง debug panel — ผู้ใช้ capture ได้
-        errorDetails: err,
-      });
+      setModal({ open: true, type: "error", title: "บันทึกข้อมูลไม่สำเร็จ", description, errorDetails: err });
     }
   };
 
@@ -226,10 +227,14 @@ export const WorkExperienceSection: React.FC = () => {
 
     setModal((prev) => ({ ...prev, loading: true }));
     try {
-      removeWorkExperience(pendingDeleteIndex);
-
+      const expToDelete = workExperiences[pendingDeleteIndex];
       if (!user?.user_id) throw new Error("ไม่พบข้อมูลผู้ใช้");
-      await saveProfile(user.user_id);
+
+      const realId = expToDelete.id && UUID_REGEX.test(expToDelete.id) ? expToDelete.id : undefined;
+      if (realId) {
+        await deleteWorkExperience(realId, user.user_id);
+      }
+      removeWorkExperience(pendingDeleteIndex);
 
       setModal({
         open: true,
@@ -243,14 +248,7 @@ export const WorkExperienceSection: React.FC = () => {
         axiosErr?.response?.data?.message_th ||
         axiosErr?.message ||
         "เกิดข้อผิดพลาดขณะลบข้อมูล กรุณาลองใหม่อีกครั้ง";
-
-      setModal({
-        open: true,
-        type: "error",
-        title: "ลบข้อมูลไม่สำเร็จ",
-        description,
-        errorDetails: err,
-      });
+      setModal({ open: true, type: "error", title: "ลบข้อมูลไม่สำเร็จ", description, errorDetails: err });
     } finally {
       setPendingDeleteIndex(null);
     }

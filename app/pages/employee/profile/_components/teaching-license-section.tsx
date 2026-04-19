@@ -28,6 +28,7 @@ import type { RcFile } from "antd/es/upload";
 import React, { useState } from "react";
 import type { ResumeEntry } from "../_stores/profile-store";
 import { useProfileStore } from "../_stores/profile-store";
+import { postLicense, deleteLicense } from "../_api/employee-profile-api";
 
 const { Text } = Typography;
 
@@ -89,9 +90,9 @@ export const TeachingLicenseSection: React.FC = () => {
     profile,
     setLicenseStatus,
     addLicenseAttachment,
-    saveProfile,
-    deleteLicenseAttachmentFromDB,
+    removeLicenseAttachment,
   } = useProfileStore();
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const { user } = useAuthStore();
 
   const currentStatus = profile.licenseStatus ?? "";
@@ -118,7 +119,11 @@ export const TeachingLicenseSection: React.FC = () => {
         const path = parseStoragePath(attachment.url, "licenses");
         if (path) await deleteFile("licenses", path);
       }
-      await deleteLicenseAttachmentFromDB(attachment.id, user.user_id);
+      const realId = attachment.id && UUID_REGEX.test(attachment.id) ? attachment.id : undefined;
+      if (realId) {
+        await deleteLicense(realId, user.user_id);
+      }
+      removeLicenseAttachment(attachment.id);
       setModal({
         open: true,
         type: "success",
@@ -187,15 +192,19 @@ export const TeachingLicenseSection: React.FC = () => {
       setIsUploading(true);
       try {
         const result = await uploadFile("licenses", user.user_id, file);
+        // ✨ บันทึกลง DB ผ่าน 1:1 API แล้วใช้ id จริงจาก response
+        const res = await postLicense(user.user_id, {
+          license_name: file.name,
+          file_url: result.url,
+        });
         const newFile: ResumeEntry = {
-          id: `lic-${Date.now()}`,
+          id: res.data?.id ?? `lic-${Date.now()}`,
           fileName: file.name,
           fileSize: file.size,
           uploadedAt: new Date().toLocaleDateString("th-TH"),
           url: result.url,
         };
         addLicenseAttachment(newFile);
-        await saveProfile(user.user_id);
         setModal({
           open: true,
           type: "success",

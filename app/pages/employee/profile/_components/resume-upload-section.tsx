@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { deleteFile, uploadFile } from "@/app/lib/storage";
 import { useProfileStore } from "../_stores/profile-store";
 import type { ResumeEntry } from "../_stores/profile-store";
+import { postResume, putResume, deleteResume } from "../_api/employee-profile-api";
 
 // ✨ parse storage path จาก Supabase public URL
 const parseStoragePath = (url: string, bucket: string): string | null => {
@@ -62,8 +63,8 @@ interface ResumeUploadSectionProps {
 
 export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId }) => {
   const { token } = theme.useToken();
-  const { profile, addResume, removeResume, setActiveResume, saveProfile, deleteResumeFromDB } =
-    useProfileStore();
+  const { profile, addResume, removeResume, setActiveResume } = useProfileStore();
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   const resumes = profile.resumes ?? [];
   const activeResumeId = profile.activeResumeId ?? null;
@@ -88,7 +89,11 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
         const path = parseStoragePath(resume.url, "resumes");
         if (path) await deleteFile("resumes", path);
       }
-      await deleteResumeFromDB(resume.id, userId);
+      const realId = resume.id && UUID_REGEX.test(resume.id) ? resume.id : undefined;
+      if (realId) {
+        await deleteResume(realId, userId);
+      }
+      removeResume(resume.id);
       setModal({
         open: true,
         type: "success",
@@ -147,15 +152,20 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
       setIsUploading(true);
       try {
         const result = await uploadFile("resumes", userId, file);
+        // ✨ บันทึกลง DB ผ่าน 1:1 API แล้วใช้ id จริงจาก response
+        const res = await postResume(userId, {
+          file_name: file.name,
+          file_url: result.url,
+          file_size: file.size,
+        });
         const newResume: ResumeEntry = {
-          id: `resume-${Date.now()}`,
+          id: res.data?.id ?? `resume-${Date.now()}`,
           fileName: file.name,
           fileSize: file.size,
           uploadedAt: new Date().toLocaleDateString("th-TH"),
           url: result.url,
         };
         addResume(newResume);
-        await saveProfile(userId);
         setModal({
           open: true,
           type: "success",
@@ -240,7 +250,17 @@ export const ResumeUploadSection: React.FC<ResumeUploadSectionProps> = ({ userId
                         size="small"
                         type="default"
                         style={{ fontSize: 12 }}
-                        onClick={() => setActiveResume(resume.id)}
+                        onClick={async () => {
+                          setActiveResume(resume.id);
+                          const realId = resume.id && UUID_REGEX.test(resume.id) ? resume.id : undefined;
+                          if (realId) {
+                            try {
+                              await putResume(realId, userId, { is_active: true });
+                            } catch {
+                              // ✨ silent fail — store อัปเดตแล้ว จะ sync ครั้งถัดไปตอน fetchProfile
+                            }
+                          }
+                        }}
                       >
                         ตั้งเป็นที่ใช้งาน
                       </Button>

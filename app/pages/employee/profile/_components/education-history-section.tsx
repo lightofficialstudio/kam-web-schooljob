@@ -21,6 +21,7 @@ import {
 } from "antd";
 import React, { useState } from "react";
 import { EducationEntry, useProfileStore } from "../_stores/profile-store";
+import { postEducation, putEducation, deleteEducation } from "../_api/employee-profile-api";
 
 const { Title, Text } = Typography;
 
@@ -63,7 +64,8 @@ export const EducationHistorySection: React.FC = () => {
   // ✨ เก็บ index ที่รอการยืนยันลบ
   const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
 
-  const { profile, addEducation, updateEducation, removeEducation, saveProfile, isSaving } = useProfileStore();
+  const { profile, addEducation, updateEducation, removeEducation, isSaving } = useProfileStore();
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const { user } = useAuthStore();
 
   const educations = profile.educations || [];
@@ -98,15 +100,27 @@ export const EducationHistorySection: React.FC = () => {
     setIsDrawerOpen(true);
   };
 
-  // ✨ บันทึก — ครอบ try/catch ทุกกรณี
+  // ✨ บันทึก — ใช้ POST (สร้าง) หรือ PUT (อัปเดต) แบบ 1:1
   const handleSave = async () => {
-    // ✨ validate form fields ก่อน — ถ้า fail AntD จะแสดง inline error เองอยู่แล้ว
     let values: ReturnType<typeof form.getFieldsValue>;
     try {
       values = await form.validateFields();
     } catch {
       return;
     }
+
+    if (!user?.user_id) {
+      setModal({ open: true, type: "error", title: "ไม่พบข้อมูลผู้ใช้", description: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง" });
+      return;
+    }
+
+    const payload = {
+      level: values.level,
+      institution: values.institution,
+      major: values.major,
+      graduation_year: values.graduationYear ?? null,
+      gpa: values.gpa ?? null,
+    };
 
     const entry: EducationEntry = {
       level: values.level,
@@ -117,24 +131,18 @@ export const EducationHistorySection: React.FC = () => {
     };
 
     try {
-      if (editingIndex !== null) {
-        const existingId = profile.educations?.[editingIndex]?.id;
-        updateEducation(editingIndex, { ...entry, id: existingId });
+      const existingId = editingIndex !== null ? profile.educations?.[editingIndex]?.id : undefined;
+      const realId = existingId && UUID_REGEX.test(existingId) ? existingId : undefined;
+
+      if (editingIndex !== null && realId) {
+        // ✨ PUT — อัปเดต record เดิม
+        const res = await putEducation(realId, user.user_id, payload);
+        updateEducation(editingIndex, { ...entry, id: res.data?.id ?? realId });
       } else {
-        addEducation(entry);
+        // ✨ POST — สร้าง record ใหม่
+        const res = await postEducation(user.user_id, payload);
+        addEducation({ ...entry, id: res.data?.id });
       }
-
-      if (!user?.user_id) {
-        setModal({
-          open: true,
-          type: "error",
-          title: "ไม่พบข้อมูลผู้ใช้",
-          description: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
-        });
-        return;
-      }
-
-      await saveProfile(user.user_id);
 
       setModal({
         open: true,
@@ -152,13 +160,7 @@ export const EducationHistorySection: React.FC = () => {
         axiosErr?.response?.data?.message_th ||
         axiosErr?.message ||
         "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ กรุณาลองใหม่อีกครั้ง";
-      setModal({
-        open: true,
-        type: "error",
-        title: "บันทึกข้อมูลไม่สำเร็จ",
-        description,
-        errorDetails: err,
-      });
+      setModal({ open: true, type: "error", title: "บันทึกข้อมูลไม่สำเร็จ", description, errorDetails: err });
     }
   };
 
@@ -185,28 +187,23 @@ export const EducationHistorySection: React.FC = () => {
     if (pendingDeleteIndex === null) return;
     setModal((prev) => ({ ...prev, loading: true }));
     try {
-      removeEducation(pendingDeleteIndex);
+      const eduToDelete = educations[pendingDeleteIndex];
       if (!user?.user_id) throw new Error("ไม่พบข้อมูลผู้ใช้");
-      await saveProfile(user.user_id);
-      setModal({
-        open: true,
-        type: "success",
-        title: "ลบข้อมูลสำเร็จ",
-        description: "ข้อมูลการศึกษาถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว",
-      });
+
+      const realId = eduToDelete.id && UUID_REGEX.test(eduToDelete.id) ? eduToDelete.id : undefined;
+      if (realId) {
+        await deleteEducation(realId, user.user_id);
+      }
+      removeEducation(pendingDeleteIndex);
+
+      setModal({ open: true, type: "success", title: "ลบข้อมูลสำเร็จ", description: "ข้อมูลการศึกษาถูกลบออกจากฐานข้อมูลเรียบร้อยแล้ว" });
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
       const description =
         axiosErr?.response?.data?.message_th ||
         axiosErr?.message ||
         "เกิดข้อผิดพลาดขณะลบข้อมูล กรุณาลองใหม่อีกครั้ง";
-      setModal({
-        open: true,
-        type: "error",
-        title: "ลบข้อมูลไม่สำเร็จ",
-        description,
-        errorDetails: err,
-      });
+      setModal({ open: true, type: "error", title: "ลบข้อมูลไม่สำเร็จ", description, errorDetails: err });
     } finally {
       setPendingDeleteIndex(null);
     }

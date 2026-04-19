@@ -54,6 +54,7 @@ import {
   WorkExperienceSection,
 } from "./_components";
 import { useProfileStore } from "./_stores/profile-store";
+import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
 
 const { Title, Text, Link } = Typography;
 const { Content } = Layout;
@@ -78,7 +79,6 @@ export default function EmployeeProfilePage() {
     fetchProfile,
     saveProfile,
     isLoading,
-    isSaving,
   } = useProfileStore();
   const { openNotification } = useNotificationModalStore();
   const { user, isAuthenticated, updateUser } = useAuthStore();
@@ -95,12 +95,10 @@ export default function EmployeeProfilePage() {
     e.target.value = ""; // reset เพื่อให้เลือกไฟล์เดิมซ้ำได้
     try {
       const result = await uploadFile("avatars", user.user_id, file);
-      // ✨ updateField เป็น synchronous — store อัปเดตทันทีก่อน saveProfile อ่านค่า
       updateField("profileImageUrl", result.url);
-      await saveProfile(user.user_id);
-      // ✨ sync รูปโปรไฟล์กลับไปที่ authStore เพื่อให้ Navbar แสดงผลถูกต้องทันที
+      // ✨ ใช้ patchBasicInfo แทน saveProfile — อัปเดตเฉพาะ profile_image_url
+      await patchBasicInfo(user.user_id, { profile_image_url: result.url });
       updateUser({ profile_image_url: result.url });
-      console.log("✅ [Avatar] อัปโหลดและบันทึกรูปโปรไฟล์สำเร็จ:", result.url);
     } catch (err) {
       console.error("❌ [Avatar] upload error:", err);
     }
@@ -234,34 +232,64 @@ export default function EmployeeProfilePage() {
         string,
         unknown
       > & { languageAndItSkills?: string[]; dateOfBirth?: unknown };
+
+      const dobStr =
+        dateOfBirth !== undefined
+          ? dayjs.isDayjs(dateOfBirth)
+            ? (dateOfBirth as ReturnType<typeof dayjs>).format("YYYY-MM-DD")
+            : ((dateOfBirth as string | undefined) ?? undefined)
+          : undefined;
+
       const merged = {
         ...profile,
         ...rest,
-        // ✨ แปลง dayjs กลับเป็น string ISO เพื่อเก็บใน store
-        ...(dateOfBirth !== undefined
-          ? {
-              dateOfBirth: dayjs.isDayjs(dateOfBirth)
-                ? (dateOfBirth as ReturnType<typeof dayjs>).format("YYYY-MM-DD")
-                : ((dateOfBirth as string | undefined) ?? undefined),
-            }
-          : {}),
-        // ✨ [เก็บ languageAndItSkills รวมไว้ใน languagesSpoken]
+        ...(dobStr !== undefined ? { dateOfBirth: dobStr } : {}),
         ...(languageAndItSkills !== undefined
           ? { languagesSpoken: languageAndItSkills, itSkills: [] }
           : {}),
       };
       setProfile(merged);
 
-      // ✨ บันทึกไปยัง API จริงถ้ามี userId จาก auth-store
       if (user?.user_id) {
-        await saveProfile(user.user_id);
+        // ✨ route ไปยัง 1:1 API ตาม section ที่กำลังแก้ไข
+        if (editSection === "basic-info" || editSection === "personal-info") {
+          await patchBasicInfo(user.user_id, {
+            first_name: merged.firstName || undefined,
+            last_name: merged.lastName || undefined,
+            phone_number: merged.phoneNumber ?? null,
+            gender: merged.gender ?? null,
+            date_of_birth: dobStr ?? null,
+            nationality: merged.nationality ?? null,
+            profile_image_url: merged.profileImageUrl ?? null,
+            profile_visibility: merged.profileVisibility,
+          });
+        } else if (
+          editSection === "teaching" ||
+          editSection === "skills" ||
+          editSection === "teaching-skills" ||
+          editSection === "personal-summary"
+        ) {
+          await patchSummary(user.user_id, {
+            special_activities: merged.specialActivities ?? null,
+            teaching_experience: merged.teachingExperience ?? null,
+            recent_school: merged.recentSchool ?? null,
+            can_relocate: merged.canRelocate,
+            license_status: merged.licenseStatus || null,
+            specializations: merged.specialization ?? [],
+            grade_can_teaches: merged.gradeCanTeach ?? [],
+            preferred_provinces: merged.preferredProvinces ?? [],
+          });
+        } else {
+          // ✨ fallback — section อื่นยังใช้ saveProfile (monolithic)
+          await saveProfile(user.user_id);
+        }
+
+        // ✨ re-fetch profileStrength หลัง save เพื่ออัปเดต % ความสมบูรณ์
+        fetchProfile(user.user_id, user.email);
       }
 
-      // ✨ sync รูปโปรไฟล์กลับไปที่ authStore ถ้ามีการเปลี่ยนแปลง (เช่น GenderDobPhotoSection)
-      if (
-        merged.profileImageUrl &&
-        merged.profileImageUrl !== user?.profile_image_url
-      ) {
+      // ✨ sync รูปโปรไฟล์กลับไปที่ authStore
+      if (merged.profileImageUrl && merged.profileImageUrl !== user?.profile_image_url) {
         updateUser({ profile_image_url: merged.profileImageUrl });
       }
 
@@ -603,15 +631,12 @@ export default function EmployeeProfilePage() {
                           const newVisibility = e.target.value as
                             | "public"
                             | "apply_only";
-                          // ✨ updateField เป็น synchronous — store อัปเดตทันทีก่อน saveProfile อ่านค่า
                           updateField("profileVisibility", newVisibility);
                           if (user?.user_id) {
                             try {
-                              await saveProfile(user.user_id);
+                              await patchBasicInfo(user.user_id, { profile_visibility: newVisibility });
                             } catch {
-                              console.error(
-                                "❌ บันทึกการมองเห็นโปรไฟล์ไม่สำเร็จ",
-                              );
+                              console.error("❌ บันทึกการมองเห็นโปรไฟล์ไม่สำเร็จ");
                             }
                           }
                         }}
@@ -750,7 +775,7 @@ export default function EmployeeProfilePage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSave={() => form.submit()}
-        loading={isSaving}
+        loading={false}
         title={
           editSection === "basic-info"
             ? "แก้ไขข้อมูลพื้นฐาน"
