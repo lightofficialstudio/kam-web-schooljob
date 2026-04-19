@@ -40,6 +40,9 @@ import { BlogKanban } from "./_components/blog-kanban";
 import { BlogStatsBar } from "./_components/blog-stats-bar";
 import { BlogTable } from "./_components/blog-table";
 import { useAdminBlogStore } from "./_state/blog-store";
+import { AdminBreadcrumb } from "@/app/components/admin/header/breadcrumb.component";
+import { AdminHeader } from "@/app/components/admin/header/header.component";
+import { SummaryCard } from "@/app/components/admin/card/summary-card.component";
 
 const { Title, Text } = Typography;
 
@@ -299,163 +302,71 @@ export default function AdminBlogPage() {
   const draftCount = blogs.filter((b) => b.status === "DRAFT").length;
 
   return (
-    <div style={{ minHeight: "100vh", background: token.colorBgLayout }}>
-      {/* ─── Hero Banner ─── */}
-      <div
-        style={{
-          background:
-            "linear-gradient(135deg, #001e45 0%, #0a4a8a 55%, #11b6f5 100%)",
-          padding: "36px 0 72px",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* ✨ Decoration circles */}
-        <div
-          style={{
-            position: "absolute",
-            top: -60,
-            right: -60,
-            width: 280,
-            height: 280,
-            borderRadius: "50%",
-            background: "rgba(17,182,245,0.12)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -40,
-            left: "30%",
-            width: 180,
-            height: 180,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.05)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 40,
-            left: -40,
-            width: 120,
-            height: 120,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.04)",
-            pointerEvents: "none",
-          }}
-        />
+    <div style={{ padding: "24px 24px 48px", minHeight: "100vh", background: token.colorBgLayout }}>
+      {/* 1. Breadcrumb */}
+      <AdminBreadcrumb
+        items={[
+          { title: "แดชบอร์ด", path: "/pages/admin/dashboard" },
+          { title: "จัดการบทความ" }
+        ]}
+      />
 
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "0 24px",
-            position: "relative",
-          }}
-        >
-          <Breadcrumb
-            style={{ marginBottom: 16 }}
-            items={[
-              {
-                title: (
-                  <Link
-                    href="/pages/admin/dashboard"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
-                  >
-                    แดชบอร์ด
-                  </Link>
-                ),
-              },
-              { title: <span style={{ color: "white" }}>จัดการบทความ</span> },
-            ]}
-          />
-
-          <Flex align="flex-start" justify="space-between" wrap="wrap" gap={16}>
-            <Flex vertical gap={6}>
-              <Flex align="center" gap={10}>
-                <Title level={2} style={{ margin: 0, color: "white" }}>
-                  จัดการบทความ
-                </Title>
-                {draftCount > 0 && (
-                  <Badge
-                    count={`${draftCount} Draft`}
-                    style={{ background: "#fa8c16", fontSize: 11 }}
-                  />
-                )}
-              </Flex>
-              <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
-                สร้าง แก้ไข เผยแพร่บทความ · มี AI ช่วยเขียนในตัว
-              </Text>
-            </Flex>
-
-            <Flex gap={10} align="center">
-              <Tooltip title="AI จะช่วยเขียนชื่อ, สรุป, เนื้อหา, tags และวิเคราะห์ SEO ได้ใน Editor">
-                <Tag
-                  icon={<RobotOutlined />}
-                  color="processing"
-                  style={{
-                    fontSize: 13,
-                    padding: "5px 14px",
-                    borderRadius: 20,
-                    cursor: "help",
-                    background: "rgba(17,182,245,0.2)",
-                    borderColor: "rgba(17,182,245,0.5)",
-                    color: "white",
-                  }}
-                >
-                  AI-Powered
-                </Tag>
-              </Tooltip>
-              <Button
-                type="primary"
-                size="large"
-                icon={<PlusOutlined />}
-                onClick={openCreate}
+      {/* 2. Header */}
+      <AdminHeader
+        title="จัดการบทความ (Blog Management)"
+        description="สร้าง แก้ไข และเผยแพร่บทความเพื่อสร้างความน่าเชื่อถือให้กับระบบ"
+        icon={<EditOutlined style={{ fontSize: 22, color: "#fff" }} />}
+        style={{ marginBottom: 24 }}
+        action={
+          <Flex align="center" gap={12}>
+            <Tooltip title="AI จะช่วยเขียนชื่อ, สรุป, เนื้อหา, tags และวิเคราะห์ SEO ได้ใน Editor">
+              <Tag
+                icon={<RobotOutlined />}
+                color="processing"
                 style={{
-                  background: "rgba(255,255,255,0.15)",
-                  borderColor: "rgba(255,255,255,0.4)",
-                  color: "white",
-                  fontWeight: 600,
-                  height: 44,
-                  borderRadius: 10,
-                  backdropFilter: "blur(8px)",
+                  fontSize: 12,
+                  padding: "4px 12px",
+                  borderRadius: 20,
+                  cursor: "help",
                 }}
               >
-                สร้างบทความใหม่
-              </Button>
-            </Flex>
+                AI-Powered
+              </Tag>
+            </Tooltip>
+            <Button
+              type="primary"
+              size="middle"
+              icon={<PlusOutlined />}
+              onClick={openCreate}
+              style={{
+                fontWeight: 600,
+                borderRadius: 10,
+              }}
+            >
+              สร้างบทความใหม่
+            </Button>
           </Flex>
-        </div>
-      </div>
+        }
+      />
 
       {/* ─── Main Content ─── */}
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "-36px auto 0",
-          padding: "0 24px 80px",
-          position: "relative",
-        }}
-      >
-        {/* ─── Stats Bar ─── */}
-        <div style={{ marginBottom: 20 }}>
+      <div style={{ position: "relative" }}>
+        {/* 3. Summary Stats (BlogStatsBar includes its own row) */}
+        <div style={{ marginBottom: 24 }}>
           <BlogStatsBar />
         </div>
 
         {/* ─── Analytics Section ─── */}
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 24 }}>
           <BlogAnalyticsSection />
         </div>
 
-        {/* ─── Filter + View Controls ─── */}
+        {/* 4. Content (Filter + List/Grid) */}
         <Card
           variant="borderless"
           style={{
             borderRadius: 16,
-            marginBottom: 18,
+            marginBottom: 24,
             boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
           }}
           styles={{ body: { padding: "14px 20px" } }}

@@ -58,7 +58,7 @@ export const SchoolProfileHeader: React.FC<SchoolProfileHeaderProps> = ({
         <Flex align="flex-start" gap={20} wrap="wrap">
           <Badge
             count={
-              <CheckCircleFilled style={{ color: "#52c41a", fontSize: 18 }} />
+              <CheckCircleFilled style={{ color: "#52c41a", fontSize: 16 }} />
             }
             offset={[-8, 88]}
           >

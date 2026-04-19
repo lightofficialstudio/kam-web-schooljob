@@ -251,7 +251,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
       <Card variant="borderless" style={{ borderRadius: 16 }}>
         <SectionTitle
           icon={<MedicineBoxOutlined />}
-          color="#52c41a"
+          color={token.colorPrimary}
           text="สวัสดิการและจุดเด่น"
         />
         {hasBenefits ? (
@@ -260,7 +260,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
               <Col key={benefit} xs={24} sm={12}>
                 <Flex align="center" gap={10} style={{ marginBottom: 4 }}>
                   <CheckCircleOutlined
-                    style={{ color: "#52c41a", fontSize: 18, flexShrink: 0 }}
+                    style={{ color: token.colorSuccess, fontSize: 18, flexShrink: 0 }}
                   />
                   <Text style={{ fontSize: 15 }}>{benefit}</Text>
                 </Flex>
@@ -279,7 +279,7 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
       <Card variant="borderless" style={{ borderRadius: 16 }}>
         <SectionTitle
           icon={<InfoCircleOutlined />}
-          color="#fa8c16"
+          color={token.colorPrimary}
           text="ข้อมูลเพิ่มเติม"
         />
         <Row gutter={[16, 16]}>

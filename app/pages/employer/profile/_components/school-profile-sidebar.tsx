@@ -26,6 +26,7 @@ import {
   Tooltip,
   Typography,
   Upload,
+  theme,
 } from "antd";
 import type { RcFile } from "antd/es/upload";
 import Image from "next/image";
@@ -50,6 +51,7 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
   const { saveProfile, setProfile } = useSchoolProfileState();
   const { user } = useAuthStore();
   const { message } = App.useApp();
+  const { token } = theme.useToken();
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // ✨ อัปโหลดโลโก้โรงเรียนไป Supabase Storage แล้ว save URL ลง DB
@@ -283,7 +285,7 @@ export const SchoolProfileSidebar: React.FC<SchoolProfileSidebarProps> = ({
         <Card
           title={
             <Flex align="center" gap={8}>
-              <PictureOutlined style={{ color: "#11b6f5" }} />
+              <PictureOutlined style={{ color: token.colorPrimary }} />
               <span>ภาพถ่ายโรงเรียน</span>
             </Flex>
           }

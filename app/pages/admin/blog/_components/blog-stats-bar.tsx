@@ -1,7 +1,7 @@
 "use client";
 
 // ✨ Blog Stats Bar — KPI cards โดยใช้ SummaryCard กลาง
-import { SummaryCard } from "@/app/components/card/summary-card.component";
+import { SummaryCard } from "@/app/components/admin/card/summary-card.component";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
