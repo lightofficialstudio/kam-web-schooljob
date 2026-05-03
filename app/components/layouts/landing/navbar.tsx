@@ -690,6 +690,19 @@ export default function Navbar() {
                   โรงเรียน
                 </Text>
               </Link>
+              {user && (
+                <Link
+                  href="/pages/employee/applications"
+                  style={{ textDecoration: "none" }}
+                >
+                  <Text
+                    strong
+                    style={{ cursor: "pointer", fontSize: scrolled ? 13 : 14 }}
+                  >
+                    ใบสมัครงาน
+                  </Text>
+                </Link>
+              )}
               <Link href="/pages/blog" style={{ textDecoration: "none" }}>
                 <Text
                   strong

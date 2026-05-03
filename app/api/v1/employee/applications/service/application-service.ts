@@ -9,9 +9,8 @@ const statusMap: Record<ApplicationStatus, string> = {
   REJECTED: "rejected",
 };
 
-// ✨ ดึงใบสมัครทั้งหมดของ Employee พร้อมข้อมูลงาน
+// ✨ ดึงใบสมัครทั้งหมดของ Employee พร้อมข้อมูลงานและโรงเรียน
 export const getEmployeeApplicationsService = async (userId: string) => {
-  // ค้นหา profile จาก userId
   const profile = await prisma.profile.findUnique({
     where: { userId },
     select: { id: true },
@@ -27,21 +26,40 @@ export const getEmployeeApplicationsService = async (userId: string) => {
         select: {
           id: true,
           title: true,
+          jobType: true,
+          province: true,
+          salaryMin: true,
+          salaryMax: true,
+          salaryNegotiable: true,
+          deadline: true,
           schoolProfile: {
-            select: { schoolName: true },
+            select: {
+              schoolName: true,
+              schoolType: true,
+              logoUrl: true,
+            },
           },
         },
       },
     },
   });
 
-  // ✨ แปลงโครงสร้างให้ตรงกับ JobApplication interface ฝั่ง frontend
   return applications.map((app) => ({
     id: app.id,
     jobId: app.jobId,
     jobTitle: app.job.title,
+    jobType: app.job.jobType ?? null,
+    province: app.job.province,
+    salaryMin: app.job.salaryMin ?? null,
+    salaryMax: app.job.salaryMax ?? null,
+    salaryNegotiable: app.job.salaryNegotiable,
+    deadline: app.job.deadline ? app.job.deadline.toISOString() : null,
     schoolName: app.job.schoolProfile.schoolName,
+    schoolType: app.job.schoolProfile.schoolType ?? null,
+    schoolLogoUrl: app.job.schoolProfile.logoUrl ?? null,
+    coverLetter: app.coverLetter ?? null,
     appliedAt: app.appliedAt.toISOString(),
+    updatedAt: app.updatedAt.toISOString(),
     status: statusMap[app.status],
   }));
 };

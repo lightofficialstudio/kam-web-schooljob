@@ -20,6 +20,7 @@ const { Text, Title, Paragraph } = Typography;
 const LINKS_EMPLOYEE = [
   { label: "ค้นหาตำแหน่งงาน", href: "/pages/job" },
   { label: "โปรไฟล์ของฉัน", href: "/pages/employee/profile" },
+  { label: "ใบสมัครงาน", href: "/pages/employee/applications" },
   { label: "ค้นหาโรงเรียน", href: "/pages/employee/school" },
   { label: "ตั้งค่าบัญชี", href: "/pages/employee/account-setting" },
 ];
