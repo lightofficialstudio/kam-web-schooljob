@@ -332,7 +332,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({ app }) => {
           <Text type="secondary" style={{ fontSize: 11 }}>
             อัปเดตล่าสุด {dayjs(app.updatedAt).fromNow()}
           </Text>
-          <Link href={`/pages/job/${app.jobId}`} target="_blank">
+          <Link href={`/pages/job?job_id=${app.jobId}`} target="_blank">
             <Button
               size="small"
               icon={<EyeOutlined />}
