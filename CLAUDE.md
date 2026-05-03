@@ -137,9 +137,11 @@ Flow:
 ### Layout & Routing Guard
 
 `app/components/layouts/layout-selector.tsx` wrap ทุก page:
-- path `/pages/admin/*` → `AdminLayout` (guard: redirect ถ้าไม่ใช่ ADMIN)
+- path `/pages/admin/*` → `AdminLayout` + `AdminGuard` (client component)
 - ทุก path อื่น → `LandingLayout`
 - Role-home map: `EMPLOYEE → /pages/employee/profile`, `EMPLOYER → /pages/employer/profile`
+
+`AdminGuard` (`admin-guard.tsx`) รอ localStorage hydrate ก่อน redirect — ดังนั้น render `null` ในช่วงแรก เพื่อป้องกัน flash of admin content ก่อน auth check เสร็จ
 
 ### Theme System
 
@@ -180,6 +182,11 @@ Flow:
 | `/pages/employer/school-management` | จัดการสมาชิก + RBAC |
 | `/pages/employer/delegated-access` | การเข้าถึงแบบมอบหมาย |
 | `/pages/employer/account-setting` | ตั้งค่าบัญชี |
+
+### Special
+| Path | หน้า |
+|------|------|
+| `/maintenance` | หน้า maintenance mode (ดึง title/message จาก API) |
 
 ### ADMIN
 | Path | หน้า |
@@ -310,7 +317,14 @@ app/
 │   ├── admin/
 │   └── storage/
 ├── pages/                   # UI pages — แต่ละหน้ามี _components/, _stores/, _api/
-├── components/layouts/      # LandingLayout, AdminLayout, LayoutSelector, Modals
+├── maintenance/             # หน้า maintenance mode (/maintenance) — ดึง message จาก /api/v1/system/maintenance
+├── components/
+│   ├── layouts/             # LandingLayout, AdminLayout, LayoutSelector, Modals
+│   ├── admin/
+│   │   ├── card/            # SummaryCard สำหรับ admin pages
+│   │   └── header/          # Breadcrumb + Header component สำหรับ admin pages
+│   ├── card/                # SummaryCard สำหรับ landing-side pages
+│   └── modal/               # Shared modal component
 ├── stores/                  # Global stores: auth-store.ts, notification-modal-store.ts
 ├── contexts/                # theme-context.tsx (light/dark + Ant Design ConfigProvider)
 └── lib/                     # supabase.ts (client)
@@ -355,3 +369,12 @@ NEXT_PUBLIC_MAILER_PASS
 - Remote images: unsplash.com, dicebear.com, supabase.co storage
 - `optimizePackageImports` สำหรับ Ant Design
 - Prisma ใช้ `@prisma/adapter-pg` กับ PgBouncer — connection pool max: 2 (Supabase free tier)
+- Deployment target: **Netlify** (มี `netlify.toml` ที่ root)
+
+---
+
+## MCP Server
+
+`.mcp.json` กำหนด MCP server ชื่อ `antd-docs` ที่รันจาก `mcp-servers/antd-docs/index.ts`:
+- ใช้ tool `antd-docs` เพื่อดึง Ant Design docs ล่าสุดก่อนใช้ component ใหม่
+- ป้องกันการใช้ deprecated API (antd 6.x เปลี่ยน API หลายจุดจาก v5)
