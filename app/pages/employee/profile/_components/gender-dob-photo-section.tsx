@@ -3,6 +3,7 @@
 import { ModalComponent } from "@/app/components/modal/modal.component";
 import { uploadFile } from "@/app/lib/storage";
 import { CameraOutlined, CheckCircleFilled, UserOutlined } from "@ant-design/icons";
+import { motion } from "framer-motion";
 import { Avatar, Col, Form, type FormInstance, Input, Row, Select, theme } from "antd";
 import React, { useRef, useState } from "react";
 import { useProfileStore } from "../_stores/profile-store";
@@ -175,17 +176,6 @@ export const GenderDobPhotoSection: React.FC<GenderDobPhotoSectionProps> = ({
               }}
               onClick={() => !isUploading && inputRef.current?.click()}
             >
-              {/* Spinning ring ขณะ upload — อยู่นอก overflow-hidden */}
-              {isUploading && (
-                <div
-                  className="absolute animate-spin rounded-full pointer-events-none"
-                  style={{
-                    inset: -5,
-                    border: `4px solid ${token.colorPrimaryBg}`,
-                    borderTopColor: token.colorPrimary,
-                  }}
-                />
-              )}
 
               {/* Hover ring — scale in เมื่อ hover */}
               {!isUploading && !showSuccess && (
@@ -252,14 +242,33 @@ export const GenderDobPhotoSection: React.FC<GenderDobPhotoSectionProps> = ({
                   </div>
                 )}
 
-                {/* Uploading overlay — spinner กลางรูป */}
+                {/* ✨ Linear Progress Indicator (Indeterminate) — แบบ Google ที่ขอบล่างของ avatar */}
                 {isUploading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/35">
-                    <div
-                      className="w-7 h-7 rounded-full animate-spin"
-                      style={{
-                        border: "3px solid rgba(255,255,255,0.25)",
-                        borderTopColor: "white",
+                  <div
+                    className="absolute left-0 right-0 bottom-0 overflow-hidden pointer-events-none"
+                    style={{ height: 3, backgroundColor: `${token.colorPrimary}28` }}
+                  >
+                    <motion.div
+                      className="absolute inset-y-0"
+                      style={{ width: "35%", backgroundColor: token.colorPrimary }}
+                      animate={{ x: ["-110%", "320%"] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: [0.65, 0.815, 0.735, 0.395],
+                        repeatDelay: 0,
+                      }}
+                    />
+                    <motion.div
+                      className="absolute inset-y-0"
+                      style={{ width: "55%", backgroundColor: token.colorPrimary, opacity: 0.45 }}
+                      animate={{ x: ["-120%", "210%"] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: [0.165, 0.84, 0.44, 1],
+                        delay: 0.65,
+                        repeatDelay: 0,
                       }}
                     />
                   </div>

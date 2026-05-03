@@ -4,6 +4,7 @@ import { ModalComponent } from "@/app/components/modal/modal.component";
 import { uploadFile } from "@/app/lib/storage";
 import { useAuthStore } from "@/app/stores/auth-store";
 import {
+  CameraOutlined,
   CheckCircleFilled,
   EditOutlined,
   EnvironmentOutlined,
@@ -16,7 +17,6 @@ import {
 } from "@ant-design/icons";
 import {
   Avatar,
-  Badge,
   Button,
   Card,
   Col,
@@ -29,13 +29,13 @@ import {
   Space,
   Spin,
   Tag,
-  Tooltip,
   Typography,
   theme as antTheme,
 } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
 import { patchWorkLocation } from "./_api/work-location-api";
 import {
@@ -82,6 +82,8 @@ export default function EmployeeProfilePage() {
   const router = useRouter();
   const [form] = Form.useForm();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [showAvatarSuccess, setShowAvatarSuccess] = useState(false);
 
   // ✨ Modal state มาตรฐาน — ใช้ ModalComponent แทน openNotification ทุกจุด
   interface ModalState {
@@ -100,35 +102,47 @@ export default function EmployeeProfilePage() {
   const [modal, setModal] = useState<ModalState>(MODAL_CLOSED);
   const closeModal = () => setModal(MODAL_CLOSED);
 
-  // ✨ อัปโหลดรูปโปรไฟล์จากปุ่มดินสอบน Avatar โดยตรง (ไม่เปิด Drawer)
+  // ✨ อัปโหลดรูปโปรไฟล์โดยคลิกที่ Avatar โดยตรง — auto-save ทันที ไม่ต้องกด "บันทึก"
   const handleAvatarFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file || !user?.user_id) return;
-    e.target.value = ""; // reset เพื่อให้เลือกไฟล์เดิมซ้ำได้
+    e.target.value = ""; // ✨ reset เพื่อให้เลือกไฟล์เดิมซ้ำได้
+
+    // 🔐 ตรวจสอบประเภทไฟล์
+    const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
+    if (!ALLOWED_MIME.includes(file.type)) {
+      setModal({ open: true, type: "error", title: "ประเภทไฟล์ไม่ถูกต้อง", description: "รองรับเฉพาะ JPEG, PNG และ WebP เท่านั้น" });
+      return;
+    }
+    // 🔐 ตรวจสอบขนาดไฟล์ ≤ 10 MB
+    if (file.size > 10 * 1024 * 1024) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      setModal({ open: true, type: "error", title: "ไฟล์มีขนาดใหญ่เกินไป", description: `ไฟล์มีขนาด ${mb} MB เกินขีดจำกัด 10 MB` });
+      return;
+    }
+
+    setIsAvatarUploading(true);
     try {
       const result = await uploadFile("avatars", user.user_id, file);
       updateField("profileImageUrl", result.url);
-      // ✨ ใช้ patchBasicInfo แทน saveProfile — อัปเดตเฉพาะ profile_image_url
+      // ✨ auto-save — patchBasicInfo บันทึก profile_image_url ทันทีโดยไม่ต้องกด "บันทึก"
       await patchBasicInfo(user.user_id, { profile_image_url: result.url });
       updateUser({ profile_image_url: result.url });
-      setModal({
-        open: true,
-        type: "success",
-        title: "อัปโหลดรูปโปรไฟล์สำเร็จ",
-        description: "รูปโปรไฟล์ของคุณได้รับการอัปเดตเรียบร้อยแล้ว",
-      });
-    } catch (err) {
-      console.error("❌ [Avatar] upload error:", err);
+      setShowAvatarSuccess(true);
+      setTimeout(() => setShowAvatarSuccess(false), 1800);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message_th?: string } }; message?: string };
       setModal({
         open: true,
         type: "error",
-        title: "อัปโหลดรูปไม่สำเร็จ",
-        description:
-          "ไม่สามารถอัปโหลดรูปโปรไฟล์ได้ กรุณาตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB) และลองใหม่อีกครั้ง",
+        title: "อัปโหลดรูปโปรไฟล์ไม่สำเร็จ",
+        description: axiosErr?.response?.data?.message_th ?? axiosErr?.message ?? "เกิดข้อผิดพลาด กรุณาลองใหม่",
         errorDetails: err,
       });
+    } finally {
+      setIsAvatarUploading(false);
     }
   };
 
@@ -420,113 +434,214 @@ export default function EmployeeProfilePage() {
                   }}
                   styles={{ body: { padding: 32 } }}
                 >
-                  <Row justify="space-between" align="top">
-                    <Col>
-                      <Space size={32} align="start">
-                        {/* ─── Hidden file input สำหรับ Avatar ─── */}
-                        <input
-                          ref={avatarInputRef}
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          style={{ display: "none" }}
-                          onChange={handleAvatarFileChange}
-                        />
-                        <Badge
-                          count={
-                            <Tooltip
-                              title="อัปโหลดรูปภาพส่วนตัว"
-                              placement="right"
-                            >
-                              <Button
-                                shape="circle"
-                                size="small"
-                                icon={
-                                  <EditOutlined
-                                    style={{
-                                      color: token.colorTextDescription,
-                                    }}
-                                  />
-                                }
-                                style={{
-                                  boxShadow: token.boxShadowSecondary,
-                                  borderColor: token.colorBorderSecondary,
-                                }}
-                                onClick={() => avatarInputRef.current?.click()}
-                              />
-                            </Tooltip>
-                          }
-                          offset={[-8, 120]}
+                  {/* ─── Hidden file input ─── */}
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={handleAvatarFileChange}
+                  />
+
+                  <div className="flex items-start justify-between gap-4">
+                    {/* ─── Avatar + Info ─── */}
+                    <div className="flex items-start gap-6 flex-1 min-w-0">
+
+                      {/* ─── Clickable Avatar ─── */}
+                      <div
+                        className="group relative flex-shrink-0"
+                        style={{
+                          width: 120,
+                          height: 120,
+                          cursor: isAvatarUploading ? "wait" : "pointer",
+                        }}
+                        onClick={() => !isAvatarUploading && avatarInputRef.current?.click()}
+                      >
+
+                        {/* Hover ring — scale in เมื่อ hover */}
+                        {!isAvatarUploading && !showAvatarSuccess && (
+                          <div
+                            className="absolute pointer-events-none opacity-0 scale-95
+                              group-hover:opacity-100 group-hover:scale-100 transition-all duration-300"
+                            style={{
+                              inset: -5,
+                              borderRadius: token.borderRadiusLG + 5,
+                              border: `2px dashed ${token.colorPrimary}`,
+                            }}
+                          />
+                        )}
+
+                        {/* Success ring */}
+                        {showAvatarSuccess && (
+                          <div
+                            className="absolute pointer-events-none"
+                            style={{
+                              inset: -4,
+                              borderRadius: token.borderRadiusLG + 4,
+                              border: `3px solid #52c41a`,
+                              boxShadow: `0 0 0 3px rgba(82,196,26,0.12)`,
+                            }}
+                          />
+                        )}
+
+                        {/* Avatar + overlays — clipped เป็น rounded rect */}
+                        <div
+                          className="relative w-full h-full overflow-hidden"
+                          style={{ borderRadius: token.borderRadiusLG }}
                         >
                           <Avatar
-                            size={140}
+                            size={120}
                             shape="square"
                             icon={<UserOutlined />}
                             src={profile.profileImageUrl || null}
                             style={{
-                              border: `4px solid ${token.colorBgContainer}`,
+                              width: "100%",
+                              height: "100%",
+                              border: `3px solid ${token.colorBgContainer}`,
                               boxShadow: token.boxShadowSecondary,
                               backgroundColor: token.colorBgLayout,
-                              borderRadius: token.borderRadiusLG,
+                              borderRadius: 0,
+                              fontSize: 48,
+                              display: "block",
                             }}
                           />
-                        </Badge>
 
-                        <Flex vertical style={{ paddingTop: 8 }}>
-                          <Title
-                            level={1}
-                            style={{
-                              margin: 0,
-                              textTransform: "uppercase",
-                              fontSize: 36,
-                              fontWeight: 700,
-                              letterSpacing: "-0.025em",
-                            }}
+                          {/* Hover overlay — camera icon + ข้อความ slide up */}
+                          {!isAvatarUploading && !showAvatarSuccess && (
+                            <div
+                              className="absolute inset-0 flex flex-col items-center justify-center
+                                bg-transparent group-hover:bg-black/50 transition-all duration-300"
+                            >
+                              <span
+                                className="transform translate-y-3 opacity-0
+                                  group-hover:translate-y-0 group-hover:opacity-100
+                                  transition-all duration-300 delay-75"
+                                style={{ color: "white", fontSize: 22, lineHeight: 1 }}
+                              >
+                                <CameraOutlined />
+                              </span>
+                              <span
+                                className="text-white text-xs font-medium mt-1.5
+                                  transform translate-y-3 opacity-0
+                                  group-hover:translate-y-0 group-hover:opacity-100
+                                  transition-all duration-300 delay-100"
+                              >
+                                เปลี่ยนรูป
+                              </span>
+                            </div>
+                          )}
+
+                          {/* ✨ Linear Progress Indicator (Indeterminate) — แบบ Google ที่ขอบล่างของ avatar */}
+                          {isAvatarUploading && (
+                            <div
+                              className="absolute left-0 right-0 bottom-0 overflow-hidden pointer-events-none"
+                              style={{ height: 3, backgroundColor: `${token.colorPrimary}28` }}
+                            >
+                              <motion.div
+                                className="absolute inset-y-0"
+                                style={{ width: "35%", backgroundColor: token.colorPrimary }}
+                                animate={{ x: ["-110%", "320%"] }}
+                                transition={{
+                                  duration: 1.6,
+                                  repeat: Infinity,
+                                  ease: [0.65, 0.815, 0.735, 0.395],
+                                  repeatDelay: 0,
+                                }}
+                              />
+                              <motion.div
+                                className="absolute inset-y-0"
+                                style={{ width: "55%", backgroundColor: token.colorPrimary, opacity: 0.45 }}
+                                animate={{ x: ["-120%", "210%"] }}
+                                transition={{
+                                  duration: 1.6,
+                                  repeat: Infinity,
+                                  ease: [0.165, 0.84, 0.44, 1],
+                                  delay: 0.65,
+                                  repeatDelay: 0,
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {/* Success overlay */}
+                          {showAvatarSuccess && (
+                            <div
+                              className="absolute inset-0 flex items-center justify-center"
+                              style={{ backgroundColor: "rgba(82,196,26,0.28)" }}
+                            >
+                              <CheckCircleFilled style={{ color: "white", fontSize: 32 }} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* ─── Profile Info ─── */}
+                      <div className="flex-1 min-w-0 pt-1">
+                        {/* ชื่อ-นามสกุล */}
+                        <Title
+                          level={2}
+                          style={{ margin: 0, fontWeight: 700, lineHeight: 1.25, letterSpacing: "-0.02em" }}
+                        >
+                          {profile.firstName || "—"}{" "}
+                          <span style={{ color: token.colorTextSecondary, fontWeight: 600 }}>
+                            {profile.lastName || ""}
+                          </span>
+                        </Title>
+
+                        {/* วิชาที่เชี่ยวชาญ (ถ้ามี) */}
+                        {profile.specialization?.[0] && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            <Tag
+                              color="blue"
+                              style={{ borderRadius: 999, fontSize: 12, margin: 0 }}
+                            >
+                              {profile.specialization[0]}
+                            </Tag>
+                            {profile.specialization.length > 1 && (
+                              <Tag style={{ borderRadius: 999, fontSize: 12, margin: 0 }}>
+                                +{profile.specialization.length - 1}
+                              </Tag>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Info row — จังหวัด + อีเมล */}
+                        <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-3">
+                          <span
+                            className="flex items-center gap-1.5 text-sm"
+                            style={{ color: token.colorTextSecondary }}
                           >
-                            {profile.firstName || "-"} {profile.lastName || ""}
-                          </Title>
+                            <EnvironmentOutlined style={{ fontSize: 13 }} />
+                            {profile.preferredProvinces?.[0] || "ยังไม่ระบุจังหวัด"}
+                          </span>
+                          <span
+                            className="flex items-center gap-1.5 text-sm"
+                            style={{ color: token.colorTextSecondary }}
+                          >
+                            <MailOutlined style={{ fontSize: 13 }} />
+                            {profile.email || user?.email || "—"}
+                          </span>
+                        </div>
 
-                          {/* ✨ ชื่อครู */}
-                          <div style={{ marginTop: 8 }} />
+                        {/* Profile link */}
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                          <LinkOutlined style={{ fontSize: 13, color: token.colorTextSecondary }} />
+                          <Link href="#" style={{ fontSize: 13 }}>
+                            schoolboard.com/profiles/{(profile.firstName || "").toLowerCase()}
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
 
-                          <Flex vertical gap={8} style={{ marginTop: 16 }}>
-                            <Space size={12}>
-                              <EnvironmentOutlined
-                                style={{ color: token.colorTextDescription }}
-                              />
-                              <Text type="secondary">
-                                {profile.preferredProvinces?.[0] ||
-                                  "ยังไม่ระบุจังหวัด"}
-                              </Text>
-                            </Space>
-                            <Space size={12}>
-                              <MailOutlined
-                                style={{ color: token.colorTextDescription }}
-                              />
-                              <Text type="secondary">
-                                {profile.email || user?.email || "-"}
-                              </Text>
-                            </Space>
-                            <Space size={12}>
-                              <LinkOutlined
-                                style={{ color: token.colorTextDescription }}
-                              />
-                              <Link href="#">
-                                schoolboard.com/profiles/
-                                {(profile.firstName || "").toLowerCase()}
-                              </Link>
-                            </Space>
-                          </Flex>
-                        </Flex>
-                      </Space>
-                    </Col>
-                    <Col>
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => handleOpenEdit("basic-info")}
-                      />
-                    </Col>
-                  </Row>
+                    {/* ─── Edit button ─── */}
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={() => handleOpenEdit("basic-info")}
+                      style={{ flexShrink: 0 }}
+                    >
+                      แก้ไข
+                    </Button>
+                  </div>
                 </Card>
 
                 <Flex vertical gap={32} style={{ width: "100%" }}>
