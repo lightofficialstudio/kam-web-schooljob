@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/app/stores/auth-store";
+import { FileSearchOutlined } from "@ant-design/icons";
 import { Col, Row, Tabs, theme, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { requestGetApplications } from "./_api/applications-api";
@@ -50,15 +51,28 @@ export default function ApplicationsPage() {
       : applications.filter((a) => a.status === activeTab);
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 16px 64px" }}>
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px 64px" }}>
       {/* ─── Page header ─── */}
-      <div style={{ marginBottom: 28 }}>
-        <Title level={3} style={{ margin: 0, marginBottom: 4 }}>
-          ใบสมัครงาน
-        </Title>
-        <Text type="secondary" style={{ fontSize: 14 }}>
-          ติดตามสถานะใบสมัครงานของคุณแบบ real-time
-        </Text>
+      <div
+        className="rounded-2xl px-6 py-5 mb-7 flex items-center gap-4"
+        style={{
+          background: `linear-gradient(135deg, #001e45 0%, #0a4a8a 60%, #11b6f5 100%)`,
+        }}
+      >
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+          style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
+        >
+          <FileSearchOutlined />
+        </div>
+        <div>
+          <Title level={4} style={{ color: "white", margin: 0, lineHeight: 1.2 }}>
+            ใบสมัครงาน
+          </Title>
+          <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>
+            ติดตามสถานะใบสมัครงานของคุณทุกขั้นตอน
+          </Text>
+        </div>
       </div>
 
       {/* ─── Stats bar ─── */}

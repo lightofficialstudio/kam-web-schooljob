@@ -1,36 +1,17 @@
 "use client";
 
+import { SummaryCard } from "@/app/components/card/summary-card.component";
+import {
+  CalendarOutlined,
+  CheckCircleFilled,
+  CloseCircleFilled,
+  ClockCircleOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import { Col, Row, theme, Typography } from "antd";
 import type { ApplicationEntry } from "../_stores/applications-store";
 
 const { Text } = Typography;
-
-interface StatItemProps {
-  label: string;
-  count: number;
-  color: string;
-  bg: string;
-  border: string;
-}
-
-const StatItem: React.FC<StatItemProps> = ({ label, count, color, bg, border }) => (
-  <div
-    style={{
-      textAlign: "center",
-      padding: "16px 12px",
-      borderRadius: 12,
-      background: bg,
-      border: `1px solid ${border}`,
-    }}
-  >
-    <div style={{ fontSize: 28, fontWeight: 700, color, lineHeight: 1.1 }}>
-      {count}
-    </div>
-    <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: "block" }}>
-      {label}
-    </Text>
-  </div>
-);
 
 interface ApplicationStatsBarProps {
   applications: ApplicationEntry[];
@@ -49,53 +30,113 @@ export const ApplicationStatsBar: React.FC<ApplicationStatsBarProps> = ({
     rejected: applications.filter((a) => a.status === "rejected").length,
   };
 
+  // ✨ อัตราผ่านการคัดเลือก: accepted / (accepted + rejected)
+  const decided = counts.accepted + counts.rejected;
+  const successRate = decided > 0 ? Math.round((counts.accepted / decided) * 100) : null;
+
   return (
-    <Row gutter={[12, 12]}>
-      <Col xs={12} sm={6} md={4} lg={4}>
-        <StatItem
-          label="ทั้งหมด"
-          count={counts.total}
-          color={token.colorPrimary}
-          bg={token.colorPrimaryBg}
-          border={token.colorPrimaryBorder}
-        />
-      </Col>
-      <Col xs={12} sm={6} md={5} lg={5}>
-        <StatItem
-          label="รอพิจารณา"
-          count={counts.submitted}
-          color={token.colorInfoText}
-          bg={token.colorInfoBg}
-          border={token.colorInfoBorder}
-        />
-      </Col>
-      <Col xs={12} sm={6} md={5} lg={5}>
-        <StatItem
-          label="นัดสัมภาษณ์"
-          count={counts.interview}
-          color={token.colorWarningText}
-          bg={token.colorWarningBg}
-          border={token.colorWarningBorder}
-        />
-      </Col>
-      <Col xs={12} sm={6} md={5} lg={5}>
-        <StatItem
-          label="ผ่านการคัดเลือก"
-          count={counts.accepted}
-          color={token.colorSuccessText}
-          bg={token.colorSuccessBg}
-          border={token.colorSuccessBorder}
-        />
-      </Col>
-      <Col xs={24} sm={24} md={5} lg={5}>
-        <StatItem
-          label="ไม่ผ่านการคัดเลือก"
-          count={counts.rejected}
-          color={token.colorErrorText}
-          bg={token.colorErrorBg}
-          border={token.colorErrorBorder}
-        />
-      </Col>
-    </Row>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <Row gutter={[12, 12]}>
+        <Col xs={12} sm={12} md={12} lg={5}>
+          <SummaryCard
+            title="ส่งใบสมัครแล้ว"
+            value={counts.total}
+            unit="ใบ"
+            icon={<FileTextOutlined />}
+            color={token.colorPrimary}
+          />
+        </Col>
+        <Col xs={12} sm={12} md={12} lg={5}>
+          <SummaryCard
+            title="รอพิจารณา"
+            value={counts.submitted}
+            unit="ใบ"
+            icon={<ClockCircleOutlined />}
+            color="#2563eb"
+          />
+        </Col>
+        <Col xs={12} sm={12} md={8} lg={4}>
+          <SummaryCard
+            title="นัดสัมภาษณ์"
+            value={counts.interview}
+            unit="ครั้ง"
+            icon={<CalendarOutlined />}
+            color="#ea580c"
+          />
+        </Col>
+        <Col xs={12} sm={12} md={8} lg={5}>
+          <SummaryCard
+            title="ผ่านการคัดเลือก"
+            value={counts.accepted}
+            unit="ใบ"
+            icon={<CheckCircleFilled />}
+            color="#16a34a"
+          />
+        </Col>
+        <Col xs={24} sm={24} md={8} lg={5}>
+          <SummaryCard
+            title="ไม่ผ่านการคัดเลือก"
+            value={counts.rejected}
+            unit="ใบ"
+            icon={<CloseCircleFilled />}
+            color="#dc2626"
+          />
+        </Col>
+      </Row>
+
+      {/* ─── Success rate banner ─── */}
+      {successRate !== null && (
+        <div
+          style={{
+            borderRadius: 12,
+            padding: "12px 16px",
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <Text style={{ fontSize: 12, color: token.colorTextSecondary, whiteSpace: "nowrap" }}>
+            อัตราผ่านการคัดเลือก
+          </Text>
+          <div
+            style={{
+              flex: 1,
+              height: 7,
+              borderRadius: 999,
+              background: token.colorFillSecondary,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${successRate}%`,
+                borderRadius: 999,
+                transition: "width 0.7s ease",
+                background:
+                  successRate >= 50
+                    ? "linear-gradient(90deg, #16a34a 0%, #4ade80 100%)"
+                    : "linear-gradient(90deg, #ea580c 0%, #fbbf24 100%)",
+              }}
+            />
+          </div>
+          <Text
+            strong
+            style={{
+              fontSize: 14,
+              color: successRate >= 50 ? "#16a34a" : "#ea580c",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {successRate}%
+          </Text>
+          <Text style={{ fontSize: 11, color: token.colorTextTertiary, whiteSpace: "nowrap" }}>
+            ({counts.accepted}/{decided} ครั้ง)
+          </Text>
+        </div>
+      )}
+    </div>
   );
 };
