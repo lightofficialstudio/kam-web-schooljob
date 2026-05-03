@@ -1,12 +1,13 @@
 {
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "allow": [
       "Bash(Get-ChildItem *)",
       "PowerShell(Get-ChildItem *)",
       "Skill(update-config)",
-      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\('antd:', p.dependencies?.antd || p.devDependencies?.antd\\); console.log\\('scripts:', JSON.stringify\\(p.scripts, null, 2\\)\\)\")"
-    ]
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\('antd:', p.dependencies?.antd || p.devDependencies?.antd\\); console.log\\('scripts:', JSON.stringify\\(p.scripts, null, 2\\)\\)\")",
+      "Bash(bun run *)"
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
