@@ -35,6 +35,7 @@ import {
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { TopProgressBar } from "@/app/components/top-progress-bar/top-progress-bar.component";
 import { motion } from "framer-motion";
 import { patchBasicInfo, patchSummary } from "./_api/employee-profile-api";
 import { patchWorkLocation } from "./_api/work-location-api";
@@ -84,6 +85,7 @@ export default function EmployeeProfilePage() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const [showAvatarSuccess, setShowAvatarSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // ✨ Modal state มาตรฐาน — ใช้ ModalComponent แทน openNotification ทุกจุด
   interface ModalState {
@@ -239,6 +241,7 @@ export default function EmployeeProfilePage() {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       const values = await form.validateFields();
       const { languageAndItSkills, dateOfBirth, ...rest } = values as Record<
@@ -369,6 +372,8 @@ export default function EmployeeProfilePage() {
           errorDetails: err,
         });
       }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -386,6 +391,9 @@ export default function EmployeeProfilePage() {
 
   return (
     <Layout style={{ minHeight: "100vh", paddingBottom: 80 }}>
+      {/* ✨ YouTube-style slim top progress bar — แสดงเมื่อมี async operation */}
+      <TopProgressBar active={isAvatarUploading || isSaving} />
+
       {/* 1. Header Banner */}
       <Flex
         style={{
