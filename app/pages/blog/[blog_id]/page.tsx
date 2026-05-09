@@ -62,6 +62,21 @@ const formatThaiDate = (iso?: string | null) => {
   });
 };
 
+// ✨ ดึงเฉพาะ body content จาก full HTML document
+// กรณีผู้ใช้วาง full HTML (<html><head><style>...</style><body>...) เข้ามา
+// ต้องลบ <style>, <script>, <head> และ wrapper tags ออก
+// เพื่อป้องกัน embedded styles override dark mode ของระบบ
+const extractBodyContent = (html: string): string => {
+  return html
+    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    .replace(/<head[\s\S]*?<\/head>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "") // ✨ ลบ style blocks ที่ hardcode สี
+    .replace(/<script[\s\S]*?<\/script>/gi, "") // ✨ ลบ script (security)
+    .replace(/<\/?html[^>]*>/gi, "")
+    .replace(/<\/?body[^>]*>/gi, "")
+    .trim();
+};
+
 export default function BlogDetailPage() {
   const { token } = antTheme.useToken();
   const params = useParams();
@@ -256,12 +271,15 @@ export default function BlogDetailPage() {
                 <Col xs={24} lg={17}>
                   <Typography>
                     <div
+                      className="blog-content"
                       style={{
                         fontSize: "18px",
                         lineHeight: "1.9",
                         color: token.colorText,
                       }}
-                      dangerouslySetInnerHTML={{ __html: blog.content }}
+                      dangerouslySetInnerHTML={{
+                        __html: extractBodyContent(blog.content),
+                      }}
                     />
                   </Typography>
 

@@ -36,6 +36,120 @@
   background-color: rgba(67, 127, 199, 0.04) !important;
 }
 
+/* ════════════════════════════════════════════
+   ✨ Blog Content — Light / Dark Mode Support
+   เนื้อหาบทความที่ render จาก HTML string
+   parent div ใช้ color: token.colorText (Ant Design token)
+   ทุก child element ใช้ inherit เพื่อรับสี dark/light อัตโนมัติ
+   ════════════════════════════════════════════ */
+
+/* ✨ text elements ทั้งหมด inherit จาก parent div
+   parent ใช้ style={{ color: token.colorText }} ที่เปลี่ยนตาม theme เอง */
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  color: inherit;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+  line-height: 1.4;
+}
+.blog-content p {
+  color: inherit;
+  margin-bottom: 1.2em;
+}
+.blog-content strong,
+.blog-content b {
+  color: inherit;
+}
+.blog-content em,
+.blog-content i {
+  color: inherit;
+}
+.blog-content ul,
+.blog-content ol {
+  color: inherit;
+  padding-left: 1.5em;
+  margin-bottom: 1.2em;
+}
+.blog-content li {
+  color: inherit;
+  margin-bottom: 0.4em;
+}
+.blog-content a {
+  color: #11b6f5;
+  text-decoration: underline;
+}
+.blog-content a:hover {
+  color: #0d8fd4;
+}
+.blog-content blockquote {
+  border-left: 4px solid #11b6f5;
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  background: rgba(17, 182, 245, 0.06);
+  color: inherit;
+  opacity: 0.8;
+  border-radius: 0 8px 8px 0;
+}
+.blog-content code {
+  background: rgba(128, 128, 128, 0.12);
+  color: #c7254e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+.blog-content pre {
+  background: rgba(128, 128, 128, 0.08);
+  color: inherit;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.2em;
+}
+.blog-content pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+.blog-content hr {
+  border: none;
+  border-top: 1px solid currentColor;
+  opacity: 0.15;
+  margin: 2em 0;
+}
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5em;
+}
+.blog-content th,
+.blog-content td {
+  border: 1px solid currentColor;
+  border-opacity: 0.15;
+  padding: 8px 12px;
+  color: inherit;
+}
+.blog-content th {
+  background: rgba(128, 128, 128, 0.08);
+  font-weight: 600;
+}
+.blog-content img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* ✨ dark mode: code สี — ส่วนอื่นๆ inherit จาก token.colorText แล้ว */
+[data-theme="dark"] .blog-content code {
+  color: #f08080;
+}
+[data-theme="dark"] .blog-content blockquote {
+  background: rgba(17, 182, 245, 0.08);
+}
+
 /* ✨ [Custom Keyframe Animations] */
 @keyframes fadeInDown {
   from {
