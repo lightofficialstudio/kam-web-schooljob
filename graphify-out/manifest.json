@@ -1,0 +1,1758 @@
+{
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/postcss.config.mjs": {
+    "mtime": 1772894644.823923,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma.config.ts": {
+    "mtime": 1775274933.6506157,
+    "hash": "d4b151fb0b584f27a79798d5a7045f37"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/next-env.d.ts": {
+    "mtime": 1778322665.886803,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/proxy.ts": {
+    "mtime": 1776603035.6662555,
+    "hash": "fc568d784f7d5f19c8a7a166af4d3a85"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright.config.ts": {
+    "mtime": 1773161615.6290898,
+    "hash": "3a19b86942687bbb1980258ca2d93c92"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/eslint.config.mjs": {
+    "mtime": 1774187190.0505788,
+    "hash": "dde183262693fccb5a213f8131d93b80"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/next.config.ts": {
+    "mtime": 1776156255.4068317,
+    "hash": "b653c8601c6793cc9d7a6fda57af3d2b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/layout.tsx": {
+    "mtime": 1775277052.4346516,
+    "hash": "19a6d7116e4f621ae0967bb86abe5990"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/page.tsx": {
+    "mtime": 1774673309.4560094,
+    "hash": "8af3edd27d2e3dde330449ce34ceeb6c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/not-found.tsx": {
+    "mtime": 1776494377.0708048,
+    "hash": "73d275caed47bc3891e289bf28057484"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/browser.ts": {
+    "mtime": 1772895202.08075,
+    "hash": "33c5165a38c964ce263f3526380540b8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/client.ts": {
+    "mtime": 1772895202.0807173,
+    "hash": "240f05591003935207aef1fe0bc7a5c4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/models.ts": {
+    "mtime": 1772895202.0808153,
+    "hash": "c3eeb20d8e02e01534042b5a018b0592"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/commonInputTypes.ts": {
+    "mtime": 1772895202.0807831,
+    "hash": "c763266388c596c610d0045d0d2ca6aa"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/enums.ts": {
+    "mtime": 1772895202.080793,
+    "hash": "fa6c58ad2d5526df3ff4f7e351d5f2f2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/internal/class.ts": {
+    "mtime": 1772895202.0813403,
+    "hash": "4223c50cb017f2f17e655fd352e5b7da"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/internal/prismaNamespace.ts": {
+    "mtime": 1772895202.0812206,
+    "hash": "483d33d2a4d667aa62e8f75323c3ab1f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/generated/prisma/internal/prismaNamespaceBrowser.ts": {
+    "mtime": 1772895202.081198,
+    "hash": "4e539c00b6046f9fdee046fc563fe327"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/contexts/theme-context.tsx": {
+    "mtime": 1776495631.150597,
+    "hash": "582abd316b6f0f149187351e7ce0c5e4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/stores/notification-modal-store.ts": {
+    "mtime": 1773163805.205834,
+    "hash": "9c88e12d360661f4692db4cf2ba0aaa9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/stores/auth-store.ts": {
+    "mtime": 1776179158.8090637,
+    "hash": "3cd2b3099311d3f96e05bd2a8643daa8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/top-progress-bar/top-progress-bar.component.tsx": {
+    "mtime": 1778319921.92607,
+    "hash": "cb94320ff914a91786fb129573058259"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/card/summary-card.component.tsx": {
+    "mtime": 1776514742.1092615,
+    "hash": "c92ea9e1dfb7dc850a7a1d1442ae70a7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/admin/card/summary-card.component.tsx": {
+    "mtime": 1776612786.9721932,
+    "hash": "c92ea9e1dfb7dc850a7a1d1442ae70a7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/admin/header/breadcrumb.component.tsx": {
+    "mtime": 1776613056.334709,
+    "hash": "4dd3530846bc1ab783362ef359fc633a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/admin/header/header.component.tsx": {
+    "mtime": 1776611739.6261017,
+    "hash": "0c712bd5fe83a82426fafab4bedb4468"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/layout-selector.tsx": {
+    "mtime": 1776603567.7662013,
+    "hash": "158883662a0de38214007f14481e955c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/landing/navbar.tsx": {
+    "mtime": 1778319921.9258533,
+    "hash": "241f81ef756fa98c6584ba810079984c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/landing/landing-layout-client.tsx": {
+    "mtime": 1778320543.2543242,
+    "hash": "efe0cc1c66efb9de012a840e2fc3b487"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/landing/footer.tsx": {
+    "mtime": 1778319921.9256744,
+    "hash": "e399318736f22dd3b218ccd9ec171d83"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/landing/landing-layout.tsx": {
+    "mtime": 1774686963.988746,
+    "hash": "3868cb2f11a63d3d69ef9f52f961f399"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/landing/_config/landing-theme.ts": {
+    "mtime": 1774686963.9882922,
+    "hash": "4c36a4314984d7786cd823699bb47beb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/admin/navbar.tsx": {
+    "mtime": 1775276124.6539164,
+    "hash": "038b9b953223e9c7795585a36117e48d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/admin/admin-layout.tsx": {
+    "mtime": 1776613871.0041022,
+    "hash": "503b59688b680c22fb5fae6353add6d0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/admin/admin-guard.tsx": {
+    "mtime": 1775279022.3107204,
+    "hash": "82a624d094c321d12dfead69c0e37457"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/admin/sidebar.tsx": {
+    "mtime": 1776613882.040781,
+    "hash": "e2ab29b59440b5f39954c4c6af1b6e03"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/admin/index.ts": {
+    "mtime": 1772904719.0027714,
+    "hash": "a33c457bccefd1adbe6d0c71f7d8e627"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/modal/notification-modal-provider.tsx": {
+    "mtime": 1774673309.45441,
+    "hash": "fcc3178de3d85396c289945b0258626e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/modal/result-modal.tsx": {
+    "mtime": 1774673309.4549227,
+    "hash": "e4b8b709a8485343f2e918236a972968"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/layouts/modal/base-modal.tsx": {
+    "mtime": 1774678641.6181445,
+    "hash": "153fbe24d8618b272e0055d30d9de1e8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/components/modal/modal.component.tsx": {
+    "mtime": 1776518060.1314843,
+    "hash": "26582294c64097f171422476a9f15381"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/lib/storage.ts": {
+    "mtime": 1776519699.1345398,
+    "hash": "b365fbd9bd805cdba876cbe24532741e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/lib/supabase.ts": {
+    "mtime": 1773163805.2095444,
+    "hash": "97fe16a7605455c2d0491eb81224ae50"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/lib/geo.ts": {
+    "mtime": 1776503512.9050605,
+    "hash": "1c2a470f1021602f593bacea822c4bd4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/blogs/read/route.ts": {
+    "mtime": 1776062069.7205083,
+    "hash": "413203ef4072ee787692cc10adf467b6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/blogs/[blog_id]/route.ts": {
+    "mtime": 1776271832.9516184,
+    "hash": "45f9fe752811342741431a8e13f492a3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/blogs/categories/route.ts": {
+    "mtime": 1776587613.3348792,
+    "hash": "7741d0a665b80c8e6b62cd99243113c1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/authenticate/signup/route.ts": {
+    "mtime": 1776579285.2694817,
+    "hash": "622ce266429f0a25795f9612d2b3f3eb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/authenticate/signin/route.ts": {
+    "mtime": 1776178786.5984647,
+    "hash": "c879c51e3df5f80b8f36475d80ac8dc0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/authenticate/service/authenticate-service.ts": {
+    "mtime": 1776583302.3134406,
+    "hash": "c3165d97f6e343079043fbdb32a1a6c1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/authenticate/validation/authenticate-schema.ts": {
+    "mtime": 1776579270.5515602,
+    "hash": "069204c98ed27c30a0e47e3581ff6b06"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/config/options/route.ts": {
+    "mtime": 1778324316.3046308,
+    "hash": "c7438c5e17e0ce8b89911dc6d00e309e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/plan/route.ts": {
+    "mtime": 1776161437.3744695,
+    "hash": "c4e858ff966d4d471d78e2b14d746f88"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/delegated/route.ts": {
+    "mtime": 1775981858.99891,
+    "hash": "25bfd43db57f8f5e119b81b806ddf8ed"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/roles/route.ts": {
+    "mtime": 1775981845.7313318,
+    "hash": "c7f14cb0200ce97cc87c95ecaf011126"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/roles/permissions/route.ts": {
+    "mtime": 1775981853.1553679,
+    "hash": "1585da107c9af1104b159172e5426491"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/members/route.ts": {
+    "mtime": 1775981821.5613322,
+    "hash": "00fc1b2631366d5d4e380e53b697eb2d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/service/org-service.ts": {
+    "mtime": 1775982976.5843878,
+    "hash": "725d5de93e22905d57c907609922cce7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/invites/route.ts": {
+    "mtime": 1776514449.8220212,
+    "hash": "162abcc1db9e3bdefb15b74da49b3c9d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/invites/accept/route.ts": {
+    "mtime": 1776514948.172224,
+    "hash": "ef3c1679c9908ddf2d875009ca4a8f0a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/organization/validation/org-schema.ts": {
+    "mtime": 1775981800.5946937,
+    "hash": "2b62747a81ac3f73c17756f35810c698"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/account-setting/update-personal/route.ts": {
+    "mtime": 1776175820.733634,
+    "hash": "d0fd82f6919df0857a957f3850dbaead"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/account-setting/change-password/route.ts": {
+    "mtime": 1776175827.5433016,
+    "hash": "9713434632331ad7b6b04bca297e8f8e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/profile/update/route.ts": {
+    "mtime": 1775377500.0644987,
+    "hash": "a83d937c13a03152548d43e6a02f3dfd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/profile/read/route.ts": {
+    "mtime": 1775377500.0530102,
+    "hash": "89441456424c1ca53bbc2b6c6922a594"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/profile/service/employer-profile-service.ts": {
+    "mtime": 1776163483.3202834,
+    "hash": "4ac762f4c38ddef1913bb8b23d285587"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/profile/validation/employer-profile-schema.ts": {
+    "mtime": 1776163465.4259622,
+    "hash": "e3feb8853363e2d1f73ccf9257bbbbff"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/profile/update-cover/route.ts": {
+    "mtime": 1778322649.1357315,
+    "hash": "fe301d9bf7c5bddf6c1a6a460ad68fee"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/pipeline/route.ts": {
+    "mtime": 1775380838.6887412,
+    "hash": "0ae0c1671223eadc32fa423feff1e35e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/close/route.ts": {
+    "mtime": 1775379888.2822669,
+    "hash": "7e61c97d337a3aaf6e4d04c9fe0629dd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/update/route.ts": {
+    "mtime": 1775378464.1989748,
+    "hash": "c56fd8e292d380ebf41da5455c2ad3d1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/applicants/read/route.ts": {
+    "mtime": 1775979067.4948385,
+    "hash": "4840bc2b43225051b2a8a26696dcff84"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/applicants/update-status/route.ts": {
+    "mtime": 1776514919.1524003,
+    "hash": "e32f0bd240f8280d0d5969c135a3a3ce"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/read/route.ts": {
+    "mtime": 1775378464.0878022,
+    "hash": "3fb4808f41f9c72dc45eb932f8f54e4c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/service/job-service.ts": {
+    "mtime": 1776514887.552924,
+    "hash": "304ed6efed16b82263d7e4f30dfb29dd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/create/route.ts": {
+    "mtime": 1775378464.0325694,
+    "hash": "a1e17fba294494b6829878d2fc4b4bad"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/stats/read/route.ts": {
+    "mtime": 1775979443.7642472,
+    "hash": "b2df7a8168fde033594ada672ba19daa"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/jobs/validation/job-schema.ts": {
+    "mtime": 1775378583.3128338,
+    "hash": "4413042dbbab9455b020550e104d9d51"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employer/package/read/route.ts": {
+    "mtime": 1776183152.0098708,
+    "hash": "9ea9d27767cd854502a9bbf79edbd3cb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/audit-logs/route.ts": {
+    "mtime": 1776518365.9524708,
+    "hash": "c9cebae1fd2dc471fb6f0b170121e0fc"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/update/route.ts": {
+    "mtime": 1776179412.980697,
+    "hash": "4d7b5ff03d4189ee55f92e2793ad8c08"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/delete/route.ts": {
+    "mtime": 1776179425.703999,
+    "hash": "e0d782cb3a0af1585afbf87e744ab4b8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/read/route.ts": {
+    "mtime": 1776179400.294473,
+    "hash": "f9293845739ec1231b4685d32029ca29"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/bulk-delete/route.ts": {
+    "mtime": 1776527078.8465083,
+    "hash": "8f165dbe8c9309f6cf1948b3be53c031"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/bulk-update/route.ts": {
+    "mtime": 1776527078.894336,
+    "hash": "2c68c9a0ebed3f3aa8f10e62f5cbdaa2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/ai/route.ts": {
+    "mtime": 1776271176.0205014,
+    "hash": "e8234b48bb3fd648927714069d983b4c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/service/blog-service.ts": {
+    "mtime": 1776527078.603851,
+    "hash": "9739fe1b0e065a86aaadf3ace7813db2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/create/route.ts": {
+    "mtime": 1776179385.1758568,
+    "hash": "1f6faea9f315e22ebd01fbd465f830cf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/stats/route.ts": {
+    "mtime": 1776271864.178848,
+    "hash": "28b55a4492c94bddee2baf3d02b3d8bf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/blogs/validation/blog-schema.ts": {
+    "mtime": 1776179347.2092643,
+    "hash": "c205b5d200d4065278c4d11660910435"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/config/route.ts": {
+    "mtime": 1776529785.1775925,
+    "hash": "b71aa8812d5e308f06de18cbd1ad69b4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/config/reorder/route.ts": {
+    "mtime": 1776529021.7630186,
+    "hash": "c1c9d764f122e46674784298b8f601f0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/announcements/count/route.ts": {
+    "mtime": 1776531194.7546048,
+    "hash": "572ff1ccff2b7c180ff701d22479fa16"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/announcements/history/route.ts": {
+    "mtime": 1776530269.346933,
+    "hash": "de1348192ccc7e9eb6aff549c63a7e14"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/announcements/service/announcement-service.ts": {
+    "mtime": 1776601522.1618624,
+    "hash": "a4ba5f85b3e853defce19b29c718c5e2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/announcements/broadcast/route.ts": {
+    "mtime": 1776601061.7778714,
+    "hash": "b1f83840e22519ba466db35a25d0ad8a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/announcements/validation/announcement-schema.ts": {
+    "mtime": 1776601483.8321197,
+    "hash": "224d2194d835047b19dd5d91faae2078"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/dashboard/route.ts": {
+    "mtime": 1776523655.6501098,
+    "hash": "37c9b029006797a81aea743d879ff242"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/users/route.ts": {
+    "mtime": 1776269647.50522,
+    "hash": "32b3d7aea2da0cea5317ce1925075790"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/users/[id]/route.ts": {
+    "mtime": 1776269711.6655703,
+    "hash": "730d010ab016c382c08389e8f28beb18"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/school-detail/route.ts": {
+    "mtime": 1776528432.172498,
+    "hash": "aef7e17b5eb031d07c9b29c7f78bede0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/update/route.ts": {
+    "mtime": 1776179702.9850295,
+    "hash": "878c94e6f62c34126ed003e236d924df"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/plans/route.ts": {
+    "mtime": 1776268812.385038,
+    "hash": "1bc5497db367c8b3ac572b355d450732"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/plans/[plan]/route.ts": {
+    "mtime": 1776268837.1624763,
+    "hash": "c7276ee3c3e1a677f4338883ee6efeb6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/read/route.ts": {
+    "mtime": 1776179686.719193,
+    "hash": "e6ad84eafe60d196d0a8d433faf33085"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/bulk-update/route.ts": {
+    "mtime": 1776528452.0861804,
+    "hash": "c2c01719f148c1ac4e96af53394e25be"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/service/package-service.ts": {
+    "mtime": 1776528407.1524835,
+    "hash": "5b30dc37517f9676453a28a9343610cf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/packages/validation/package-schema.ts": {
+    "mtime": 1776268750.0015645,
+    "hash": "e151f1babe8a5119a7bdf767b1f7cfed"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/site-settings/route.ts": {
+    "mtime": 1776602341.4893396,
+    "hash": "099cbb9d7dd49efe5a0e649fb8e81ef8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/get-one/route.ts": {
+    "mtime": 1776521831.1557057,
+    "hash": "2e237704328e08f41611a41744055463"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/update/route.ts": {
+    "mtime": 1776521872.640107,
+    "hash": "a1cb0f1c366a57294983511fbac0b3a6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/delete/route.ts": {
+    "mtime": 1776518349.1985774,
+    "hash": "5c1637d15c85576d4f72b4f3ae83afc4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/applicants/route.ts": {
+    "mtime": 1776520600.281213,
+    "hash": "30ee80dc6ab04824c170c68c10757922"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/read/route.ts": {
+    "mtime": 1776518297.9735134,
+    "hash": "f8965d3869b245c7abfe8a5812fb8a9e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/update-status/route.ts": {
+    "mtime": 1776518330.6327004,
+    "hash": "ef2d6f705a97ef2e8896f46648d23c04"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/service/admin-job-service.ts": {
+    "mtime": 1776521952.562347,
+    "hash": "87bf03a63381693f957148707bf23621"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/jobs/create/route.ts": {
+    "mtime": 1776519118.1842804,
+    "hash": "f3d1812adaebcebb64c3c92ab05f1bba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/admin/schools/read/route.ts": {
+    "mtime": 1776517078.1216211,
+    "hash": "6ff33615355405e1edc91036650a5c99"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/storage/delete/route.ts": {
+    "mtime": 1776519699.5235038,
+    "hash": "737981d78f2ffd5cdbfc6246869bccd8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/storage/service/storage-service.ts": {
+    "mtime": 1778322216.3715131,
+    "hash": "8700e9b49593fa81ee7cb6167d3bc23c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/storage/upload/route.ts": {
+    "mtime": 1778322224.0140774,
+    "hash": "c4541ce05cbb66822b01f1dec3bc489d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/system/maintenance/route.ts": {
+    "mtime": 1776602360.8772633,
+    "hash": "abea8b27213f4f7ebea794be6ceae970"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/jobs/route.ts": {
+    "mtime": 1776497007.0410836,
+    "hash": "e6593b44fe9e55461ec127b054abe6f5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/jobs/latest/route.ts": {
+    "mtime": 1776155495.2860792,
+    "hash": "32c916096fe0b08c31a4c611f501fe15"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/jobs/[job_id]/route.ts": {
+    "mtime": 1776160944.5721061,
+    "hash": "a608b4a6468cce99d7056de7f7ad93c6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/jobs/service/job-search-service.ts": {
+    "mtime": 1776497051.3990583,
+    "hash": "f42da3538a8331dcc811fc7c7399dd52"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/jobs/validation/job-search-schema.ts": {
+    "mtime": 1776496994.0704658,
+    "hash": "65200bec2efc794b20e8a5c8f04f6fdb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/account-setting/change-password/route.ts": {
+    "mtime": 1776588010.030391,
+    "hash": "1c1fab01c2194da40f71d3aac0854d72"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/licenses/route.ts": {
+    "mtime": 1776587469.66649,
+    "hash": "2b7168f38252e9d5f33e523ab89b72f0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/licenses/service/license-service.ts": {
+    "mtime": 1776587469.6669388,
+    "hash": "c353c8503022186ba2b346331c496f26"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/licenses/[id]/route.ts": {
+    "mtime": 1776597118.794395,
+    "hash": "71d176bcc2261ac6ac3d4f15d7fae64d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/licenses/validation/license-schema.ts": {
+    "mtime": 1776587469.667828,
+    "hash": "c819ecd89096e04e00148e2f9a484460"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-location/update/route.ts": {
+    "mtime": 1776600945.9746504,
+    "hash": "52865e868af1715cdfa1c80eeb725c48"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-location/update/service/work-location-service.ts": {
+    "mtime": 1776600945.6523511,
+    "hash": "f227c63470572cf4ceaf1565780c25f1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-location/update/validation/work-location-schema.ts": {
+    "mtime": 1776600945.6565995,
+    "hash": "cdda21541cf57586062998644898a6b8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-experiences/route.ts": {
+    "mtime": 1776587292.3594074,
+    "hash": "6efbd6dd39f1503a05d689628f53d90e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-experiences/service/work-experience-service.ts": {
+    "mtime": 1776587282.4228826,
+    "hash": "02d07198131111e3ac0f746eda98c31a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-experiences/[id]/route.ts": {
+    "mtime": 1776597089.6920447,
+    "hash": "422c38996ac9db5782922bcc66815701"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/work-experiences/validation/work-experience-schema.ts": {
+    "mtime": 1776587272.8385754,
+    "hash": "958e5a3417198a547ba81e767fcc652a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/resumes/route.ts": {
+    "mtime": 1776587469.6608114,
+    "hash": "bf11810a2b4d88f7f3bd7dcc89659d8f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/resumes/service/resume-service.ts": {
+    "mtime": 1776587469.6612651,
+    "hash": "af156e50116c03afbba8d3f4c8ffe3c8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/resumes/[id]/route.ts": {
+    "mtime": 1776597110.5795636,
+    "hash": "89b0d59f216fef64bc0b9381cda0a0a1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/resumes/validation/resume-schema.ts": {
+    "mtime": 1776587469.662306,
+    "hash": "ccba229c71aaabc23518bd39359d6cbb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/update/route.ts": {
+    "mtime": 1775372586.4236367,
+    "hash": "ff177b540aa82e7a203256b224e29b59"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/read/route.ts": {
+    "mtime": 1776586380.0587003,
+    "hash": "bb9535671d65fab334a618dc44ddf1d7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/basic/route.ts": {
+    "mtime": 1776587469.651122,
+    "hash": "10a2cc191454849c1825742fbeb0b252"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/basic/service/basic-service.ts": {
+    "mtime": 1776587469.6516273,
+    "hash": "4a8176f941f18af7b826eaf59467f3bf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/basic/validation/basic-schema.ts": {
+    "mtime": 1776587469.6521165,
+    "hash": "b6d4ea770f8afd3599ce656617c869c1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/service/employee-profile-service.ts": {
+    "mtime": 1776586350.215147,
+    "hash": "016e68dce1f910df363910c97ae85ce8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/validation/employee-profile-schema.ts": {
+    "mtime": 1775376516.3073773,
+    "hash": "f5d8235346bd1397cc7c3520a7cff6f8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/summary/route.ts": {
+    "mtime": 1776587469.6556246,
+    "hash": "57fa2e229e1cbc2a6d0d29af6a05150a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/summary/service/summary-service.ts": {
+    "mtime": 1776599188.748119,
+    "hash": "9039c97f35a27b673d145f3ccfa5e1f5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/summary/validation/summary-schema.ts": {
+    "mtime": 1776599162.461828,
+    "hash": "0356efb83b3fbd75486ba6a110526945"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/applications/read/route.ts": {
+    "mtime": 1776060485.049297,
+    "hash": "73bb30303bf9ecd05dea71821f50304b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/applications/service/application-service.ts": {
+    "mtime": 1778319921.925475,
+    "hash": "426c5ea89872550dcf04bdf686ae1fad"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/applications/create/route.ts": {
+    "mtime": 1776514865.7172341,
+    "hash": "082eb6cc3e36d35700016a495e7805f5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/applications/validation/application-schema.ts": {
+    "mtime": 1776060471.9377244,
+    "hash": "7237f4575a4ce871b375b8ea265cee35"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/[school_id]/read/route.ts": {
+    "mtime": 1776498148.889909,
+    "hash": "b6be977659ff469b62e83b0e2080b563"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/[school_id]/service/school-profile-service.ts": {
+    "mtime": 1776579897.0365338,
+    "hash": "5f35d650a0e1850b6001a9e239ab58c5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/[school_id]/validation/school-profile-schema.ts": {
+    "mtime": 1776498110.239407,
+    "hash": "bb69dda759ed613176b7cf6f31d76f90"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/read/route.ts": {
+    "mtime": 1776578737.6864417,
+    "hash": "dfef5c93413d601a67b7fed23dea8e34"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/service/school-service.ts": {
+    "mtime": 1776578722.2997785,
+    "hash": "07ddde0bb89afd95faf2c76e4d1e36ed"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/schools/validation/school-search-schema.ts": {
+    "mtime": 1776578683.2438762,
+    "hash": "4968667e3ace5aacafd313b74ccfb67a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/educations/route.ts": {
+    "mtime": 1776587375.1345174,
+    "hash": "add06b307f7f282672d3daea85c761b3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/educations/service/education-service.ts": {
+    "mtime": 1776587365.8944333,
+    "hash": "67f262fb16a3ada0402ca541d00d67a3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/educations/[id]/route.ts": {
+    "mtime": 1776597099.7053132,
+    "hash": "cc47b265a71dc41e3d3f7133c5f4c90a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/educations/validation/education-schema.ts": {
+    "mtime": 1776587354.7763126,
+    "hash": "d5012edede4833f671b902d36507af5f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/notifications/read/route.ts": {
+    "mtime": 1776514404.9058,
+    "hash": "15de2c5e5ebf8ff641a57ee05f6afb17"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/notifications/read-all/route.ts": {
+    "mtime": 1776514413.0880644,
+    "hash": "96d28a62481f29d441bb6ba64d826ff2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/notifications/service/notification-service.ts": {
+    "mtime": 1776514396.852655,
+    "hash": "b5ce653ab8bb56d9cbcff0d5fce9e377"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/maintenance/page.tsx": {
+    "mtime": 1776602531.182907,
+    "hash": "1899374ccacef2dd31748d32f4d5eee0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/page.tsx": {
+    "mtime": 1774678641.637992,
+    "hash": "77be4f092448f4baeea166ef5a9cd8ae"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_state/landing-store.ts": {
+    "mtime": 1776269868.118501,
+    "hash": "96b7472d67f38e36e8bd8c742e8433d5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_api/landing-api.ts": {
+    "mtime": 1776266680.5340343,
+    "hash": "f6a0552b88070a1db5dcbfd3f76c3ade"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/stores/landing-search-store.ts": {
+    "mtime": 1772895593.2544346,
+    "hash": "8f5acf094084e0f565c867c915c5142b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_components/latest-jobs-section.tsx": {
+    "mtime": 1776271752.6967232,
+    "hash": "06602740c180df94983b6c0141dea4af"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_components/employer-section.tsx": {
+    "mtime": 1776272258.929689,
+    "hash": "d6ccf5397942f045fd2d29489e0d7dba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_components/job-seeker-section.tsx": {
+    "mtime": 1776272757.1911192,
+    "hash": "0e65d098039d7c66d6a2292b8145d48e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/landing/_components/hero-section.tsx": {
+    "mtime": 1776530002.677635,
+    "hash": "57cd79acdad5c7ef53ee7300aa6e0b19"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/page.tsx": {
+    "mtime": 1776185601.3141127,
+    "hash": "adf40c5eadafec46b41b7b8e0cf252f2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/_state/account-setting-store.ts": {
+    "mtime": 1776175853.575138,
+    "hash": "2f4657773ed81d191ca2fe0e1c5258e4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/_api/account-setting-api.ts": {
+    "mtime": 1776611466.1944375,
+    "hash": "b16a9fb0ff2a7ad4f1aa13aa4e7dea8a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/stores/account-setting-store.ts": {
+    "mtime": 1774187190.0475159,
+    "hash": "c69f7f8ca553774bc7603c2d32022324"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/components/package-section.tsx": {
+    "mtime": 1776611538.6421607,
+    "hash": "d5c64f34ede65e3fac39c0c60e2c6452"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/account-setting/components/account-setting-form.tsx": {
+    "mtime": 1776185536.3765085,
+    "hash": "b767b4e7c23dc972991f0866c423db5b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/delegated-access/page.tsx": {
+    "mtime": 1776186163.9711978,
+    "hash": "d3d98f98a23276324306cd4833c0d278"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/delegated-access/_state/delegated-store.ts": {
+    "mtime": 1775981908.4229958,
+    "hash": "be0857f6e2c45abadcb3b3b0994156f3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/page.tsx": {
+    "mtime": 1778322965.9342892,
+    "hash": "6389c551955020a3837b6b690d2e1d5d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_state/school-profile.state.ts": {
+    "mtime": 1776503160.1858573,
+    "hash": "c3bcc1db10a854ca22996adce4ff6d5e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_api/school-profile.api.ts": {
+    "mtime": 1778322819.095562,
+    "hash": "f9e9c29883700bb16ca028fe987b157d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/school-jobs-tab.tsx": {
+    "mtime": 1774686963.9937642,
+    "hash": "556df40f088b83d521937943eb5d36f0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/statistic-item.tsx": {
+    "mtime": 1776188361.2623234,
+    "hash": "ac7bb0b09c60d69090199e236b2816b4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/school-info-tab.tsx": {
+    "mtime": 1778323020.4010875,
+    "hash": "2bf75d52b19a187c5a0e2346159d5e64"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/school-profile-header.tsx": {
+    "mtime": 1778322971.2478325,
+    "hash": "24478382bfcc75024c5818d8d53acb6c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/school-profile-skeleton.tsx": {
+    "mtime": 1776187048.8620975,
+    "hash": "4991baa4fdd74ee6a12a21d5dd9991c6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/school-profile-sidebar.tsx": {
+    "mtime": 1776614204.8527029,
+    "hash": "17c1f6e2224a5b95bdee6ed34e2a227e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_components/profile-edit-drawer.tsx": {
+    "mtime": 1776530002.4294841,
+    "hash": "c5da1fd889ab980e75aafdf2e86597c4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/profile/_stores/school-profile-store.ts": {
+    "mtime": 1774686963.9954596,
+    "hash": "5e2b0ae2bbdea8d98a48716e97b45a91"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/page.tsx": {
+    "mtime": 1778324637.6989613,
+    "hash": "61fb1b4bed34bf93a19dbd5d1a6b3fea"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_api/job-post-api.ts": {
+    "mtime": 1778324322.7261386,
+    "hash": "caa7f12adf3fb83771d75d29e3c2eade"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/job-tips-sidebar.tsx": {
+    "mtime": 1776183051.3551588,
+    "hash": "6c7e62bf6c12a3082375f5408ee4a7e0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/job-detail-section.tsx": {
+    "mtime": 1775378135.498158,
+    "hash": "5f81a108c922e65f6654484c0f9d6b86"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/post-job-skeleton.tsx": {
+    "mtime": 1776182550.9162529,
+    "hash": "698c4d0400bdc30f060fe7a57b29bd70"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/location-section.tsx": {
+    "mtime": 1776503513.1134534,
+    "hash": "7ecc342508617f516bcacc7395493755"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/post-settings-section.tsx": {
+    "mtime": 1774678641.6272035,
+    "hash": "afdfc0980e73f237e43cc9e653b4792d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/basic-info-section.tsx": {
+    "mtime": 1778324613.9826636,
+    "hash": "7281d9ebd4e2c0e55e2e7cd5e4087a17"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_components/salary-section.tsx": {
+    "mtime": 1775378036.807671,
+    "hash": "a06118a6bb338ec5655dfdf8853739e5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/_stores/job-post-store.ts": {
+    "mtime": 1778324580.8280506,
+    "hash": "efa213b33a39370ae31535cbb82c529e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/post/[id]/page.tsx": {
+    "mtime": 1774673309.4635704,
+    "hash": "9d90ae876d9b27a6ed14af54395c684f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/page.tsx": {
+    "mtime": 1776612286.8082743,
+    "hash": "1e7eddc7983fb6e3dae90af58a20e94b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_state/job-stats-modal-store.ts": {
+    "mtime": 1775979467.94879,
+    "hash": "45ceed63476780f72cdb9e9134611db2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_state/applicant-drawer-store.ts": {
+    "mtime": 1775979132.9965951,
+    "hash": "4075199f0e5538318901eba928e3bf42"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_state/job-read-store.ts": {
+    "mtime": 1775979623.22128,
+    "hash": "b7fb9037413ec099e47774969d298d19"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_api/job-read-api.ts": {
+    "mtime": 1775979454.5212078,
+    "hash": "42b58f3e379d0238500ed8f983a3fee8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/jobs-table.tsx": {
+    "mtime": 1776185944.8240721,
+    "hash": "affdb9301278229e217ec0f3e093713b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/stats-section.tsx": {
+    "mtime": 1776612775.9600282,
+    "hash": "3c4c482bc22f5bdf3ba8f49fb84121f5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/insights-card.tsx": {
+    "mtime": 1775380838.6925607,
+    "hash": "364c0e4834cc97f19dd5c5b976c4a621"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/job-stats-modal.tsx": {
+    "mtime": 1776517241.009714,
+    "hash": "a8e17f80301e7cfd4e4318bc8d00a1d9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/my-jobs-skeleton.tsx": {
+    "mtime": 1776185010.2568834,
+    "hash": "1b72bc3fe847f04e49a34babc98e2b06"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/applicant-profile-modal.tsx": {
+    "mtime": 1775269325.6908262,
+    "hash": "734ce3f1908d6a2930d8dafa983910f8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/filter-section.tsx": {
+    "mtime": 1774686963.9900718,
+    "hash": "a6270e29fbe1de8ed0e92cf2c7e161be"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/package-banner.tsx": {
+    "mtime": 1776517240.8843966,
+    "hash": "22d78b80e0014bd3f0ecbf90f67abf1c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/job/read/_components/applicant-drawer.tsx": {
+    "mtime": 1776186318.443348,
+    "hash": "1290ddc7f569744cee56f882a7a5eb6a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/school-management/page.tsx": {
+    "mtime": 1776613266.0193465,
+    "hash": "05e9c4904b2663f33956f4ca24873a9f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/school-management/_state/org-store.ts": {
+    "mtime": 1776613532.1481967,
+    "hash": "2c6f3322c51d71829b382b0bcc0da164"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/school-management/_api/org-api.ts": {
+    "mtime": 1776511721.9458418,
+    "hash": "7152a76b2038dc500be255f8ca21ea72"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/school-management/_components/rbac-tab.tsx": {
+    "mtime": 1776613413.7775164,
+    "hash": "9beecf0195acd937e484366c85f39f11"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employer/school-management/_components/package-tab.tsx": {
+    "mtime": 1776613814.929849,
+    "hash": "0d032801ef14fb799de9bc10d660ebb6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signup/page.tsx": {
+    "mtime": 1776579388.5440502,
+    "hash": "dcb44438a3ba50f07bc75cb6d132b66e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signup/_state/signup-store.ts": {
+    "mtime": 1776582627.879638,
+    "hash": "57ef698fea2fc3dedd8727eec2ade0ec"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signup/_api/signup-api.ts": {
+    "mtime": 1776579300.9543695,
+    "hash": "568e119d3cb03f4ad3da65d6df742296"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signup/_components/signup-form.tsx": {
+    "mtime": 1776582627.92957,
+    "hash": "dfb290d6a00b4b839baba29ebcd0f9dd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signup/_components/branding-panel.tsx": {
+    "mtime": 1776582628.0954149,
+    "hash": "94d345bcb00337c219fb7e6bc26cf26e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/page.tsx": {
+    "mtime": 1776614639.9480565,
+    "hash": "57ff5f38ea7187a3a22592d809dcc284"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/_state/config-store.ts": {
+    "mtime": 1778323573.2766545,
+    "hash": "642ffc3121292b3028f10814734c58f2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/_api/config-api.ts": {
+    "mtime": 1776529021.6237657,
+    "hash": "9a03e5c93d8d81b09b9b2166bbafdeee"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/_components/edit-option-modal.tsx": {
+    "mtime": 1776529313.5754988,
+    "hash": "587d0f6a0c4f0bdc453a4010bdc1745e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/_components/config-table.tsx": {
+    "mtime": 1778323650.4312773,
+    "hash": "7424bbeff5377ba27b65471ad0da42ef"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/config/_components/add-option-modal.tsx": {
+    "mtime": 1776528269.353981,
+    "hash": "b36912931be27e4a2b2b90d16f60f9ce"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/page.tsx": {
+    "mtime": 1776614149.424733,
+    "hash": "e23b870e8cfa21801b3491be026848b3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_state/blog-store.ts": {
+    "mtime": 1776527078.6010537,
+    "hash": "df8392e8f0da315bbb3886813617a6bf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_api/blog-api.ts": {
+    "mtime": 1776527078.8046358,
+    "hash": "5c70f4b065de6b64c9884d1b644004af"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/seo-checker-panel.tsx": {
+    "mtime": 1776527256.1135833,
+    "hash": "0456967bbfd95b0103ceb2556d6aa6a7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/blog-analytics-section.tsx": {
+    "mtime": 1776271995.0912411,
+    "hash": "2c267055d661725ab264d9b21abdbea8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/blog-stats-bar.tsx": {
+    "mtime": 1776614156.4326127,
+    "hash": "f4d51e1ee13d4222f0398c99c1f05ea2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/blog-editor-drawer.tsx": {
+    "mtime": 1776527537.8870604,
+    "hash": "682fa824acb7df24d07d6c5ca19bbc31"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/ai-assistant-panel.tsx": {
+    "mtime": 1778320274.88578,
+    "hash": "1510b0ee79a1dcb87475f17f29b070da"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/blog-table.tsx": {
+    "mtime": 1776527078.7055035,
+    "hash": "9570f42daeb3bb953b629de02794f41f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/blog/_components/blog-kanban.tsx": {
+    "mtime": 1776519350.0804403,
+    "hash": "04dc5724729283741f5e9dfd4cb94ba2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/page.tsx": {
+    "mtime": 1776613105.9268987,
+    "hash": "dd6900710dd9ea03efbca2bf6948dc33"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_state/dashboard-store.ts": {
+    "mtime": 1776531558.562787,
+    "hash": "90534eee1c0b8aa9a41b269a753145c3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_api/dashboard-api.ts": {
+    "mtime": 1776523681.3745902,
+    "hash": "639cfc730959691218cd600f74a8275e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/platform-health-chart.tsx": {
+    "mtime": 1776531537.95167,
+    "hash": "5ea1c45dd5d3cd9adc47f9d2e9028506"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/deadline-jobs-panel.tsx": {
+    "mtime": 1776611036.762246,
+    "hash": "85628c30e6297b1f869a4c6016f0644c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/inactive-schools-panel.tsx": {
+    "mtime": 1776611066.2815897,
+    "hash": "a81aec81e08d22fdcac4a5297259362d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/stats-section.tsx": {
+    "mtime": 1776613107.9417229,
+    "hash": "02a5b218c533a0057e9d51f347a37dba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/application-funnel-chart.tsx": {
+    "mtime": 1776524253.6464336,
+    "hash": "c6676800e12cfebece0de50ed13a8408"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/recent-signups-card.tsx": {
+    "mtime": 1776270728.960724,
+    "hash": "64b2d769fe3294344f585f888a4124fb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/user-growth-chart.tsx": {
+    "mtime": 1776270780.285312,
+    "hash": "6b29328203539467fc959ddaafc58bf7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/quick-links-section.tsx": {
+    "mtime": 1776530445.0876143,
+    "hash": "10effed3611d6d6ff57fcf3ceac95d36"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/system-health-section.tsx": {
+    "mtime": 1776531523.4476752,
+    "hash": "7d8ee587643f305f27172eb928dc710a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/welcome-section.tsx": {
+    "mtime": 1776525232.9945352,
+    "hash": "4abdd9e7b7f2e08568c6b868e1583591"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/activity-table-section.tsx": {
+    "mtime": 1775278546.7617838,
+    "hash": "196e7885a02a5cf06a4f1174c86542fb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/system-info-section.tsx": {
+    "mtime": 1775278058.6718578,
+    "hash": "cf222460bace4c6e60babc552d8e08bf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/job-application-trend-chart.tsx": {
+    "mtime": 1776524253.5618038,
+    "hash": "d88ad3f7c2248a7aac8c300cfafc0de4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/section-header.tsx": {
+    "mtime": 1776611086.195864,
+    "hash": "cc5cf1cb3fa5d6d6d4131cfef015bb4c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/role-distribution-chart.tsx": {
+    "mtime": 1776531486.9034402,
+    "hash": "aa21cdf215f0b84a1a95fd053db3837f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/job-status-donut-chart.tsx": {
+    "mtime": 1776531571.8413713,
+    "hash": "f57ad07e5d902a0c6d8e182905bb0d8b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/province-distribution-chart.tsx": {
+    "mtime": 1776603837.2373931,
+    "hash": "5036ffff1e5a25d7cc2f421f71e218fa"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/dashboard/_components/pending-actions-card.tsx": {
+    "mtime": 1776531586.1904414,
+    "hash": "705a329ede26f15bcbe37431c56a7a33"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/menu-management/page.tsx": {
+    "mtime": 1776611754.7786183,
+    "hash": "fa20da7d9684cc101f45cf89ec36e99a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/page.tsx": {
+    "mtime": 1776613820.8540103,
+    "hash": "a01cc80c0f474d11ed3f7034d887676b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_state/package-store.ts": {
+    "mtime": 1776528539.8123891,
+    "hash": "b679393457d82afdbbf1b7c6d2d019eb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_api/package-api.ts": {
+    "mtime": 1776528475.870483,
+    "hash": "5d4fcb4591bd8957fc841f2caeb14cce"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/plan-form-modal.tsx": {
+    "mtime": 1776603276.1597745,
+    "hash": "179fa3a9225f4cb35d8992421c25dc3b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/plan-change-modal.tsx": {
+    "mtime": 1776268985.1874533,
+    "hash": "31112ce39f6015f00471d420d58ac93d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/revenue-projection-panel.tsx": {
+    "mtime": 1776528664.7446933,
+    "hash": "9d9bb5e9d998123bf813b037e32308f1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/school-detail-drawer.tsx": {
+    "mtime": 1776602992.639107,
+    "hash": "d46ebd23b9a0a7f1f3d1aad84005ad60"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/quota-alert-panel.tsx": {
+    "mtime": 1776528624.4430366,
+    "hash": "de72faf26c59dabd9472c994007f6934"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/package-management/_components/bulk-plan-modal.tsx": {
+    "mtime": 1776528697.234655,
+    "hash": "44514d0e6596a58fc8929965c8250f5e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/page.tsx": {
+    "mtime": 1776613463.7056823,
+    "hash": "4d0d96ecd810cc10c7edbd1772751254"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_state/user-management-store.ts": {
+    "mtime": 1776518537.095314,
+    "hash": "99e20a2d8529537b0d8f184a0e006216"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_api/user-management-api.ts": {
+    "mtime": 1776269745.7643063,
+    "hash": "21420701ae90ba99c2d2502ec13e1639"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/stats-section.tsx": {
+    "mtime": 1776613314.8067229,
+    "hash": "5b57cdfdd0a6b5dfd9a411cbc1244cde"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/user-table.tsx": {
+    "mtime": 1776270000.4519677,
+    "hash": "46ca7a4c94c5d317b9c4edbf090e8647"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/user-detail-drawer.tsx": {
+    "mtime": 1776603442.6456957,
+    "hash": "96ba8fd38323bbfc1e60897ebf520cf3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/bulk-action-section.tsx": {
+    "mtime": 1776518537.4365141,
+    "hash": "1e1f5476eeae333effbaa9e714a4b6bd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/filter-section.tsx": {
+    "mtime": 1776269914.1320372,
+    "hash": "39118f10e0bbbb76e3f51c0587916eba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/user-management/_components/summary-section.tsx": {
+    "mtime": 1775277645.4404123,
+    "hash": "e42f727f8785d7f6a11f743bddfab0e9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/announcement/page.tsx": {
+    "mtime": 1776611773.7700114,
+    "hash": "b46a1e3902b6c368fec5b46a4ad3be99"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/announcement/_state/announcement-store.ts": {
+    "mtime": 1776601631.9099257,
+    "hash": "abec5f62e1401d048e382bb50cdc15e0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/announcement/_api/announcement-api.ts": {
+    "mtime": 1776601548.0324852,
+    "hash": "612fb69d9b60d68b3688354b385869cd"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/announcement/_components/broadcast-composer.tsx": {
+    "mtime": 1776601703.7217665,
+    "hash": "40aa4d8920c3f8ad5acd334a3162fde3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/announcement/_components/announcement-history.tsx": {
+    "mtime": 1776601729.9046388,
+    "hash": "5b1d56996fa8c884e8376ff3f816719a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/page.tsx": {
+    "mtime": 1776520921.479879,
+    "hash": "75c8c1916997972d6f6f5d16c3e66dd7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_state/admin-job-store.ts": {
+    "mtime": 1776521846.7290235,
+    "hash": "06417e3656e46c2f2359f2083c43400a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_api/admin-job-api.ts": {
+    "mtime": 1776519760.6610677,
+    "hash": "1cea20bc8494b240c1e0af423d99379d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/job-detail-drawer.tsx": {
+    "mtime": 1776521846.7622688,
+    "hash": "9037cef8224b3227c4694549536e0762"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/applicant-list.tsx": {
+    "mtime": 1776520171.1261058,
+    "hash": "14b2f65606adb92179671da563e3d708"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/stats-bar.tsx": {
+    "mtime": 1776612775.9599974,
+    "hash": "904e0f6c8797b99186b7c32b2f101698"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/job-table.tsx": {
+    "mtime": 1776521939.1690981,
+    "hash": "005d39643833ae7a32d1d414e53ba612"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/audit-log-drawer.tsx": {
+    "mtime": 1776521980.7758741,
+    "hash": "a35748cba776f640c44784da4954e350"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/job-status-tag.tsx": {
+    "mtime": 1776518452.4205098,
+    "hash": "895278086636255b8eb7019580ef35ad"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/read/_components/job-filter-bar.tsx": {
+    "mtime": 1776518437.564979,
+    "hash": "e8be3370f01071b8300b088ed0994f06"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/edit/[id]/page.tsx": {
+    "mtime": 1776603531.9156597,
+    "hash": "2b950447b352392c8d18daa6c1aef338"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/admin/job-management/create/page.tsx": {
+    "mtime": 1776603575.6944642,
+    "hash": "1713e213e80670bd76f9cf5540d5af11"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/blog/page.tsx": {
+    "mtime": 1776062144.8334672,
+    "hash": "147fcf634907caf80a0cac2b0a5d888c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/blog/_state/blog-store.ts": {
+    "mtime": 1776587613.6099772,
+    "hash": "950f903453f3901aa8d4a446c98de988"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/blog/_api/blog-api.ts": {
+    "mtime": 1776587613.5548692,
+    "hash": "ec17b3c2395b3fd0324a36fc69a99299"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/blog/[blog_id]/page.tsx": {
+    "mtime": 1776062187.34202,
+    "hash": "277257670328ae9f71f55f65ad34a0c8"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signin/page.tsx": {
+    "mtime": 1776578978.7055922,
+    "hash": "0134a9d1c256cf93b1026216444d9584"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signin/_state/signin-store.ts": {
+    "mtime": 1774686963.9965749,
+    "hash": "281f5c8269fe040724327c1416d7cf5f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signin/_api/signin-api.ts": {
+    "mtime": 1774686963.9959116,
+    "hash": "485efec9a4b85c03937783d732f18823"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signin/_components/signin-form.tsx": {
+    "mtime": 1776603567.7630315,
+    "hash": "11657858ae602a27de10aa80ce0576c1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/signin/_components/signin-branding-panel.tsx": {
+    "mtime": 1776579164.9336865,
+    "hash": "a776704a2d7aed289e6bf53c2e743a3c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/page.tsx": {
+    "mtime": 1776578655.7262788,
+    "hash": "a966a9bda11bc96903260e89e11def0b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_state/job-search-store.ts": {
+    "mtime": 1776497066.2663732,
+    "hash": "ac86078c6864f6758004a387389807df"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_state/saved-jobs-store.ts": {
+    "mtime": 1774678641.6355884,
+    "hash": "27ed209e4d67059bb7f9a09f2b5c7992"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_state/application-tracker-store.ts": {
+    "mtime": 1776060517.1104228,
+    "hash": "16876300d9b1d8e01ea87836efb14dae"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_api/job-search-api.ts": {
+    "mtime": 1776496070.6244287,
+    "hash": "18c15cb570d265af0260f9eb17a3323c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/job-detail-drawer.tsx": {
+    "mtime": 1776578656.2922392,
+    "hash": "2ff755f30142dedfec2bdf54c4fc8b7f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/application-tracker-drawer.tsx": {
+    "mtime": 1776578656.2929509,
+    "hash": "829389f0a6245db96b9895f6784883ba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/search-filter-section.tsx": {
+    "mtime": 1776516698.4124534,
+    "hash": "a16f0a3cd0d3fc12cfe716d7b3b0bcfb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/job-list-section.tsx": {
+    "mtime": 1776578656.0466192,
+    "hash": "8550c9433a2e89cf84537d48da22d0e3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/job-card.tsx": {
+    "mtime": 1776578656.0465689,
+    "hash": "b5be9bef919a0c6f06c81a7d6a6b30d5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/_components/sidebar-section.tsx": {
+    "mtime": 1776578656.8308926,
+    "hash": "ce8b99f50bb08ad2be8d4d38ff593330"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/page.tsx": {
+    "mtime": 1776157249.8653123,
+    "hash": "9308edb73225abeac8ac4e5e81741656"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_state/apply-store.ts": {
+    "mtime": 1776061392.7095935,
+    "hash": "88eca5ad5881d5f774f9b2c362322a0f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_api/apply-api.ts": {
+    "mtime": 1776061375.5178785,
+    "hash": "59f33c6ee4b7ab8401b7391fde32e3d1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_components/user-profile-card.tsx": {
+    "mtime": 1776061408.0426605,
+    "hash": "401727ba857ee72ef4b4c2bad299167a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_components/job-summary.tsx": {
+    "mtime": 1774678641.6312985,
+    "hash": "0b4e33aa9912c37b304131ddd71ed4b0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_components/document-section.tsx": {
+    "mtime": 1776061433.7513971,
+    "hash": "f2d076b5415f211e25fce22547ac82d6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/job/[job_id]/apply/_stores/apply-store.ts": {
+    "mtime": 1774678641.6319695,
+    "hash": "0a309233f9fe2d39a0061e111e2edf54"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/account-setting/page.tsx": {
+    "mtime": 1776588062.1348398,
+    "hash": "4186051d4b8296fa3e6b35461320dace"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/account-setting/_api/account-setting-api.ts": {
+    "mtime": 1776588010.1939478,
+    "hash": "92f5c9bc1b1badaf51006648a72641f9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/account-setting/_components/account-setting-form.tsx": {
+    "mtime": 1776587940.061574,
+    "hash": "f354b18503bf3f18ce8ee81e07a1fb21"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/account-setting/_stores/account-setting-store.ts": {
+    "mtime": 1776588010.388091,
+    "hash": "01daf528ffe53c940b4b761c7e1ce93e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/page.tsx": {
+    "mtime": 1778319921.9277008,
+    "hash": "6f15bad64ca439641e42463bbe975e06"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_api/work-location-api.ts": {
+    "mtime": 1776600946.0281367,
+    "hash": "436b69f044471b18eaa9510cde55778d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_api/employee-profile-api.ts": {
+    "mtime": 1776587650.8836162,
+    "hash": "799e4f09e40376bb3b668c70a77d9d81"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/education-section.tsx": {
+    "mtime": 1774678641.6204622,
+    "hash": "3c4e3b980768816762d0bd5d9083b552"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/education-history-section.tsx": {
+    "mtime": 1776598632.126307,
+    "hash": "ecdfe40b51c04338d05f91677c48c3ea"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/resume-upload-section.tsx": {
+    "mtime": 1776598754.065838,
+    "hash": "556673975c99d4369131bd957531e76f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/profile-section-wrapper.tsx": {
+    "mtime": 1774678641.6210608,
+    "hash": "5114dfefa8844061a08abe4c454ceac0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/specialization-section.tsx": {
+    "mtime": 1774678641.6216984,
+    "hash": "0e7d26e0ce3f594bb66c0159fafea61d"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/teaching-license-section.tsx": {
+    "mtime": 1776598767.258323,
+    "hash": "f32afa7ae8cfb84bde2909e312e6ffd7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/skills-location-section.tsx": {
+    "mtime": 1776600946.096141,
+    "hash": "f71cea0073c187cb6bbbc75a2fbf03fb"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/work-experience-section.tsx": {
+    "mtime": 1776598589.6609864,
+    "hash": "244962dc2aec82f664b9c7ef8d3299be"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/personal-summary-section.tsx": {
+    "mtime": 1774678641.6207201,
+    "hash": "857b2f0e414b239bd75bc53e7c42267e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/profile-layout.tsx": {
+    "mtime": 1774678641.6209543,
+    "hash": "05963a48f70042d27dc626d637772f6a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/gender-dob-photo-section.tsx": {
+    "mtime": 1778319921.92752,
+    "hash": "62ea33ea0491e12c601594924b948ac2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/index.ts": {
+    "mtime": 1776600946.2037663,
+    "hash": "7a4185e91bbcf5cbd744d1179503a68c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/section-form.tsx": {
+    "mtime": 1776585834.0318098,
+    "hash": "cb561a0b68da5a699124d54ba9c650ff"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/work-location-section.tsx": {
+    "mtime": 1776600946.0384376,
+    "hash": "e9840bfc9b32674d19993bf78728e94e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/basic-info-section.tsx": {
+    "mtime": 1775270044.3810241,
+    "hash": "e245738ecd9db8de3082548a5a3b20ed"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/profile-edit-drawer.tsx": {
+    "mtime": 1776495100.2937822,
+    "hash": "bf16d32080560d8474c296342ebe95f3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/teaching-info-section.tsx": {
+    "mtime": 1774678641.6218421,
+    "hash": "d82c45d13007c0fd4c627ed81cd090f1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_components/teaching-skills-section.tsx": {
+    "mtime": 1775279410.2899687,
+    "hash": "0c52913a31fd6b9b658aaa823e3d13c9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/profile/_stores/profile-store.ts": {
+    "mtime": 1776600443.700648,
+    "hash": "1883a5a842221c3205f17c6ce2c2994f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/page.tsx": {
+    "mtime": 1778319921.9273236,
+    "hash": "54aeddfe40cf90ca2160f9c5e7344e2c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/_api/applications-api.ts": {
+    "mtime": 1778319921.9264848,
+    "hash": "cdabece2944d891285d4cc842d529553"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/_components/application-empty-state.tsx": {
+    "mtime": 1778319921.9268665,
+    "hash": "cac1cbd0cc4fac661aa1cc66ae97764f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/_components/application-stats-bar.tsx": {
+    "mtime": 1778319921.9270442,
+    "hash": "8accba934c07624e0ccd9cef1ed2ac66"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/_components/application-card.tsx": {
+    "mtime": 1778319921.926725,
+    "hash": "ed12fe96d4d1f07cbef5e745df773a29"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/applications/_stores/applications-store.ts": {
+    "mtime": 1778319921.9272044,
+    "hash": "f22959aeab53c39dc337353abf071098"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/page.tsx": {
+    "mtime": 1776578853.045631,
+    "hash": "87f9f1b6f8fc104092c0e46a705e61d9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/_api/school-api.ts": {
+    "mtime": 1776578751.5064154,
+    "hash": "187004d079de8f514467ba3308ff5931"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/page.tsx": {
+    "mtime": 1776580530.0425737,
+    "hash": "26f569f032a260329ff88d4f6af4497f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_state/school-profile-store.ts": {
+    "mtime": 1776498185.4109707,
+    "hash": "a7938cf8ad14aecece994cb8a1d27a70"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_api/school-profile-api.ts": {
+    "mtime": 1776579955.6038697,
+    "hash": "5c51772cc2bc4a48236d55eb5c953057"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_components/open-jobs-section.tsx": {
+    "mtime": 1776580616.894784,
+    "hash": "08db1bab09396eba6fc165bb3528fbad"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_components/school-benefits-section.tsx": {
+    "mtime": 1776581396.4846869,
+    "hash": "aeebfe94bf3ed726a8ce6c0beb569ab2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_components/school-profile-header.tsx": {
+    "mtime": 1776580041.9208248,
+    "hash": "1f403de71946d8c616d3ff0da58983a0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/profile/[school_id]/_components/school-info-section.tsx": {
+    "mtime": 1776580669.3042238,
+    "hash": "76909125af50764a294e85906c9dd0ae"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/_components/school-jobs-drawer.tsx": {
+    "mtime": 1776578243.3064327,
+    "hash": "fed477daabed9576fc7989748276a654"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/_components/school-card.tsx": {
+    "mtime": 1776578228.168515,
+    "hash": "f289470af834d12f8703c0ecd9b97433"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/_components/school-search.tsx": {
+    "mtime": 1776578104.7944057,
+    "hash": "7a4dc5f20ff5d935047bbb4844b20220"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/pages/employee/school/_stores/school-store.ts": {
+    "mtime": 1776578786.3371556,
+    "hash": "7b14a122204051805483a2ca20506489"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/seed.ts": {
+    "mtime": 1778323864.2103877,
+    "hash": "66edd96a28c71c7c298bac95cc41e0d6"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/seed-config.ts": {
+    "mtime": 1776162580.8193836,
+    "hash": "ee961bbbaacad03b7a87ddf9fede5b4b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/migrations/20250309000000_add_work_education_models/migration.sql": {
+    "mtime": 1773156534.5276387,
+    "hash": "70ad09dce69537bc313d6e5710dc5f4f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/migrations/update_profile_fields/migration.sql": {
+    "mtime": 1773155316.4869034,
+    "hash": "0c6e25243403eba3b428c66352e03c76"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/migrations/20260307165023_add_password_to_profile/migration.sql": {
+    "mtime": 1772902223.6355093,
+    "hash": "04285c6719c46e06a081fac1b25fe3a7"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/prisma/migrations/20260307154733_rename_to_snake_case/migration.sql": {
+    "mtime": 1772898453.765432,
+    "hash": "d8249b4cbc396c5a5b8b633086f8f295"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/tests/auth/auth-flow.spec.ts": {
+    "mtime": 1773162497.748258,
+    "hash": "b8a7e099f4c300f44c46408067a4ec56"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/sw.js": {
+    "mtime": 1775272215.070842,
+    "hash": "19dc48002026bff0677c40a9d7835223"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/lib/prisma.ts": {
+    "mtime": 1776423795.9122057,
+    "hash": "71b8eebfeb20689806df427c20402dd2"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/lib/mailer.ts": {
+    "mtime": 1776514326.31391,
+    "hash": "19d4cee56da175088f946ecb04a71035"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/lib/utils.ts": {
+    "mtime": 1776269118.8265944,
+    "hash": "b65d8c1d38a08c4f8f7dcd79711b4b49"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/lib/notification.ts": {
+    "mtime": 1776519032.1090093,
+    "hash": "704b6eb72d40144796f1f7ee0cf63ea1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/mcp-servers/antd-docs/index.ts": {
+    "mtime": 1776577780.796488,
+    "hash": "f5fd467becaca7a6e26491d8686b9c88"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/README.md": {
+    "mtime": 1772894644.8235338,
+    "hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/build_log.txt": {
+    "mtime": 1776270629.7168813,
+    "hash": "43ecc2bf56855ee06450c9777e682b46"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/CLAUDE.md": {
+    "mtime": 1778320031.2863271,
+    "hash": "2cf06b7e702120892ac9b5e4a6f7b6cf"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/file-tree.md": {
+    "mtime": 1776577404.4219935,
+    "hash": "454069aa0bf31d65e354fce11365ae51"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/_document/_database/connection-guide.md": {
+    "mtime": 1775275018.1749074,
+    "hash": "53516efc6d688f4bfc78f2884bb98a60"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/_document/_database/database-design.md": {
+    "mtime": 1775381168.3110082,
+    "hash": "d177b0c54a417690a7ca9c711dbdc71e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/_document/_api/api-map.md": {
+    "mtime": 1775380838.5211272,
+    "hash": "3e0e67fb398889629458280b99b015ba"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/authenticate/docs/authenticate-spec.md": {
+    "mtime": 1772899460.0671802,
+    "hash": "1f13bf9b5a3d1046caa3df9d55e9d884"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/docs/update-spec.md": {
+    "mtime": 1775372806.9972587,
+    "hash": "d9cf4812d54acf29d55a859c8927f1cc"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/app/api/v1/employee/profile/docs/read-spec.md": {
+    "mtime": 1775372793.954336,
+    "hash": "894b64148cd4d89dd181e93d53eafeee"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright-report/index.html": {
+    "mtime": 1773161805.0081627,
+    "hash": "73516598c78ea56dd5083c59c0c23ffa"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright-report/data/ffa794d7bd09f166c577faf3a40e52c5b2e3d18b.md": {
+    "mtime": 1773161805.001307,
+    "hash": "68d72f659c29b992205b605fdd8747e1"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright-report/data/6ee1b95b501d4b0b7d17a65603ed7596bc0fd175.md": {
+    "mtime": 1773161805.0005333,
+    "hash": "770dbfc8806c54c5d7419e891b016319"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/test-results/auth-auth-flow-Authenticat-5fc01-e-Teacher-Signup-Login-Flow-chromium/error-context.md": {
+    "mtime": 1773162491.214274,
+    "hash": "1e3521a953a295ce96c12dbf2d53be8b"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/test-results/auth-auth-flow-Authenticat-4d380-er-School-Signup-Login-Flow-chromium/error-context.md": {
+    "mtime": 1773162491.1701543,
+    "hash": "63339f22ab06235718de74f895d8a9d4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/file.svg": {
+    "mtime": 1772894644.8235295,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/vercel.svg": {
+    "mtime": 1772894644.8246853,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/next.svg": {
+    "mtime": 1772894644.8243957,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/globe.svg": {
+    "mtime": 1772894644.8243296,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/window.svg": {
+    "mtime": 1772894644.8246794,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_job-offers_55y0.svg": {
+    "mtime": 1773480910.4115932,
+    "hash": "31a812a497f8e04384de47823c5e038f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_updated-resume_287i.svg": {
+    "mtime": 1773480910.4147599,
+    "hash": "3bf2ce73fba6cc1acf261311775cd4a9"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_portfolio-update_6bro.svg": {
+    "mtime": 1773480910.4126,
+    "hash": "49032357b78e06a33e75a62cd497d91e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_starting-work_ifnt.svg": {
+    "mtime": 1773480910.4144247,
+    "hash": "8edcd1a415ad4ea63a3cc22bd5d2d1ca"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_social-bio_2xzi.svg": {
+    "mtime": 1773480910.4141989,
+    "hash": "309780e72f231ced2dfc2cbe0046d205"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_click-here_3vzn.svg": {
+    "mtime": 1773480910.4104726,
+    "hash": "dd8df32fe966ee6da116184a0520500e"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_online-resume_z4sp.svg": {
+    "mtime": 1773480910.4122534,
+    "hash": "7eec2c752af55996fdf31f5cd62f5ebe"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_resume_jrgi.svg": {
+    "mtime": 1773480910.4138734,
+    "hash": "8caf96fe270c997cbe8c3ee0c82101d3"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_online-information_hhp2.svg": {
+    "mtime": 1773480910.4120727,
+    "hash": "f3cca42a11fa2d02996e9acd2e0f3ad4"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_hire_hadq.svg": {
+    "mtime": 1773480910.4107585,
+    "hash": "e15ce10607013cd8fb02459bf72b973c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_web-search_7oif.svg": {
+    "mtime": 1773480910.4151168,
+    "hash": "a0b326d08f3fad452ba09607904ada86"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_online-cv_4iq9.svg": {
+    "mtime": 1773480910.411924,
+    "hash": "c014572afeef75583a94ea39a7ab5c5f"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_my-resume_etai.svg": {
+    "mtime": 1773480910.4117477,
+    "hash": "1efdd7a58458e5ee63db1c89983bc448"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_screening-resumes_dh9s.svg": {
+    "mtime": 1773480910.4140382,
+    "hash": "9a8a87ed7e1fafb21d2275f2272cfde0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_professional-card_ldgq.svg": {
+    "mtime": 1773480910.413098,
+    "hash": "0351aba9ceee366a633edc5970127b5c"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_add-file_lf11.svg": {
+    "mtime": 1773480910.4100544,
+    "hash": "dd2ff96a8af9480dcea71ecb64aceee5"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_web-search_7oif copy.svg": {
+    "mtime": 1773480910.414985,
+    "hash": "a0b326d08f3fad452ba09607904ada86"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_interview_yz52.svg": {
+    "mtime": 1773480910.4113684,
+    "hash": "ec62f257857d9f06dadf1a16e5d54992"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_resume-folder_hf4p.svg": {
+    "mtime": 1773480910.4137163,
+    "hash": "e5c629cfa4e59685733847e0258dc2ee"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_personal-information_h7kf.svg": {
+    "mtime": 1773480910.4124298,
+    "hash": "1b2b21ac56a2ca30697b74ca1ba7c5aa"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_hiring_8szx.svg": {
+    "mtime": 1773480910.41109,
+    "hash": "06f7dca3d7a03779735386ed24bf730a"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_profile_d7qw.svg": {
+    "mtime": 1773480910.4133775,
+    "hash": "9cdb7479db45664a5e438ec511a5bd69"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_project-completed_ug9i.svg": {
+    "mtime": 1773480910.4135444,
+    "hash": "e18e8b6510b188c485cc9576bc6be1df"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/public/images/flat/undraw_about-me_5990.svg": {
+    "mtime": 1773480910.409682,
+    "hash": "84744e12ce0e7c159fb4fc0179dddbac"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright-report/data/f2de32d9e42944039ff7161a3deca396662ffdd2.png": {
+    "mtime": 1773161805.0011032,
+    "hash": "138cfadf5253e837337f8019931db7ed"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/playwright-report/data/9c237e06c6c8892948a025798bf69624eadc55b8.png": {
+    "mtime": 1773161805.0001945,
+    "hash": "dee942ba1a54f368f2fc0b98755a1bd0"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/test-results/auth-auth-flow-Authenticat-5fc01-e-Teacher-Signup-Login-Flow-chromium/test-failed-1.png": {
+    "mtime": 1773162491.1958249,
+    "hash": "510886e71cc1db6f640ff0d4b39b43ea"
+  },
+  "/Users/light/Desktop/PORTFOLIO/Kam-Business/KAM-WEB-SCHOOLJOB/test-results/auth-auth-flow-Authenticat-4d380-er-School-Signup-Login-Flow-chromium/test-failed-1.png": {
+    "mtime": 1773162491.1484194,
+    "hash": "e491109856a61090e34fac86a7e05127"
+  }
+}

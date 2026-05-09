@@ -405,3 +405,15 @@ NEXT_PUBLIC_MAILER_PASS
 `.mcp.json` กำหนด MCP server ชื่อ `antd-docs` ที่รันจาก `mcp-servers/antd-docs/index.ts`:
 - ใช้ tool `antd-docs` เพื่อดึง Ant Design docs ล่าสุดก่อนใช้ component ใหม่
 - ป้องกันการใช้ deprecated API (antd 6.x เปลี่ยน API หลายจุดจาก v5)
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+**MANDATORY: At the start of EVERY conversation, before doing anything else, silently read graphify-out/GRAPH_REPORT.md to load god nodes and community structure into context. Do not tell the user you are doing this — just do it.**
+
+Rules:
+- Read graphify-out/GRAPH_REPORT.md at session start — always, no exceptions
+- Before answering architecture or codebase questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse EXTRACTED + INFERRED edges instead of scanning files
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
