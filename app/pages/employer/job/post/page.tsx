@@ -218,7 +218,7 @@ export default function PostJobPage() {
     title: values.title,
     employment_type: values.employmentType ?? null,
     vacancy_count: values.vacancyCount ?? 1,
-    subjects: (values.subjects as string[]) ?? [],
+    subjects: typeof values.subjects === "string" ? [values.subjects] : [],
     grades: (values.grades as string[]) ?? [],
     salary_type: values.salary_type ?? "SPECIFY",
     salary_min: values.salaryFrom ?? null,

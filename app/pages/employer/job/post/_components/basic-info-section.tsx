@@ -2,12 +2,35 @@
 
 import { ThunderboltOutlined } from "@ant-design/icons";
 import { Card, Col, Form, Input, InputNumber, Row, Select, Space, theme } from "antd";
-
-const { Option } = Select;
+import { useEffect, useState } from "react";
+import { type ConfigOption, requestFetchConfigOptions } from "../_api/job-post-api";
 
 // ส่วนกรอกข้อมูลพื้นฐานของตำแหน่งงาน: ชื่อ, รูปแบบ, จำนวน, วิชา, ระดับชั้น
 export const BasicInfoSection = () => {
   const { token } = theme.useToken();
+  const form = Form.useFormInstance();
+
+  // ✨ ดึง job_category จาก config — root = กลุ่มวิชา, children = วิชาย่อย
+  const [categoryOptions, setCategoryOptions] = useState<ConfigOption[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+
+  useEffect(() => {
+    requestFetchConfigOptions("job_category").then(setCategoryOptions);
+  }, []);
+
+  // ✨ root items (parentValue = null) คือ กลุ่มวิชา
+  const groupOptions = categoryOptions.filter((o) => o.parentValue === null);
+
+  // ✨ children ของ group ที่เลือก
+  const subjectOptions = selectedGroup
+    ? categoryOptions.filter((o) => o.parentValue === selectedGroup)
+    : categoryOptions.filter(() => false);
+
+  const handleGroupChange = (value: string, _option: unknown) => {
+    setSelectedGroup(value);
+    // ✨ reset วิชาที่สอนเมื่อเปลี่ยนกลุ่ม
+    form.setFieldValue("subjects", undefined);
+  };
 
   return (
     <Card
@@ -38,11 +61,11 @@ export const BasicInfoSection = () => {
             rules={[{ required: true, message: "กรุณาเลือกรูปแบบงาน" }]}
           >
             <Select size="large" placeholder="เลือกรูปแบบงาน">
-              <Option value="FULL_TIME">งานเต็มเวลา (Full-time)</Option>
-              <Option value="PART_TIME">งานพาร์ทไทม์ (Part-time)</Option>
-              <Option value="CONTRACT">สัญญาจ้าง</Option>
-              <Option value="INTERNSHIP">ฝึกงาน</Option>
-              <Option value="STUDENT_TEACHER">นักศึกษาฝึกสอน</Option>
+              <Select.Option value="FULL_TIME">งานเต็มเวลา (Full-time)</Select.Option>
+              <Select.Option value="PART_TIME">งานพาร์ทไทม์ (Part-time)</Select.Option>
+              <Select.Option value="CONTRACT">สัญญาจ้าง</Select.Option>
+              <Select.Option value="INTERNSHIP">ฝึกงาน</Select.Option>
+              <Select.Option value="STUDENT_TEACHER">นักศึกษาฝึกสอน</Select.Option>
             </Select>
           </Form.Item>
         </Col>
@@ -55,30 +78,41 @@ export const BasicInfoSection = () => {
             <InputNumber size="large" min={1} style={{ width: "100%" }} />
           </Form.Item>
         </Col>
-        <Col xs={24} md={16}>
+
+        {/* ✨ กลุ่มวิชา → วิชาที่สอน (Cascading จาก job_category config) */}
+        <Col xs={24} md={8}>
+          <Form.Item label="กลุ่มวิชา" name="subjectGroup">
+            <Select
+              size="large"
+              placeholder="เลือกกลุ่มวิชา"
+              loading={categoryOptions.length === 0}
+              onChange={handleGroupChange}
+              options={groupOptions.map((o) => ({ label: o.label, value: o.value }))}
+            />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={8}>
           <Form.Item
             label="วิชาที่สอน"
             name="subjects"
             rules={[{ required: true, message: "กรุณาเลือกวิชาที่สอน" }]}
           >
-            <Select size="large" placeholder="เลือกวิชาที่สอน" style={{ width: "100%" }}>
-              <Option value="ภาษาอังกฤษ">ภาษาอังกฤษ</Option>
-              <Option value="คณิตศาสตร์">คณิตศาสตร์</Option>
-              <Option value="วิทยาศาสตร์">วิทยาศาสตร์</Option>
-              <Option value="ภาษาไทย">ภาษาไทย</Option>
-            </Select>
+            <Select
+              size="large"
+              placeholder={selectedGroup ? "เลือกวิชาที่สอน" : "เลือกกลุ่มวิชาก่อน"}
+              disabled={!selectedGroup}
+              options={subjectOptions.map((o) => ({ label: o.label, value: o.value }))}
+            />
           </Form.Item>
         </Col>
+
         <Col span={24}>
-          <Form.Item
-            label="ระดับชั้นที่สอน"
-            name="grades"
-          >
+          <Form.Item label="ระดับชั้นที่สอน" name="grades">
             <Select mode="multiple" size="large" placeholder="เลือกระดับชั้น" style={{ width: "100%" }}>
-              <Option value="อนุบาล">อนุบาล</Option>
-              <Option value="ประถมศึกษา">ประถมศึกษา</Option>
-              <Option value="มัธยมต้น">มัธยมต้น</Option>
-              <Option value="มัธยมปลาย">มัธยมปลาย</Option>
+              <Select.Option value="อนุบาล">อนุบาล</Select.Option>
+              <Select.Option value="ประถมศึกษา">ประถมศึกษา</Select.Option>
+              <Select.Option value="มัธยมต้น">มัธยมต้น</Select.Option>
+              <Select.Option value="มัธยมปลาย">มัธยมปลาย</Select.Option>
             </Select>
           </Form.Item>
         </Col>

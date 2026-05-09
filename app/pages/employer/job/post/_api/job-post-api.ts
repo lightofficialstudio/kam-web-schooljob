@@ -33,6 +33,22 @@ export const requestUpdateJob = async (
   return data;
 };
 
+// ✨ ดึง config options ตาม group (ใช้สำหรับ dropdown ที่ admin กำหนด)
+export interface ConfigOption {
+  id: string;
+  label: string;
+  value: string;
+  parentValue: string | null;
+  sortOrder: number;
+}
+
+export const requestFetchConfigOptions = async (group: string): Promise<ConfigOption[]> => {
+  const { data } = await axios.get<ApiResponse<ConfigOption[]>>(
+    `/api/v1/config/options?group=${group}`,
+  );
+  return data.data ?? [];
+};
+
 // ✨ ดึงข้อมูลประกาศงานตาม ID
 export const requestFetchJobById = async (userId: string, jobId: string) => {
   const { data } = await axios.get<ApiResponse<Record<string, unknown>>>(
