@@ -9,6 +9,7 @@ import {
   requestAdminBulkUpdateBlogs,
   requestAdminCreateBlog,
   requestAdminDeleteBlog,
+  requestAdminGetBlog,
   requestAdminListBlogs,
   requestAdminUpdateBlog,
   requestAiBlogAssist,
@@ -19,6 +20,7 @@ export interface AdminBlogItem {
   id: string;
   title: string;
   slug: string;
+  content?: string; // ✨ โหลดแบบ lazy เมื่อกดแก้ไข — list API ไม่ส่งมาเพื่อลด payload
   excerpt: string;
   category: string;
   coverImageUrl: string | null;
@@ -177,7 +179,22 @@ export const useAdminBlogStore = create<BlogStore>((set, get) => ({
   setPage: (p) => set({ page: p }),
   setViewMode: (m) => set({ viewMode: m }),
   openCreate: () => set({ editingBlog: null, isDrawerOpen: true }),
-  openEdit: (blog) => set({ editingBlog: blog, isDrawerOpen: true }),
+  openEdit: async (blog) => {
+    // ✨ เปิด drawer ทันทีด้วย metadata จาก list — content ยังว่าง
+    set({ editingBlog: blog, isDrawerOpen: true });
+    // ✨ Fetch full blog (รวม content) แบบ lazy — แล้ว update editingBlog อีกครั้ง
+    try {
+      const res = await requestAdminGetBlog(blog.id);
+      const full = res.data?.data ?? res.data;
+      set((state) => ({
+        editingBlog: state.editingBlog
+          ? { ...state.editingBlog, content: full.content ?? "" }
+          : state.editingBlog,
+      }));
+    } catch {
+      // ✨ ถ้า fetch full ล้มเหลว ก็ยังแก้ metadata ได้ตามปกติ
+    }
+  },
   closeDrawer: () => set({ isDrawerOpen: false, editingBlog: null }),
 
   // ✨ Bulk Publish — เปลี่ยนทุก selected เป็น PUBLISHED

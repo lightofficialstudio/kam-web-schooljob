@@ -302,7 +302,7 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
         form.setFieldsValue({
           title: editingBlog.title,
           slug: editingBlog.slug,
-          content: (editingBlog as AdminBlogItemWithContent).content ?? "",
+          content: editingBlog.content ?? "",
           excerpt: editingBlog.excerpt ?? "",
           cover_image_url: existingCover,
           category: editingBlog.category ?? undefined,
@@ -823,9 +823,4 @@ interface FormValues {
   category?: string;
   tags?: string[];
   status: "DRAFT" | "PUBLISHED";
-}
-
-// ✨ เพิ่ม content field ใน AdminBlogItem สำหรับ edit
-interface AdminBlogItemWithContent {
-  content?: string;
 }
