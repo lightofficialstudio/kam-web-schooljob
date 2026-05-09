@@ -1,13 +1,9 @@
 "use client";
 
+import type { ModalType } from "@/app/components/modal/modal.component";
+import { ModalComponent } from "@/app/components/modal/modal.component";
 import { useAuthStore } from "@/app/stores/auth-store";
-import { useNotificationModalStore } from "@/app/stores/notification-modal-store";
-import {
-  ArrowLeftOutlined,
-  CheckCircleFilled,
-  CloseCircleFilled,
-  ThunderboltOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import {
   theme as antTheme,
   Breadcrumb,
@@ -120,8 +116,16 @@ export default function PostJobPage() {
   const params = useParams();
   const { token } = antTheme.useToken();
   const { user } = useAuthStore();
-  const { openNotification } = useNotificationModalStore();
   const jobId = params?.id as string | undefined;
+  // ✨ state สำหรับ ModalComponent (success/error)
+  const [modalState, setModalState] = useState<{
+    open: boolean;
+    type: ModalType;
+    title: string;
+    description: string;
+    onConfirm?: () => void;
+  }>({ open: false, type: "success", title: "", description: "" });
+  const closeModal = () => setModalState((prev) => ({ ...prev, open: false }));
   const isEdit = !!jobId;
   const {
     setSalaryType,
@@ -244,11 +248,11 @@ export default function PostJobPage() {
   // ✨ บันทึกข้อมูลเมื่อกด Submit
   const onFinish = async (values: Record<string, unknown>) => {
     if (!user?.user_id) {
-      openNotification({
+      setModalState({
+        open: true,
         type: "error",
-        mainTitle: "ไม่พบข้อมูลผู้ใช้",
+        title: "ไม่พบข้อมูลผู้ใช้",
         description: "กรุณาเข้าสู่ระบบใหม่",
-        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
       });
       return;
     }
@@ -277,22 +281,22 @@ export default function PostJobPage() {
         await requestCreateJob(user.user_id, payload);
       }
 
-      openNotification({
+      setModalState({
+        open: true,
         type: "success",
-        mainTitle: isEdit ? "แก้ไขประกาศงานสำเร็จ" : "ลงประกาศงานสำเร็จ",
+        title: isEdit ? "แก้ไขประกาศงานสำเร็จ" : "ลงประกาศงานสำเร็จ",
         description: isEdit
           ? "ข้อมูลประกาศงานถูกอัปเดตเรียบร้อยแล้ว"
           : "ประกาศงานของคุณถูกเผยแพร่เรียบร้อยแล้ว",
-        icon: <CheckCircleFilled style={{ color: token.colorSuccess }} />,
+        onConfirm: () => router.push("/pages/employer/job/read"),
       });
-      router.push("/pages/employer/job/read");
     } catch (err) {
       console.error("❌ [PostJobPage] บันทึกงานไม่สำเร็จ:", err);
-      openNotification({
+      setModalState({
+        open: true,
         type: "error",
-        mainTitle: "เกิดข้อผิดพลาด",
+        title: "เกิดข้อผิดพลาด",
         description: "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
-        icon: <CloseCircleFilled style={{ color: token.colorError }} />,
       });
     } finally {
       setSubmitting(false);
@@ -400,6 +404,17 @@ export default function PostJobPage() {
       </Flex>
 
       {/* Main Content */}
+      {/* ✨ Modal แจ้งเตือน success/error */}
+      <ModalComponent
+        open={modalState.open}
+        type={modalState.type}
+        title={modalState.title}
+        description={modalState.description}
+        onClose={closeModal}
+        onConfirm={modalState.onConfirm ?? closeModal}
+        confirmLabel={modalState.type === "success" ? "ตกลง" : "ปิด"}
+      />
+
       <Content>
         <Flex style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <Form
