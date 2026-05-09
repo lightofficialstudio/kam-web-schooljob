@@ -429,6 +429,7 @@ model Application {
 model Blog {
   id            String     @id @default(uuid())
   authorId      String?    @map("author_id") // SET NULL เมื่อ author ถูกลบ
+  authorName    String?    @map("author_name") // ✨ ชื่อนักเขียน override (admin กำหนดเอง)
   title         String
   slug          String     @unique // SEO-friendly URL
   content       String // เนื้อหาบทความ (Markdown/HTML)
@@ -441,7 +442,7 @@ model Blog {
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @updatedAt @map("updated_at")
 
-  author    Profile?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  author    Profile?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
   blogViews BlogView[]
 
   @@index([status], name: "idx_blogs_status")
@@ -457,8 +458,8 @@ model BlogView {
   viewerRole UserRole? @map("viewer_role") // snapshot role ณ เวลาที่ดู
   viewedAt   DateTime  @default(now()) @map("viewed_at")
   sessionId  String?   @map("session_id") // browser session (dedup anonymous)
-  referrer   String?   // หน้าที่มาจาก (เช่น /pages/blog, google)
-  country    String?   // ประเทศ (optional, จาก header)
+  referrer   String? // หน้าที่มาจาก (เช่น /pages/blog, google)
+  country    String? // ประเทศ (optional, จาก header)
 
   blog   Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   viewer Profile? @relation("BlogViewViewer", fields: [viewerId], references: [id], onDelete: SetNull)
@@ -646,15 +647,15 @@ model ConfigOption {
 
 // ── admin_audit_logs — บันทึกการกระทำของ ADMIN ทุกรายการ ──
 model AdminAuditLog {
-  id           String   @id @default(uuid())
-  adminId      String   @map("admin_id") // profileId ของ Admin
-  action       String   // CREATE_JOB | UPDATE_JOB_STATUS | DELETE_JOB | ...
-  targetType   String   @map("target_type") // job | user | blog | ...
-  targetId     String   @map("target_id") // id ของ record ที่ถูกกระทำ
-  targetLabel  String?  @map("target_label") // ชื่อ/label เพื่อให้อ่านง่าย
-  note         String?  // หมายเหตุเพิ่มเติม
-  metadata     String?  // JSON payload ก่อน/หลัง (optional)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  adminId     String   @map("admin_id") // profileId ของ Admin
+  action      String // CREATE_JOB | UPDATE_JOB_STATUS | DELETE_JOB | ...
+  targetType  String   @map("target_type") // job | user | blog | ...
+  targetId    String   @map("target_id") // id ของ record ที่ถูกกระทำ
+  targetLabel String?  @map("target_label") // ชื่อ/label เพื่อให้อ่านง่าย
+  note        String? // หมายเหตุเพิ่มเติม
+  metadata    String? // JSON payload ก่อน/หลัง (optional)
+  createdAt   DateTime @default(now()) @map("created_at")
 
   admin Profile @relation("AdminAuditLogAdmin", fields: [adminId], references: [id], onDelete: Cascade)
 
@@ -667,7 +668,7 @@ model AdminAuditLog {
 // ── SiteSetting — Key-Value store สำหรับตั้งค่าระบบ (Admin เท่านั้น) ──
 model SiteSetting {
   key       String   @id // เช่น "maintenance_mode", "maintenance_message"
-  value     String   // เก็บเป็น string (boolean → "true"/"false", JSON string ก็ได้)
+  value     String // เก็บเป็น string (boolean → "true"/"false", JSON string ก็ได้)
   updatedAt DateTime @updatedAt @map("updated_at")
   updatedBy String?  @map("updated_by") // userId ของ Admin ที่แก้ไขล่าสุด
 
@@ -676,20 +677,20 @@ model SiteSetting {
 
 // ── ตารางเก็บ Package Plan ทั้งหมด — Admin จัดการได้ครบจาก Dashboard ──
 model PackagePlan {
-  id                     String   @id @default(uuid())
-  plan                   String   @unique // plan key เช่น "basic", "premium", "enterprise" หรือ custom
-  label                  String   @default("") // ชื่อแสดงผล เช่น "Basic", "Premium"
-  color                  String   @default("#8c8c8c") // สี Hex สำหรับ Tag/UI
-  price                  Int      @default(0) // ราคา บาท/เดือน (0 = ฟรี)
-  jobQuota               Int      @default(3) @map("job_quota") // จำนวนประกาศสูงสุด (999 = ไม่จำกัด)
-  features               String   @default("[]") @map("features") // JSON array ของ string feature list
-  quotaWarningThreshold  Int      @default(80) @map("quota_warning_threshold") // % เตือนก่อนเต็ม quota
-  badgeIcon              String   @default("default") @map("badge_icon") // "default" | "crown" | "thunder"
-  upgradeTarget          String?  @map("upgrade_target") // plan key ที่แนะนำให้ upgrade (null = สูงสุด)
-  sortOrder              Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
-  isActive               Boolean  @default(true) @map("is_active") // เปิด/ปิด plan
-  createdAt              DateTime @default(now()) @map("created_at")
-  updatedAt              DateTime @updatedAt @map("updated_at")
+  id                    String   @id @default(uuid())
+  plan                  String   @unique // plan key เช่น "basic", "premium", "enterprise" หรือ custom
+  label                 String   @default("") // ชื่อแสดงผล เช่น "Basic", "Premium"
+  color                 String   @default("#8c8c8c") // สี Hex สำหรับ Tag/UI
+  price                 Int      @default(0) // ราคา บาท/เดือน (0 = ฟรี)
+  jobQuota              Int      @default(3) @map("job_quota") // จำนวนประกาศสูงสุด (999 = ไม่จำกัด)
+  features              String   @default("[]") @map("features") // JSON array ของ string feature list
+  quotaWarningThreshold Int      @default(80) @map("quota_warning_threshold") // % เตือนก่อนเต็ม quota
+  badgeIcon             String   @default("default") @map("badge_icon") // "default" | "crown" | "thunder"
+  upgradeTarget         String?  @map("upgrade_target") // plan key ที่แนะนำให้ upgrade (null = สูงสุด)
+  sortOrder             Int      @default(0) @map("sort_order") // ลำดับการแสดงผล
+  isActive              Boolean  @default(true) @map("is_active") // เปิด/ปิด plan
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
   @@index([isActive, sortOrder])
   @@map("package_plans")

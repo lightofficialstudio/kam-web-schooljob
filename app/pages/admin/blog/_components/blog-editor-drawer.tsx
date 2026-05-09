@@ -8,8 +8,8 @@ import {
   PictureOutlined,
   TagsOutlined,
   UploadOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import type { UploadFile } from "antd";
 import {
   Button,
   Col,
@@ -19,9 +19,11 @@ import {
   Form,
   Image,
   Input,
+  Modal,
   Row,
   Segmented,
   Select,
+  Slider,
   Space,
   Tag,
   Tooltip,
@@ -31,6 +33,8 @@ import {
 } from "antd";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import type { Area } from "react-easy-crop";
+import Cropper from "react-easy-crop";
 import { useAdminBlogStore } from "../_state/blog-store";
 import { AiAssistantPanel } from "./ai-assistant-panel";
 import { SeoCheckerPanel } from "./seo-checker-panel";
@@ -56,6 +60,147 @@ const toSlug = (text: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 300);
+
+// ✨ ตัด canvas จาก crop area pixels → Blob (ใช้สำหรับ upload)
+const getCroppedBlob = (imageSrc: string, cropArea: Area): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    const image = new window.Image();
+    image.setAttribute("crossOrigin", "anonymous");
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = cropArea.width;
+      canvas.height = cropArea.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("canvas ctx null"));
+        return;
+      }
+      ctx.drawImage(
+        image,
+        cropArea.x,
+        cropArea.y,
+        cropArea.width,
+        cropArea.height,
+        0,
+        0,
+        cropArea.width,
+        cropArea.height,
+      );
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))),
+        "image/jpeg",
+        0.92,
+      );
+    };
+    image.onerror = reject;
+    image.src = imageSrc;
+  });
+
+// ─── CoverCropModal — Modal ตัดรูป Cover Image ───────────────────────────────
+interface CoverCropModalProps {
+  open: boolean;
+  imageSrc: string;
+  onCancel: () => void;
+  onConfirm: (blob: Blob) => void;
+}
+
+const CoverCropModal: React.FC<CoverCropModalProps> = ({
+  open,
+  imageSrc,
+  onCancel,
+  onConfirm,
+}) => {
+  const { token } = theme.useToken();
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState<Area | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
+  // ✨ reset เมื่อเปิด modal ใหม่
+  useEffect(() => {
+    if (open) {
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedArea(null);
+    }
+  }, [open]);
+
+  const handleConfirm = async () => {
+    if (!croppedArea) return;
+    setConfirming(true);
+    try {
+      const blob = await getCroppedBlob(imageSrc, croppedArea);
+      onConfirm(blob);
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      title="✂️ ตัดรูปหน้าปก"
+      onCancel={onCancel}
+      width={700}
+      footer={
+        <Flex justify="flex-end" gap={8}>
+          <Button onClick={onCancel}>ยกเลิก</Button>
+          <Button
+            type="primary"
+            loading={confirming}
+            onClick={handleConfirm}
+            disabled={!croppedArea}
+          >
+            ยืนยันการตัด
+          </Button>
+        </Flex>
+      }
+      destroyOnClose
+    >
+      {/* ✨ Crop area — aspect ratio 16:9 (เหมาะ blog cover) */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: 360,
+          background: token.colorBgLayout,
+          borderRadius: 10,
+          overflow: "hidden",
+        }}
+      >
+        <Cropper
+          image={imageSrc}
+          crop={crop}
+          zoom={zoom}
+          aspect={16 / 9}
+          onCropChange={setCrop}
+          onZoomChange={setZoom}
+          onCropComplete={(_, areaPixels) => setCroppedArea(areaPixels)}
+        />
+      </div>
+      {/* ✨ Zoom slider */}
+      <Flex align="center" gap={12} style={{ marginTop: 16 }}>
+        <span
+          style={{
+            fontSize: 12,
+            color: token.colorTextTertiary,
+            whiteSpace: "nowrap",
+          }}
+        >
+          ซูม
+        </span>
+        <Slider
+          min={1}
+          max={3}
+          step={0.05}
+          value={zoom}
+          onChange={(v) => setZoom(v)}
+          style={{ flex: 1 }}
+        />
+      </Flex>
+    </Modal>
+  );
+};
 
 // ✨ type สำหรับ showModal callback ที่ส่งมาจาก store
 type ShowModalFn = (opts: {
@@ -294,6 +439,10 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
   const [uploading, setUploading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
 
+  // ✨ state สำหรับ crop modal
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string>("");
+
   // ✨ โหลดข้อมูลบทความเดิมเมื่อเปิด Drawer แก้ไข
   useEffect(() => {
     if (isDrawerOpen) {
@@ -308,6 +457,8 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
           category: editingBlog.category ?? undefined,
           tags: editingBlog.tags ?? [],
           status: editingBlog.status,
+          author_name:
+            (editingBlog as AdminBlogItemWithAuthorName).authorName ?? "",
         });
         // ✨ ตรวจว่า cover เดิมเป็น uploaded URL หรือ external link
         if (existingCover) {
@@ -344,45 +495,17 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
     });
   };
 
-  // ✨ Upload ไปยัง Supabase Storage bucket "blog-covers"
-  const handleUpload = async (file: UploadFile) => {
-    if (!authorId) {
-      showModal({
-        type: "confirm",
-        title: "กรุณาเข้าสู่ระบบก่อน",
-        description: "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่",
-        confirmLabel: "ตกลง",
-      });
-      return false;
-    }
-    const rawFile = file.originFileObj ?? (file as unknown as File);
-    if (!rawFile) return false;
-
-    // ✨ ตรวจ MIME + ขนาด (client-side pre-check)
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!allowed.includes(rawFile.type)) {
-      showModal({
-        type: "error",
-        title: "ประเภทไฟล์ไม่รองรับ",
-        description: "รองรับเฉพาะ JPEG, PNG, WebP และ GIF เท่านั้น",
-        errorDetails: `MIME: ${rawFile.type}`,
-      });
-      return false;
-    }
-    if (rawFile.size > 5 * 1024 * 1024) {
-      showModal({
-        type: "error",
-        title: "ไฟล์ใหญ่เกินไป",
-        description: "ขนาดไฟล์ต้องไม่เกิน 5 MB",
-        errorDetails: `ขนาดไฟล์: ${(rawFile.size / 1024 / 1024).toFixed(2)} MB`,
-      });
-      return false;
-    }
-
+  // ✨ Upload ไปยัง Supabase Storage bucket "blog-covers" (รับ File หรือ Blob จาก crop)
+  const handleUpload = async (fileOrBlob: File | Blob) => {
+    if (!authorId) return;
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("file", rawFile);
+      const fileName =
+        fileOrBlob instanceof File
+          ? fileOrBlob.name
+          : `cover_${Date.now()}.jpg`;
+      formData.append("file", fileOrBlob, fileName);
       formData.append("bucket", "blog-covers");
       formData.append("user_id", authorId);
       const res = await axios.post("/api/v1/storage/upload", formData, {
@@ -403,7 +526,51 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
     } finally {
       setUploading(false);
     }
-    return false; // ✨ return false เพื่อป้องกัน antd Upload default behavior
+  };
+
+  // ✨ เมื่อผู้ใช้เลือกไฟล์ → ตรวจสอบ MIME + size → เปิด crop modal
+  const handleFileSelect = (rawFile: File) => {
+    if (!authorId) {
+      showModal({
+        type: "confirm",
+        title: "กรุณาเข้าสู่ระบบก่อน",
+        description: "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่",
+        confirmLabel: "ตกลง",
+      });
+      return;
+    }
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowed.includes(rawFile.type)) {
+      showModal({
+        type: "error",
+        title: "ประเภทไฟล์ไม่รองรับ",
+        description: "รองรับเฉพาะ JPEG, PNG, WebP และ GIF เท่านั้น",
+        errorDetails: `MIME: ${rawFile.type}`,
+      });
+      return;
+    }
+    if (rawFile.size > 20 * 1024 * 1024) {
+      showModal({
+        type: "error",
+        title: "ไฟล์ใหญ่เกินไป",
+        description: "ขนาดไฟล์ต้องไม่เกิน 20 MB",
+        errorDetails: `ขนาดไฟล์: ${(rawFile.size / 1024 / 1024).toFixed(2)} MB`,
+      });
+      return;
+    }
+    // ✨ อ่าน file เป็น data URL แล้วเปิด crop modal
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result as string);
+      setCropOpen(true);
+    };
+    reader.readAsDataURL(rawFile);
+  };
+
+  // ✨ เมื่อยืนยันการ crop → upload blob ที่ตัดแล้ว
+  const handleCropConfirm = async (blob: Blob) => {
+    setCropOpen(false);
+    await handleUpload(blob);
   };
 
   const handleRemoveCover = () => {
@@ -599,6 +766,27 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
             </Form.Item>
 
             <Form.Item
+              name="author_name"
+              label={
+                <Flex align="center" gap={6}>
+                  <UserOutlined />
+                  <span>ชื่อนักเขียน</span>
+                </Flex>
+              }
+              extra="ถ้าเว้นว่าง จะใช้ชื่อจากโปรไฟล์ผู้สร้างแทน"
+            >
+              <Input
+                prefix={
+                  <UserOutlined style={{ color: token.colorTextTertiary }} />
+                }
+                placeholder="เช่น ผู้ช่วยศาสตราจารย์ อ.องค์อินทร์"
+                allowClear
+                maxLength={100}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
+
+            <Form.Item
               label={
                 <Flex align="center" gap={6}>
                   <PictureOutlined />
@@ -660,7 +848,7 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
                       accept="image/jpeg,image/png,image/webp,image/gif"
                       showUploadList={false}
                       beforeUpload={(file) => {
-                        handleUpload(file as unknown as UploadFile);
+                        handleFileSelect(file); // ✨ เปิด crop modal แทน upload ตรง
                         return false;
                       }}
                       disabled={uploading}
@@ -809,6 +997,14 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
           />
         </Col>
       </Row>
+
+      {/* ✨ Crop Modal — เปิดเมื่อผู้ใช้เลือกไฟล์ cover */}
+      <CoverCropModal
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        onCancel={() => setCropOpen(false)}
+        onConfirm={handleCropConfirm}
+      />
     </Drawer>
   );
 };
@@ -823,4 +1019,10 @@ interface FormValues {
   category?: string;
   tags?: string[];
   status: "DRAFT" | "PUBLISHED";
+  author_name?: string;
+}
+
+// ✨ extend AdminBlogItem เพื่อรองรับ authorName override จาก full blog fetch
+interface AdminBlogItemWithAuthorName {
+  authorName?: string | null;
 }

@@ -123,6 +123,7 @@ export class AdminBlogService {
         tags: input.tags ? JSON.stringify(input.tags) : null,
         status: input.status,
         authorId: resolvedAuthorId,
+        authorName: input.author_name ?? null, // ✨ override ชื่อนักเขียน
         publishedAt: input.status === "PUBLISHED" ? new Date() : null,
       },
     });
@@ -177,6 +178,9 @@ export class AdminBlogService {
         ...(data.tags !== undefined && { tags: JSON.stringify(data.tags) }),
         ...(data.status && { status: data.status }),
         ...(resolvedAuthorId !== undefined && { authorId: resolvedAuthorId }),
+        ...(data.author_name !== undefined && {
+          authorName: data.author_name || null,
+        }), // ✨ override ชื่อนักเขียน
         ...(isPublishing &&
           !current?.publishedAt && { publishedAt: new Date() }),
       },

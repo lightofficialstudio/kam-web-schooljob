@@ -29,7 +29,12 @@ export async function GET(
 
     if (!blog) {
       return Response.json(
-        { status_code: 404, message_th: "ไม่พบบทความ", message_en: "Blog not found", data: null },
+        {
+          status_code: 404,
+          message_th: "ไม่พบบทความ",
+          message_en: "Blog not found",
+          data: null,
+        },
         { status: 404 },
       );
     }
@@ -38,14 +43,16 @@ export async function GET(
     const sessionId = request.headers.get("x-session-id") ?? undefined;
     const referrer = request.headers.get("referer") ?? undefined;
 
-    prisma.blogView.create({
-      data: {
-        blogId: blog.id,
-        viewerId: null, // ไม่รู้ viewer ณ ตอนนี้ (public route ไม่มี auth)
-        sessionId,
-        referrer: referrer?.slice(0, 255),
-      },
-    }).catch(() => {}); // ✨ ไม่ให้ tracking พัง response หลัก
+    prisma.blogView
+      .create({
+        data: {
+          blogId: blog.id,
+          viewerId: null, // ไม่รู้ viewer ณ ตอนนี้ (public route ไม่มี auth)
+          sessionId,
+          referrer: referrer?.slice(0, 255),
+        },
+      })
+      .catch(() => {}); // ✨ ไม่ให้ tracking พัง response หลัก
 
     // ✨ ดึงบทความที่เกี่ยวข้อง (category เดียวกัน ยกเว้นตัวเอง)
     const related = await prisma.blog.findMany({
@@ -54,7 +61,13 @@ export async function GET(
         category: blog.category ?? undefined,
         NOT: { id: blog.id },
       },
-      select: { id: true, title: true, slug: true, category: true, coverImageUrl: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        category: true,
+        coverImageUrl: true,
+      },
       take: 3,
       orderBy: { publishedAt: "desc" },
     });
@@ -73,9 +86,12 @@ export async function GET(
         coverImageUrl: blog.coverImageUrl,
         publishedAt: blog.publishedAt?.toISOString() ?? null,
         tags: blog.tags ? JSON.parse(blog.tags) : [],
-        author: blog.author
-          ? `${blog.author.firstName ?? ""} ${blog.author.lastName ?? ""}`.trim() || "ทีมงาน KAM"
-          : "ทีมงาน KAM",
+        author: blog.authorName
+          ? blog.authorName
+          : blog.author
+            ? `${blog.author.firstName ?? ""} ${blog.author.lastName ?? ""}`.trim() ||
+              "ทีมงาน KAM"
+            : "ทีมงาน KAM",
         authorRole: blog.author?.specialActivities ?? "นักเขียน",
         authorImageUrl: blog.author?.profileImageUrl ?? null,
         related,
@@ -84,7 +100,12 @@ export async function GET(
   } catch (error) {
     console.error("❌ [GET /api/v1/blogs/:id]", error);
     return Response.json(
-      { status_code: 500, message_th: "เกิดข้อผิดพลาดภายในระบบ", message_en: "Internal server error", data: null },
+      {
+        status_code: 500,
+        message_th: "เกิดข้อผิดพลาดภายในระบบ",
+        message_en: "Internal server error",
+        data: null,
+      },
       { status: 500 },
     );
   }

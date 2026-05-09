@@ -19,6 +19,7 @@ export const createBlogSchema = z.object({
   tags: z.array(z.string()).optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).default("DRAFT"),
   author_id: z.string().optional(), // ✨ profile.id ของ admin ที่สร้าง
+  author_name: z.string().max(100).optional(), // ✨ override ชื่อนักเขียน (ถ้าไม่ใส่ ใช้ profile name แทน)
 });
 
 // ✨ Schema สำหรับแก้ไขบทความ (ทุก field optional)

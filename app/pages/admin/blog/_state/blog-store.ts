@@ -90,6 +90,7 @@ interface BlogStore {
     tags?: string[];
     status: "DRAFT" | "PUBLISHED";
     author_id?: string;
+    author_name?: string; // ✨ override ชื่อนักเขียน
   }) => Promise<void>;
   deleteBlog: (id: string) => Promise<void>;
   quickPublish: (
