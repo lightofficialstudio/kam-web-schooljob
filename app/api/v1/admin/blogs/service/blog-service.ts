@@ -122,7 +122,10 @@ export class AdminBlogService {
         category: input.category ?? null,
         tags: input.tags ? JSON.stringify(input.tags) : null,
         status: input.status,
-        authorId: resolvedAuthorId,
+        // ✨ ใช้ relation connect แทน scalar authorId (Prisma 7 pattern)
+        ...(resolvedAuthorId
+          ? { author: { connect: { id: resolvedAuthorId } } }
+          : { author: { disconnect: true } }),
         authorName: input.author_name ?? null, // ✨ override ชื่อนักเขียน
         publishedAt: input.status === "PUBLISHED" ? new Date() : null,
       },
@@ -177,7 +180,11 @@ export class AdminBlogService {
         ...(data.category !== undefined && { category: data.category }),
         ...(data.tags !== undefined && { tags: JSON.stringify(data.tags) }),
         ...(data.status && { status: data.status }),
-        ...(resolvedAuthorId !== undefined && { authorId: resolvedAuthorId }),
+        // ✨ ใช้ relation connect/disconnect แทน scalar authorId (Prisma 7 pattern)
+        ...(resolvedAuthorId !== undefined &&
+          (resolvedAuthorId
+            ? { author: { connect: { id: resolvedAuthorId } } }
+            : { author: { disconnect: true } })),
         ...(data.author_name !== undefined && {
           authorName: data.author_name || null,
         }), // ✨ override ชื่อนักเขียน
