@@ -333,6 +333,9 @@ export default function SchoolManagementPage() {
   // ✨ ดึง delegated context — เป็น source of truth ว่ากำลังจัดการโรงเรียนไหน
   const delegatedActive = useDelegatedContextStore((s) => s.active);
   const delegatedOrgId = delegatedActive?.schoolProfileId ?? null;
+  // ✨ ชื่อโรงเรียนที่กำลังจัดการอยู่ (delegated หรือของตัวเอง)
+  const schoolName =
+    delegatedActive?.schoolName ?? user?.school_name ?? "โรงเรียน";
   const router = useRouter();
   const [api, contextHolder] = notification.useNotification();
 
@@ -827,6 +830,17 @@ export default function SchoolManagementPage() {
                   </Text>
                 ),
               },
+              ...(schoolName
+                ? [
+                    {
+                      title: (
+                        <Text style={{ color: "#fff", fontWeight: 600 }}>
+                          {schoolName}
+                        </Text>
+                      ),
+                    },
+                  ]
+                : []),
             ]}
           />
 
@@ -850,8 +864,14 @@ export default function SchoolManagementPage() {
                 <Title level={3} style={{ color: "#fff", margin: 0 }}>
                   จัดการโรงเรียน
                 </Title>
-                <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 14 }}>
-                  จัดการทีมงานและสิทธิ์การเข้าถึงระบบของโรงเรียน
+                <Text
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 15,
+                    fontWeight: 600,
+                  }}
+                >
+                  {schoolName}
                 </Text>
               </Flex>
             </Flex>
