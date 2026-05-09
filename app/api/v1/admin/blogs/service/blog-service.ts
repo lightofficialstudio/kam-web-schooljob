@@ -122,10 +122,10 @@ export class AdminBlogService {
         category: input.category ?? null,
         tags: input.tags ? JSON.stringify(input.tags) : null,
         status: input.status,
-        // ✨ ใช้ relation connect แทน scalar authorId (Prisma 7 pattern)
-        ...(resolvedAuthorId
-          ? { author: { connect: { id: resolvedAuthorId } } }
-          : { author: { disconnect: true } }),
+        // ✨ ใช้ relation connect เฉพาะเมื่อมี authorId — ใน create ห้ามใช้ disconnect
+        ...(resolvedAuthorId && {
+          author: { connect: { id: resolvedAuthorId } },
+        }),
         authorName: input.author_name ?? null, // ✨ override ชื่อนักเขียน
         publishedAt: input.status === "PUBLISHED" ? new Date() : null,
       },
