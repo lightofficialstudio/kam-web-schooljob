@@ -10,7 +10,7 @@ import {
 } from "../_api/config-api";
 
 // ✨ Metadata ของแต่ละ Group — label ภาษาไทย + หน้าที่มีผลกระทบ
-export const GROUP_META: Record<string, { label: string; usedIn: string[] }> = {
+export const GROUP_META: Record<string, { label: string; usedIn: string[]; description?: string }> = {
   school_type: {
     label: "ประเภทโรงเรียน",
     usedIn: ["/pages/employer/profile", "/pages/job (filter)"],
@@ -22,6 +22,12 @@ export const GROUP_META: Record<string, { label: string; usedIn: string[] }> = {
   job_category: {
     label: "หมวดหมู่งาน (ตำแหน่งงาน)",
     usedIn: ["/pages/landing", "/pages/job (filter)"],
+  },
+  job_position: {
+    label: "ตำแหน่งงาน",
+    usedIn: ["/pages/employer/job/post"],
+    description:
+      "รายการตำแหน่งงานในโรงเรียน · ตำแหน่งที่ต้องการระบุวิชาที่สอน ให้ตั้ง Parent = requires_subject · ตำแหน่งทั่วไป (เช่น ภารโรง) ไม่ต้องตั้ง Parent",
   },
 };
 

@@ -25,6 +25,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
+  Alert,
   Button,
   Card,
   Flex,
@@ -503,8 +504,18 @@ export function ConfigTable() {
         activeKey={activeGroup}
         onChange={setActiveGroup}
         items={tabItems}
-        style={{ marginBottom: 16 }}
+        style={{ marginBottom: GROUP_META[activeGroup]?.description ? 8 : 16 }}
       />
+
+      {/* ✨ คำอธิบาย logic ของ group — แสดงเฉพาะ group ที่มี description */}
+      {GROUP_META[activeGroup]?.description && (
+        <Alert
+          type="info"
+          showIcon
+          message={GROUP_META[activeGroup].description}
+          style={{ marginBottom: 16, borderRadius: 8, fontSize: 13 }}
+        />
+      )}
 
       {isHierarchical ? (
         // ✨ Tree Table — drag เฉพาะ parent row เพื่อเรียงหมวดหมู่

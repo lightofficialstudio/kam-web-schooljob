@@ -1,34 +1,59 @@
 "use client";
 
 import { ThunderboltOutlined } from "@ant-design/icons";
-import { Card, Col, Form, Input, InputNumber, Row, Select, Space, theme } from "antd";
+import { Card, Col, Form, InputNumber, Row, Select, Space, theme } from "antd";
 import { useEffect, useState } from "react";
 import { type ConfigOption, requestFetchConfigOptions } from "../_api/job-post-api";
 
-// ส่วนกรอกข้อมูลพื้นฐานของตำแหน่งงาน: ชื่อ, รูปแบบ, จำนวน, วิชา, ระดับชั้น
+// ✨ positions ที่มี parentValue = "requires_subject" → แสดง subject fields
+const REQUIRES_SUBJECT_MARKER = "requires_subject";
+
+// ส่วนกรอกข้อมูลพื้นฐานของตำแหน่งงาน: ตำแหน่ง, รูปแบบ, จำนวน, วิชา, ระดับชั้น
 export const BasicInfoSection = () => {
   const { token } = theme.useToken();
   const form = Form.useFormInstance();
 
-  // ✨ ดึง job_category จาก config — root = กลุ่มวิชา, children = วิชาย่อย
+  // ✨ ดึง job_position — root = ตำแหน่งทั่วไป, parentValue="requires_subject" = ตำแหน่งครู
+  const [positionOptions, setPositionOptions] = useState<ConfigOption[]>([]);
+  // ✨ ดึง job_category — root = กลุ่มวิชา, children = วิชาย่อย
   const [categoryOptions, setCategoryOptions] = useState<ConfigOption[]>([]);
+
+  const [selectedPosition, setSelectedPosition] = useState<ConfigOption | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string>("");
 
   useEffect(() => {
+    requestFetchConfigOptions("job_position").then(setPositionOptions);
     requestFetchConfigOptions("job_category").then(setCategoryOptions);
   }, []);
 
-  // ✨ root items (parentValue = null) คือ กลุ่มวิชา
+  // ✨ ตำแหน่งที่แสดงใน dropdown (เฉพาะ active, ไม่รวม marker node)
+  const selectablePositions = positionOptions.filter(
+    (o) => o.value !== REQUIRES_SUBJECT_MARKER,
+  );
+
+  // ✨ position นี้ต้องการระบุวิชาหรือไม่
+  const requiresSubject = selectedPosition?.parentValue === REQUIRES_SUBJECT_MARKER;
+
+  // ✨ root items ของ job_category คือ กลุ่มวิชา
   const groupOptions = categoryOptions.filter((o) => o.parentValue === null);
 
-  // ✨ children ของ group ที่เลือก
+  // ✨ วิชาย่อยของ group ที่เลือก
   const subjectOptions = selectedGroup
     ? categoryOptions.filter((o) => o.parentValue === selectedGroup)
     : categoryOptions.filter(() => false);
 
+  const handlePositionChange = (value: string) => {
+    const found = positionOptions.find((o) => o.value === value) ?? null;
+    setSelectedPosition(found);
+    // ✨ เก็บ label ของ position ไว้ใน hidden field สำหรับส่งเป็น title ไป API
+    form.setFieldValue("titleLabel", found?.label ?? value);
+    form.setFieldValue("subjectGroup", undefined);
+    form.setFieldValue("subjects", undefined);
+    setSelectedGroup("");
+  };
+
   const handleGroupChange = (value: string, _option: unknown) => {
     setSelectedGroup(value);
-    // ✨ reset วิชาที่สอนเมื่อเปลี่ยนกลุ่ม
     form.setFieldValue("subjects", undefined);
   };
 
@@ -44,16 +69,23 @@ export const BasicInfoSection = () => {
       style={{ borderRadius: 16, border: `1px solid ${token.colorBorderSecondary}` }}
     >
       <Row gutter={[16, 16]}>
+        {/* ✨ ตำแหน่งงาน — ดึงจาก job_position config */}
         <Col xs={24} md={16}>
           <Form.Item
             label="ตำแหน่งงาน"
             name="title"
-            rules={[{ required: true, message: "กรุณาระบุตำแหน่งงาน" }]}
-            tooltip="เช่น ครูภาษาอังกฤษ, ครูสอนศิลปะ"
+            rules={[{ required: true, message: "กรุณาเลือกตำแหน่งงาน" }]}
           >
-            <Input size="large" placeholder="ระบุตำแหน่งงาน" />
+            <Select
+              size="large"
+              placeholder="เลือกตำแหน่งงาน"
+              loading={positionOptions.length === 0}
+              onChange={handlePositionChange}
+              options={selectablePositions.map((o) => ({ label: o.label, value: o.value }))}
+            />
           </Form.Item>
         </Col>
+
         <Col xs={24} md={8}>
           <Form.Item
             label="รูปแบบงาน"
@@ -69,6 +101,7 @@ export const BasicInfoSection = () => {
             </Select>
           </Form.Item>
         </Col>
+
         <Col xs={24} md={8}>
           <Form.Item
             label="จำนวนที่รับ (คน)"
@@ -79,32 +112,36 @@ export const BasicInfoSection = () => {
           </Form.Item>
         </Col>
 
-        {/* ✨ กลุ่มวิชา → วิชาที่สอน (Cascading จาก job_category config) */}
-        <Col xs={24} md={8}>
-          <Form.Item label="กลุ่มวิชา" name="subjectGroup">
-            <Select
-              size="large"
-              placeholder="เลือกกลุ่มวิชา"
-              loading={categoryOptions.length === 0}
-              onChange={handleGroupChange}
-              options={groupOptions.map((o) => ({ label: o.label, value: o.value }))}
-            />
-          </Form.Item>
-        </Col>
-        <Col xs={24} md={8}>
-          <Form.Item
-            label="วิชาที่สอน"
-            name="subjects"
-            rules={[{ required: true, message: "กรุณาเลือกวิชาที่สอน" }]}
-          >
-            <Select
-              size="large"
-              placeholder={selectedGroup ? "เลือกวิชาที่สอน" : "เลือกกลุ่มวิชาก่อน"}
-              disabled={!selectedGroup}
-              options={subjectOptions.map((o) => ({ label: o.label, value: o.value }))}
-            />
-          </Form.Item>
-        </Col>
+        {/* ✨ แสดง subject fields เฉพาะตำแหน่งที่มี parentValue = "requires_subject" */}
+        {requiresSubject && (
+          <>
+            <Col xs={24} md={8}>
+              <Form.Item label="กลุ่มวิชา" name="subjectGroup">
+                <Select
+                  size="large"
+                  placeholder="เลือกกลุ่มวิชา"
+                  loading={categoryOptions.length === 0}
+                  onChange={handleGroupChange}
+                  options={groupOptions.map((o) => ({ label: o.label, value: o.value }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                label="วิชาที่สอน"
+                name="subjects"
+                rules={[{ required: true, message: "กรุณาเลือกวิชาที่สอน" }]}
+              >
+                <Select
+                  size="large"
+                  placeholder={selectedGroup ? "เลือกวิชาที่สอน" : "เลือกกลุ่มวิชาก่อน"}
+                  disabled={!selectedGroup}
+                  options={subjectOptions.map((o) => ({ label: o.label, value: o.value }))}
+                />
+              </Form.Item>
+            </Col>
+          </>
+        )}
 
         <Col span={24}>
           <Form.Item label="ระดับชั้นที่สอน" name="grades">

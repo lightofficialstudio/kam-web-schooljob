@@ -215,7 +215,7 @@ export default function PostJobPage() {
 
   // ✨ แปลง form values → API payload (snake_case)
   const toApiPayload = (values: Record<string, unknown>) => ({
-    title: values.title,
+    title: (values.titleLabel as string) || (values.title as string),
     employment_type: values.employmentType ?? null,
     vacancy_count: values.vacancyCount ?? 1,
     subjects: typeof values.subjects === "string" ? [values.subjects] : [],

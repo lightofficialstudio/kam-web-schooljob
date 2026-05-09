@@ -954,7 +954,22 @@ async function main() {
     `✅ Created ConfigOptions: job_category — ${jobCategoryParents.length} parents, ${totalChildren} children`,
   );
 
-  // ─── 11. PackagePlan — ราคาตั้งต้น (Admin แก้ไขได้ผ่าน Dashboard) ───
+  // ─── 11. ConfigOptions — ตำแหน่งงาน (job_position) ───
+  // ✨ requires_subject = marker node (ไม่แสดงใน dropdown) — ตำแหน่งที่มี parentValue = "requires_subject" จะแสดง subject fields
+  await prisma.configOption.createMany({
+    data: [
+      // marker node — ไม่แสดงใน dropdown แต่ใช้เป็น parent flag
+      { group: "job_position", value: "requires_subject", label: "[ต้องการระบุวิชา]", parentValue: null, sortOrder: 0 },
+      // กลุ่ม "ครู" — parentValue = "requires_subject" → แสดง subject fields
+      { group: "job_position", value: "teacher", label: "ครู", parentValue: "requires_subject", sortOrder: 1 },
+      // กลุ่ม "อื่น ๆ" — parentValue = null → ไม่แสดง subject fields
+      { group: "job_position", value: "other_position", label: "อื่น ๆ", parentValue: null, sortOrder: 2 },
+    ],
+    skipDuplicates: true,
+  });
+  console.log("✅ Created ConfigOptions: job_position — 1 marker, 1 teacher, 1 other");
+
+  // ─── 12. PackagePlan — ราคาตั้งต้น (Admin แก้ไขได้ผ่าน Dashboard) ───
   await prisma.packagePlan.deleteMany();
   await prisma.packagePlan.createMany({
     data: [
