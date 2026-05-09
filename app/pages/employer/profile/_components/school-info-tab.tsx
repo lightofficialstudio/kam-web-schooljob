@@ -16,7 +16,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Card, Col, Flex, Row, Tag, theme, Typography } from "antd";
-import Image from "next/image";
 
 import type { SchoolProfile } from "../_state/school-profile.state";
 
@@ -170,29 +169,13 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
   return (
     <Flex vertical gap={20}>
       {/* ─── Cover Image (ถ้ามี) ─── */}
-      {profile.coverImageUrl && (
-        <div
-          style={{
-            width: "100%",
-            height: 220,
-            position: "relative",
-            borderRadius: 16,
-            overflow: "hidden",
-          }}
-        >
-          <Image
-            src={profile.coverImageUrl}
-            alt="ภาพปกโรงเรียน"
-            fill
-            style={{ objectFit: "cover" }}
-            sizes="(max-width: 768px) 100vw, 800px"
-          />
-        </div>
-      )}
 
       {/* ─── เกี่ยวกับเรา + วิสัยทัศน์ ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle icon={<SafetyCertificateOutlined />} text="เกี่ยวกับเรา" />
+        <SectionTitle
+          icon={<SafetyCertificateOutlined />}
+          text="เกี่ยวกับเรา"
+        />
         {profile.description ? (
           <Paragraph style={{ fontSize: 15, lineHeight: 1.9, marginBottom: 0 }}>
             {profile.description}
@@ -243,14 +226,21 @@ export const SchoolInfoTab: React.FC<SchoolInfoTabProps> = ({
 
       {/* ─── สวัสดิการ ─── */}
       <Card variant="borderless" style={{ borderRadius: 16 }}>
-        <SectionTitle icon={<MedicineBoxOutlined />} text="สวัสดิการและจุดเด่น" />
+        <SectionTitle
+          icon={<MedicineBoxOutlined />}
+          text="สวัสดิการและจุดเด่น"
+        />
         {hasBenefits ? (
           <Row gutter={[16, 8]}>
             {profile.benefits!.map((benefit) => (
               <Col key={benefit} xs={24} sm={12}>
                 <Flex align="center" gap={10} style={{ marginBottom: 4 }}>
                   <CheckCircleOutlined
-                    style={{ color: token.colorSuccess, fontSize: 18, flexShrink: 0 }}
+                    style={{
+                      color: token.colorSuccess,
+                      fontSize: 18,
+                      flexShrink: 0,
+                    }}
                   />
                   <Text style={{ fontSize: 15 }}>{benefit}</Text>
                 </Flex>

@@ -94,6 +94,31 @@ export const requestFetchSchoolProfile = async (
   };
 };
 
+// ✨ อัปโหลดภาพพื้นหลังโรงเรียน → Supabase Storage แล้ว update DB ทันที
+export const requestUploadAndSaveSchoolCover = async (
+  userId: string,
+  file: File,
+): Promise<string> => {
+  // step 1 — upload ไฟล์
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("bucket", "avatars");
+  formData.append("user_id", userId);
+  const uploadRes = await axios.post<ApiResponse<{ url: string }>>(
+    "/api/v1/storage/upload",
+    formData,
+  );
+  const url = uploadRes.data.data.url;
+
+  // step 2 — บันทึก url ลง DB ผ่าน endpoint เฉพาะ
+  await axios.patch(
+    `/api/v1/employer/profile/update-cover?user_id=${userId}`,
+    { cover_image_url: url },
+  );
+
+  return url;
+};
+
 // ✨ อัปเดตข้อมูลโปรไฟล์โรงเรียน
 export const requestUpdateSchoolProfile = async (
   userId: string,

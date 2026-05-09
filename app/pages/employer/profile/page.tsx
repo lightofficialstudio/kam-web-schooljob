@@ -21,6 +21,7 @@ import {
 export default function EmployerProfilePage() {
   const {
     profile,
+    setProfile,
     setIsDrawerOpen,
     saveProfile,
     isSaving,
@@ -62,6 +63,11 @@ export default function EmployerProfilePage() {
 
   const handleEditClick = () => setIsDrawerOpen(true);
 
+  // ✨ อัปเดต coverImageUrl ใน local state หลัง upload สำเร็จ
+  const handleCoverUpdated = (url: string) => {
+    setProfile({ ...profile, coverImageUrl: url });
+  };
+
   // ✨ บันทึกโปรไฟล์ผ่าน store → API แล้วแสดง success modal
   // merge กับ profile เดิมก่อนเสมอ — ป้องกัน logoUrl/coverImageUrl หาย
   const handleSave = async (values: SchoolProfile) => {
@@ -95,7 +101,7 @@ export default function EmployerProfilePage() {
       }}
     >
       {/* ─── Hero Header ─── */}
-      <SchoolProfileHeader profile={profile} onEditClick={handleEditClick} />
+      <SchoolProfileHeader profile={profile} onEditClick={handleEditClick} onCoverUpdated={handleCoverUpdated} />
 
       {/* ─── Main Content ─── */}
       <div
