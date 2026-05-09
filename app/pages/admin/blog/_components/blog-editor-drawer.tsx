@@ -202,6 +202,132 @@ const CoverCropModal: React.FC<CoverCropModalProps> = ({
   );
 };
 
+// ─── BlogPreviewModal — ดูตัวอย่างบทความก่อนบันทึก ─────────────────────────────
+interface BlogPreviewModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  content: string;
+  excerpt?: string;
+  coverUrl?: string;
+  authorName?: string;
+  tags?: string[];
+  category?: string;
+}
+
+// ✨ ลบ HTML document boilerplate ออกก่อน render (เหมือน public blog page)
+const cleanHtml = (html: string) =>
+  html
+    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    .replace(/<head[\s\S]*?<\/head>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<\/?html[^>]*>/gi, "")
+    .replace(/<\/?body[^>]*>/gi, "")
+    .trim();
+
+const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
+  open,
+  onClose,
+  title,
+  content,
+  excerpt,
+  coverUrl,
+  authorName,
+  tags,
+  category,
+}) => {
+  const { token } = theme.useToken();
+
+  return (
+    <Modal
+      open={open}
+      onCancel={onClose}
+      title="👁️ ดูตัวอย่างบทความ"
+      width="min(92vw, 900px)"
+      footer={
+        <Flex justify="flex-end">
+          <Button onClick={onClose}>ปิด</Button>
+        </Flex>
+      }
+      styles={{
+        body: { maxHeight: "80vh", overflowY: "auto", padding: "0 24px 24px" },
+      }}
+      destroyOnClose
+    >
+      {/* ✨ รูปหน้าปก */}
+      {coverUrl && (
+        <Image
+          src={coverUrl}
+          alt={title}
+          width="100%"
+          style={{
+            borderRadius: 12,
+            maxHeight: 320,
+            objectFit: "cover",
+            marginBottom: 20,
+            display: "block",
+          }}
+          preview={false}
+        />
+      )}
+
+      {/* ✨ Title */}
+      <Typography.Title
+        level={2}
+        style={{ margin: "16px 0 8px", fontSize: 26 }}
+      >
+        {title || "(ยังไม่มีชื่อ)"}
+      </Typography.Title>
+
+      {/* ✨ Meta: category + tags */}
+      <Flex gap={6} wrap="wrap" style={{ marginBottom: 10 }}>
+        {category && <Tag color="blue">{category}</Tag>}
+        {tags?.map((t) => (
+          <Tag key={t}>{t}</Tag>
+        ))}
+      </Flex>
+
+      {/* ✨ Author name */}
+      {authorName && (
+        <Flex align="center" gap={6} style={{ marginBottom: 14 }}>
+          <UserOutlined style={{ color: token.colorTextTertiary }} />
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            {authorName}
+          </Typography.Text>
+        </Flex>
+      )}
+
+      {/* ✨ Excerpt */}
+      {excerpt && (
+        <div
+          style={{
+            padding: "12px 16px",
+            background: token.colorFillSecondary,
+            borderLeft: `3px solid ${token.colorPrimary}`,
+            borderRadius: 6,
+            marginBottom: 20,
+            fontSize: 15,
+            fontStyle: "italic",
+            color: token.colorTextSecondary,
+          }}
+        >
+          {excerpt}
+        </div>
+      )}
+
+      <Divider style={{ margin: "0 0 16px" }} />
+
+      {/* ✨ เนื้อหาบทความ — render HTML + ใช้ blog-content class เหมือนหน้า public */}
+      <div
+        className="blog-content"
+        style={{ fontSize: 16, lineHeight: 1.9, color: token.colorText }}
+        dangerouslySetInnerHTML={{ __html: cleanHtml(content) }}
+      />
+    </Modal>
+  );
+};
+
 // ✨ type สำหรับ showModal callback ที่ส่งมาจาก store
 type ShowModalFn = (opts: {
   type: "success" | "error" | "confirm" | "delete";
@@ -392,6 +518,7 @@ const HtmlEditor: React.FC<HtmlEditorProps> = ({
             onMouseUp={trackCursor}
             rows={16}
             placeholder={`<h2>หัวข้อหลัก</h2>\n<p>เนื้อหาย่อหน้าแรก...</p>\n\n<h3>หัวข้อรอง</h3>\n<ul>\n  <li>ประเด็นที่ 1</li>\n  <li>ประเด็นที่ 2</li>\n</ul>`}
+            rows={22}
             style={{
               borderRadius: "0 0 10px 10px",
               fontFamily: "monospace",
@@ -442,6 +569,9 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
   // ✨ state สำหรับ crop modal
   const [cropOpen, setCropOpen] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string>("");
+
+  // ✨ state สำหรับ preview modal
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // ✨ โหลดข้อมูลบทความเดิมเมื่อเปิด Drawer แก้ไข
   useEffect(() => {
@@ -625,12 +755,19 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
       open={isDrawerOpen}
       forceRender
       styles={{
-        wrapper: { width: "min(88vw, 1400px)" },
+        wrapper: { width: "min(96vw, 1600px)" },
         body: { padding: 0, overflow: "hidden" },
       }}
       extra={
         <Space>
           <Button onClick={closeDrawer}>ยกเลิก</Button>
+          {/* ✨ ปุ่มดูตัวอย่างก่อนบันทึก */}
+          <Button
+            icon={<FileTextOutlined />}
+            onClick={() => setPreviewOpen(true)}
+          >
+            ดูตัวอย่าง
+          </Button>
           <Button
             type="primary"
             loading={isSubmitting}
@@ -648,7 +785,7 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
       <Row style={{ height: "100%", overflow: "hidden", flexWrap: "nowrap" }}>
         {/* ─── ฝั่งซ้าย: Form ─── */}
         <Col
-          flex="0 0 58%"
+          flex="0 0 65%"
           style={{
             padding: "20px 24px",
             borderRight: `1px solid ${token.colorBorderSecondary}`,
@@ -969,7 +1106,7 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
 
         {/* ─── ฝั่งขวา: AI Assistant ─── */}
         <Col
-          flex="0 0 42%"
+          flex="0 0 35%"
           style={{
             padding: "20px",
             background: token.colorBgLayout,
@@ -1005,6 +1142,27 @@ export const BlogEditorDrawer: React.FC<{ authorId?: string }> = ({
         onCancel={() => setCropOpen(false)}
         onConfirm={handleCropConfirm}
       />
+
+      {/* ✨ Preview Modal — ดูตัวอย่างบทความก่อนบันทึก */}
+      {previewOpen &&
+        (() => {
+          const vals = form.getFieldsValue();
+          const previewCover =
+            coverMode === "upload" ? uploadedUrl : (vals.cover_image_url ?? "");
+          return (
+            <BlogPreviewModal
+              open={previewOpen}
+              onClose={() => setPreviewOpen(false)}
+              title={vals.title ?? ""}
+              content={vals.content ?? ""}
+              excerpt={vals.excerpt}
+              coverUrl={previewCover || undefined}
+              authorName={vals.author_name}
+              tags={vals.tags}
+              category={vals.category}
+            />
+          );
+        })()}
     </Drawer>
   );
 };
